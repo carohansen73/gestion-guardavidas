@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\LicenciaTipo;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -14,6 +15,22 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // User::factory(10)->create();
+        $this->call([
+            PlayaSeeder::class,
+        ]);
+
+        $this->call([
+            BanderaSeeder::class,
+        ]);
+
+        $this->call([
+            FuerzaSeeder::class,
+        ]);
+
+        $this->call([
+            LicenciaTipoSeeder::class,
+        ]);
+
 
         User::factory()->create([
             'name' => 'Test User',

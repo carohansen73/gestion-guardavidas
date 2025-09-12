@@ -1,4 +1,4 @@
-##Descripción del proyecto##
+## Descripción del proyecto ##
 
 Este proyecto consiste en una plataforma web de gestión para guardavidas, cuyo objetivo principal es registrar, organizar y consultar los diferentes acontecimientos que ocurren durante el desarrollo de sus tareas en las playas bajo su supervisión.
 La aplicación permite centralizar la información vinculada a la actividad diaria de los guardavidas, facilitando la trazabilidad de los hechos, la transparencia en la comunicación y la toma de decisiones por parte de los responsables.
