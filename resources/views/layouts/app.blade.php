@@ -12,9 +12,9 @@
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
         <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/css/style.css'])
         {{-- estilo del template --}}
-        <link rel="stylesheet" href="{{ asset('build/assets/style.css') }}">
+        {{-- <link rel="stylesheet" href="{{ asset('resources/css/style.css') }}"> --}}
     </head>
     <body class="font-sans antialiased" x-data="{ darkMode: false }" :class="{ 'dark': darkMode }" class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100">
@@ -36,6 +36,8 @@
             </main>
         </div>
 
-         <script src="{{ asset('build/assets/script.js') }}"></script>
+        @include('layouts.bottom-navigation')
+
+         <script src="{{ asset('resources/js/script.js') }}"></script>
     </body>
 </html>
