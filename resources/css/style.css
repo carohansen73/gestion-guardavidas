@@ -14,5 +14,31 @@ section .dark body .bg-gray-600  { background-color: #4b5563 !important; }
 .dark .gray-900  { background-color: #111827 !important; }
 .dark .gray-950  { background-color: #030712 !important; }  */
 
+:root {
+    --primary-color: #64D8F9;
+    --secondary-color: #A2FBFF;
+    --secondary-color: #E2E2E2;
+    --secondary-color: #71787B;
+    --secondary-color: #00212F;
+
+    --primary-color: #0074D9;
+    --secondary-color: #FFB248;
+    --secondary-color: #333333;
+    --secondary-color: #999999;
+    --secondary-color: #F5F5F5;
+
+    /* sky-600 yellow 500 */
+
+  --body-color: #A2FBFF;
+  --text-color: #636363;
+  --text-color-dark: #242738;
+  --white-color: #ffffff;
+  --light-color: #f8f9fa;
+  --font-family: Lato;
+}
 
 
+
+nav .buttom-navigation{
+    z-index: 100;
+}

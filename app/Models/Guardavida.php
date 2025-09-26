@@ -37,4 +37,10 @@ class Guardavida extends Model
     {
         return $this->belongsTo(Puesto::class);
     }
+
+    //many to many
+     public function intervenciones()
+    {
+        return $this->belongsToMany(Intervencion::class, 'guardavidas_intervenciones', 'guardavida_id', 'intervencion_id');
+    }
 }

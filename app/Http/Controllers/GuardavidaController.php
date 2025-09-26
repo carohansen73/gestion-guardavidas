@@ -6,6 +6,9 @@ use App\Models\Guardavida;
 use App\Http\Requests\StoreGuardavidaRequest;
 use App\Http\Requests\UpdateGuardavidaRequest;
 
+use Illuminate\Http\Request;
+
+
 class GuardavidaController extends Controller
 {
     /**
@@ -62,5 +65,11 @@ class GuardavidaController extends Controller
     public function destroy(Guardavida $guardavida)
     {
         //
+    }
+
+    public function getAll(){
+        $guardavidas = Guardavida::select('id', 'nombre', 'apellido')->get();
+
+        return response()->json($guardavidas);
     }
 }

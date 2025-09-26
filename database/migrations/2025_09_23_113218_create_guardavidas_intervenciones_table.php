@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('bandera_tipos', function (Blueprint $table) {
+        Schema::create('guardavidas_intervenciones', function (Blueprint $table) {
             $table->id();
-            $table->string('codigo');
-            $table->string('color');
+            $table->foreignId('guardavida_id')->constrained()->onDelete('cascade');
+            $table->foreignId('intervencion_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('bandera_tipos');
+        Schema::dropIfExists('guardavidas_intervenciones');
     }
 };

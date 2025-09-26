@@ -25,7 +25,7 @@
 
 <nav>
 
-<div class="fixed bottom-0 left-0 right-0 bg-gray-300 lg:hidden">
+<div class="fixed bottom-0 left-0 right-0 bg-gray-300 lg:hidden buttom-navigation">
      <div class="flex justify-around items-center p-2">
     <!-- Íconos de la navbar -->
     <a aria-current="page" class="inline-flex flex-col items-center text-xs font-medium py-3 px-4 text-white flex-grow" href="#">

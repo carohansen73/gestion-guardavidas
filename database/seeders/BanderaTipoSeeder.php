@@ -2,18 +2,18 @@
 
 namespace Database\Seeders;
 
-use App\Models\Bandera;
+use App\Models\BanderaTipo;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class BanderaSeeder extends Seeder
+class BanderaTipoSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-         Bandera::insert([
+         BanderaTipo::insert([
             ['codigo' => 'Mar bueno', 'color' => 'celeste'],
             ['codigo' => 'Dudoso', 'color' => 'amarillo-negro'],
             ['codigo' => 'Peligroso', 'color' => 'rojo-negro'],

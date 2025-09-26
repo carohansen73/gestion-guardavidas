@@ -16,8 +16,8 @@
         {{-- estilo del template --}}
         {{-- <link rel="stylesheet" href="{{ asset('resources/css/style.css') }}"> --}}
     </head>
-    <body class="font-sans antialiased" x-data="{ darkMode: false }" :class="{ 'dark': darkMode }" class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100">
+    <body class="font-sans antialiased  md:pb-0 pb-14" x-data="{ darkMode: false }" :class="{ 'dark': darkMode }">
+        <div class="min-h-screen bg-gray-50 dark:bg-gray-800">
             @include('layouts.navigation')
 
             <!-- Page Heading -->
@@ -30,7 +30,7 @@
             @endisset
 
             <!-- Page Content -->
-            <main class="bg-gray-50 dark:bg-gray-900 mt-0">
+            <main class=" mt-0">
                  @yield('content')
                 {{-- {{ $slot }} --}}
             </main>
@@ -39,5 +39,7 @@
         @include('layouts.bottom-navigation')
 
          <script src="{{ asset('resources/js/script.js') }}"></script>
+
+         <script src="https://unpkg.com/flowbite@2.5.1/dist/flowbite.min.js"></script>
     </body>
 </html>

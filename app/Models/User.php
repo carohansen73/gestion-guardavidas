@@ -46,4 +46,12 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Relación con Guardavidas
+     *
+     */
+    public function guardavida() {
+        return $this->hasOne(Guardavida::class);
+    }
 }

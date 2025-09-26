@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call([
-            BanderaSeeder::class,
+            BanderaTipoSeeder::class,
         ]);
 
         $this->call([
@@ -43,6 +43,10 @@ class DatabaseSeeder extends Seeder
 
          $this->call([
             PuestoSeeder::class,
+        ]);
+
+         $this->call([
+            GuardavidaSeeder::class,
         ]);
     }
 }

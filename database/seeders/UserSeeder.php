@@ -46,16 +46,35 @@ class UserSeeder extends Seeder
 
         //creo usuario guardavidas
         $guardavidaUser = User::query()->create([
-            'name' => 'guardavida',
+            'name' => 'María Gómez',
             'email' => 'guardavida@gmail.com',
             'password' => Hash::make('123456789'),
             'email_verified_at' => now()
         ]);
 
+        //creo usuario guardavidas
+        $guardavidaUser2 = User::query()->create([
+            'name' => 'Carla Fernández',
+            'email' => 'guardavida2@gmail.com',
+            'password' => Hash::make('123456789'),
+            'email_verified_at' => now()
+        ]);
+
+        //creo usuario guardavidas
+        $guardavidaUser3 = User::query()->create([
+            'name' => 'Juan Pérez',
+            'email' => 'guardavida3@gmail.com',
+            'password' => Hash::make('123456789'),
+            'email_verified_at' => now()
+        ]);
+
+
         //creo rol guardavida
         $roleGuardavida = Role::create(['name' => 'guardavida']);
         //asigno rol guardavida a usuario guardavida
         $guardavidaUser->assignRole($roleGuardavida);
+        $guardavidaUser2->assignRole($roleGuardavida);
+        $guardavidaUser3->assignRole($roleGuardavida);
 
         $roleGuardavida->syncPermissions('ver puestos');
 
