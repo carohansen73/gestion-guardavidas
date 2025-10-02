@@ -229,9 +229,7 @@
 @endif
 
     <div class="space-y-12">
-        <div class="border-b border-gray-900/10 pb-12 dark:border-white/10 rounded-lg bg-white dark:bg-gray-600 px-4 py-2">
-
-
+        <div class="pb-12  px-4 py-2">
 
             <div class=" grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
 
@@ -359,9 +357,7 @@
           </div>
         </div>
 
-
-
-          <!-- Fuerzas -->
+        <!-- Fuerzas -->
         <div class="sm:col-span-2">
             <label for="fecha" class="block text-sm font-medium text-gray-900 dark:text-white">Intervinieron otras fuerzas</label>
             <div class="mt-2">
@@ -377,8 +373,6 @@
             </select>
             </div>
         </div>
-
-
 
         <!-- Lista de guardavidas -->
          <div class="sm:col-span-2">
@@ -396,23 +390,6 @@
             </select>
             </div>
         </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         <!-- Detalles -->
         <div class="col-span-full">
@@ -432,7 +409,7 @@
   <div class="m-6 mb-6 flex items-center justify-end gap-x-6">
     <button type="button" class="text-sm font-semibold text-gray-900 dark:text-white">Cancelar</button>
     <button type="submit"
-      class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500">
+      class="rounded-md bg-sky-600 px-3 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500">
       Guardar
     </button>
   </div>

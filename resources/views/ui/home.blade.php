@@ -1,8 +1,30 @@
 @extends('layouts.app')
 {{-- @extends('layouts.navbar') --}}
+{{-- @auth
 @php
-    $header = '<h1>Mi Header Personalizado</h1>';
+
+    $playa = Auth::user()->guardavida?->playa?->nombre;
+    $rol = Auth::user()->getRoleNames()->first();
+    if ($rol !== 'admin' && $playa) {
+        $header = '<div class="">
+            <div class="bg-gradient-to-r from-blue-400 to-teal-400 dark:from-blue-700 dark:to-teal-700 text-white rounded-b-2xl shadow-lg p-6 transform transition hover:scale-105 duration-300">
+                <div class="flex justify-center  md:items-center ">
+                    <div class="flex items-center justify-center gap-2">
+                        <!-- Icono de playa animado -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 animate-bounce text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                        </svg>
+                        <div>
+                            <p class="text-lg md:text-xl font-bold">'.$playa.'</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>';
+    }
 @endphp
+  @endauth --}}
 
 
     <x-slot name="header">
@@ -13,6 +35,16 @@
 
 @section('content')
 
+@if($isMobile)
+    {{-- Mobile partial --}}
+    {{-- @include('intervencion.partials.mobile-list') --}}
+    <p>Mobileeee</p>
+@else
+    {{-- Desktop partial --}}
+     @include('ui.partials.desktop-buttons-create')
+    <p>Destoooppp</p>
+@endif
+
 
 <button @click="darkMode = !darkMode"
         class="px-4 py-2 bg-gray-200 dark:bg-gray-800 rounded">
@@ -22,48 +54,138 @@
 <div :class="{'dark': darkMode}">
    <p class="text-gray-900 dark:text-gray-100">Hola!</p>
 </div>
+@auth
+@php
+    $rol = Auth::user()->getRoleNames()->first();
+    $playaUsuario = Auth::user()->guardavida->playa->nombre ?? null;
+@endphp
 
 
 
-
-
-
-<section class="text-gray-600 body-font">
-  <div class="container px-4 py-10 mx-auto">
-    <div class="col-12"></div>
-
-    {{-- <div class="flex flex-wrap lg:w-4/5 sm:mx-auto sm:mb-2 -mx-2"> --}}
-
-      {{-- <div class="p-2 w-full"> --}}
-        <div class="bg-gray-100 dark:bg-gray-600 rounded flex p-4 h-full ">
-
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="text-sky-500 dark:text-sky-300 w-6 h-6 flex-shrink-0 mr-4">
-                <path fill-rule="evenodd" d="M3 2.25a.75.75 0 0 1 .75.75v.54l1.838-.46a9.75 9.75 0 0 1 6.725.738l.108.054A8.25 8.25 0 0 0 18 4.524l3.11-.732a.75.75 0 0 1 .917.81 47.784 47.784 0 0 0 .005 10.337.75.75 0 0 1-.574.812l-3.114.733a9.75 9.75 0 0 1-6.594-.77l-.108-.054a8.25 8.25 0 0 0-5.69-.625l-2.202.55V21a.75.75 0 0 1-1.5 0V3A.75.75 0 0 1 3 2.25Z" clip-rule="evenodd" />
-            </svg>
-            <div class="flex flex-col ">
-                <span class="title-font font-medium text-gray-500 dark:text-gray-300 ">Bandera del día </span>
-                <p class="title-font font-medium text-sky-500 dark:text-sky-300"> Mar bueno </p>
+@if($rol !== 'admin' && $playaUsuario)
+    <div class="px-4 py-4">
+        <div class="bg-gray-100 dark:bg-gray-600  text-gray-500 dark:text-gray-300 rounded-2xl p-6 transform transition focus:scale-105 duration-300">
+            <!-- Contenido principal: playa izquierda, bandera derecha -->
+            <div class="flex md:flex-row md:items-center justify-between gap-1">
+                <!-- Izquierda: icono + playa -->
+                <div class="flex items-center gap-1">
+                    <!-- Icono de playa animado -->
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                        class="bandera
+                    text-{{$bandera->color}}-500 dark:text-{{$bandera->color}}-300
+                        w-12 h-12 flex-shrink-0 mr-4 animate-ondear">
+                        <path fill-rule="evenodd" d="M3 2.25a.75.75 0 0 1 .75.75v.54l1.838-.46a9.75 9.75 0 0 1 6.725.738l.108.054A8.25 8.25 0 0 0 18 4.524l3.11-.732a.75.75 0 0 1 .917.81 47.784 47.784 0 0 0 .005 10.337.75.75 0 0 1-.574.812l-3.114.733a9.75 9.75 0 0 1-6.594-.77l-.108-.054a8.25 8.25 0 0 0-5.69-.625l-2.202.55V21a.75.75 0 0 1-1.5 0V3A.75.75 0 0 1 3 2.25Z" clip-rule="evenodd" />
+                    </svg>
+                    <!-- Nombre de la playa -->
+                    <div>
+                        {{-- <p class="text-sm font-medium opacity-90">Tu playa</p> --}}
+                        <h2 class="text-2xl md:text-3xl font-bold mb-2">Bandera del día</h2>
+                        <p class="text-sm font-medium"> Mar {{ $bandera->codigo }}</p>
+                    </div>
+                </div>
             </div>
         </div>
-      {{-- </div> --}}
-  </div>
-</section>
+    </div>
+@endif
+
+@endauth
+
+
+
+{{-- @if($rol !== 'admin' && $playaUsuario)
+<div class=" px-4 py-4">
+    <div class="bg-gradient-to-r from-blue-400 to-teal-400 dark:from-blue-700 dark:to-teal-700 text-white rounded-2xl shadow-lg p-4 flex items-center gap-4 transform transition hover:scale-105 duration-300">
+        <h2> Bienvenido!</h2>
+        <div class="flex items-center justify-between gap-4">
+            <div class="flex items-center">
+                <!-- Icono de playa -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                </svg>
+                <!-- Texto -->
+                <div>
+                    <p class="text-sm font-medium opacity-90">Tu playa</p>
+                    <p class="text-lg font-bold">{{ $playaUsuario }}</p>
+                </div>
+            </div>
+            <!-- Bandera del día -->
+            <div class="flex items-center flex-col gap-2">
+                <span class="w-8 h-8 rounded-full" style="background-color: blue;"></span>
+                <p class="text-sm font-medium">{{ $bandera->codigo }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+@endif --}}
+
+{{-- @if($rol !== 'admin' && $playaUsuario)
+    <div class="px-4 py-4">
+        <div class="bg-gradient-to-r from-blue-400 to-teal-400 dark:from-blue-700 dark:to-teal-700 text-sky-900 rounded-2xl shadow-lg p-6 transform transition hover:scale-105 duration-300">
+            <div class="flex md:flex-row md:items-center justify-between gap-1">
+                <div class="flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                    class="bandera
+                {{ $bandera->color }}
+                    w-12 h-12 flex-shrink-0 mr-4 animate-ondear">
+                    <path fill-rule="evenodd" d="M3 2.25a.75.75 0 0 1 .75.75v.54l1.838-.46a9.75 9.75 0 0 1 6.725.738l.108.054A8.25 8.25 0 0 0 18 4.524l3.11-.732a.75.75 0 0 1 .917.81 47.784 47.784 0 0 0 .005 10.337.75.75 0 0 1-.574.812l-3.114.733a9.75 9.75 0 0 1-6.594-.77l-.108-.054a8.25 8.25 0 0 0-5.69-.625l-2.202.55V21a.75.75 0 0 1-1.5 0V3A.75.75 0 0 1 3 2.25Z" clip-rule="evenodd" />
+                </svg>
+                    <div>
+                        <h2 class="text-2xl md:text-3xl font-bold mb-2">Bandera del día</h2>
+                        <p class="text-sm font-medium"> Mar {{ $bandera->codigo }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endif --}}
+
+
+{{-- @if($rol !== 'admin' && $playaUsuario)
+    <div class="px-4 py-4">
+        <div class="bg-gradient-to-r from-gray-100 to-{{$bandera->color}}-400 dark:from-gray-500 dark:to-{{$bandera->color}}-500 text-sky-900 dark:text-gray-200 rounded-2xl shadow-lg p-6 transform transition hover:scale-105 duration-300">
+            <div class="flex md:flex-row md:items-center justify-between gap-1">
+                <div class="flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                        class="bandera
+                    text-{{$bandera->color}}-500 dark:text-{{$bandera->color}}-300
+                        w-12 h-12 flex-shrink-0 mr-4 animate-ondear">
+                        <path fill-rule="evenodd" d="M3 2.25a.75.75 0 0 1 .75.75v.54l1.838-.46a9.75 9.75 0 0 1 6.725.738l.108.054A8.25 8.25 0 0 0 18 4.524l3.11-.732a.75.75 0 0 1 .917.81 47.784 47.784 0 0 0 .005 10.337.75.75 0 0 1-.574.812l-3.114.733a9.75 9.75 0 0 1-6.594-.77l-.108-.054a8.25 8.25 0 0 0-5.69-.625l-2.202.55V21a.75.75 0 0 1-1.5 0V3A.75.75 0 0 1 3 2.25Z" clip-rule="evenodd" />
+                    </svg>
+                    <div>
+                        <h2 class="text-2xl md:text-3xl font-bold mb-2">Bandera del día</h2>
+                        <p class="text-sm font-medium"> Mar {{ $bandera->codigo }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endif --}}
 
 
 
 <section class="text-gray-600 body-font">
     <div class="container px-4 py-10 mx-auto">
-        <div class="flex flex-col text-center w-full mb-10 -m-2">
+        <div class="flex flex-col text-center w-full mb-10">
             <h1 class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900">Registrar un evento</h1>
         </div>
         <div class="flex flex-wrap -m-4 text-center">
-            <div class="p-2 lg:w-1/3 md:w-1/3 sm:w-1/2 w-1/2 ">
+             <div class="p-2 lg:w-1/3 md:w-1/3 sm:w-1/2 w-1/2 ">
                 <div class="px-4 py-6 rounded-lg shadow hover:shadow-md cursor-pointer  bg-white dark:bg-gray-600 transition ease-in duration-300">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                     class="text-sky-600 w-10 h-10 sm:w-10 sm:h-10 lg:w-12 lg:h-12 mx-auto mb-3 mb-3 inline-block" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5" />
                     </svg>
                     <p class="leading-none">Banderas</p>
+                </div>
+            </div>
+            <div class="p-2 lg:w-1/3 md:w-1/3 sm:w-1/2 w-1/2 ">
+                <div class="px-4 py-6 rounded-lg shadow hover:shadow-md cursor-pointer bg-gradient-to-r from-blue-400 to-teal-400 dark:bg-gray-600 transition ease-in duration-300 text-sky-900">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                    class=" w-10 h-10 sm:w-10 sm:h-10 lg:w-12 lg:h-12 mx-auto mb-3 mb-3 inline-block" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5" />
+                    </svg>
+                    <p class="leading-none">Asistencias</p>
                 </div>
             </div>
            <div class="p-2 lg:w-1/3 md:w-1/3 sm:w-1/2 w-1/2 ">
@@ -114,9 +236,9 @@
 </section>
 
 
-<div class="space-y-2 sm:hidden">
+{{-- <div class="space-y-2 sm:hidden"> --}}
     <section class="text-gray-600 dark:text-gray-100 body-font px-4 py-10">
-        {{-- <section class="text-gray-600 dark:text-gray-100 body-font block bg-white dark:bg-gray-800 rounded-xl shadow p-4 hover:shadow-md transition"> --}}
+
         <div class="py-2  w-full">
             <a href="{{ route('intervencion.create') }}" class="bg-sky-600 rounded flex px-4 py-3 h-full justify-between">
                 <div class="flex">
@@ -198,7 +320,7 @@
 
 
     </section>
-</div>
+{{-- </div> --}}
 
 
 

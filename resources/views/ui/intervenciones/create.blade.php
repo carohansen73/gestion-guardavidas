@@ -16,7 +16,7 @@
     <form action="{{ route('intervencion.store') }}" method="POST" class="bg-white rounded shadow-md ">
         @csrf
 
-        <div class="container px-4 py-10 mx-auto">
+        <div class="container px-2 py-4 mx-auto">
             @include('ui.intervenciones.fields')
         </div>
 

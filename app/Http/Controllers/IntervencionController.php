@@ -13,6 +13,7 @@ use App\Http\Requests\StoreIntervencionRequest;
 use App\Http\Requests\UpdateIntervencionRequest;
 use Illuminate\Support\Facades\Auth;
 
+
 class IntervencionController extends Controller
 {
     /**
@@ -20,9 +21,26 @@ class IntervencionController extends Controller
      */
     public function index()
     {
-        $intervenciones = Intervencion::all();
+        //TOTO ver que rol puede ver en tdas las playas o solo algunas
+        $user = Auth::user();
+        if ($user->hasRole('guardavida')) {
+            $intervenciones = Intervencion::where('playa_id', $user->guardavida->playa_id)
+            ->with(['guardavidas', 'fuerzas', 'puesto', 'playa'])
+            ->latest()
+            ->get();
+        }  elseif ($user->hasAnyRole(['admin', 'encargado', 'jefeDePlaya'])) {
+            $intervenciones = Intervencion::with(['guardavidas', 'fuerzas', 'puesto', 'playa'])
+            ->latest()->get();
+        } else {
+            abort (403, 'No tienes permisos para ver estas intervenciones');
+        }
+
+        $playas = Playa::all();
+
         return view('ui.intervenciones.index')
-        ->with('intervenciones', $intervenciones);
+        ->with('intervenciones', $intervenciones)
+        ->with('playas', $playas)
+        ->with('user', $user);
     }
 
     /**
