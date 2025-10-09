@@ -49,7 +49,7 @@
     {{-- @endrole --}}
 
     @if (session('success'))
-        <div class="bg-green-100 text-green-700 p-3 rounded mb-4">
+        <div class="bg-green-100 text-green-700 p-3 rounded mt-3">
             {{ session('success') }}
         </div>
     @endif
@@ -60,10 +60,10 @@
 
     {{-- Lista para Mobile --}}
     <div class="space-y-4 sm:hidden">
-        <section class="text-gray-600 dark:text-gray-100 body-font px-4 py-4 mb-10">
-            <div id="accordion-collapse" data-accordion="collapse">
+        <section class="text-gray-600 dark:text-gray-100 body-font py-3 px-4 mb-10">
+            <div id="accordion-collapse" data-accordion="collapse" class="bg-white dark:bg-gray-600">
                 @foreach ($intervenciones as $intervencion)
-                    <div class=" rounded shadow-md"
+                    <div class=" rounded "
                     data-playa="{{ $intervencion->playa->id ?? '' }}"
                     data-fecha="{{ $intervencion->fecha->format('Y-m-d') }}">
                         <h2 id="accordion-collapse-heading-{{$intervencion->id}}">

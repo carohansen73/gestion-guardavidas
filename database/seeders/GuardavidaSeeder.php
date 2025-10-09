@@ -22,7 +22,7 @@ class GuardavidaSeeder extends Seeder
             'numero' => '456',
             'piso_dpto' => '2B',
             'playa_id' => 1,
-            'puesto_id' => 2,
+            'puesto_id' => 1,//SAMOA
             'user_id' => 3,
         ]);
 

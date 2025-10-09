@@ -11,7 +11,7 @@ class UpdateIntervencionRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,19 @@ class UpdateIntervencionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'fecha'             => 'required|date',
+            'tipo_intervencion' => 'required|string|max:255',
+            'victimas'          => 'required|integer|digits_between:1,3',
+            'codigo'            => 'required|integer|between:1,6',
+            'bandera_id'        => 'required|exists:bandera_tipos,id',
+            'traslado'          => 'required|boolean',
+            'playa_id'          => 'required|exists:playas,id',
+            'puesto_id'         => 'required|exists:puestos,id',
+            'detalles'          => 'nullable|string',
+            'fuerzas'           => 'array',
+            'fuerzas.*'         => 'integer|exists:fuerzas,id',
+            'guardavidas'       => 'array',
+            'guardavidas.*'     => 'integer|exists:guardavidas,id',
         ];
     }
 }

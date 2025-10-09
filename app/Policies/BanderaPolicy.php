@@ -13,7 +13,7 @@ class BanderaPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,7 +21,7 @@ class BanderaPolicy
      */
     public function view(User $user, Bandera $bandera): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -29,7 +29,8 @@ class BanderaPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        // return true;
+        return $user->hasRole('guardavida');
     }
 
     /**
@@ -37,7 +38,8 @@ class BanderaPolicy
      */
     public function update(User $user, Bandera $bandera): bool
     {
-        return false;
+        // return true;
+         return $user->id === $bandera->user_id || $user->hasRole('Admin');
     }
 
     /**
@@ -45,7 +47,7 @@ class BanderaPolicy
      */
     public function delete(User $user, Bandera $bandera): bool
     {
-        return false;
+        return true;
     }
 
     /**

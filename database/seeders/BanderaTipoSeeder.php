@@ -14,11 +14,12 @@ class BanderaTipoSeeder extends Seeder
     public function run(): void
     {
          BanderaTipo::insert([
-            ['codigo' => 'Mar bueno', 'color' => 'celeste'],
-            ['codigo' => 'Dudoso', 'color' => 'amarillo-negro'],
-            ['codigo' => 'Peligroso', 'color' => 'rojo-negro'],
-            ['codigo' => 'Rayos', 'color' => 'negro'],
-            ['codigo' => 'Prohibido bañarse', 'color' => 'rojo'],
+            ['codigo' => 'Mar bueno', 'color' => 'sky', 'borde' => 'sky'],
+            ['codigo' => 'Dudoso', 'color' => 'yellow', 'borde' => 'black'],
+            ['codigo' => 'Peligroso', 'color' => 'black', 'borde' => 'red'],
+            ['codigo' => 'Rayos', 'color' => 'black', 'borde' => 'black'],
+            ['codigo' => 'Prohibido bañarse', 'color' => 'red', 'borde' => 'red'],
+            ['codigo' => 'Niño perdido', 'color' => 'white', 'borde' => 'white'],
         ]);
     }
 }

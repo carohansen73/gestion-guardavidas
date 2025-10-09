@@ -1,10 +1,11 @@
 "use strict"
 
-// TODO no andaa!!!!!
-
 document.addEventListener('DOMContentLoaded', e => {
     let currentPlaya = 'all';
     let sortAsc = true;
+
+
+
 
     window.filterByPlaya = function(playaId) {
         currentPlaya = playaId;
@@ -26,15 +27,39 @@ document.addEventListener('DOMContentLoaded', e => {
         sortAsc = !sortAsc;
         applyFilters();
     }
+    //Ocultar/Mostrar svg de busqueda
+    // const icon = document.getElementById('searchIcon');
+    // document.getElementById('searchInput').addEventListener('input', toggleSearchSvg)
+
 
     window.applyFilters = function() {
         const search = document.getElementById('searchInput')?.value.toLowerCase() || '';
-        const rows = document.querySelectorAll('tbody tr, .rounded.shadow-md');
 
+        //Filtro Lista para mobile
+        const cards = document.querySelectorAll('.registro-item-lista');
+
+          cards.forEach(card => {
+            const text = card.innerText.toLowerCase();
+            const playaId = card.dataset.playa;
+            let visible = true;
+
+            if (currentPlaya !== 'all' && playaId !== currentPlaya) {
+                visible = false;
+            }
+
+            if (search && !text.includes(search)) {
+                visible = false;
+            }
+
+            card.style.display = visible ? '' : 'none';
+        });
+
+
+        //Filtro para table
+        const rows = document.querySelectorAll('.registro-item-tabla');
         rows.forEach(row => {
             const text = row.innerText.toLowerCase();
             const playaId = row.dataset.playa;
-
             let visible = true;
 
             if (currentPlaya !== 'all' && playaId !== currentPlaya) {
@@ -48,10 +73,10 @@ document.addEventListener('DOMContentLoaded', e => {
             row.style.display = visible ? '' : 'none';
         });
 
-        // ordenar visibles
-         const tbody = document.querySelector('tbody');
+        // ordenar tabla
+        const tbody = document.querySelector('tbody');
         if(tbody) {
-            const visibles = rows.filter(r => r.style.display !== 'none');
+            const visibles = Array.from(rows).filter(r => r.style.display !== 'none');
 
             visibles.sort((a, b) => {
                 const da = new Date(a.dataset.fecha);
@@ -65,5 +90,16 @@ document.addEventListener('DOMContentLoaded', e => {
 
         // sorted.forEach(r => tbody.appendChild(r));
     }
+
+    // function toggleSearchSvg(event){
+    //     if (event.target.value.trim() === ''){
+    //         icon.classList.remove('hidden');
+    //     } else{
+    //         icon.classList.add('hidden');
+    //     }
+
+    // }
+
+
 
  });

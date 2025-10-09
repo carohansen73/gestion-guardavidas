@@ -35,6 +35,10 @@ Route::middleware('auth')->group(function () {
      Route::get('/home', [HomeController::class, 'index'])->name('home');
 
     Route::resource('intervencion', App\Http\Controllers\IntervencionController::class);
+
+    Route::resource('bandera', App\Http\Controllers\BanderaController::class);
+
+
     Route::get('/get-all-guardavidas', [GuardavidaController::class, 'getAll']);
 
 

@@ -21,7 +21,7 @@ class IntervencionController extends Controller
      */
     public function index()
     {
-        //TOTO ver que rol puede ver en tdas las playas o solo algunas
+        //TODO ver que rol puede ver en tdas las playas o solo algunas
         $user = Auth::user();
         if ($user->hasRole('guardavida')) {
             $intervenciones = Intervencion::where('playa_id', $user->guardavida->playa_id)
@@ -100,7 +100,9 @@ class IntervencionController extends Controller
      */
     public function show(Intervencion $intervencion)
     {
-        //
+         return view('ui.intervenciones.show-fields', compact(
+           'intervencion'
+        ));
     }
 
     /**
@@ -118,7 +120,7 @@ class IntervencionController extends Controller
         $fuerzas = Fuerza::all();
 
 
-        return view('ui.intervenciones.create', compact(
+        return view('ui.intervenciones.edit', compact(
             'guardavidas', 'banderas', 'playas', 'puestos', 'fuerzas', 'guardavidaAuth', 'intervencion'
         ));
     }
@@ -128,7 +130,6 @@ class IntervencionController extends Controller
      */
     public function update(UpdateIntervencionRequest $request, Intervencion $intervencion)
     {
-
         //actualizo los datos
         $intervencion->update($request->validated());
 

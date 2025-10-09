@@ -13,10 +13,10 @@
  <section class="text-gray-600 dark:text-gray-100 body-font px-4 py-10">
   <h2 class="text-base/7 font-semibold text-gray-900 dark:text-white">Registrar Intervención</h2>
 
-    <form action="{{ route('intervencion.store') }}" method="POST" class="bg-white rounded shadow-md ">
+    <form action="{{ route('intervencion.store') }}" method="POST" class="">
         @csrf
 
-        <div class="container px-2 py-4 mx-auto">
+        <div class="container bg-white rounded shadow-md px-4 py-6 mx-auto">
             @include('ui.intervenciones.fields')
         </div>
 

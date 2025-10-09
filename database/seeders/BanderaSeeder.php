@@ -12,6 +12,6 @@ class BanderaSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+
     }
 }

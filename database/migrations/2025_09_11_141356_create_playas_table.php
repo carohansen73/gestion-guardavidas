@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('playas', function (Blueprint $table) {
             $table->id();
             $table->string('nombre');
+            $table->decimal('lat', 10, 6);
+            $table->decimal('lon', 10, 6);
             $table->timestamps();
         });
     }
