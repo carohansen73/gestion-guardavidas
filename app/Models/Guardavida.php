@@ -11,6 +11,7 @@ class Guardavida extends Model
     use HasFactory;
 
     protected $fillable = [
+        'funcion',
         'nombre',
         'apellido',
         'dni',

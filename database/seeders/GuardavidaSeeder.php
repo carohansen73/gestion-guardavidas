@@ -14,6 +14,7 @@ class GuardavidaSeeder extends Seeder
     {
 
           Guardavida::create([
+            'funcion' => 'Encargado',
             'nombre' => 'María',
             'apellido' => 'Gómez',
             'dni' => '30222333',
@@ -29,6 +30,7 @@ class GuardavidaSeeder extends Seeder
 
 
         Guardavida::create([
+            'funcion' => 'Guardavida',
             'nombre' => 'Carla',
             'apellido' => 'Fernández',
             'dni' => '30444555',
@@ -44,6 +46,7 @@ class GuardavidaSeeder extends Seeder
 
 
          Guardavida::create([
+            'funcion' => 'Timonel',
             'nombre' => 'Juan',
             'apellido' => 'Pérez',
             'dni' => '30111222',

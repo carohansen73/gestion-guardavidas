@@ -44,8 +44,8 @@ class UserSeeder extends Seeder
         //asigno todos los permisos al rol admin
         $roleAdmin->syncPermissions($permissionAdmin);
 
-        //creo usuario guardavidas
-        $guardavidaUser = User::query()->create([
+        //creo usuario encargado
+        $encargadoUser = User::query()->create([
             'name' => 'María Gómez',
             'email' => 'guardavida@gmail.com',
             'password' => Hash::make('123456789'),
@@ -68,15 +68,23 @@ class UserSeeder extends Seeder
             'email_verified_at' => now()
         ]);
 
-
         //creo rol guardavida
         $roleGuardavida = Role::create(['name' => 'guardavida']);
         //asigno rol guardavida a usuario guardavida
-        $guardavidaUser->assignRole($roleGuardavida);
+
         $guardavidaUser2->assignRole($roleGuardavida);
         $guardavidaUser3->assignRole($roleGuardavida);
 
         $roleGuardavida->syncPermissions('ver puestos');
+
+        //creo rol
+        $roleEncargado = Role::create(['name' => 'encargado']);
+        //asigno rol a usuario
+        $encargadoUser->assignRole($roleEncargado);
+        //traigo todos los permisos
+        $permissionAll = Permission::query()->pluck('name');
+        //asigno todos los permisos al rol encargado
+        $roleEncargado->syncPermissions($permissionAll);
 
         //TODO Crear policy para cada modelo y @can('ver puestos'),etc. en buttons, menu, etc.
 

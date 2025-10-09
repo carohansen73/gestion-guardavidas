@@ -37,8 +37,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('intervencion', App\Http\Controllers\IntervencionController::class);
 
     Route::resource('bandera', App\Http\Controllers\BanderaController::class);
-
-
+    Route::resource('guardavida', App\Http\Controllers\GuardavidaController::class);
     Route::get('/get-all-guardavidas', [GuardavidaController::class, 'getAll']);
 
 

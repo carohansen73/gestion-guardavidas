@@ -13,7 +13,7 @@
 <div class="text-gray-600 dark:text-gray-100 body-font px-4 ">
     <h1 class="text-lg font-semibold text-gray-900 dark:text-white mt-3 mb-sm-3"> Intervenciones </h1>
     {{-- @role('admin|encargado') --}}
-    <div class="flex flex-col-reverse md:flex-row justify-between align-center ">
+    <div class="flex flex-col-reverse md:flex-row justify-between align-center">
          {{-- <div class="">
             <input
                 type="text"
