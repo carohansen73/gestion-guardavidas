@@ -6,14 +6,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 
 
-class qrController extends Controller
+class QrController extends Controller
 {
     public function desencriptarQr(Request $request){
         try {
             $validated = $request->validate([
-                'encrypted' => 'required|string'
+                'encrypted' => 'required'
             ]);
-            $encrypted = $validated['encrypted'];
+            // Revertir el urlencode del QR guardado en la BBDD
+            $encrypted = urldecode($validated['encrypted']);
+
+            // Desencriptar el QR
             $decrypted = Crypt::decryptString($encrypted);
             $data = json_decode($decrypted);
             return response()->json(['success' => true, 'data' => $data]);
@@ -23,5 +26,9 @@ class qrController extends Controller
                 'error' => $request->input('encrypted')
             ], 400);
         }
+    }
+
+    public function activeCamera(){
+        return view('qr.qr');
     }
 }

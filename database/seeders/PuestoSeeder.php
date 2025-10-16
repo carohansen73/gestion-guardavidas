@@ -50,6 +50,9 @@ class PuestoSeeder extends Seeder
             ['nombre' => 'Otro', 'latitud' => -38.9020, 'longitud' => -60.3400, 'qr_encriptado' => '', 'playa_id' => 4],
             ['nombre' => 'Fuera zona de baño', 'latitud' => -38.9025, 'longitud' => -60.3405, 'qr_encriptado' => '', 'playa_id' => 4],
 
+            //Tres Arroyos
+            ['nombre' => 'Municipalidad', 'latitud' => -38.3767662, 'longitud' => -60.2759348, 'qr_encriptado' => '', 'playa_id' => 5],
+
         ];
 
         foreach ($puestos as $puesto){

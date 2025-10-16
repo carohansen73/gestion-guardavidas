@@ -56,6 +56,19 @@ class GuardavidaSeeder extends Seeder
             'user_id' => 5,
         ]);
 
+        Guardavida::create([
+            'nombre' => 'Valentina',
+            'apellido' => 'Cast',
+            'dni' => '44993777',
+            'telefono' => '2983123453',
+            'direccion' => 'Av. Costanera',
+            'numero' => '123',
+            'piso_dpto' => null,
+            'playa_id' => 5,
+            'puesto_id' => 29,
+            'user_id' => 6,
+        ]);
+
 
     }
 }

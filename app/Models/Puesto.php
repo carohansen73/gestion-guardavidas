@@ -48,7 +48,8 @@ class Puesto extends Model
                 $puesto->save();
 
                 $qrImage = QrCode::format('svg')->size(300)->generate($encoded);
-                Storage::put("public/qr/puesto_{$puesto->nombre}_{$puesto->id}.svg", $qrImage);
+                $filePath = public_path("qr/puesto_{$puesto->nombre}_{$puesto->id}.svg");
+                file_put_contents($filePath, $qrImage);
             };
         });
     }

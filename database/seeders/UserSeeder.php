@@ -68,6 +68,13 @@ class UserSeeder extends Seeder
             'email_verified_at' => now()
         ]);
 
+        $guardavidaUser4 = User::query()->create([
+            'name' => 'Valentina',
+            'email' => 'guardavidaTresArroyos@gmail.com',
+            'password' => Hash::make('123456789'),
+            'email_verified_at' => now()
+        ]);
+
 
         //creo rol guardavida
         $roleGuardavida = Role::create(['name' => 'guardavida']);
@@ -75,6 +82,7 @@ class UserSeeder extends Seeder
         $guardavidaUser->assignRole($roleGuardavida);
         $guardavidaUser2->assignRole($roleGuardavida);
         $guardavidaUser3->assignRole($roleGuardavida);
+        $guardavidaUser4->assignRole($roleGuardavida);
 
         $roleGuardavida->syncPermissions('ver puestos');
 
