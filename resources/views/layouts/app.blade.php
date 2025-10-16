@@ -3,7 +3,6 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{ config('app.name', 'Laravel') }}</title>
 
@@ -46,15 +45,11 @@
                  </div>
 
 
-        <p id="mensaje"></p>
-        <div id="qr-reader" style="width: 500px; display: none;"></div>
-
+        
 
         @include('layouts.bottom-navigation')
 
-        <script src="{{ asset('js/html5-qrcode.min.js') }}"></script>
         <script src="{{ asset('js/script.js') }}"></script>
-        <script src="{{ asset('js/prueba_camara.js') }}"></script>
 
          <script src="https://unpkg.com/flowbite@2.5.1/dist/flowbite.min.js"></script>
     </body>

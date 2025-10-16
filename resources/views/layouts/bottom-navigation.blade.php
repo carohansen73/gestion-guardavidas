@@ -52,8 +52,8 @@
                 <span class="sr-only">Chat</span>
             </button>
 
-            <button id="escanearQR">
-                <a class="flex flex-1 flex-col items-center justify-center text-xs font-medium text-gray-500 py-2 px-4 flex-grow text-center" href="#">
+            
+                <a class="flex flex-1 flex-col items-center justify-center text-xs font-medium text-gray-500 py-2 px-4 flex-grow text-center" href=" {{ route('activeCamera') }}">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                         class="w-9 h-9">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 3.75 9.375v-4.5ZM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 0 1-1.125-1.125v-4.5ZM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 13.5 9.375v-4.5Z" />
@@ -63,7 +63,6 @@
                     {{-- <span class="sr-only">Profile</span> --}}
                     <p>Asistencia</p>
                 </a>
-            </button>
 
         </div>
     </div>

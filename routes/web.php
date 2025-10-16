@@ -4,7 +4,8 @@ use App\Http\Controllers\Auth\ApiAuthController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\GuardavidaController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\qrController;
+use App\Http\Controllers\QrController;
+use App\Http\Controllers\AsistenciaController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -43,13 +44,16 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/get-all-guardavidas', [GuardavidaController::class, 'getAll']);
 
+    Route::get('/activeCamera', [QrController::class, 'activeCamera'])->name('activeCamera');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::post('/cargarAsistencia',[AsistenciaController::class, 'cargarAsistencia'])->name('asistencia.guardar');
 
     // QR
-    Route::post("/desencriptar-qr", [qrController::class, 'desencriptarQr'])->name('desencriptar.qr');
+    Route::post("/desencriptar-qr", [QrController::class, 'desencriptarQr'])->name('desencriptar.qr');
+
 });
 
 Route::post('api/login', [ApiAuthController::class, 'login']);

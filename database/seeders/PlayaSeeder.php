@@ -18,6 +18,7 @@ class PlayaSeeder extends Seeder
             ['nombre' => 'Dunamar' , 'lat' => -38.2000, "lon" => -60.1833],
             ['nombre' => 'Orense', 'lat' => -38.0444, "lon" => -60.2244],
             ['nombre' => 'Reta', 'lat' => -38.1100, "lon" => -60.2889],
+            ['nombre' => 'Tres Arroyos', 'lat' => -38.1100, "lon" => -60.2889],
         ]);
     }
 }
