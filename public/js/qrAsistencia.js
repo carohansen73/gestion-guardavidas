@@ -1,3 +1,5 @@
+import { registrarAsistenciaOffline } from "./sw.js";
+
 // scanner.js
 const video = document.querySelector("#video");
 const csrfToken = document
@@ -61,8 +63,6 @@ async function detectarQR() {
     }
 }
 
-
-
 async function registrarAsistencia(valorQR) {
     const user_id = await obtenerId();
     try {
@@ -87,7 +87,9 @@ async function registrarAsistencia(valorQR) {
                     cargarDistancia(latitudPuesto, longitudPuesto).then(
                         (resultado) => {
                             if (resultado.distancia > 200) {
-                                console.log("Estás fuera del rango permitido (200m). Vuelve a escanear cerca del puesto.");
+                                console.log(
+                                    "Estás fuera del rango permitido (200m). Vuelve a escanear cerca del puesto."
+                                );
                                 return;
                             } else {
                                 //Cargar la asistencia para guardarla
@@ -98,7 +100,7 @@ async function registrarAsistencia(valorQR) {
                                     userPrecision: resultado.userPrecision,
                                     user_id: user_id,
                                     idPuesto: idPuesto,
-                                    fechayhora: Date.now(),
+                                    fecha_hora: fechaHoraArgentinaDatetime(),
                                 };
                                 cargarDatos(datos);
                             }
@@ -108,22 +110,10 @@ async function registrarAsistencia(valorQR) {
                     //scanner.stop();
                 });
         } else {
-            let lat, lng;
-            navigator.geolocation.getCurrentPosition(
-                function (position) {
-                    // éxito
-                    lat = position.coords.latitude;
-                    lng = position.coords.longitude;
-                    console.log("Latitud:", lat);
-                    console.log("Longitud:", lng);
-                },
-                function (error) {
-                    console.error("Error obteniendo ubicación:", error);
-                }
-            );
+            guardarDatosOffline(user_id, valorQR);
         }
     } catch (err) {
-      console.log(err);
+        console.log(err);
         /*valoresUbiUsuario = cargarDistancia(null, null);
         console.log(valoresUbiUsuario);
         // Aquí falla por falta de conexión
@@ -133,22 +123,24 @@ async function registrarAsistencia(valorQR) {
 
         // Guardar localmente en IndexedDB
         //Se guarda QR para ser procesado cuando vuelva el internet
-        guardarAsistenciaOffline({
-            encrypted: valorQR,
-            lat: userLat,
-            lng: userLng,
-            precision: userPrecision,
-            user_id: user_id,
-            fecha_hora: Date.now(),
-            csrfToken: csrfToken,
-        });*/
+        */
     }
+}
+
+function fechaHoraArgentinaDatetime() {
+  const ahora = new Date();
+  const opciones = { timeZone: 'America/Argentina/Buenos_Aires' };
+  const fecha = new Intl.DateTimeFormat('sv-SE', opciones).format(ahora);
+  const hora = ahora.toLocaleTimeString('es-AR', { 
+    timeZone: 'America/Argentina/Buenos_Aires',
+    hour12: false
+  });
+
+  return `${fecha} ${hora}`;
 }
 
 // Iniciar automáticamente al cargar
 window.addEventListener("DOMContentLoaded", iniciarCamara);
-
-
 
 function calcularDistancia(lat1, lon1, lat2, lon2) {
     const R = 6371e3; // radio de la tierra en metros
@@ -166,12 +158,35 @@ function calcularDistancia(lat1, lon1, lat2, lon2) {
     return R * c; // en metros
 }
 
+function obtenerUbicacion() {
+    return new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject);
+    });
+}
+
+async function guardarDatosOffline(user_id, valorQR) {
+    if (!navigator.onLine) {
+        console.log("⚠️ Sin conexión, guardando asistencia localmente...");
+        let position = await obtenerUbicacion();
+        let userLat = position.coords.latitude;
+        let userLng = position.coords.longitude;
+        let userPrecision = position.coords.accuracy; // en metros
+
+        registrarAsistenciaOffline({
+            encrypted: valorQR,
+            lat: userLat,
+            lng: userLng,
+            precision: userPrecision,
+            user_id: user_id,
+            fecha_hora: fechaHoraArgentinaDatetime(),
+            csrfToken: csrfToken,
+        });
+    }
+}
 
 async function cargarDistancia(latitudPuesto, longitudPuesto) {
     try {
-        const position = await new Promise((resolve, reject) => {
-            navigator.geolocation.getCurrentPosition(resolve, reject);
-        });
+        const position = await obtenerUbicacion();
         let resultadoDistancia = await success(
             position,
             latitudPuesto,
@@ -184,7 +199,6 @@ async function cargarDistancia(latitudPuesto, longitudPuesto) {
     }
 }
 
-
 async function success(position, latitudPuesto, longitudPuesto) {
     //obtenemos latitud y longitud del usuario
     let userLat = position.coords.latitude;
@@ -196,7 +210,6 @@ async function success(position, latitudPuesto, longitudPuesto) {
         latitudPuesto,
         longitudPuesto
     );
-
     return {
         distancia: distancia,
         userLat: userLat,
@@ -211,8 +224,7 @@ async function obtenerId() {
     let user_id = parseInt(local_user_id);
     console.log(user_id);
     return user_id;
-  }
-
+}
 
 
 async function cargarDatos(datos) {
@@ -231,24 +243,23 @@ async function cargarDatos(datos) {
                 precision: datos.userPrecision,
                 user_id: datos.user_id,
                 puesto_id: datos.idPuesto,
-                //fechayhora: datos.fechayhora,
+                fecha_hora: datos.fecha_hora,
             }),
         });
 
         let res = await response.json();
         if (res.success) {
             console.log("Asistencia registrada correctamente.");
-
         } else {
-           console.log(res.error || "No se pudo registrar asistencia.");
+            console.log(res.error || "No se pudo registrar asistencia.");
         }
-    } catch(err) {
-      console.error("Error en fetch /cargarAsistencia:", err);
+    } catch (err) {
+        console.error("Error en fetch /cargarAsistencia:", err);
         console.log("Sin conexión, guardando asistencia localmente...");
 
         // Guardar localmente en IndexedDB
         //Se guarda QR para ser procesado cuando vuelva el internet
-        /*guardarAsistenciaOffline({
+        /*registrarAsistenciaOffline({
                 balneario_id: idPlaya,
                 lat: userLat,
                 lng: userLng,

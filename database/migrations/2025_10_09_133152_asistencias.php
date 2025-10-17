@@ -23,7 +23,7 @@ return new class extends Migration
             $table->foreign('puesto_id')->references('id')->on('puestos')->onDelete('cascade');
             $table->unsignedBigInteger('guardavidas_id');
             $table->foreign('guardavidas_id')->references('id')->on('guardavidas')->onDelete('cascade');
-            $table->timestamp('fecha_hora');
+            $table->dateTime('fecha_hora');
         });
     }
 

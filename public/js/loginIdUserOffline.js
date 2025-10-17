@@ -24,6 +24,7 @@ async function loginOffline() {
         if (data.success) {
             // Guardás el user_id en localStorage para usarlo offline
             localStorage.setItem('user_id', data.user.id);
+            // FALTA QUE, SI HAY UN ERROR EN EMAIL O CONTRASEÑA MUESTRE EL ERROR
              window.location.href = '/dashboard'; // redirigir manualmente
         } 
     } catch (err) {

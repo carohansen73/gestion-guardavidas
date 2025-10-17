@@ -28,7 +28,9 @@
 
         <script src="{{ asset('js/html5-qrcode.min.js') }}"></script>
         <script src="{{ asset('js/script.js') }}"></script>
-        <script src="{{ asset('js/qrAsistencia.js') }}"></script>
+        <script src="{{ asset('js/app.js') }}"></script>
+        <script src="{{ asset('js/baseDatosNavegador.js') }}"></script>
+        <script type="module" src="{{ asset('js/qrAsistencia.js') }}"></script>
 </body>
 
 </html>
