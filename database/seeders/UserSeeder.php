@@ -30,6 +30,7 @@ class UserSeeder extends Seeder
         //creo usuario admin
         $adminUser = User::query()->create([
             'name' => 'admin',
+            'lastname' => 'admin',
             'email' => 'admin@admin.com',
             'password' => '123456789',
             'email_verified_at' => now()
@@ -46,7 +47,8 @@ class UserSeeder extends Seeder
 
         //creo usuario encargado
         $encargadoUser = User::query()->create([
-            'name' => 'María Gómez',
+            'name' => 'María',
+            'lastname' => 'Gómez',
             'email' => 'guardavida@gmail.com',
             'password' => Hash::make('123456789'),
             'email_verified_at' => now()
@@ -55,6 +57,7 @@ class UserSeeder extends Seeder
         //creo usuario guardavidas
         $guardavidaUser2 = User::query()->create([
             'name' => 'Carla Fernández',
+            'lastname' => 'Carla Fernández',
             'email' => 'guardavida2@gmail.com',
             'password' => Hash::make('123456789'),
             'email_verified_at' => now()
@@ -63,6 +66,7 @@ class UserSeeder extends Seeder
         //creo usuario guardavidas
         $guardavidaUser3 = User::query()->create([
             'name' => 'Juan Pérez',
+            'lastname' => 'Juan Pérez',
             'email' => 'guardavida3@gmail.com',
             'password' => Hash::make('123456789'),
             'email_verified_at' => now()

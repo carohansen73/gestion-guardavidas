@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\GuardavidaController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -38,12 +40,19 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('bandera', App\Http\Controllers\BanderaController::class);
     Route::resource('guardavida', App\Http\Controllers\GuardavidaController::class);
+    Route::patch('usuario-toggle/{user}', [UserController::class, 'toggle'])->name('user.toggle');
+    Route::get('guardavidas-deshabilitados', [GuardavidaController::class, 'getAllDisabled'])->name('guardavidas.disabled');
     Route::get('/get-all-guardavidas', [GuardavidaController::class, 'getAll']);
 
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    //pasar a moddleware admin
+    //Route::middleware(['auth', 'can:admin'])
+    Route::put('/update-user/{user}', [RegisteredUserController::class, 'updateUserByAdmin'])->name('user.update');
+    Route::put('/update-rol/{user}', [GuardavidaController::class, 'updateUserRol'])->name('rol.update');
 });
 
 require __DIR__.'/auth.php';

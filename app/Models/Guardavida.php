@@ -44,4 +44,5 @@ class Guardavida extends Model
     {
         return $this->belongsToMany(Intervencion::class, 'guardavidas_intervenciones', 'guardavida_id', 'intervencion_id');
     }
+
 }

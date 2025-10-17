@@ -21,6 +21,17 @@
                     {{ $playa->nombre }}
                 </button>
             @endforeach
+            @if(request()->is('guardavida'))
+            <a href="{{ route('guardavidas.disabled')}}"
+            class="playa-tag px-3 py-1 bg-orange-500 text-gray-100 rounded hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-gray-200">
+               Bloqueados
+            </a>
+            @else
+             <a href="{{ route('guardavida.index')}}"
+            class="playa-tag px-3 py-1 bg-sky-500 text-gray-100 rounded hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-gray-200">
+               Habilitados
+            </a>
+            @endif
         </div>
         {{-- Busqueda --}}
         <div class="relative w-full md:w-auto my-3 sm:!my-0">

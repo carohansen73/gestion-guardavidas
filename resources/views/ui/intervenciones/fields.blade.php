@@ -415,10 +415,9 @@
   </div>
 {{-- </form> --}}
 
-@vite(['resources/js/form-intervenciones.js'])
+@vite(['resources/js/filterPuestoByPlaya.js'])
 <!-- AlpineJS para hacerlo reactivo -->
 {{-- <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script> --}}
-
 
 
 

@@ -223,7 +223,7 @@
             </div>
 
             <div class="bg-gray-50 rounded-xl shadow-md mb-2">
-              <ul>
+                <ul>
                     <li class="border-b border-gray-200 p-3">
                         <a href="{{ route('guardavida.index') }}" class="flex justify-content-between align-center text-sky-600">
                             <p>Guardavidas</h2>

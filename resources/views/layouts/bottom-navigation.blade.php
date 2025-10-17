@@ -29,7 +29,7 @@
      <div class="flex justify-around items-center  px-2">
     <!-- Íconos de la navbar -->
     <a aria-current="page" class="flex flex-1 flex-col items-center justify-center text-xs font-medium py-2 px-4 text-gray-500 flex-grow text-center"
-     href="#">
+     href="{{ route('intervencion.create') }}">
 
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
         class="w-9 h-9">
@@ -40,7 +40,7 @@
     </a>
 
     <!-- Botón flotante en el centro -->
-    <button class="relative flex flex-1 flex-col items-center justify-center text-xs font-medium  text-gray-700 py-3 px-6 flex-grow text-center">
+    <a href="{{route('home')}}" class="relative flex flex-1 flex-col items-center justify-center text-xs font-medium  text-gray-700 py-3 px-6 flex-grow text-center">
         <div class="absolute bottom-5 p-3 rounded-full border-4 border-white bg-gray-100 shadow-lg">
 
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
@@ -49,8 +49,8 @@
             </svg>
 
         </div>
-        <span class="sr-only">Chat</span>
-    </button>
+        <span class="sr-only">Home</span>
+    </a>
 
     <a class="flex flex-1 flex-col items-center justify-center text-xs font-medium text-gray-500 py-2 px-4 flex-grow text-center" href="#">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
@@ -60,7 +60,7 @@
         </svg>
 
         {{-- <span class="sr-only">Profile</span> --}}
-        <p>Asistencia</p>
+        <p>Fichar</p>
     </a>
     </div>
 </div>

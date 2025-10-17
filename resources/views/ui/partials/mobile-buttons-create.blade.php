@@ -8,10 +8,8 @@
              <div class="p-2 lg:w-1/3 md:w-1/3 sm:w-1/2 w-1/2 ">
                 <a href="{{ route('guardavida.create') }}">
                 <div class="px-4 py-6 rounded-lg shadow hover:shadow-md cursor-pointer bg-white dark:bg-gray-600 transition ease-in duration-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                    class="text-sky-600 w-10 h-10 sm:w-10 sm:h-10 lg:w-12 lg:h-12 mx-auto mb-3 mb-3 inline-block" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5" />
-                    </svg>
+                    <img src="{{asset("img/guardavida.png")}}" class="w-12 mb-3 py-2 mx-auto inline-block" alt="" srcset="">
+
                     {{-- SOLO ADMIN? JEFE dE PLAYA? ENCARGADO? --}}
                     <p class="leading-none">Guardavida</p>
                 </div>
@@ -20,11 +18,11 @@
             <div class="p-2 lg:w-1/3 md:w-1/3 sm:w-1/2 w-1/2 ">
                 <div class="px-4 py-6 rounded-lg shadow hover:shadow-md cursor-pointer bg-white dark:bg-gray-600 transition ease-in duration-300">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                    class="w-10 h-10 sm:w-10 sm:h-10 lg:w-12 lg:h-12  text-sky-600 mx-auto mb-3 mb-3 inline-block">
+                    class="w-10 h-10 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-sky-600 mx-auto mb-3 inline-block">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                     </svg>
 
-                    <p class="leading-none">Asistencia</p>
+                    <p class="leading-none">Fichar</p>
                 </div>
             </div>
            <div class="p-2 lg:w-1/3 md:w-1/3 sm:w-1/2 w-1/2 ">
