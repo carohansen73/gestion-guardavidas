@@ -1,19 +1,16 @@
-importScripts('/js/baseDatosLocal.js'); 
+/*self.addEventListener('install', event => {
+    console.log('Service Worker instalado');
+    self.skipWaiting();
+});
 
-export async function registrarAsistenciaOffline(datos) {
-  // Guardar temporalmente
-  await guardarAsistenciaOffline(datos);
-
-  // Registrar sincronización de fondo
-  const reg = await navigator.serviceWorker.ready;
-  await reg.sync.register('sincronizar-asistencias');
-  console.log('🕒 Asistencia guardada para enviar cuando vuelva la conexión');
-}
+self.addEventListener('activate', event => {
+    console.log('Service Worker activado');
+});
 
 self.addEventListener('sync', event => {
-  if (event.tag === 'sincronizar-asistencias') {
-    event.waitUntil(sincronizarAsistencias());
-  }
+    if (event.tag === 'sync-asistencias') {
+        event.waitUntil(sincronizarAsistencias());
+    }
 });
 
 async function sincronizarAsistencias() {
@@ -34,4 +31,4 @@ async function sincronizarAsistencias() {
       console.error('❌ Error al enviar asistencia:', err);
     }
   }
-}
+}*/

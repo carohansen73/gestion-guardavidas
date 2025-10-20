@@ -1,10 +1,13 @@
-import { registrarAsistenciaOffline } from "./sw.js";
+import { guardarAsistenciaOffline } from "./baseDeDatosNavegador.js";
 
 // scanner.js
 const video = document.querySelector("#video");
 const csrfToken = document
     .querySelector('meta[name="csrf-token"]')
     .getAttribute("content"); // Envia el csrf en la consulta para desencriptar el qr
+
+const contenedorAnimacionCarga = document.getElementById("contenedorCarga");
+const animacionCarga = document.getElementById("carga");
 
 // Inicializa la cámara
 async function iniciarCamara() {
@@ -32,7 +35,15 @@ async function iniciarCamara() {
         // Arranca la deteccion del QR
         detectarQR();
     } catch (error) {
-        console.error("Error al acceder a la cámara:", error);
+        contenedorAnimacionCarga.style.display = "none";
+        Swal.fire({
+                title: "Error",
+                text: "Error al acceder a la cámara.",
+                icon: "error",
+                confirmButtonColor: "#36be7f",
+            }).then(() => {
+                //window.location.href = "/dashboard"; 
+            });;
     }
 }
 
@@ -45,25 +56,42 @@ async function detectarQR() {
         video.videoWidth === 0 ||
         video.videoHeight === 0
     ) {
-        console.log("⏳ Video no listo aún, reintentando...");
+        console.log("Video no listo aún, reintentando...");
         return;
     }
 
     try {
         const barcodes = await barcodeDetector.detect(video);
+
+        // Si encontró al menos un código (array con longitud > 0)
         if (barcodes.length > 0) {
             const valorQR = barcodes[0].rawValue;
             registrarAsistencia(valorQR);
         } else {
+            // Si no encontró ningún QR en este frame, vuelve a llamar detectarQR en el siguiente frame
+            // usando requestAnimationFrame para mantener la detección continua y eficiente.
             requestAnimationFrame(detectarQR);
         }
     } catch (error) {
-        console.error("⚠️ Error al detectar QR:", error);
-        requestAnimationFrame(detectarQR);
+        Swal.fire({
+                title: "Error",
+                text: "Error al detectar QR.",
+                icon: "error",
+                confirmButtonColor: "#36be7f",
+            }).then(() => {
+                window.location.href = "/dashboard"; // Redireccion despues de cerrar el alert
+            });
     }
 }
 
+// Si hay internet, desencriptamos el QR, comparamos el rango de distancia donde se escaneo y en caso de estar a menos de 
+// 200 mts, se guarda la asistencia
+//Si llega a pasa que no hay internet, se comprueba la distancia donde leyo el QR y si esta en un rango menor a 200 mts
+//La información pasa a guardarse en el IndexedDB (falta que, cuando vuelva a tener internet automaticamente lo detecte y guarde 
+//los datos en la base de datos)
 async function registrarAsistencia(valorQR) {
+    contenedorAnimacionCarga.style.display = "block";
+    animacionCarga.classList.add("animacion");
     const user_id = await obtenerId();
     try {
         if (navigator.onLine) {
@@ -83,13 +111,21 @@ async function registrarAsistencia(valorQR) {
                     let idPuesto = data.data.puesto_id;
                     let latitudPuesto = data.data.puesto_lat;
                     let longitudPuesto = data.data.puesto_lng;
+
                     //se pide la ubicacion del usurio desde el navegador
                     cargarDistancia(latitudPuesto, longitudPuesto).then(
                         (resultado) => {
                             if (resultado.distancia > 200) {
-                                console.log(
-                                    "Estás fuera del rango permitido (200m). Vuelve a escanear cerca del puesto."
-                                );
+                                contenedorAnimacionCarga.style.display = "none";
+                                animacionCarga.classList.remove("animacion");
+                                Swal.fire({
+                                    title: "Error",
+                                    text: "Se encuentra fuera del rango permitido (200m). Vuelve a escanear cerca del puesto.",
+                                    icon: "error",
+                                    confirmButtonColor: "#36be7f",
+                                }).then(() => {
+                                    window.location.href = "/activeCamera"; // Redireccion despues de cerrar el alert
+                                });
                                 return;
                             } else {
                                 //Cargar la asistencia para guardarla
@@ -110,23 +146,44 @@ async function registrarAsistencia(valorQR) {
                     //scanner.stop();
                 });
         } else {
-            guardarDatosOffline(user_id, valorQR);
+            // En caso de estar offline
+            //HAY QUE OBTENER LATITUD Y LONGITUD DEL PUESTO, VER SI LO GUARDO COMO EL ID DEL USUARIO
+            cargarDistancia(latitudPuesto, longitudPuesto).then(
+                        (resultado) => {
+                            if (resultado.distancia > 200) {
+                                    contenedorAnimacionCarga.style.display = "none";
+                                    animacionCarga.classList.remove("animacion");
+                                Swal.fire({
+                                    title: "Error",
+                                    text: "Se encuentra fuera del rango permitido (200m). Vuelve a escanear cerca del puesto.",
+                                    icon: "error",
+                                    confirmButtonColor: "#36be7f",
+                                }).then(() => {
+                                    window.location.href = "/activeCamera"; // Redireccion despues de cerrar el alert
+                                });
+                                return;
+                            } else {
+                                guardarDatosOffline(user_id, valorQR, resultado.userLat, resultado.userLng, resultado.userPrecision);
+                            }
+                        }
+                    );
+           
         }
     } catch (err) {
-        console.log(err);
-        /*valoresUbiUsuario = cargarDistancia(null, null);
-        console.log(valoresUbiUsuario);
-        // Aquí falla por falta de conexión
-        mensaje.innerText =
-            "⚠️ Sin conexión, guardando asistencia localmente...";
-        mensaje.style.color = "orange";
-
-        // Guardar localmente en IndexedDB
-        //Se guarda QR para ser procesado cuando vuelva el internet
-        */
+        contenedorAnimacionCarga.style.display = "none";
+        animacionCarga.classList.remove("animacion");
+        Swal.fire({
+            title: "Error del sistema",
+            text: "Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente.",
+            icon: "error",
+            confirmButtonColor: "#36be7f",
+        }).then(() => {
+            window.location.href = "/dashboard"; // Redireccion despues de cerrar el alert
+        });
     }
 }
 
+//Obtenemos la fecha y hora Argentina para que se guarde en la base de datos
 function fechaHoraArgentinaDatetime() {
   const ahora = new Date();
   const opciones = { timeZone: 'America/Argentina/Buenos_Aires' };
@@ -142,7 +199,9 @@ function fechaHoraArgentinaDatetime() {
 // Iniciar automáticamente al cargar
 window.addEventListener("DOMContentLoaded", iniciarCamara);
 
-function calcularDistancia(lat1, lon1, lat2, lon2) {
+
+
+async function calcularDistancia(lat1, lon1, lat2, lon2) {
     const R = 6371e3; // radio de la tierra en metros
     const toRad = (x) => (x * Math.PI) / 180;
     const φ1 = toRad(lat1);
@@ -158,21 +217,18 @@ function calcularDistancia(lat1, lon1, lat2, lon2) {
     return R * c; // en metros
 }
 
+// Le pedimos al usuario que permita saber su ubicación para poder comparar
 function obtenerUbicacion() {
     return new Promise((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(resolve, reject);
     });
 }
 
-async function guardarDatosOffline(user_id, valorQR) {
-    if (!navigator.onLine) {
-        console.log("⚠️ Sin conexión, guardando asistencia localmente...");
-        let position = await obtenerUbicacion();
-        let userLat = position.coords.latitude;
-        let userLng = position.coords.longitude;
-        let userPrecision = position.coords.accuracy; // en metros
 
-        registrarAsistenciaOffline({
+async function guardarDatosOffline(user_id, valorQR, userLat, userLng, userPrecision) {
+    if (!navigator.onLine) {
+        console.log("Sin conexión, guardando asistencia localmente...");
+        guardarAsistenciaOffline({
             encrypted: valorQR,
             lat: userLat,
             lng: userLng,
@@ -184,49 +240,49 @@ async function guardarDatosOffline(user_id, valorQR) {
     }
 }
 
+//Obtiene las coordenas del usuario y calcula la distancia entre el usuario y el puesto
 async function cargarDistancia(latitudPuesto, longitudPuesto) {
     try {
-        const position = await obtenerUbicacion();
-        let resultadoDistancia = await success(
-            position,
+        let position = await obtenerUbicacion();
+        let userLat = position.coords.latitude;
+        let userLng = position.coords.longitude;
+        let userPrecision = position.coords.accuracy; // en metros
+        let resultadoDistancia = await calcularDistancia(
+            userLat,
+            userLng,
             latitudPuesto,
             longitudPuesto
         );
 
-        return resultadoDistancia;
+        return {
+            distancia: resultadoDistancia,
+            userLat: userLat,
+            userLng: userLng,
+            userPrecision: userPrecision,
+        };
     } catch (err) {
-        console.error("Error obteniendo ubicación:", err);
+        contenedorAnimacionCarga.style.display = "none";
+        animacionCarga.classList.remove("animacion");
+        Swal.fire({
+            title: "Error",
+            text: "Error obteniendo su ubicación.",
+            icon: "error",
+            confirmButtonColor: "#36be7f",
+        }).then(() => {
+            window.location.href = "/dashboard"; // Redireccion despues de cerrar el alert
+        });
     }
 }
 
-async function success(position, latitudPuesto, longitudPuesto) {
-    //obtenemos latitud y longitud del usuario
-    let userLat = position.coords.latitude;
-    let userLng = position.coords.longitude;
-    let userPrecision = position.coords.accuracy; // en metros
-    let distancia = calcularDistancia(
-        userLat,
-        userLng,
-        latitudPuesto,
-        longitudPuesto
-    );
-    return {
-        distancia: distancia,
-        userLat: userLat,
-        userLng: userLng,
-        userPrecision: userPrecision,
-    };
-}
 
-
+//Obtiene el ID del usuario que se guarda en el navegador para guardar en la asistencia
 async function obtenerId() {
     let local_user_id = localStorage.getItem("user_id");
     let user_id = parseInt(local_user_id);
-    console.log(user_id);
     return user_id;
 }
 
-
+//Guardamos la asistencia del guardavida en la base de datos
 async function cargarDatos(datos) {
     console.log(datos);
     try {
@@ -249,25 +305,38 @@ async function cargarDatos(datos) {
 
         let res = await response.json();
         if (res.success) {
-            console.log("Asistencia registrada correctamente.");
+            contenedorAnimacionCarga.style.display = "none";
+            animacionCarga.classList.remove("animacion");
+            Swal.fire({
+                title: "OK",
+                text: "Asistencia registrada correctamente.",
+                icon: "success",
+                confirmButtonColor: "#36be7f",
+            }).then(() => {
+                window.location.href = "/dashboard"; // Redireccion despues de cerrar el alert
+            });
         } else {
-            console.log(res.error || "No se pudo registrar asistencia.");
+            contenedorAnimacionCarga.style.display = "none";
+            animacionCarga.classList.remove("animacion");
+            Swal.fire({
+                title: "Error",
+                text: "No se pudo registrar asistencia. Por favor, intentá nuevamente",
+                icon: "error",
+                confirmButtonColor: "#36be7f",
+            }).then(() => {
+                window.location.href = "/dashboard"; // Redireccion despues de cerrar el alert
+            });
         }
     } catch (err) {
-        console.error("Error en fetch /cargarAsistencia:", err);
-        console.log("Sin conexión, guardando asistencia localmente...");
-
-        // Guardar localmente en IndexedDB
-        //Se guarda QR para ser procesado cuando vuelva el internet
-        /*registrarAsistenciaOffline({
-                balneario_id: idPlaya,
-                lat: userLat,
-                lng: userLng,
-                precision: userPrecision,
-                user_id: user_id,
-                puesto_id: idPuesto,
-                fecha_hora: Date.now(),
-                csrfToken: csrfToken,
-            });*/
+        contenedorAnimacionCarga.style.display = "none";
+        animacionCarga.classList.remove("animacion");
+        Swal.fire({
+            title: "Error",
+            text: "Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente.",
+            icon: "error",
+            confirmButtonColor: "#36be7f",
+        }).then(() => {
+                window.location.href = "/dashboard"; 
+            });
     }
 }

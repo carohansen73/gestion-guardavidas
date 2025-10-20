@@ -46,6 +46,8 @@
         </div>
     </form>
 
+    <div id="error" class="mt-3 text-sm font-semibold text-red-600"></div>
+
 </x-guest-layout>
 
 <script src="{{ asset('js/loginIdUserOffline.js') }}"></script>
