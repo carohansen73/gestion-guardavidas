@@ -49,6 +49,13 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        if(!Auth::user()->enabled){
+            Auth::logout();
+            throw ValidationException::withMessages([
+                'email' => __('Tu cuenta fue deshabilitada. Contactá al administrador.'),
+            ]);
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 

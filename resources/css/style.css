@@ -59,14 +59,4 @@ section .dark body .bg-gray-600  { background-color: #4b5563 !important; }
   animation: ondear 1.5s ease-in-out infinite;
 }
 
-video {
-    width: 100%;
-    border: solid #2a22a7 4px;
-    border-radius: 5%;
-}
 
-#resultadoQR {
-    margin-top: 15px;
-    font-weight: bold;
-    font-size: 1.2em;
-}

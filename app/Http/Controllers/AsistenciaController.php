@@ -25,7 +25,8 @@ class AsistenciaController extends Controller
             'puesto_id' => 'required|integer|exists:puestos,id',
             'lat' => 'required|numeric|between:-90,90',
             'lng' => 'required|numeric|between: -180,180',
-            'precision' => 'required|numeric|min:0'
+            'precision' => 'required|numeric|min:0',
+            'fecha_hora' => 'required|date_format:Y-m-d H:i:s'
         ]);
         $idUser = $validated['user_id'];
         $idPlaya = $validated['playa_id'];
@@ -37,7 +38,7 @@ class AsistenciaController extends Controller
                 'data' => 'No se pudo registrar la asistencia'
             ], 400);
         }
-        $fecha_hora = date("Y-m-d H:i:s");
+        $fecha_hora = $validated['fecha_hora'];
         $lat = $validated['lat'];
         $lng = $validated['lng'];
         $precision = $validated['precision'];

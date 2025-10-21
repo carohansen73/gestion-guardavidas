@@ -68,26 +68,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function filterPuestos() {
         const selectedPlaya = playaSelect.value;
+        const currentPuesto = puestoSelect.dataset.current; // ← lo agregamos abajo
 
         // Limpiar select
         puestoSelect.innerHTML = '';
 
-        // Agregar solo los puestos que coinciden con la playa seleccionada
+        // Agregar solo los puestos de la playa seleccionada
         allPuestos.forEach(option => {
-            if(option.dataset.playa == selectedPlaya) {
+            if (option.dataset.playa == selectedPlaya) {
                 puestoSelect.appendChild(option);
             }
         });
 
-        // Si ninguno coincide, seleccionar el primero disponible
-        if(puestoSelect.options.length > 0) {
+        // Mantener seleccionado el puesto actual si existe
+        const currentOption = Array.from(puestoSelect.options).find(opt => opt.value === currentPuesto);
+        if (currentOption) {
+            currentOption.selected = true;
+        } else if (puestoSelect.options.length > 0) {
             puestoSelect.selectedIndex = 0;
         }
     }
 
-    // Filtrar al cargar la página
-    filterPuestos();
+    // Guardar el puesto actual en un atributo data
+    puestoSelect.dataset.current = puestoSelect.value;
 
-    // Filtrar al cambiar la playa
+    // Filtrar al cargar y al cambiar la playa
+    filterPuestos();
     playaSelect.addEventListener('change', filterPuestos);
 });

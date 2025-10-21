@@ -1,17 +1,19 @@
 
 boton = document.getElementById("botonEnviarLogin");
+const errorDiv = document.querySelector('#error'); //Muestra mensaje de error
+
 boton.addEventListener('click', (e) =>{
     e.preventDefault();
+    errorDiv.textContent = '';
     loginOffline();
 })
-
 
 async function loginOffline() {
     const email = document.querySelector('#email').value;
     const password = document.querySelector('#password').value;
 
     try {
-        const res = await fetch('api/login', {
+        const res = await fetch('/api/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -21,12 +23,18 @@ async function loginOffline() {
         });
 
         const data = await res.json();
+
         if (data.success) {
-            // Guardás el user_id en localStorage para usarlo offline
             localStorage.setItem('user_id', data.user.id);
-             window.location.href = '/dashboard'; // redirigir manualmente
-        } 
+            window.location.href = '/dashboard';
+        } else {
+            // Mostrar el mensaje del backend
+            errorDiv.textContent = data.message || 'Error al iniciar sesión';
+        }
+
     } catch (err) {
         console.error('Error al hacer login:', err);
+        errorDiv.textContent = 'Error de conexión con el servidor.';
     }
 }
+

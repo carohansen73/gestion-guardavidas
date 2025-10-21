@@ -30,6 +30,7 @@ class UserSeeder extends Seeder
         //creo usuario admin
         $adminUser = User::query()->create([
             'name' => 'admin',
+            'lastname' => 'admin',
             'email' => 'admin@admin.com',
             'password' => '123456789',
             'email_verified_at' => now()
@@ -44,9 +45,10 @@ class UserSeeder extends Seeder
         //asigno todos los permisos al rol admin
         $roleAdmin->syncPermissions($permissionAdmin);
 
-        //creo usuario guardavidas
-        $guardavidaUser = User::query()->create([
-            'name' => 'María Gómez',
+        //creo usuario encargado
+        $encargadoUser = User::query()->create([
+            'name' => 'María',
+            'lastname' => 'Gómez',
             'email' => 'guardavida@gmail.com',
             'password' => Hash::make('123456789'),
             'email_verified_at' => now()
@@ -55,6 +57,7 @@ class UserSeeder extends Seeder
         //creo usuario guardavidas
         $guardavidaUser2 = User::query()->create([
             'name' => 'Carla Fernández',
+            'lastname' => 'Carla Fernández',
             'email' => 'guardavida2@gmail.com',
             'password' => Hash::make('123456789'),
             'email_verified_at' => now()
@@ -63,6 +66,7 @@ class UserSeeder extends Seeder
         //creo usuario guardavidas
         $guardavidaUser3 = User::query()->create([
             'name' => 'Juan Pérez',
+            'lastname' => 'Juan Pérez',
             'email' => 'guardavida3@gmail.com',
             'password' => Hash::make('123456789'),
             'email_verified_at' => now()
@@ -79,12 +83,21 @@ class UserSeeder extends Seeder
         //creo rol guardavida
         $roleGuardavida = Role::create(['name' => 'guardavida']);
         //asigno rol guardavida a usuario guardavida
-        $guardavidaUser->assignRole($roleGuardavida);
+
         $guardavidaUser2->assignRole($roleGuardavida);
         $guardavidaUser3->assignRole($roleGuardavida);
         $guardavidaUser4->assignRole($roleGuardavida);
 
         $roleGuardavida->syncPermissions('ver puestos');
+
+        //creo rol
+        $roleEncargado = Role::create(['name' => 'encargado']);
+        //asigno rol a usuario
+        $encargadoUser->assignRole($roleEncargado);
+        //traigo todos los permisos
+        $permissionAll = Permission::query()->pluck('name');
+        //asigno todos los permisos al rol encargado
+        $roleEncargado->syncPermissions($permissionAll);
 
         //TODO Crear policy para cada modelo y @can('ver puestos'),etc. en buttons, menu, etc.
 

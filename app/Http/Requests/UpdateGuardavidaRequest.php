@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateGuardavidaRequest extends FormRequest
 {
@@ -11,7 +12,7 @@ class UpdateGuardavidaRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,8 +22,21 @@ class UpdateGuardavidaRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            //
+
+        $rules = [
+            // 'nombre' => 'required|string|max:255',
+            // 'apellido' => 'required|string|max:255',
+            'dni' => ['required', 'digits_between:7,8', Rule::unique('guardavidas', 'dni')->ignore($this->guardavida->id)],
+            'telefono' => 'required|string|max:20',
+            'direccion' => 'required|string|max:255',
+            'numero' => 'required|string|max:10',
+            'piso_dpto' => 'nullable|string|max:10',
+            'playa_id' => 'required|exists:playas,id',
+            'puesto_id' => 'required|exists:puestos,id',
+            'funcion' => 'required|string|in:Timonel,Encargado,Guardavida,Jefe_de_playa',
         ];
+
+        return $rules;
+
     }
 }

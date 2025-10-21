@@ -11,7 +11,7 @@ class StoreGuardavidaRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,8 +21,25 @@ class StoreGuardavidaRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            //
+        //verifico datos primero para usuario, luego, si es guardavida para guardavidas.
+        $rules = [
+            'nombre' => 'required|string|max:255',
+            'apellido' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'rol' => 'required|string|in:guardavida,encargado,admin',
         ];
+        if (in_array($this->input('rol'), ['guardavida', 'encargado'])) {
+            $rules = array_merge($rules, [
+                'dni' => 'required|digits_between:7,8|unique:guardavidas,dni',
+                'telefono' => 'required|string|max:20',
+                'direccion' => 'required|string|max:255',
+                'numero' => 'required|string|max:10',
+                'piso_dpto' => 'nullable|string|max:10',
+                'playa_id' => 'required|exists:playas,id',
+                'puesto_id' => 'required|exists:puestos,id',
+                'funcion' => 'required|string|in:Timonel,Encargado,Guardavida,Jefe_de_playa',
+            ]);
+        }
+        return $rules;
     }
 }

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('guardavidas', function (Blueprint $table) {
             $table->id();
+            $table->enum('funcion', ['Guardavida','Timonel', 'Encargado', 'Jefe_de_playa']);
             $table->string('nombre');
             $table->string('apellido');
             $table->string('dni');

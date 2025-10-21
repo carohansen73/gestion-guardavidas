@@ -1,11 +1,13 @@
 <?php
 
 use App\Http\Controllers\Auth\ApiAuthController;
+use App\Http\Controllers\QrController;
+use App\Http\Controllers\AsistenciaController;
+use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\GuardavidaController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\QrController;
-use App\Http\Controllers\AsistenciaController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -40,8 +42,9 @@ Route::middleware('auth')->group(function () {
     Route::resource('intervencion', App\Http\Controllers\IntervencionController::class);
 
     Route::resource('bandera', App\Http\Controllers\BanderaController::class);
-
-
+    Route::resource('guardavida', App\Http\Controllers\GuardavidaController::class);
+    Route::patch('usuario-toggle/{user}', [UserController::class, 'toggle'])->name('user.toggle');
+    Route::get('guardavidas-deshabilitados', [GuardavidaController::class, 'getAllDisabled'])->name('guardavidas.disabled');
     Route::get('/get-all-guardavidas', [GuardavidaController::class, 'getAll']);
 
     Route::get('/activeCamera', [QrController::class, 'activeCamera'])->name('activeCamera');
@@ -54,9 +57,16 @@ Route::middleware('auth')->group(function () {
     // QR
     Route::post("/desencriptar-qr", [QrController::class, 'desencriptarQr'])->name('desencriptar.qr');
 
+
+    //pasar a moddleware admin
+    //Route::middleware(['auth', 'can:admin'])
+    Route::put('/update-user/{user}', [RegisteredUserController::class, 'updateUserByAdmin'])->name('user.update');
+    Route::put('/update-rol/{user}', [GuardavidaController::class, 'updateUserRol'])->name('rol.update');
 });
 
+
 Route::post('api/login', [ApiAuthController::class, 'login']);
+
 
 require __DIR__.'/auth.php';
 
