@@ -20,7 +20,9 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'lastname',
         'email',
+        'enabled',
         'password',
     ];
 
@@ -44,6 +46,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'enabled' => 'boolean',
         ];
     }
 
@@ -53,5 +56,13 @@ class User extends Authenticatable
      */
     public function guardavida() {
         return $this->hasOne(Guardavida::class);
+    }
+
+    public function scopeHabilitados($query){
+        return $query->where('enabled', true);
+    }
+
+    public function scopeDeshabilitados($query){
+        return $query->where('enabled', false);
     }
 }

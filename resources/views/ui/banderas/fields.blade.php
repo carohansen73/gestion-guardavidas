@@ -187,7 +187,7 @@
 
  </section>
 
- @vite(['resources/js/form-intervenciones.js'])
+ @vite(['resources/js/filterPuestoByPlaya.js'])
 @endsection
 
 
