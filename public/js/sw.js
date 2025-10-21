@@ -1,4 +1,6 @@
-/*self.addEventListener('install', event => {
+import { recuperarDatos } from "./baseDeDatosNavegador.js";
+
+self.addEventListener('install', event => {
     console.log('Service Worker instalado');
     self.skipWaiting();
 });
@@ -25,10 +27,12 @@ async function sincronizarAsistencias() {
         },
         body: JSON.stringify(asistencia)
       });
+
       await eliminarDatosIndexed(asistencia.id);
       console.log('✅ Asistencia sincronizada:', asistencia);
-    } catch (err) {
+    } 
+    catch (err) {
       console.error('❌ Error al enviar asistencia:', err);
     }
   }
-}*/
+}

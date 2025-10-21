@@ -56,7 +56,9 @@ Route::middleware('auth')->group(function () {
 
 });
 
+
 Route::post('api/login', [ApiAuthController::class, 'login']);
+
 
 require __DIR__.'/auth.php';
 
