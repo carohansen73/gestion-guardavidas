@@ -30,14 +30,16 @@
                 </a>
             </div>
             <div class="p-2 md:w-1/3 sm:w-1/2 w-full">
-                <div class="px-2 py-6 rounded-lg bg-white shadow-md hover:drop-shadow-xl">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                        class="bg-purple-600/20 text-purple-600 p-2 w-12 h-12 mb-3 inline-block rounded-xl">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
-                    </svg>
-                    <h2 class="title-font font-medium text-3xl text-gray-900">74</h2>
-                    <p class="leading-relaxed">Novedades Materiales</p>
-                </div>
+                <a href="{{ route('novedad-de-material.index') }}">
+                    <div class="px-2 py-6 rounded-lg bg-white shadow-md hover:drop-shadow-xl">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                            class="bg-purple-600/20 text-purple-600 p-2 w-12 h-12 mb-3 inline-block rounded-xl">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                        </svg>
+                        <h2 class="title-font font-medium text-3xl text-gray-900">74</h2>
+                        <p class="leading-relaxed">Novedades Materiales</p>
+                    </div>
+                </a>
             </div>
         </div>
     </div>

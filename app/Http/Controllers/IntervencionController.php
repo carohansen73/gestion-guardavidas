@@ -28,7 +28,7 @@ class IntervencionController extends Controller
             ->with(['guardavidas', 'fuerzas', 'puesto', 'playa'])
             ->latest()
             ->get();
-        }  elseif ($user->hasAnyRole(['admin', 'encargado', 'jefeDePlaya'])) {
+        }  elseif ($user->hasAnyRole(['admin', 'encargado'])) {
             $intervenciones = Intervencion::with(['guardavidas', 'fuerzas', 'puesto', 'playa'])
             ->latest()->get();
         } else {

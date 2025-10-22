@@ -4,8 +4,8 @@
             <thead class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
                 <tr>
                     <th class="px-4 py-2 text-left cursor-pointer" onclick="toggleSort()">Fecha</th>
-                    <th class="px-4 py-2 text-left">Bandera</th>
-                    <th class="px-4 py-2 text-left">Turno</th>
+                    <th class="px-4 py-2 text-left">Novedad</th>
+                    <th class="px-4 py-2 text-left">Material</th>
                     <th class="px-4 py-2 text-left">Playa</th>
                     <th class="px-4 py-2 text-left">Acciones</th>
                 </tr>
@@ -16,23 +16,27 @@
                         data-playa="{{ $registro->playa->id ?? '' }}"
                         data-fecha="{{ $registro->fecha->format('Y-m-d') }}">
                         <td class="px-4 py-2">{{ $registro->fecha->format('d/m/Y') }}</td>
-                        <td class="px-4 py-2">{{ $registro->bandera->codigo }}</td>
-                        <td class="px-4 py-2">{{ $registro->turno }}</td>
+                        <td class="px-4 py-2">{{ $registro->tipo_novedad }}</td>
+                        <td class="px-4 py-2">
+                            <a href="{{ route('novedad-de-material.show', $registro) }}" class="text-sky-600 hover:text-sky-400">
+                                {{ $registro->material->nombre }} {{ $registro->material->detalle }}
+                            </a>
+                        </td>
                         <td class="px-4 py-2">{{ $registro->playa->nombre ?? '-' }}</td>
                         <td class="px-4 py-2">
                             <div class="flex space-x-2">
-                                <a href="{{ route('bandera.show', $registro) }}"
+                                <a href="{{ route('novedad-de-material.show', $registro) }}"
                                 class="text-blue-600 hover:underline">Ver</a>
                                 {{-- TODO permisos!!
                                 @can('editar banderas') --}}
-                                <a href="{{ route('bandera.edit', $registro) }}"
+                                <a href="{{ route('novedad-de-material.edit', $registro) }}"
                                     class="text-yellow-600 hover:underline">
                                     Editar
                                 </a>
                                 {{-- @endcan --}}
                                 {{-- @can('eliminar banderas') --}}
-                                <form action="{{ route('bandera.destroy', $registro) }}" method="POST"
-                                    onsubmit="return confirm('¿Seguro que deseas eliminar esta intervención?')">
+                                <form action="{{ route('novedad-de-material.destroy', $registro) }}" method="POST"
+                                    onsubmit="return confirm('¿Seguro que deseas eliminar esta novedad?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-red-600 hover:underline">Eliminar</button>

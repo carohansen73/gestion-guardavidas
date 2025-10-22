@@ -14,7 +14,7 @@
     <div class="flex justify-between align-center mb-sm-4">
         <h1 class="text-lg font-semibold text-gray-900 dark:text-white mt-3 "> Guardavidas </h1>
 
-        <a href="{{ route('guardavida.create') }}" class="btn hidden sm:flex align-center bg-sky-500 dark:bg-sky-700 hover:bg-sky-400 dark:hover:bg-sky-600 rounded-full px-3 py-2 shadow">
+        <a href="{{ route('guardavida.create') }}" class="btn hidden sm:flex align-center bg-sky-500 dark:bg-sky-700 hover:bg-sky-400 dark:hover:bg-sky-600 rounded-full px-3 py-2 shadow-md hover:shadow-lg">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
             class="text-sky-500 dark:text-sky-700 w-5 h-5 bg-gray-100 dark:bg-gray-200 rounded me-2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -28,6 +28,11 @@
     @if (session('success'))
         <div class="bg-green-100 text-green-700 p-3 rounded my-2">
             {{ session('success') }}
+        </div>
+    @endif
+    @if (session('error'))
+        <div class="bg-red-100 text-red-700 p-3 rounded my-2">
+            {{ session('error') }}
         </div>
     @endif
 
@@ -73,9 +78,8 @@
                     </li>
                 </a>
                 <li class="py-2">
-                    {{-- Lo puede eliminar el suuario que lo cargo?
-                        auth()->id() === $registro->user_id || --}}
-                    @if( auth()->user()->rol === 'encargado')
+
+                    @if( auth()->user()->hasAnyRole(['encargado', 'admin']))
                         <form :action="`/guardavida/${selectedId}`" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar esta intervención?');">
                             @csrf
                             @method('DELETE')

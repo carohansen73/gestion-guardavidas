@@ -122,9 +122,9 @@
                     </li>
                 </a>
                 <li class="py-2">
-                    {{-- Lo puede eliminar el suuario que lo cargo?
+                    {{-- Lo puede eliminar el usuario que lo cargo?
                         auth()->id() === $registro->user_id || --}}
-                    @if( auth()->user()->rol === 'encargado')
+                    @if(auth()->user()->hasAnyRole(['encargado', 'admin']))
                         <form :action="`/guardavida/${selectedId}`" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar esta intervención?');">
                             @csrf
                             @method('DELETE')

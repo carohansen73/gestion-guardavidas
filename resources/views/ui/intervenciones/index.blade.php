@@ -11,7 +11,20 @@
 
 
 <div class="text-gray-600 dark:text-gray-100 body-font px-4 ">
-    <h1 class="text-lg font-semibold text-gray-900 dark:text-white mt-3 mb-sm-3"> Intervenciones </h1>
+
+    <div class="flex justify-between align-center mb-sm-4">
+        <h1 class="text-lg font-semibold text-gray-900 dark:text-white mt-3 "> Intervenciones </h1>
+
+        <a href="{{ route('intervencion.create') }}" class="btn hidden sm:flex align-center bg-sky-500 dark:bg-sky-700 hover:bg-sky-400 dark:hover:bg-sky-600 rounded-full px-3 py-2 shadow-md hover:shadow-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+            class="text-sky-500 dark:text-sky-700 w-5 h-5 bg-gray-100 dark:bg-gray-200 rounded me-2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            <span class="text-gray-100 dark:text-gray-200"> Agregar</span>
+        </a>
+    </div>
+
+
     {{-- @role('admin|encargado') --}}
     <div class="flex flex-col-reverse md:flex-row justify-between align-center">
          {{-- <div class="">
@@ -37,23 +50,33 @@
             @endforeach
         </div>
         {{-- Busqueda --}}
-        <div class="w-full md:w-auto my-3 md:my-0">
+        <div class="relative w-full md:w-auto my-3 sm:!my-0">
             <input
                 type="text"
                 id="searchInput"
-                placeholder="Buscar intervención..."
+                placeholder='Buscar... '
                 class="w-full px-3 py-2 border rounded"
                 oninput="applyFilters()">
+
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                class="w-5 h-5 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+                id="searchIcon">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+            </svg>
         </div>
     </div>
     {{-- @endrole --}}
 
     @if (session('success'))
-        <div class="bg-green-100 text-green-700 p-3 rounded mt-3">
+        <div class="bg-green-100 text-green-700 p-3 rounded my-2">
             {{ session('success') }}
         </div>
     @endif
-
+    @if (session('error'))
+        <div class="bg-red-100 text-red-700 p-3 rounded my-2">
+            {{ session('error') }}
+        </div>
+    @endif
 </div>
 
 <div x-data="{ selectedId: null }">
@@ -208,7 +231,7 @@
                                             </svg>
                                             Editar
                                         </a>
-                                        @if(auth()->id() === $intervencion->user_id || auth()->user()->rol === 'encargado')
+                                        @if(auth()->id() === $intervencion->user_id || auth()->user()->hasAnyRole(['encargado', 'admin']))
                                             <form action="{{ route('intervencion.destroy', $intervencion) }}" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar esta intervención?');">
                                                 @csrf
                                                 @method('DELETE')
@@ -261,9 +284,9 @@
     {{-- Tabla para Desktop --}}
 
 
-    <div class="hidden sm:block overflow-x-auto space-y-12">
-        <div class="-900/10 pb-12 dark:border-white/10 rounded-lg dark:bg-gray-600 px-4 py-4">
-            <table class="min-w-full border border-gray-200 dark:border-gray-700 rounded-lg shadow">
+<div class="hidden sm:block overflow-x-auto space-y-12">
+    <div class="pb-12 dark:border-white/10 rounded-lg dark:bg-gray-600 px-4 py-2">
+        <table class="min-w-full border border-gray-200 dark:border-gray-700 rounded-lg shadow">
                 <thead class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
                     <tr>
                         <th class="px-4 py-2 text-left cursor-pointer" onclick="toggleSort()">Fecha</th>
@@ -348,7 +371,7 @@
                 <li class="py-2">
                     {{-- Lo puede eliminar el suuario que lo cargo?
                         auth()->id() === $intervencion->user_id || --}}
-                    @if( auth()->user()->rol === 'encargado')
+                    @if( auth()->user()->hasAnyRole(['encargado', 'admin']))
                         <form :action="`/intervencion/${selectedId}`" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar esta intervención?');">
                             @csrf
                             @method('DELETE')

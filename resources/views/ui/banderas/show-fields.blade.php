@@ -45,7 +45,8 @@
             </div>
 
             <h3 class="text-base font-semibold text-gray-800 dark:text-white">
-                {{ $bandera->playa->nombre }} - TODO: Especificar puesto?
+                {{ $bandera->playa->nombre }}
+             {{-- - TODO: Especificar puesto? --}}
             </h3>
             <span class="text-sm text-gray-500 dark:text-gray-300">
                 {{ $bandera->fecha->format('d/m/Y') }}

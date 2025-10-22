@@ -37,12 +37,13 @@ Route::middleware('auth')->group(function () {
      Route::get('/home', [HomeController::class, 'index'])->name('home');
 
     Route::resource('intervencion', App\Http\Controllers\IntervencionController::class);
-
+    Route::resource('novedad-de-material', App\Http\Controllers\NovedadMaterialController::class);
     Route::resource('bandera', App\Http\Controllers\BanderaController::class);
     Route::resource('guardavida', App\Http\Controllers\GuardavidaController::class);
     Route::patch('usuario-toggle/{user}', [UserController::class, 'toggle'])->name('user.toggle');
     Route::get('guardavidas-deshabilitados', [GuardavidaController::class, 'getAllDisabled'])->name('guardavidas.disabled');
     Route::get('/get-all-guardavidas', [GuardavidaController::class, 'getAll']);
+
 
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

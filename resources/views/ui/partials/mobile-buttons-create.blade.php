@@ -38,6 +38,7 @@
 
             </div>
             <div class="p-2 lg:w-1/3 md:w-1/3 sm:w-1/2 w-1/2 ">
+                <a href="{{ route('novedad-de-material.create') }}">
                  <div class="px-4 py-6 rounded-lg shadow hover:shadow-md cursor-pointer bg-white dark:bg-gray-600 transition ease-in duration-300">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                        class="text-sky-600 w-10 h-10 sm:w-10 sm:h-10 lg:w-12 lg:h-12 mx-auto mb-3 mb-3 inline-block">
@@ -45,6 +46,7 @@
                     </svg>
                     <p class="leading-none">Novedad de Material</p>
                 </div>
+                </a>
             </div>
             <div class="p-2 lg:w-1/3 md:w-1/3 sm:w-1/2 w-1/2 ">
                  <div class="px-4 py-6 rounded-lg shadow hover:shadow-md cursor-pointer bg-white dark:bg-gray-600 transition ease-in duration-300">
