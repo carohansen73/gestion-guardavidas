@@ -60,6 +60,7 @@ class GuardavidaSeeder extends Seeder
         ]);
 
         Guardavida::create([
+            'funcion' => 'Timonel',
             'nombre' => 'Valentina',
             'apellido' => 'Cast',
             'dni' => '44993777',
@@ -69,7 +70,7 @@ class GuardavidaSeeder extends Seeder
             'piso_dpto' => null,
             'playa_id' => 5,
             'puesto_id' => 29,
-            'user_id' => 6,
+            'user_id' => 5,
         ]);
 
 

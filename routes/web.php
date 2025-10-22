@@ -48,6 +48,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/get-all-guardavidas', [GuardavidaController::class, 'getAll']);
 
     Route::get('/activeCamera', [QrController::class, 'activeCamera'])->name('activeCamera');
+    Route::post('/verPuesto', [UserController::class, 'verPuestoUsuario'])->name('puesto.usuario');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

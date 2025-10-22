@@ -30,7 +30,10 @@
         </div>
 
         <div class="contenedorQR">
-                <video id="video" autoplay></video>
+                <div class="qr-frame">
+                        <span></span>
+                        <video id="video" autoplay></video>
+                </div>
         </div>
 
         <div class="fixed bottom-0 left-0 right-0 z-40 bg-gray-100 lg:hidden buttom-navigation border-t border-gray-200 shadow rounded-t-lg">

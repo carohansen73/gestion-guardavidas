@@ -36,14 +36,7 @@ async function iniciarCamara() {
         detectarQR();
     } catch (error) {
         contenedorAnimacionCarga.style.display = "none";
-        Swal.fire({
-                title: "Error",
-                text: "Error al acceder a la cámara.",
-                icon: "error",
-                confirmButtonColor: "#36be7f",
-            }).then(() => {
-                //window.location.href = "/dashboard"; 
-            });;
+        alertaError("Error al acceder a la cámara.");
     }
 }
 
@@ -73,21 +66,14 @@ async function detectarQR() {
             requestAnimationFrame(detectarQR);
         }
     } catch (error) {
-        Swal.fire({
-                title: "Error",
-                text: "Error al detectar QR.",
-                icon: "error",
-                confirmButtonColor: "#36be7f",
-            }).then(() => {
-                window.location.href = "/dashboard"; // Redireccion despues de cerrar el alert
-            });
+        alertaError("Error al detectar QR.");
     }
 }
 
-// Si hay internet, desencriptamos el QR, comparamos el rango de distancia donde se escaneo y en caso de estar a menos de 
+// Si hay internet, desencriptamos el QR, comparamos el rango de distancia donde se escaneo y en caso de estar a menos de
 // 200 mts, se guarda la asistencia
 //Si llega a pasa que no hay internet, se comprueba la distancia donde leyo el QR y si esta en un rango menor a 200 mts
-//La información pasa a guardarse en el IndexedDB (falta que, cuando vuelva a tener internet automaticamente lo detecte y guarde 
+//La información pasa a guardarse en el IndexedDB (falta que, cuando vuelva a tener internet automaticamente lo detecte y guarde
 //los datos en la base de datos)
 async function registrarAsistencia(valorQR) {
     contenedorAnimacionCarga.style.display = "block";
@@ -129,16 +115,29 @@ async function registrarAsistencia(valorQR) {
                                 return;
                             } else {
                                 //Cargar la asistencia para guardarla
-                                let datos = {
-                                    idPlaya: idPlaya,
-                                    userLat: resultado.userLat,
-                                    userLng: resultado.userLng,
-                                    userPrecision: resultado.userPrecision,
-                                    user_id: user_id,
-                                    idPuesto: idPuesto,
-                                    fecha_hora: fechaHoraArgentinaDatetime(),
-                                };
-                                cargarDatos(datos);
+                                perteneceQRAlPuesto(user_id, idPuesto).then(
+                                    (puestoCorrecto) => {
+                                        console.log(puestoCorrecto)
+                                        if (puestoCorrecto && puestoCorrecto.success == true){
+                                            let datos = {
+                                                idPlaya: idPlaya,
+                                                userLat: resultado.userLat,
+                                                userLng: resultado.userLng,
+                                                userPrecision: resultado.userPrecision,
+                                                user_id: user_id,
+                                                idPuesto: idPuesto,
+                                                fecha_hora: fechaHoraArgentinaDatetime(),
+                                            };
+                                            cargarDatos(datos);
+                                        }
+                                        else{
+                                            contenedorAnimacionCarga.style.display = "none";
+                                            animacionCarga.classList.remove("animacion");
+                                            alertaError("Debe escanear en el puesto que le corresponde.");
+                                        }
+                                    }
+                                )
+                                
                             }
                         }
                     );
@@ -146,60 +145,39 @@ async function registrarAsistencia(valorQR) {
                     //scanner.stop();
                 });
         } else {
-            // En caso de estar offline
-            //HAY QUE OBTENER LATITUD Y LONGITUD DEL PUESTO, VER SI LO GUARDO COMO EL ID DEL USUARIO
-            cargarDistancia(latitudPuesto, longitudPuesto).then(
-                        (resultado) => {
-                            if (resultado.distancia > 200) {
-                                    contenedorAnimacionCarga.style.display = "none";
-                                    animacionCarga.classList.remove("animacion");
-                                Swal.fire({
-                                    title: "Error",
-                                    text: "Se encuentra fuera del rango permitido (200m). Vuelve a escanear cerca del puesto.",
-                                    icon: "error",
-                                    confirmButtonColor: "#36be7f",
-                                }).then(() => {
-                                    window.location.href = "/activeCamera"; // Redireccion despues de cerrar el alert
-                                });
-                                return;
-                            } else {
-                                guardarDatosOffline(user_id, valorQR, resultado.userLat, resultado.userLng, resultado.userPrecision);
-                            }
-                        }
-                    );
-           
+            guardarDatosOffline(
+                user_id,
+                valorQR,
+                resultado.userLat,
+                resultado.userLng,
+                resultado.userPrecision
+            );
         }
     } catch (err) {
+        console.log(err);
         contenedorAnimacionCarga.style.display = "none";
         animacionCarga.classList.remove("animacion");
-        Swal.fire({
-            title: "Error del sistema",
-            text: "Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente.",
-            icon: "error",
-            confirmButtonColor: "#36be7f",
-        }).then(() => {
-            window.location.href = "/dashboard"; // Redireccion despues de cerrar el alert
-        });
+        alertaError(
+            "Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente."
+        );
     }
 }
 
 //Obtenemos la fecha y hora Argentina para que se guarde en la base de datos
 function fechaHoraArgentinaDatetime() {
-  const ahora = new Date();
-  const opciones = { timeZone: 'America/Argentina/Buenos_Aires' };
-  const fecha = new Intl.DateTimeFormat('sv-SE', opciones).format(ahora);
-  const hora = ahora.toLocaleTimeString('es-AR', { 
-    timeZone: 'America/Argentina/Buenos_Aires',
-    hour12: false
-  });
+    const ahora = new Date();
+    const opciones = { timeZone: "America/Argentina/Buenos_Aires" };
+    const fecha = new Intl.DateTimeFormat("sv-SE", opciones).format(ahora);
+    const hora = ahora.toLocaleTimeString("es-AR", {
+        timeZone: "America/Argentina/Buenos_Aires",
+        hour12: false,
+    });
 
-  return `${fecha} ${hora}`;
+    return `${fecha} ${hora}`;
 }
 
 // Iniciar automáticamente al cargar
 window.addEventListener("DOMContentLoaded", iniciarCamara);
-
-
 
 async function calcularDistancia(lat1, lon1, lat2, lon2) {
     const R = 6371e3; // radio de la tierra en metros
@@ -224,19 +202,65 @@ function obtenerUbicacion() {
     });
 }
 
+async function perteneceQRAlPuesto(user_id, idPuesto) {
+    try {
+        const res = await fetch("/verPuesto", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": csrfToken,
+            },
+            body: JSON.stringify({ user_id: user_id, puesto_id: idPuesto }),
+        });
 
-async function guardarDatosOffline(user_id, valorQR, userLat, userLng, userPrecision) {
+        const data = await res.json();
+        return data;
+    } catch (error) {
+        console.error("Error en perteneceQRAlPuesto:", error);
+        contenedorAnimacionCarga.style.display = "none";
+        animacionCarga.classList.remove("animacion");
+        alertaError("Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente.");
+        return null;
+    }
+}
+
+
+async function guardarDatosOffline(user_id,valorQR,userLat,userLng,userPrecision) {
     if (!navigator.onLine) {
         console.log("Sin conexión, guardando asistencia localmente...");
-        guardarAsistenciaOffline({
-            encrypted: valorQR,
-            lat: userLat,
-            lng: userLng,
-            precision: userPrecision,
-            user_id: user_id,
-            fecha_hora: fechaHoraArgentinaDatetime(),
-            csrfToken: csrfToken,
-        });
+        try {
+            let guardado = await guardarAsistenciaOffline({
+                encrypted: valorQR,
+                lat: userLat,
+                lng: userLng,
+                precision: userPrecision,
+                user_id: user_id,
+                fecha_hora: fechaHoraArgentinaDatetime(),
+                csrfToken: csrfToken,
+            });
+            contenedorAnimacionCarga.style.display = "none";
+            animacionCarga.classList.remove("animacion");
+            if (guardado) {
+                Swal.fire({
+                    title: "OK",
+                    text: "¡Asistencia guardada para cuando vuelve el wifi se pueda registrar!.",
+                    icon: "success",
+                    confirmButtonColor: "#36be7f",
+                }).then(() => {
+                    window.location.href = "/dashboard";
+                });
+            } else {
+                alertaError(
+                    "No se pudo guardar la asistencia. Por favor, intentá nuevamente"
+                );
+            }
+        } catch (error) {
+            alertaError(
+                "No se pudo guardar la asistencia. Por favor, intentá nuevamente"
+            );
+        }
+    } else {
+        registrarAsistencia(valorQR);
     }
 }
 
@@ -263,17 +287,20 @@ async function cargarDistancia(latitudPuesto, longitudPuesto) {
     } catch (err) {
         contenedorAnimacionCarga.style.display = "none";
         animacionCarga.classList.remove("animacion");
-        Swal.fire({
-            title: "Error",
-            text: "Error obteniendo su ubicación.",
-            icon: "error",
-            confirmButtonColor: "#36be7f",
-        }).then(() => {
-            window.location.href = "/dashboard"; // Redireccion despues de cerrar el alert
-        });
+        alertaError("Error obteniendo su ubicación.");
     }
 }
 
+function alertaError(text) {
+    Swal.fire({
+        title: "Error",
+        text: text,
+        icon: "error",
+        confirmButtonColor: "#36be7f",
+    }).then(() => {
+        //window.location.href = "/dashboard"; // Redireccion despues de cerrar el alert
+    });
+}
 
 //Obtiene el ID del usuario que se guarda en el navegador para guardar en la asistencia
 async function obtenerId() {
@@ -318,25 +345,15 @@ async function cargarDatos(datos) {
         } else {
             contenedorAnimacionCarga.style.display = "none";
             animacionCarga.classList.remove("animacion");
-            Swal.fire({
-                title: "Error",
-                text: "No se pudo registrar asistencia. Por favor, intentá nuevamente",
-                icon: "error",
-                confirmButtonColor: "#36be7f",
-            }).then(() => {
-                window.location.href = "/dashboard"; // Redireccion despues de cerrar el alert
-            });
+            alertaError(
+                "No se pudo registrar asistencia. Por favor, intentá nuevamente"
+            );
         }
     } catch (err) {
         contenedorAnimacionCarga.style.display = "none";
         animacionCarga.classList.remove("animacion");
-        Swal.fire({
-            title: "Error",
-            text: "Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente.",
-            icon: "error",
-            confirmButtonColor: "#36be7f",
-        }).then(() => {
-                window.location.href = "/dashboard"; 
-            });
+        alertaError(
+            "Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente."
+        );
     }
 }

@@ -52,6 +52,7 @@ class PuestoSeeder extends Seeder
 
             //Tres Arroyos
             ['nombre' => 'Municipalidad', 'latitud' => -38.3767662, 'longitud' => -60.2759348, 'qr_encriptado' => '', 'playa_id' => 5],
+            ['nombre' => 'Escuela Nacional N2', 'latitud' => -38.3762244, 'longitud' => -60.2750882, 'qr_encriptado' => '', 'playa_id' => 5],
 
         ];
 

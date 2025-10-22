@@ -74,6 +74,7 @@ class UserSeeder extends Seeder
 
         $guardavidaUser4 = User::query()->create([
             'name' => 'Valentina',
+            'lastname' => 'Pérez',
             'email' => 'guardavidaTresArroyos@gmail.com',
             'password' => Hash::make('123456789'),
             'email_verified_at' => now()

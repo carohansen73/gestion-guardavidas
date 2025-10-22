@@ -65,4 +65,16 @@ class User extends Authenticatable
     public function scopeDeshabilitados($query){
         return $query->where('enabled', false);
     }
+
+    public static function obtenerPuesto($idUser, $idPuesto){
+        $datosGuardavidas = User::select('*')
+        ->where('user_id', $idUser)
+        ->join('guardavidas', 'guardavidas.user_id', '=','users.id')
+        ->join('puestos', 'guardavidas.puesto_id', '=', 'puestos.id')
+        ->where('puestos.id', $idPuesto)
+        ->first();
+        
+        return !empty($datosGuardavidas) ? $datosGuardavidas : null;
+        
+    }
 }

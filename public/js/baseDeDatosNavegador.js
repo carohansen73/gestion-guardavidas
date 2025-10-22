@@ -43,20 +43,30 @@ function crearAlmacen(event){
     }
 }
 
-export function guardarAsistenciaOffline(data){
+export async function guardarAsistenciaOffline(data){
     if (!bd) {
         console.warn("BD aún no lista, reintentá más tarde");
         return;
     }
-    let transaccion = bd.transaction(["Asistencia"], "readwrite");
-    let almacen = transaccion.objectStore("Asistencia");
-    almacen.add(data);
-    transaccion.oncomplete = () => {
-        console.log("Asistencia guardada offline:", data);
-    };
-    transaccion.onerror = (event) => {
-        console.error("Error guardando en IndexedDB:", event.target.error);
-    };
+    return new Promise((resolve, reject) => {  
+        try {
+            const transaccion = bd.transaction(["Asistencia"], "readwrite");
+            const almacen = transaccion.objectStore("Asistencia");
+            const request = almacen.add(data);
+
+            request.onsuccess = () => {
+                console.log("Asistencia guardada offline:", data);
+            };
+
+            transaccion.oncomplete = () => resolve(true);
+            transaccion.onerror = (event) => {
+                console.error("Error guardando en IndexedDB:", event.target.error);
+                reject(event.target.error);
+            };
+        } catch (error) {
+            reject(error);
+        }
+    });
 }
 
 function recuperarDatos(){
