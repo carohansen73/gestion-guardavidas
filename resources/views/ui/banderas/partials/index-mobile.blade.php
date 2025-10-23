@@ -126,11 +126,13 @@
 
     </section>
 
-    <a href="{{ route('bandera.create') }}" class="btn fixed z-40 flex align-content-center bg-sky-500 dark:bg-sky-700 bottom-24 right-8 rounded-full px-3 py-3 shadow">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-        class="text-sky-500 w-6 h-6 z-50 bg-gray-100 rounded me-2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-        </svg>
-        <span class="text-gray-100 text-lg"> Agregar</span>
-    </a>
+    @can('agregar_bandera')
+        <a href="{{ route('bandera.create') }}" class="btn fixed z-40 flex align-content-center bg-sky-500 dark:bg-sky-700 bottom-24 right-8 rounded-full px-3 py-3 shadow">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+            class="text-sky-500 w-6 h-6 z-50 bg-gray-100 rounded me-2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            <span class="text-gray-100 text-lg"> Agregar</span>
+        </a>
+    @endcan
 </div>

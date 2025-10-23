@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Intervencion;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateIntervencionRequest extends FormRequest
@@ -11,7 +12,7 @@ class UpdateIntervencionRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return auth()->user()->can('editar_intervencion', Intervencion::class);
     }
 
     /**

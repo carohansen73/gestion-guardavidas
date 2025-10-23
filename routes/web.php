@@ -11,19 +11,12 @@ Route::get('/', function () {
     return view('auth.welcome');
 })->name('welcome');
 
-Route::get('/tailwind', function () {
-    return view('ui.tailwind');
-});
+
 
 // Route::get('/home', function () {
 //     return view('ui.home');
 // })->name('home');
 
-
-
-Route::get('/home-options', function () {
-    return view('ui.home-options');
-});
 
 Route::get('/template', function () {
     return view('ui.template');

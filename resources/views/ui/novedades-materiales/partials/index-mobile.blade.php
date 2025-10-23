@@ -57,6 +57,7 @@
                             {{-- BOTONES GROUP --}}
                             <div class="flex justify-center py-3">
                                 <div class="inline-flex rounded-md shadow-xs" role="group">
+                                    @can('editar_novedad_material')
                                     <a  href="{{ route('novedad-de-material.edit', $registro->id) }}"
                                         class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
                                         <svg xmlns="http://www.w3.org/2000/svg"
@@ -68,7 +69,8 @@
                                         </svg>
                                         Editar
                                     </a>
-                                    @if(auth()->user()->hasAnyRole(['encargado', 'admin']))
+                                    @endcan
+                                    @can('eliminar_novedad_material')
                                         <form action="{{ route('novedad-de-material.destroy', $registro) }}" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar esta intervención?');">
                                             @csrf
                                             @method('DELETE')
@@ -96,7 +98,7 @@
                                             </svg>
                                             Eliminar
                                         </button>
-                                    @endif
+                                    @endcan
                                 </div>
                             </div> <!--flex-->
                             {{-- FIN BOTONES GROUP--}}
@@ -106,14 +108,15 @@
                 </div>
             @endforeach
         </div>
-
     </section>
 
-    <a href="{{ route('novedad-de-material.create') }}" class="btn fixed z-40 flex align-content-center bg-sky-500 dark:bg-sky-700 bottom-24 right-8 rounded-full px-3 py-3 shadow">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-        class="text-sky-500 w-6 h-6 z-50 bg-gray-100 rounded me-2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-        </svg>
-        <span class="text-gray-100 text-lg"> Agregar</span>
-    </a>
+    @can('agregar_novedad_material')
+        <a href="{{ route('novedad-de-material.create') }}" class="btn fixed z-40 flex align-content-center bg-sky-500 dark:bg-sky-700 bottom-24 right-8 rounded-full px-3 py-3 shadow">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+            class="text-sky-500 w-6 h-6 z-50 bg-gray-100 rounded me-2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            <span class="text-gray-100 text-lg"> Agregar</span>
+        </a>
+    @endcan
 </div>

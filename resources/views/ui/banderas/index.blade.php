@@ -12,13 +12,15 @@
 <div class="text-gray-600 dark:text-gray-100 body-font px-4 ">
     <div class="flex justify-between align-center mb-sm-4">
         <h1 class="text-lg font-semibold text-gray-900 dark:text-white mt-3 "> Historial de banderas </h1>
-        <a href="{{ route('bandera.create') }}" class="btn hidden sm:flex align-center bg-sky-500 dark:bg-sky-700 hover:bg-sky-400 dark:hover:bg-sky-600 rounded-full px-3 py-2 shadow-md hover:shadow-lg">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-            class="text-sky-500 dark:text-sky-700 w-5 h-5 bg-gray-100 dark:bg-gray-200 rounded me-2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-            </svg>
-            <span class="text-gray-100 dark:text-gray-200"> Agregar</span>
-        </a>
+        @can('agregar_bandera')
+            <a href="{{ route('bandera.create') }}" class="btn hidden sm:flex align-center bg-sky-500 dark:bg-sky-700 hover:bg-sky-400 dark:hover:bg-sky-600 rounded-full px-3 py-2 shadow-md hover:shadow-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                class="text-sky-500 dark:text-sky-700 w-5 h-5 bg-gray-100 dark:bg-gray-200 rounded me-2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+                <span class="text-gray-100 dark:text-gray-200"> Agregar</span>
+            </a>
+        @endcan
     </div>
 
     @include('ui.banderas.partials.filtros-de-busqueda')
@@ -63,6 +65,7 @@
         {{-- Acciones --}}
         <div class="py-4">
             <ul class="space-y-3 font-medium">
+                @can('editar_bandera')
                 <a :href="'{{ route('bandera.edit', ':id') }}'.replace(':id', selectedId)">
                     <li class="py-2 inline-flex">
                         <svg xmlns="http://www.w3.org/2000/svg"
@@ -75,10 +78,11 @@
                         Editar
                     </li>
                 </a>
+                @endcan
                 <li class="py-2">
                     {{-- Lo puede eliminar el suuario que lo cargo?
                         auth()->id() === $registro->user_id || --}}
-                    @if( auth()->user()->rol === 'encargado')
+                    @can('eliminar_bandera')
                         <form :action="`/bandera/${selectedId}`" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar esta intervención?');">
                             @csrf
                             @method('DELETE')
@@ -110,7 +114,7 @@
                                 </svg>
                             Eliminar
                         </button>
-                    @endif
+                    @endcan
                 </li>
             </ul>
         </div>

@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\Material;
+use App\Models\NovedadMaterial;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateNovedadMaterialRequest extends FormRequest
@@ -12,7 +13,7 @@ class UpdateNovedadMaterialRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+         return auth()->user()->can('editar_novedad_material', NovedadMaterial::class);
     }
 
     /**

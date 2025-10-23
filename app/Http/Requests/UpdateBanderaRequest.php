@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Bandera;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateBanderaRequest extends StoreBanderaRequest
@@ -12,8 +13,7 @@ class UpdateBanderaRequest extends StoreBanderaRequest
     public function authorize(): bool
     {
         // return true;
-            $bandera = $this->route('bandera');
-            return auth()->user()->can('update', $bandera);
+           return auth()->user()->can('editar_bandera', Bandera::class);
     }
 
     /**

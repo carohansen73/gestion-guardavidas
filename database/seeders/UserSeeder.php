@@ -32,12 +32,12 @@ class UserSeeder extends Seeder
             'name' => 'admin',
             'lastname' => 'admin',
             'email' => 'admin@admin.com',
-            'password' => '123456789',
+            'password' => Hash::make('123456789'),
             'email_verified_at' => now()
         ]);
 
         //creo rol admin
-        $roleAdmin = Role::create(['name' => 'admin']);
+        $roleAdmin = Role::firstOrCreate(['name' => 'admin']);
         //asigno rol admin a usuario admin
         $adminUser->assignRole($roleAdmin);
         //traigo tosdos los permisos
@@ -73,7 +73,7 @@ class UserSeeder extends Seeder
         ]);
 
         //creo rol guardavida
-        $roleGuardavida = Role::create(['name' => 'guardavida']);
+        $roleGuardavida = Role::firstOrCreate(['name' => 'guardavida']);
         //asigno rol guardavida a usuario guardavida
 
         $guardavidaUser2->assignRole($roleGuardavida);
@@ -82,7 +82,7 @@ class UserSeeder extends Seeder
         $roleGuardavida->syncPermissions('ver puestos');
 
         //creo rol
-        $roleEncargado = Role::create(['name' => 'encargado']);
+        $roleEncargado = Role::firstOrCreate(['name' => 'encargado']);
         //asigno rol a usuario
         $encargadoUser->assignRole($roleEncargado);
         //traigo todos los permisos
@@ -91,6 +91,6 @@ class UserSeeder extends Seeder
         $roleEncargado->syncPermissions($permissionAll);
 
         //TODO Crear policy para cada modelo y @can('ver puestos'),etc. en buttons, menu, etc.
-
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
     }
 }

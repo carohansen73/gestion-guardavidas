@@ -23,21 +23,20 @@
                             <div class="flex space-x-2">
                                 <a href="{{ route('bandera.show', $registro) }}"
                                 class="text-blue-600 hover:underline">Ver</a>
-                                {{-- TODO permisos!!
-                                @can('editar banderas') --}}
-                                <a href="{{ route('bandera.edit', $registro) }}"
-                                    class="text-yellow-600 hover:underline">
-                                    Editar
-                                </a>
-                                {{-- @endcan --}}
-                                {{-- @can('eliminar banderas') --}}
-                                <form action="{{ route('bandera.destroy', $registro) }}" method="POST"
-                                    onsubmit="return confirm('¿Seguro que deseas eliminar esta intervención?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:underline">Eliminar</button>
-                                </form>
-                                {{-- @endcan --}}
+                                @can('editar_bandera')
+                                    <a href="{{ route('bandera.edit', $registro) }}"
+                                        class="text-yellow-600 hover:underline">
+                                        Editar
+                                    </a>
+                                @endcan
+                                @can('eliminar_bandera')
+                                    <form action="{{ route('bandera.destroy', $registro) }}" method="POST"
+                                        onsubmit="return confirm('¿Seguro que deseas eliminar esta intervención?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-red-600 hover:underline">Eliminar</button>
+                                    </form>
+                                @endcan
                             </div>
                         </td>
                     </tr>

@@ -13,7 +13,7 @@ class StoreBanderaRequest extends FormRequest
     public function authorize(): bool
     {
         //Llamo al policy para que chequee si el usuario esta autorizado
-        return auth()->user()->can('create', Bandera::class);
+        return auth()->user()->can('agregar_bandera', Bandera::class);
         // return Auth::user()->can('create', Bandera::class);
     }
 
