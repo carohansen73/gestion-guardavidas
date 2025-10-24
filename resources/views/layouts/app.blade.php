@@ -49,7 +49,8 @@
 
         @include('layouts.bottom-navigation')
 
-        <script src="{{ asset('js/script.js') }}"></script>
+        <!---<script src="{{ asset('js/script.js') }}"></script>-->
+        <script src="{{ asset('app.js') }}"></script>
 
          <script src="https://unpkg.com/flowbite@2.5.1/dist/flowbite.min.js"></script>
     </body>

@@ -45,10 +45,10 @@
             <!--Para las alertas en JS-->
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script src="{{ asset('js/html5-qrcode.min.js') }}"></script>
-
-        <script type="module" src="{{ asset('js/app-sw.js') }}"></script>
         <script type="module" src="{{ asset('js/baseDeDatosNavegador.js') }}"></script>
         <script type="module" src="{{ asset('js/qrAsistencia.js') }}"></script>
+
+        <script src="{{ asset('js/app-sw.js') }}"></script>
 </body>
 
 </html>

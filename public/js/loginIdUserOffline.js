@@ -13,7 +13,7 @@ async function loginOffline() {
     const password = document.querySelector('#password').value;
 
     try {
-        const res = await fetch('/api/login', {
+        const res = await fetch('/api/loginIdUser', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

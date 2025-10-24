@@ -43,43 +43,40 @@ function crearAlmacen(event){
     }
 }
 
-export async function guardarAsistenciaOffline(data){
+export async function guardarAsistenciaOffline(data) {
     if (!bd) {
         console.warn("BD aún no lista, reintentá más tarde");
         return;
     }
-    return new Promise((resolve, reject) => {  
-        try {
-            const transaccion = bd.transaction(["Asistencia"], "readwrite");
-            const almacen = transaccion.objectStore("Asistencia");
-            const request = almacen.add(data);
 
+    try {
+        const transaccion = bd.transaction(["Asistencia"], "readwrite");
+        const almacen = transaccion.objectStore("Asistencia");
+
+        // Convertimos la operación de add a promesa para poder usar await
+        await new Promise((resolve, reject) => {
+            const request = almacen.add(data);
             request.onsuccess = () => {
                 console.log("Asistencia guardada offline:", data);
+                resolve();
             };
-
-            transaccion.oncomplete = () => resolve(true);
-            transaccion.onerror = (event) => {
+            request.onerror = (event) => {
                 console.error("Error guardando en IndexedDB:", event.target.error);
                 reject(event.target.error);
             };
-        } catch (error) {
-            reject(error);
+        });
+
+        // Registrar la sincronización solo después de guardar los datos
+        if ('serviceWorker' in navigator && 'SyncManager' in window) {
+            const swReg = await navigator.serviceWorker.ready; // Ver razon por la que no carga
+            await swReg.sync.register('sync-asistencias');
+            console.log('Sincronización registrada');
         }
-    });
+        return true;
+    } catch (error) {
+        console.error("Error en guardarAsistenciaOffline:", error);
+        throw error;
+    }
 }
 
-function recuperarDatos(){
-    let datosGuardavidas = objectStore.getAll();
-    return datosGuardavidas;
-}
 
-function eliminarDatosIndexed(id){
-    let request = objectStore.delete(id);
-    request.onsuccess = function(event) {
-        console.log(`Registro ${id} eliminado correctamente`);
-    };
-    request.onerror = function(event) {
-        console.error(`Error al eliminar registro ${id}:`, event.target.error);
-    };
-}

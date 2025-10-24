@@ -14,8 +14,9 @@ class AsistenciaController extends Controller
     {
         if (!Auth::check()) {
             return response()->json([
-                'success' => false,
-                'data' => 'Debe loguearse para guardar la asistencia'
+                'success' => Auth::check(),
+                'data' => 'Debe loguearse para guardar la asistencia',
+                'valorAuth' => Auth::check()
             ], 401);
         }
 

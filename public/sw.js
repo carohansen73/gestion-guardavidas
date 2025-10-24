@@ -1,0 +1,193 @@
+self.addEventListener('install', event => {
+    console.log("instalando SW");
+    self.skipWaiting(); // fuerza que se active inmediatamente
+});
+
+self.addEventListener('activate', event => {
+    console.log("Activado SW");
+    event.waitUntil(clients.claim()); // la página queda controlada de inmediato
+});
+
+self.addEventListener('sync', event => {
+  console.log('Evento de sincronización recibido:', event.tag);
+  if (event.tag === 'sync-asistencias') {
+    event.waitUntil(
+      sincronizarAsistencias(), 
+    );
+  }
+})
+
+
+
+async function sincronizarAsistencias() {
+  const asistencias = await recuperarDatos();
+  for (let asistencia of asistencias) {
+    cargarAsistenciaReconexion(asistencia);
+  }
+}
+
+async function cargarAsistenciaReconexion(asistencia) {
+    try {
+            let data = await desencriptarQR(asistencia.encrypted, asistencia.csrfToken);
+            if (!data){
+                throw new Error('Ha sucedido un error, intente nuevamente.');
+            }
+            let idPlaya = data.playa_id;
+            let idPuesto = data.puesto_id;
+            let latitudPuesto = data.puesto_lat;
+            let longitudPuesto = data.puesto_lng;
+
+            let resultado = calcularDistancia(asistencia.lat, asistencia.lng, latitudPuesto, longitudPuesto);
+            if (resultado.distancia > 200){
+                throw new Error('Se encuentra a más de 200 mts');
+            }
+
+            let puestoCorrecto = await perteneceQRAlPuesto(asistencia.user_id, idPuesto);
+            if (!puestoCorrecto || puestoCorrecto.success == false){
+                throw new Error('Debe escanear el QR perteneciente a su puesto.');
+            }
+            let datos = {
+              idPlaya: idPlaya,
+              userLat: asistencia.lat,
+              userLng: asistencia.lng,
+              userPrecision: asistencia.precision,
+              user_id: asistencia.user_id,
+              idPuesto: idPuesto,
+              fecha_hora: asistencia.fecha_hora,
+            };
+            cargarDatos(datos, asistencia.id);
+
+    } catch (err) {
+        console.log(err);
+        //alertaError(err);
+    }
+}
+
+
+async function desencriptarQR(valorQR) {
+    try{
+        const res = await fetch("/api/desencriptar-qr", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ encrypted: valorQR }),
+        });
+        const data = await res.json();
+        return data.data;
+    }
+    catch(err){
+        console.log(err);
+        return undefined;
+    }
+    
+}
+
+async function recuperarDatos() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('datosAsistencia', 1);
+
+    request.onerror = () => reject('Error abriendo la DB');
+    request.onsuccess = () => {
+      const db = request.result;
+      const tx = db.transaction('Asistencia', 'readonly'); // tu store
+      const store = tx.objectStore('Asistencia');
+      const getAllRequest = store.getAll();
+
+      getAllRequest.onsuccess = () => resolve(getAllRequest.result);
+      getAllRequest.onerror = () => reject('Error leyendo datos');
+    };
+  });
+}
+
+async function perteneceQRAlPuesto(user_id, idPuesto ) {
+    try {
+        const res = await fetch("/api/verPuesto", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ user_id: user_id, puesto_id: idPuesto }),
+        });
+
+        const data = await res.json();
+        return data;
+    } catch (error) {
+        console.error("Error en perteneceQRAlPuesto:", error);
+        //alertaError("Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente.");
+        return null;
+    }
+}
+
+async function calcularDistancia(lat1, lon1, lat2, lon2) {
+    const R = 6371e3; // radio de la tierra en metros
+    const toRad = (x) => (x * Math.PI) / 180;
+    const φ1 = toRad(lat1);
+    const φ2 = toRad(lat2);
+    const Δφ = toRad(lat2 - lat1);
+    const Δλ = toRad(lon2 - lon1);
+    //calculo de longitud y latitud y si concuerda con los metros de distancia permitidos
+    const a =
+        Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+        Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c; // en metros
+}
+
+//Guardamos la asistencia del guardavida en la base de datos
+async function cargarDatos(datos, idIndexed) {
+    console.log("aca");
+    try {
+        let response = await fetch("/api/cargarAsistencia", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify({
+                playa_id: datos.idPlaya,
+                lat: datos.userLat,
+                lng: datos.userLng,
+                precision: datos.userPrecision,
+                user_id: datos.user_id,
+                puesto_id: datos.idPuesto,
+                fecha_hora: datos.fecha_hora,
+            }),
+        });
+
+        if (!response.ok) {
+            console.error('Error en la petición:', response.status, await response.text());
+            return undefined;
+        }
+
+        let res = await response.json(); 
+        if (res.success) {
+           eliminarDatosIndexed(idIndexed);
+           console.log("Asistencia guardada!");
+        } else {
+            console.log("Error");
+        }
+    } catch (err) {
+        console.log("Error catch: ",err);
+        //alertaError("Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente.");
+    }
+}
+
+function eliminarDatosIndexed(id) {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('datosAsistencia', 1);
+
+    request.onerror = () => reject('Error abriendo la DB');
+
+    request.onsuccess = () => {
+      const db = request.result;
+      const tx = db.transaction('Asistencia', 'readwrite'); // readonly → readwrite
+      const store = tx.objectStore('Asistencia');
+      const deleteRequest = store.delete(id); // nueva variable para no chocar con "request"
+
+      deleteRequest.onsuccess = () => resolve(`Registro ${id} eliminado`);
+      deleteRequest.onerror = () => reject('Error eliminando el registro');
+    };
+  });
+}
