@@ -260,7 +260,7 @@
                     </li>
                     @can('ver_licencia')
                         <li class="p-3 text-sky-600 hover:bg-sky-600 hover:text-white rounded-b-xl">
-                            <a href="{{ route('bandera.create') }}" class="flex justify-content-between align-center">
+                            <a href="{{ route('licencia.index') }}" class="flex justify-content-between align-center">
                                 <p>Licencias</h2>
                                 <svg xmlns="http://www.w3.org/2000/svg"
                                     fill="none"

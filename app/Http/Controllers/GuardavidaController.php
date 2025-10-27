@@ -121,6 +121,7 @@ class GuardavidaController extends Controller
                     'playa_id'  => $validated['playa_id'],
                     'puesto_id' => $validated['puesto_id'],
                     'funcion'   => $validated['funcion'],
+                    'turno'   => $validated['turno'],
                     'user_id'   => $user->id,
                     // 'legajo' => $validated['legajo'] ?? null,
                 ]);

@@ -352,7 +352,7 @@
                 @endcan--}}
                 @can('ver_licencia')
                  <li class="py-2">
-                    <a href="{{ route('bandera.index') }}"
+                    <a href="{{ route('licencia.index') }}"
                         class=" inline-flex  font-medium  "
                         disabled>
                         <svg xmlns="http://www.w3.org/2000/svg"

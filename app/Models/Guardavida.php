@@ -22,6 +22,7 @@ class Guardavida extends Model
         'user_id',
         'playa_id',
         'puesto_id',
+        'turno',
     ];
 
     public function user()
