@@ -1,5 +1,7 @@
 <?php
 
+
+use App\Http\Controllers\QrController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\GuardavidaController;
@@ -37,11 +39,14 @@ Route::middleware('auth')->group(function () {
     Route::get('guardavidas-deshabilitados', [GuardavidaController::class, 'getAllDisabled'])->name('guardavidas.disabled');
     Route::get('/get-all-guardavidas', [GuardavidaController::class, 'getAll']);
 
+    Route::get('/activeCamera', [QrController::class, 'activeCamera'])->name('activeCamera');
+
 
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
 
     //pasar a moddleware admin
     //Route::middleware(['auth', 'can:admin'])
@@ -62,4 +67,7 @@ Route::get('/mi-perfil', [GuardavidaController::class, 'miPerfil'])->name('guard
 Route::put('/guardavidas/perfil/{id}', [GuardavidaController::class, 'actualizarPerfil'])->name('guardavidas.actualizar');
 
 
-require __DIR__.'/auth.php';
+
+
+//require __DIR__.'/auth.php';
+

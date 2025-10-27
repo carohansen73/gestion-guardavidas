@@ -45,4 +45,15 @@ class Guardavida extends Model
         return $this->belongsToMany(Intervencion::class, 'guardavidas_intervenciones', 'guardavida_id', 'intervencion_id');
     }
 
+    public static function obtenerGuardavidas($idUser, $idPlaya){
+        $datosGuardavidas = Guardavida::select('guardavidas.*', 'puestos.nombre as puesto', 'playas.nombre as playa','playas.id as playas_id')
+        ->where('user_id', $idUser)
+        ->join('puestos', 'guardavidas.puesto_id', '=','puestos.id')
+        ->join('playas', 'puestos.playa_id', '=', 'playas.id')
+        ->where('playas.id', $idPlaya)
+        ->first();
+        
+        return !empty($datosGuardavidas) ? $datosGuardavidas : null;
+        
+    }
 }
