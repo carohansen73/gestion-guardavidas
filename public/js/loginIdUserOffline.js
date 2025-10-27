@@ -26,6 +26,7 @@ async function loginOffline() {
 
         if (data.success) {
             localStorage.setItem('user_id', data.user.id);
+            localStorage.setItem('token', data.user.token);
             window.location.href = '/dashboard';
         } else {
             // Mostrar el mensaje del backend

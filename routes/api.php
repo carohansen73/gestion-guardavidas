@@ -13,3 +13,7 @@ Route::post('/verPuesto', [UserController::class, 'verPuestoUsuario'])->name('pu
 Route::post('/cargarAsistencia',[AsistenciaController::class, 'cargarAsistencia'])->name('asistencia.guardar');
 
 Route::post('/loginIdUser', [ApiAuthController::class, 'login']);
+
+Route::get('/test-api', function () {
+    return response()->json(['msg' => 'API activa']);
+});

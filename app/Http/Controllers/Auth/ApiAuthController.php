@@ -39,12 +39,15 @@ class ApiAuthController extends Controller
     Auth::login($user);
     $request->session()->regenerate();
 
+    $token = $user->createToken('sw-token')->plainTextToken;
+
     return response()->json([
         'success' => true,
         'user' => [
             'id' => $user->id,
             'name' => $user->name,
-        ]
+        ],
+        'token' => $token
     ]);
 }
 

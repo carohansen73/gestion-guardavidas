@@ -47,8 +47,6 @@
         <script src="{{ asset('js/html5-qrcode.min.js') }}"></script>
         <script type="module" src="{{ asset('js/baseDeDatosNavegador.js') }}"></script>
         <script type="module" src="{{ asset('js/qrAsistencia.js') }}"></script>
-
-        <script src="{{ asset('js/app-sw.js') }}"></script>
 </body>
 
 </html>
