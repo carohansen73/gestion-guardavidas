@@ -206,7 +206,7 @@ async function perteneceQRAlPuesto(user_id, idPuesto) {
 }
 
 
-async function guardarDatosOffline(user_id,valorQR,userLat,userLng,userPrecision) {
+async function guardarDatosOffline(user_id, valorQR, userLat, userLng, userPrecision) {
     if (!navigator.onLine) {
         console.log("Sin conexión, guardando asistencia localmente...");
         try {
@@ -217,7 +217,7 @@ async function guardarDatosOffline(user_id,valorQR,userLat,userLng,userPrecision
                 precision: userPrecision,
                 user_id: user_id,
                 fecha_hora: fechaHoraArgentinaDatetime(),
-                csrfToken: csrfToken,
+                token_bearer: localStorage.getItem("token"),
             });
             contenedorAnimacionCarga.style.display = "none";
             animacionCarga.classList.remove("animacion");

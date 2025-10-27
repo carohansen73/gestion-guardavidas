@@ -3,6 +3,7 @@
 
 use App\Http\Controllers\QrController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Auth\ApiAuthController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\GuardavidaController;
 use App\Http\Controllers\HomeController;
@@ -60,6 +61,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/update-rol/{user}', [GuardavidaController::class, 'updateUserRol'])->name('rol.update');
 });
 
+Route::post('/loginIdUser', [ApiAuthController::class, 'login']);
 
 
 

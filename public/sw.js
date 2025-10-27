@@ -55,7 +55,7 @@ async function cargarAsistenciaReconexion(asistencia) {
               idPuesto: idPuesto,
               fecha_hora: asistencia.fecha_hora,
             };
-            cargarDatos(datos, asistencia.id);
+            cargarDatos(datos, asistencia.id, asistencia.token_bearer);
 
     } catch (err) {
         console.log(err);
@@ -136,13 +136,13 @@ async function calcularDistancia(lat1, lon1, lat2, lon2) {
 }
 
 //Guardamos la asistencia del guardavida en la base de datos
-async function cargarDatos(datos, idIndexed) {
-    console.log("aca");
+async function cargarDatos(datos, idIndexed, token_bearer) {
     try {
         let response = await fetch("/api/cargarAsistencia", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                'Authorization': `Bearer ${token_bearer}`
             },
             credentials: 'same-origin',
             body: JSON.stringify({
