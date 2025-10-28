@@ -14,19 +14,12 @@ Route::get('/', function () {
     return view('auth.welcome');
 })->name('welcome');
 
-Route::get('/tailwind', function () {
-    return view('ui.tailwind');
-});
+
 
 // Route::get('/home', function () {
 //     return view('ui.home');
 // })->name('home');
 
-
-
-Route::get('/home-options', function () {
-    return view('ui.home-options');
-});
 
 Route::get('/template', function () {
     return view('ui.template');
@@ -40,7 +33,7 @@ Route::middleware('auth')->group(function () {
      Route::get('/home', [HomeController::class, 'index'])->name('home');
 
     Route::resource('intervencion', App\Http\Controllers\IntervencionController::class);
-
+    Route::resource('novedad-de-material', App\Http\Controllers\NovedadMaterialController::class);
     Route::resource('bandera', App\Http\Controllers\BanderaController::class);
     Route::resource('guardavida', App\Http\Controllers\GuardavidaController::class);
     Route::patch('usuario-toggle/{user}', [UserController::class, 'toggle'])->name('user.toggle');
@@ -48,6 +41,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/get-all-guardavidas', [GuardavidaController::class, 'getAll']);
 
     Route::get('/activeCamera', [QrController::class, 'activeCamera'])->name('activeCamera');
+
 
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -62,7 +56,6 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::post('/loginIdUser', [ApiAuthController::class, 'login']);
-
 
 
 

@@ -213,6 +213,10 @@
     <section class="text-gray-600 dark:text-gray-100 body-font px-4 py-4 mb-10">
 
         <div class="py-2  w-full">
+           @if(auth()->user()->can('ver_guardavida') || auth()->user()->can('ver_intervencion')
+           || auth()->user()->can('ver_novedad_material') || auth()->user()->can('ver_licencia') )
+
+
             <a class="bg-sky-600 rounded flex px-4 py-3 h-full justify-between">
                 <div class="flex">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
@@ -222,39 +226,24 @@
                     <span class="title-font font-medium text-gray-100">Ver Registros</span>
                 </div>
 
-                         <div class=" flex justify-end">
-                                    <button class=""
-                                    type="button"
-                                    data-drawer-target="drawer-bottom-example"
-                                    data-drawer-show="drawer-bottom-example"
-                                    data-drawer-placement="bottom"
-                                    aria-controls="drawer-bottom-example"
-                                       >
-                                        <!-- icono tres puntos -->
-                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                    fill="currentColor" class="bi bi-three-dots-vertical text-gray-100 w-6 h-6" viewBox="0 0 16 16">
-                                        <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
-                                        </svg>
-                                    </button>
-                                </div>
-                {{-- <svg xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="3"
-                stroke="currentColor"
-                class="text-gray-100 w-6 h-6 flex-shrink-0 mr-4">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-                </svg> --}}
+                <div class=" flex justify-end">
+                    <button class=""
+                    type="button"
+                    data-drawer-target="drawer-bottom-example"
+                    data-drawer-show="drawer-bottom-example"
+                    data-drawer-placement="bottom"
+                    aria-controls="drawer-bottom-example"
+                        >
+                        <!-- icono tres puntos -->
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                    fill="currentColor" class="bi bi-three-dots-vertical text-gray-100 w-6 h-6" viewBox="0 0 16 16">
+                        <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
+                        </svg>
+                    </button>
+                </div>
             </a>
+            @endif
         </div>
-
-
-
-
-
-
-
-
 
     </section>
 {{-- </div> --}}
@@ -297,6 +286,7 @@
         {{-- Acciones --}}
         <div class="py-4">
             <ul class="space-y-3 font-medium">
+                @can('ver_guardavida')
                 <li class="py-2">
                     <a href="{{ route('guardavida.index') }}"
                         class=" inline-flex  font-medium">
@@ -311,6 +301,8 @@
                         Guardavidas
                     </a>
                 </li>
+                @endcan
+                @can('ver_intervencion')
                 <li class="py-2">
                     <a href="{{ route('bandera.index') }}" class=" inline-flex font-medium">
                         <svg xmlns="http://www.w3.org/2000/svg"
@@ -323,8 +315,10 @@
                         Intervenciones
                     </a>
                 </li>
+                @endcan
+                @can('ver_novedad_material')
                  <li class="py-2">
-                    <a href="{{ route('bandera.index') }}"
+                    <a href="{{ route('novedad-de-material.index') }}"
                         class=" inline-flex  font-medium  "
                         disabled>
                         <svg xmlns="http://www.w3.org/2000/svg"
@@ -338,6 +332,8 @@
                         Novedades de materiales
                     </a>
                 </li>
+                @endcan
+                {{-- @can('ver_guardavida')
                 <li class="py-2">
                     <a href="{{ route('bandera.index') }}"
                         class=" inline-flex  font-medium  "
@@ -353,6 +349,8 @@
                         Asistencia
                     </a>
                 </li>
+                @endcan--}}
+                @can('ver_licencia')
                  <li class="py-2">
                     <a href="{{ route('bandera.index') }}"
                         class=" inline-flex  font-medium  "
@@ -368,6 +366,7 @@
                         Licencias
                     </a>
                 </li>
+                @endcan
 
             </ul>
         </div>

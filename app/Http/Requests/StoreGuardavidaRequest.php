@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Guardavida;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreGuardavidaRequest extends FormRequest
@@ -11,7 +12,7 @@ class StoreGuardavidaRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return auth()->user()->can('agregar_guardavida', Guardavida::class);
     }
 
     /**

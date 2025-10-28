@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Guardavida;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -12,7 +13,7 @@ class UpdateGuardavidaRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return auth()->user()->can('editar_guardavida', Guardavida::class);
     }
 
     /**

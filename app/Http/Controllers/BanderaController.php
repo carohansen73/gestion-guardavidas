@@ -46,16 +46,15 @@ class BanderaController extends Controller
      */
     public function create()
     {
+        $user = Auth::user();
+        $guardavidaAuth = $user->guardavida;
 
-         $user = Auth::user();
-         $guardavidaAuth = $user->guardavida;
 
+        $banderas = BanderaTipo::all();
+        $playas = Playa::all();
+        $puestos = Puesto::orderBy('nombre')->get();
 
-         $banderas = BanderaTipo::all();
-         $playas = Playa::all();
-         $puestos = Puesto::orderBy('nombre')->get();
-
-         $bandera = null;
+        $bandera = null;
 
         return view('ui.banderas.fields', compact(
             'guardavidaAuth', 'banderas', 'playas', 'puestos', 'bandera'
@@ -151,15 +150,15 @@ class BanderaController extends Controller
         //solo lo puede eliminar el usuaurio que lo creó o el encargado, jefe de playa o admin
         //TODO cuanod haga el control por Policy
         //$this->authorize('delete', $bandera);
-        if ($bandera->user_id !== $user->id && $user->rol !== 'encargado' && $user->rol !== 'jefe' && $user->rol !== 'admin') {
+        if ($bandera->user_id === $user->id || $user->hasAnyRole(['encargado', 'admin']) ) {
+            $bandera->delete();
+
             return redirect()->route('bandera.index')
-            ->with('error', 'No tienes permiso para eliminar este registro de bandera.');
+            ->with('success', 'Registro de bandera eliminado');
         }
 
-        $bandera->delete();
-
         return redirect()->route('bandera.index')
-            ->with('success', 'Registro de bandera eliminado');
+        ->with('error', 'No tienes permiso para eliminar este registro de bandera.');
     }
 
     /**

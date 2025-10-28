@@ -13,7 +13,7 @@ class StoreIntervencionRequest extends FormRequest
     public function authorize(): bool
     {
         //Llamo al policy para que chequee si el usuario esta autorizado
-        return auth()->user()->can('create', Intervencion::class);
+        return auth()->user()->can('agregar_intervencion', Intervencion::class);
     }
 
     /**

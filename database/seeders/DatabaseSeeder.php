@@ -43,5 +43,9 @@ class DatabaseSeeder extends Seeder
          $this->call([
             GuardavidaSeeder::class,
         ]);
+
+        $this->call([
+            RolesYPermisosSeeder::class,
+        ]);
     }
 }

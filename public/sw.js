@@ -63,10 +63,11 @@ async function cargarAsistenciaReconexion(asistencia) {
     }
 }
 
-
 async function desencriptarQR(valorQR, token_bearer) {
     try{
-        const res = await fetch("/api/desencriptar-qr", {
+      const fullAuthHeader = `Bearer ${token_bearer}`;
+    console.log("Cabecera de Autorización enviada:", fullAuthHeader);
+        const res = await fetch("api/desencriptar-qr", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -78,7 +79,6 @@ async function desencriptarQR(valorQR, token_bearer) {
         return data.data;
     }
     catch(err){
-        await notificarClientes('error', `Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente.`);
         return undefined;
     }
     

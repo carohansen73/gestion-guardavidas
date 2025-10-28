@@ -33,8 +33,8 @@
                     <div id="accordion-collapse-body-{{$registro->id}}" class="hidden" aria-labelledby="accordion-collapse-heading-{{$registro->id}}">
                         <div class="px-4 py-2 border border-b-0 border-gray-200 dark:border-gray-700 dark:bg-gray-900">
 
-                            {{-- Menu opciones - Editar eliminar --}}
-                            <div class="w-full flex justify-end">
+                            {{-- Menu opciones edit-eliminar icono tres puntos --}}
+                            {{-- <div class="w-full flex justify-end">
                                 <button class=""
                                 type="button"
                                 data-drawer-target="drawer-bottom-example"
@@ -42,13 +42,13 @@
                                 data-drawer-placement="bottom"
                                 aria-controls="drawer-bottom-example"
                                     @click="selectedId = {{ $registro->id }}">
-                                    <!-- icono tres puntos -->
+
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor"
                                     class="bi bi-three-dots-vertical w-6 h-6" viewBox="0 0 16 16">
                                     <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
                                     </svg>
                                 </button>
-                            </div>
+                            </div> --}}
                             <p class="text-sm text-gray-800 dark:text-gray-400 font-medium mt-1 line-clamp-2">
                                 DNI
                                 <span class="text-sm text-gray-500 dark:text-gray-300">
@@ -88,7 +88,7 @@
                                         </svg>
                                         Editar
                                     </a>
-                                    @if(auth()->user()->hasrole('encargado') ||  auth()->user()->hasrole('admin'))
+                                   @can('eliminar_guardavida')
                                         <form action="{{ route('user.toggle', $registro->user->id) }}" method="POST" class="inline">
                                             @csrf
                                             @method('PATCH')
@@ -118,7 +118,7 @@
                                                 </svg>
                                             Bloquear
                                         </button>
-                                    @endif
+                                    @endcan
                                 </div>
                             </div> <!--flex-->
                             {{-- FIN BOTONES GROUP--}}
@@ -130,12 +130,13 @@
         </div>
 
     </section>
-
-    <a href="{{ route('guardavida.create') }}" class="btn fixed z-40 flex align-content-center bg-sky-500 dark:bg-sky-700 bottom-24 right-8 rounded-full px-3 py-3 shadow">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-        class="text-sky-500 w-6 h-6 z-50 bg-gray-100 rounded me-2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-        </svg>
-        <span class="text-gray-100 text-lg"> Agregar</span>
-    </a>
+    @can('agregar_guardavida')
+        <a href="{{ route('guardavida.create') }}" class="btn fixed z-40 flex align-content-center bg-sky-500 dark:bg-sky-700 bottom-24 right-8 rounded-full px-3 py-3 shadow">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+            class="text-sky-500 w-6 h-6 z-50 bg-gray-100 rounded me-2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            <span class="text-gray-100 text-lg"> Agregar</span>
+        </a>
+    @endcan
 </div>

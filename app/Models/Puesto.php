@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 use Illuminate\Database\Eloquent\Model;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\Crypt;
@@ -19,6 +20,22 @@ class Puesto extends Model
         'longitud',
         'qr_encriptado'
     ];
+
+
+    // Un puesto puede estar asignado a varios guardavidas
+    public function guardavidas()
+    {
+        return $this->hasMany(Guardavida::class);
+    }
+
+    // Un puesto puede estar vinculado a muchas asistencias
+    public function asistencias()
+    {
+        return $this->hasMany(Asistencia::class);
+    }
+
+
+
 
     public function playa()
     {

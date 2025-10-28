@@ -242,4 +242,150 @@ class GuardavidaController extends Controller
 
         return response()->json($guardavidas);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /**
+     * Seleccion de guardavidas:
+     * param se recibe el id de identificacion del guardavidas que se desea seleccionar.
+     *
+     * return  devuelve en el template el guardavidas seleccionado y encontrado por el identificador.
+     *
+     */
+/*
+    public function seleccionarGuardavidaById($id)
+    {
+
+        $guardavida = Guardavida::showGuardavidaId($id);
+
+        if ($guardavida != null) {
+            return view('auth.guardavidasListado', compact('guardavida'));
+        }
+    }
+
+    /**
+     * Funcion de asignacion de guardavidas por puesto.
+     * @param recibe $request para l avalidacion de los datos antes de la asignacion.
+     * Se valida :$guardavida_id-> referencia al identificador del guardavida , $puesto_id->referencia al puesto existente en que se encunetre.
+     *
+     * @return mensaje de exito o falla en relacion al resultado de la asignacion
+     *
+     */
+/*
+    public function asignarGuardavidaAPuesto(Request $request)
+    {
+        $validated = $request->validate([
+            'guardavida_id' => 'required|exists:guardavidas,id',
+            'puesto_id' => 'required|exists:puestos,id',
+        ]);
+
+        $guardavida = Guardavida::find($validated['guardavida_id']);
+        $guardavida->puesto_id = $validated['puesto_id'];
+        $guardavida->save();
+
+        return redirect()->back()->with('success', [
+            'titulo' => '¡Asignado!',
+            'detalle' => 'El guardavidas fue asignado correctamente al puesto.'
+        ]);
+    }
+
+
+    /**
+     * Funcion para renderizar el formulario de asignacion de guardavidas a puestos en cada playa del distrito.
+     * @return devuelve dentro del template el listado de guardavidas por puestos.
+     */
+    //muestro las asignaciones de los guardavidas en el template
+    /*
+    public function showFormAsignarGuardavida()
+    {
+        $guardavidas = Guardavida::all();
+        $puestos = Puesto::all();
+
+        return view('auth.guardavidasListado', compact('guardavidas', 'puestos'));
+    }
+
+
+    //registrar licencias (creo que va en otro controller depende quien puede cargar licencias)
+
+
+*/
+
+    /**
+     *  Ver guardavidas asignados a turnos y por puestos en cada balneario.
+     *  Se obtiene desde el model (Guardavidas) el listado en relacion con puesto,turno y balneario.
+     * Luego se renderiza al template donde figura el listado y se le pasa la informacion obtenida desde el model.
+     *
+     */
+/*
+    protected function guardavidasPorPuestoyTurno()
+    {
+        $guardavidas = Guardavida::with(['puesto', 'turnos', 'balnearios'])->get();
+
+        // Si quieres agrupar por balneario o puesto, hazlo en el modelo o con Collection
+        return view('auth.guardavidasListado', compact('guardavidas'));
+    }
+
+*/
+
+    /**
+     * Saber que hace cada quien segun su funcion
+     *
+     * Se obtiene de desde el modelo (Guardavidas) agrupados por funcion.
+     * Se envia los datos obtenidos al template del listado para guardavidas.
+     */
+
+/*
+    public function obtenerFuncion()
+    {
+        $guardavidas = Guardavida::with('funciones')->get();
+        return view('auth.guardavidasListado', compact('guardavidas'));
+    }
+        */
+    /*
+    public function obtenerRol()
+    {
+        $rol = false;
+        if (Auth::check() && Auth::user()->hasRole('jefe_guardavidas')) {
+            $rol = true;
+        }
+        return response()->json($rol);
+    }
+
+*/
+
+
+    /*** para futuros filtros de busquedas nombre, por balneario , puesto y turnos ***/
+
+
+    /**
+     * Filtro de busqueda de guardavidas por nombre
+     * param $request se recibe el nombre de guardavida que se necesita encontrar dentro del sistema.
+     * Se compara con lo guardado en la bd.
+     * return se devuelve un json con  el resultado de la busqueda.
+     * */
+
+    /*
+    public function filterGuardavidasByName(Request $request)
+    {
+        $busqueda = $request->query('busqueda');
+        $guardavidas = Guardavidas::with(['balnearios', 'puestos'])
+            ->where('nombre', 'LIKE', '%' . $busqueda . '%')
+
+            ->get();
+        return response()->json($guardavidas);
+    }
+        */
 }
