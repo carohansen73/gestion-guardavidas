@@ -2,9 +2,7 @@ import { guardarAsistenciaOffline } from "./baseDeDatosNavegador.js";
 
 // scanner.js
 const video = document.querySelector("#video");
-const csrfToken = document
-    .querySelector('meta[name="csrf-token"]')
-    .getAttribute("content"); // Envia el csrf en la consulta para desencriptar el qr
+
 
 const contenedorAnimacionCarga = document.getElementById("contenedorCarga");
 const animacionCarga = document.getElementById("carga");
@@ -23,7 +21,6 @@ async function iniciarCamara() {
 
         video.srcObject = stream;
         await video.play(); // Espera a que el video empiece
-        console.log("Cámara iniciada correctamente.");
 
         // Verificamos compatibilidad del detector
         if (!("BarcodeDetector" in window)) {
@@ -44,7 +41,6 @@ async function iniciarCamara() {
 async function detectarQR() {
     const barcodeDetector = new BarcodeDetector({ formats: ["qr_code"] });
     if (video.readyState < 2 || video.videoWidth === 0 || video.videoHeight === 0) {
-        console.log("Video no listo aún, reintentando...");
         return;
     }
     try {
@@ -76,7 +72,6 @@ async function registrarAsistencia(valorQR) {
     try {
         if (navigator.onLine) {
             let data = await desencriptarQR(valorQR);
-            console.log(data);
             if (!data){
                 throw new Error('Ha sucedido un error, intente nuevamente.');
             }
@@ -90,13 +85,13 @@ async function registrarAsistencia(valorQR) {
                 throw new Error('Distancia inválida');
             }
             if (resultado.distancia > 200){
-                throw new Error('Se encuentra a más de 200 mts');
+                throw new Error('No se puede registrar la asistencia: el QR esta siendo escaneado a más de 200 metros de distancia.');
             }
 
             let puestoCorrecto = await perteneceQRAlPuesto(user_id, idPuesto);
-            console.log(puestoCorrecto);
-            if (!puestoCorrecto || puestoCorrecto == false){
-                throw new Error('Debe escanear el QR perteneciente a su puesto.');
+
+            if (!puestoCorrecto || puestoCorrecto.success == false){
+                throw new Error('No se puede registrar la asistencia: el QR esta siendo escaneado en el puesto incorrecto.');
             }
 
             let datos = {
@@ -118,7 +113,6 @@ async function registrarAsistencia(valorQR) {
             guardarDatosOffline(user_id, valorQR, userLat, userLng,userPrecision);
         }
     } catch (err) {
-        console.log(err);
         contenedorAnimacionCarga.style.display = "none";
         animacionCarga.classList.remove("animacion");
         alertaError(err);
@@ -127,11 +121,11 @@ async function registrarAsistencia(valorQR) {
 
 async function desencriptarQR(valorQR) {
     try{
-        const res = await fetch("/desencriptar-qr", {
+        const res = await fetch("api/desencriptar-qr", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRF-TOKEN": csrfToken,
+                'Authorization': `Bearer ${localStorage.getItem("token")}`
             },
             body: JSON.stringify({ encrypted: valorQR }),
         });
@@ -185,11 +179,11 @@ function obtenerUbicacion() {
 
 async function perteneceQRAlPuesto(user_id, idPuesto) {
     try {
-        const res = await fetch("/verPuesto", {
+        const res = await fetch("api/verPuesto", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRF-TOKEN": csrfToken,
+                'Authorization': `Bearer ${localStorage.getItem("token")}`
             },
             body: JSON.stringify({ user_id: user_id, puesto_id: idPuesto }),
         });
@@ -197,7 +191,6 @@ async function perteneceQRAlPuesto(user_id, idPuesto) {
         const data = await res.json();
         return data;
     } catch (error) {
-        console.error("Error en perteneceQRAlPuesto:", error);
         contenedorAnimacionCarga.style.display = "none";
         animacionCarga.classList.remove("animacion");
         alertaError("Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente.");
@@ -208,7 +201,6 @@ async function perteneceQRAlPuesto(user_id, idPuesto) {
 
 async function guardarDatosOffline(user_id, valorQR, userLat, userLng, userPrecision) {
     if (!navigator.onLine) {
-        console.log("Sin conexión, guardando asistencia localmente...");
         try {
             let guardado = await guardarAsistenciaOffline({
                 encrypted: valorQR,
@@ -283,13 +275,12 @@ async function obtenerId() {
 
 //Guardamos la asistencia del guardavida en la base de datos
 async function cargarDatos(datos) {
-    console.log(datos);
     try {
-        let response = await fetch("/cargarAsistencia", {
+        let response = await fetch("api/cargarAsistencia", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRF-TOKEN": csrfToken,
+                'Authorization': `Bearer ${localStorage.getItem("token")}`
             },
             body: JSON.stringify({
                 playa_id: datos.idPlaya,

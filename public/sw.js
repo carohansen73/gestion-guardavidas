@@ -1,3 +1,4 @@
+
 self.addEventListener('install', event => {
     console.log("instalando SW");
     self.skipWaiting(); // fuerza que se active inmediatamente
@@ -28,23 +29,23 @@ async function sincronizarAsistencias() {
 
 async function cargarAsistenciaReconexion(asistencia) {
     try {
-            let data = await desencriptarQR(asistencia.encrypted, asistencia.csrfToken);
+            let data = await desencriptarQR(asistencia.encrypted, asistencia.token_bearer);
             if (!data){
-                throw new Error('Ha sucedido un error, intente nuevamente.');
+                throw new Error('Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente.');
             }
             let idPlaya = data.playa_id;
             let idPuesto = data.puesto_id;
             let latitudPuesto = data.puesto_lat;
             let longitudPuesto = data.puesto_lng;
 
-            let resultado = calcularDistancia(asistencia.lat, asistencia.lng, latitudPuesto, longitudPuesto);
-            if (resultado.distancia > 200){
-                throw new Error('Se encuentra a más de 200 mts');
+            let resultado = await calcularDistancia(asistencia.lat, asistencia.lng, latitudPuesto, longitudPuesto);
+            if (resultado > 200){
+                throw new Error(`No se pudo registrar la asistencia: el QR fue escaneado a más de 200 metros de distancia el día: ${asistencia.fecha_hora}.`);
             }
 
-            let puestoCorrecto = await perteneceQRAlPuesto(asistencia.user_id, idPuesto);
+            let puestoCorrecto = await perteneceQRAlPuesto(asistencia.user_id, idPuesto, asistencia.token_bearer);
             if (!puestoCorrecto || puestoCorrecto.success == false){
-                throw new Error('Debe escanear el QR perteneciente a su puesto.');
+                throw new Error(`No se pudo registrar la asistencia: el QR fue escaneado en el puesto incorrecto el día: ${asistencia.fecha_hora}.`);
             }
             let datos = {
               idPlaya: idPlaya,
@@ -58,18 +59,18 @@ async function cargarAsistenciaReconexion(asistencia) {
             cargarDatos(datos, asistencia.id, asistencia.token_bearer);
 
     } catch (err) {
-        console.log(err);
-        //alertaError(err);
+        await notificarClientes('error', err);
     }
 }
 
 
-async function desencriptarQR(valorQR) {
+async function desencriptarQR(valorQR, token_bearer) {
     try{
         const res = await fetch("/api/desencriptar-qr", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                'Authorization': `Bearer ${token_bearer}`
             },
             body: JSON.stringify({ encrypted: valorQR }),
         });
@@ -77,7 +78,7 @@ async function desencriptarQR(valorQR) {
         return data.data;
     }
     catch(err){
-        console.log(err);
+        await notificarClientes('error', `Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente.`);
         return undefined;
     }
     
@@ -100,12 +101,13 @@ async function recuperarDatos() {
   });
 }
 
-async function perteneceQRAlPuesto(user_id, idPuesto ) {
+async function perteneceQRAlPuesto(user_id, idPuesto, token_bearer) {
     try {
         const res = await fetch("/api/verPuesto", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                'Authorization': `Bearer ${token_bearer}`
             },
             body: JSON.stringify({ user_id: user_id, puesto_id: idPuesto }),
         });
@@ -113,8 +115,7 @@ async function perteneceQRAlPuesto(user_id, idPuesto ) {
         const data = await res.json();
         return data;
     } catch (error) {
-        console.error("Error en perteneceQRAlPuesto:", error);
-        //alertaError("Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente.");
+        await notificarClientes('error', `Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente.`);
         return null;
     }
 }
@@ -131,7 +132,6 @@ async function calcularDistancia(lat1, lon1, lat2, lon2) {
         Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
         Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
     return R * c; // en metros
 }
 
@@ -157,20 +157,20 @@ async function cargarDatos(datos, idIndexed, token_bearer) {
         });
 
         if (!response.ok) {
-            console.error('Error en la petición:', response.status, await response.text());
+        await notificarClientes('error', `Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente.`);
             return undefined;
         }
 
         let res = await response.json(); 
         if (res.success) {
            eliminarDatosIndexed(idIndexed);
-           console.log("Asistencia guardada!");
+           await notificarClientes('success', 'Asistencia sincronizada correctamente!');
         } else {
-            console.log("Error");
+            await notificarClientes('error', 'El servidor respondió con error');
         }
     } catch (err) {
         console.log("Error catch: ",err);
-        //alertaError("Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente.");
+        await notificarClientes('error', `Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente.`);
     }
 }
 
@@ -189,5 +189,13 @@ function eliminarDatosIndexed(id) {
       deleteRequest.onsuccess = () => resolve(`Registro ${id} eliminado`);
       deleteRequest.onerror = () => reject('Error eliminando el registro');
     };
+  });
+}
+
+async function notificarClientes(status, message){
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientes => {
+    for (const cliente of clientes) {
+      cliente.postMessage({ status, message });
+    }
   });
 }

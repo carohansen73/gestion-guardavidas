@@ -25,7 +25,6 @@ class AsistenciaController extends Controller
             return response()->json([
                 'success' =>false,
                 'data' => 'Debe loguearse para guardar la asistencia',
-                'valorAuth' => $user
             ], 401);
         }
 
