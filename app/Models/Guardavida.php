@@ -68,7 +68,7 @@ class Guardavida extends Model
         return $guardavidas->isNotEmpty() ? $guardavidas : null;
     }
 
-
+*/
     public static function showGuardavidaId($id)
     {
         $guardavida = Guardavida::where('id', $id)->first();
@@ -77,7 +77,7 @@ class Guardavida extends Model
 
         return $guardavida ?? null;
     }
-*/
+
 
 /*
     public static function obtenerCategoriasGuardavidasAgrupados()

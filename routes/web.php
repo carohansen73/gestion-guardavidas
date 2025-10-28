@@ -52,7 +52,16 @@ Route::middleware('auth')->group(function () {
     //Route::middleware(['auth', 'can:admin'])
     Route::put('/update-user/{user}', [RegisteredUserController::class, 'updateUserByAdmin'])->name('user.update');
     Route::put('/update-rol/{user}', [GuardavidaController::class, 'updateUserRol'])->name('rol.update');
+
+    //  NUEVAS RUTAS PARA PERFILES (dentro del middleware)
+    Route::get('/guardavida/{guardavida}/perfil', [GuardavidaController::class, 'showProfile'])
+        ->name('guardavida.profile');
+    Route::get('/mi-perfil', [GuardavidaController::class, 'myProfile'])
+        ->name('guardavida.myProfile');
+    Route::put('/guardavida/{guardavida}/perfil', [GuardavidaController::class, 'updateProfile'])
+        ->name('guardavida.updateProfile');
 });
+
 
 
 
