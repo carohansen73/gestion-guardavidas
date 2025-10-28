@@ -56,17 +56,17 @@ Route::middleware('auth')->group(function () {
 
 /*============ NUEVAS RUTAS PARA PERFIL DE GUARDAVIDAS ============*/
 
-
+/*
 // Perfil del guardavidas (vista personal o administrativa)
 Route::get('/guardavidas/perfil/{id}', [GuardavidaController::class, 'verPerfil'])->name('guardavidas.perfil');
 
 // Mi perfil (para el guardavidas logueado)
 Route::get('/mi-perfil', [GuardavidaController::class, 'miPerfil'])->name('guardavidas.miPerfil');
 
-// Actualizar perfil (solo admin o el mismo usuario)
+// Actualizar perfil (solo admin )
 Route::put('/guardavidas/perfil/{id}', [GuardavidaController::class, 'actualizarPerfil'])->name('guardavidas.actualizar');
 
-
+*/
 
 
 //require __DIR__.'/auth.php';

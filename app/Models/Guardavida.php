@@ -60,11 +60,11 @@ class Guardavida extends Model
 
     }
 
-
+/*
     //guardavidas solos sin criterios de orden
     public static function showGuardavidas()
     {
-        $guardavidas = self::all();
+        $guardavidas = Guardavida::all();
         return $guardavidas->isNotEmpty() ? $guardavidas : null;
     }
 
@@ -77,16 +77,16 @@ class Guardavida extends Model
 
         return $guardavida ?? null;
     }
+*/
 
-
-
+/*
     public static function obtenerCategoriasGuardavidasAgrupados()
     {
 
         $balnearios = Guardavida::all()->groupBy('playa');
         return $balnearios;
     }
-
+*/
     //no encontre la tabla pero hay que agregarla
    /* public function turnos()
     {

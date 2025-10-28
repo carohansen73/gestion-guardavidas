@@ -27,7 +27,7 @@
                 <button class="btn-filtro activo" data-tipo="balneario" data-valor="todos">Todos</button>
                 <button class="btn-filtro" data-tipo="balneario" data-valor="balneario1">Claromeco</button>
                 <button class="btn-filtro" data-tipo="balneario" data-valor="balneario2">Reta</button>
-                <button class="btn-filtro" data-tipo="balneario" data-valor="balneario2">Orense</button>
+                <button class="btn-filtro" data-tipo="balneario" data-valor="balneario3">Orense</button>
 
 
 

@@ -248,12 +248,13 @@ class GuardavidaController extends Controller
      * Ver perfil de un guardavidas específico
      * Puede ser visto por administradores o por el propio guardavidas dependiendo el rol por el que se ingrese
      *
-     * @param int $id ID del guardavidas
-     * @return view
+     * param int $id ID del guardavidas
+     * return view
      */
+    /*
     public function verPerfil($id)
     {  //falta gregar la tabla que referencia a la funcion asi no  traemos todo junto y puede seccionarse
-        $guardavida = Guardavidas::with(['puesto', 'turnos', 'playa', 'funciones'])->find($id);
+        $guardavida = Guardavida::with(['puesto', 'turnos', 'playa', 'funciones'])->find($id);
 
         if (!$guardavida) {
             return redirect()->route('guardavidaslistado')->with('error', [
@@ -279,6 +280,7 @@ class GuardavidaController extends Controller
      *
      * @return view
      */
+    /*
     public function miPerfil()
     {
         if (!Auth::check()) {
@@ -315,13 +317,16 @@ class GuardavidaController extends Controller
     /**
      * Actualizar perfil de guardavidas
      *
-     * @param int $id
-     * @param Request $request
-     * @return redirect
+     * param int $id
+     * param Request $request
+     * return redirect
      */
+
+
+    /*
     public function actualizarPerfil($id, Request $request)
     {
-        $guardavida = Guardavidas::find($id);
+        $guardavida = Guardavida::find($id);
 
         if (!$guardavida) {
             return response()->json([
@@ -393,7 +398,7 @@ class GuardavidaController extends Controller
             'detalle' => 'No se pudo actualizar el perfil.'
         ], 500);
     }
-
+*/
 
 
 
@@ -412,12 +417,12 @@ class GuardavidaController extends Controller
 
     /**
      * Seleccion de guardavidas:
-     * @param se recibe el id de identificacion del guardavidas que se desea seleccionar.
+     * param se recibe el id de identificacion del guardavidas que se desea seleccionar.
      *
-     * @return  devuelve en el template el guardavidas seleccionado y encontrado por el identificador.
+     * return  devuelve en el template el guardavidas seleccionado y encontrado por el identificador.
      *
      */
-
+/*
     public function seleccionarGuardavidaById($id)
     {
 
@@ -436,7 +441,7 @@ class GuardavidaController extends Controller
      * @return mensaje de exito o falla en relacion al resultado de la asignacion
      *
      */
-
+/*
     public function asignarGuardavidaAPuesto(Request $request)
     {
         $validated = $request->validate([
@@ -444,7 +449,7 @@ class GuardavidaController extends Controller
             'puesto_id' => 'required|exists:puestos,id',
         ]);
 
-        $guardavida = Guardavidas::find($validated['guardavida_id']);
+        $guardavida = Guardavida::find($validated['guardavida_id']);
         $guardavida->puesto_id = $validated['puesto_id'];
         $guardavida->save();
 
@@ -460,10 +465,11 @@ class GuardavidaController extends Controller
      * @return devuelve dentro del template el listado de guardavidas por puestos.
      */
     //muestro las asignaciones de los guardavidas en el template
+    /*
     public function showFormAsignarGuardavida()
     {
-        $guardavidas = Guardavidas::all();
-        $puestos = Puestos::all();
+        $guardavidas = Guardavida::all();
+        $puestos = Puesto::all();
 
         return view('auth.guardavidasListado', compact('guardavidas', 'puestos'));
     }
@@ -472,7 +478,7 @@ class GuardavidaController extends Controller
     //registrar licencias (creo que va en otro controller depende quien puede cargar licencias)
 
 
-
+*/
 
     /**
      *  Ver guardavidas asignados a turnos y por puestos en cada balneario.
@@ -480,16 +486,16 @@ class GuardavidaController extends Controller
      * Luego se renderiza al template donde figura el listado y se le pasa la informacion obtenida desde el model.
      *
      */
-
+/*
     protected function guardavidasPorPuestoyTurno()
     {
-        $guardavidas = Guardavidas::with(['puesto', 'turnos', 'balnearios'])->get();
+        $guardavidas = Guardavida::with(['puesto', 'turnos', 'balnearios'])->get();
 
         // Si quieres agrupar por balneario o puesto, hazlo en el modelo o con Collection
         return view('auth.guardavidasListado', compact('guardavidas'));
     }
 
-
+*/
 
     /**
      * Saber que hace cada quien segun su funcion
@@ -498,12 +504,13 @@ class GuardavidaController extends Controller
      * Se envia los datos obtenidos al template del listado para guardavidas.
      */
 
-
+/*
     public function obtenerFuncion()
     {
-        $guardavidas = Guardavidas::with('funciones')->get();
+        $guardavidas = Guardavida::with('funciones')->get();
         return view('auth.guardavidasListado', compact('guardavidas'));
     }
+        */
     /*
     public function obtenerRol()
     {
@@ -522,10 +529,12 @@ class GuardavidaController extends Controller
 
     /**
      * Filtro de busqueda de guardavidas por nombre
-     * @param $request se recibe el nombre de guardavida que se necesita encontrar dentro del sistema.
+     * param $request se recibe el nombre de guardavida que se necesita encontrar dentro del sistema.
      * Se compara con lo guardado en la bd.
-     * @return se devuelve un json con  el resultado de la busqueda.
+     * return se devuelve un json con  el resultado de la busqueda.
      * */
+
+    /*
     public function filterGuardavidasByName(Request $request)
     {
         $busqueda = $request->query('busqueda');
@@ -535,4 +544,5 @@ class GuardavidaController extends Controller
             ->get();
         return response()->json($guardavidas);
     }
+        */
 }
