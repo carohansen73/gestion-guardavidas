@@ -11,7 +11,7 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('sync', event => {
   console.log('Evento de sincronización recibido:', event.tag);
-  if (event.tag === 'sync-asistencias') {
+  if (event.tag === 'sincronizar-asistencias') {
     event.waitUntil(
       sincronizarAsistencias(), 
     );
@@ -40,11 +40,13 @@ async function cargarAsistenciaReconexion(asistencia) {
 
             let resultado = await calcularDistancia(asistencia.lat, asistencia.lng, latitudPuesto, longitudPuesto);
             if (resultado > 200){
+                agregarBaseDeDatosErrores(asistencia);
                 throw new Error(`No se pudo registrar la asistencia: el QR fue escaneado a más de 200 metros de distancia el día: ${asistencia.fecha_hora}.`);
             }
 
             let puestoCorrecto = await perteneceQRAlPuesto(asistencia.user_id, idPuesto, asistencia.token_bearer);
             if (!puestoCorrecto || puestoCorrecto.success == false){
+                agregarBaseDeDatosErrores(asistencia);
                 throw new Error(`No se pudo registrar la asistencia: el QR fue escaneado en el puesto incorrecto el día: ${asistencia.fecha_hora}.`);
             }
             let datos = {
@@ -198,4 +200,56 @@ async function notificarClientes(status, message){
       cliente.postMessage({ status, message });
     }
   });
+}
+
+async function agregarBaseDeDatosErrores(asistencia){
+    return new Promise((resolve, reject) => {
+    const request = indexedDB.open('datosAsistencia', 1);
+
+    request.onerror = () => reject('Error abriendo la DB');
+
+    request.onsuccess = () => {
+      const db = request.result;
+      const tx = db.transaction('erroresDeAsistencia', 'readwrite'); // readonly → readwrite
+      const store = tx.objectStore('erroresDeAsistencia');
+      const resultado = almacen.add(asistencia);
+            resultado.onsuccess = () => {
+                console.log("error en asistencia guardado:", asistencia);
+                resolve();
+            };
+            resultado.onerror = (event) => {
+                console.error("Error guardando en IndexedDB:", event.target.error);
+                reject(event.target.error);
+            };
+
+    };
+  });
+  try {
+        const transaccion = bd.transaction(["erroresDeAsistencia"], "readwrite");
+        const almacen = transaccion.objectStore("erroresDeAsistencia");
+
+        // Convertimos la operación de add a promesa para poder usar await
+        await new Promise((resolve, reject) => {
+            const request = almacen.add(asistencia);
+            request.onsuccess = () => {
+                console.log("error en asistencia guardado:", asistencia);
+                resolve();
+            };
+            request.onerror = (event) => {
+                console.error("Error guardando en IndexedDB:", event.target.error);
+                reject(event.target.error);
+            };
+        });
+
+        // Registrar la sincronización solo después de guardar los datos
+        if ('serviceWorker' in navigator && 'SyncManager' in window) {
+            const swReg = await navigator.serviceWorker.ready; // Ver razon por la que no carga
+            await swReg.sync.register('sincronizacion-asistencias');
+            console.log('Sincronización registrada');
+        }
+        return true;
+    } catch (error) {
+        console.error("Error en guardarAsistenciaOffline:", error);
+        throw error;
+    }
 }

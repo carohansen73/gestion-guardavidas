@@ -1,20 +1,19 @@
 //Sincronizacion de Service Worker para poder escuchar cuando vuelva el internet para guardar las asistencias
 //que quedaron en la base de datos del navegador
+
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js', { type: 'module' })
-        .then(reg => {
-            console.log('✅ Service Worker registrado con éxito:', reg);
+        .then(async reg => {
+            // Esperar a que esté listo (activo y controlando la página)
+            const swReg = await navigator.serviceWorker.ready;
+            console.log('Service Worker listo.');
+
             if ('SyncManager' in window) {
-                return navigator.serviceWorker.ready;
+                await swReg.sync.register('sincronizar-asistencias');
+                console.log('Sincronización registrada correctamente');
             } else {
                 console.warn('SyncManager no soportado en este navegador');
             }
         })
-        .then(swReg => {
-            if (swReg) {
-                swReg.sync.register('sync-asistencias');
-                console.log('🔄 Sincronización registrada');
-            }
-        })
-        .catch(err => console.error('❌ Error al registrar SW o Sync:', err));
+        .catch(err => console.error('Error al registrar SW o Sync:', err));
 }

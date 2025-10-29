@@ -1,21 +1,5 @@
 let bd;
 
-function abrirIndexedDB() {
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open('AsistenciasDB', 1);
-        request.onupgradeneeded = function(event) {
-            const db = event.target.result;
-            db.createObjectStore('asistencias', { keyPath: 'id', autoIncrement: true });
-        };
-        request.onsuccess = function(event) {
-            resolve(event.target.result);
-        };
-        request.onerror = function(event) {
-            reject(event.target.error);
-        };
-    });
-}
-
 function iniciarBaseDatos(){
 
     //Abre la bd, si no existe la crea
@@ -42,6 +26,9 @@ function crearAlmacen(event){
     let baseDeDatos = event.target.result;
     if (!baseDeDatos.objectStoreNames.contains("Asistencia")) {
         baseDeDatos.createObjectStore("Asistencia", { keyPath: "id", autoIncrement: true });
+    }
+    if (!baseDeDatos.objectStoreNames.contains("erroresDeAsistencia")) {
+        baseDeDatos.createObjectStore("erroresDeAsistencia", { keyPath: "id", autoIncrement: true });
     }
 }
 
@@ -71,7 +58,7 @@ export async function guardarAsistenciaOffline(data) {
         // Registrar la sincronización solo después de guardar los datos
         if ('serviceWorker' in navigator && 'SyncManager' in window) {
             const swReg = await navigator.serviceWorker.ready; // Ver razon por la que no carga
-            await swReg.sync.register('sync-asistencias');
+            await swReg.sync.register('sincronizacion-asistencias');
             console.log('Sincronización registrada');
         }
         return true;
@@ -80,5 +67,6 @@ export async function guardarAsistenciaOffline(data) {
         throw error;
     }
 }
+
 
 
