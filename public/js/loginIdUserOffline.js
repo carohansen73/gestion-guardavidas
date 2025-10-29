@@ -13,7 +13,7 @@ async function loginOffline() {
     const password = document.querySelector('#password').value;
 
     try {
-        const res = await fetch('/api/loginIdUser', {
+        const res = await fetch('/loginIdUser', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -23,10 +23,11 @@ async function loginOffline() {
         });
 
         const data = await res.json();
+        console.log(data);
 
         if (data.success) {
             localStorage.setItem('user_id', data.user.id);
-            localStorage.setItem('token', data.user.token);
+            localStorage.setItem('token', data.token);
             window.location.href = '/dashboard';
         } else {
             // Mostrar el mensaje del backend

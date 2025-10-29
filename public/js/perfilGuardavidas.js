@@ -2,7 +2,15 @@
 const csrfToken = document
     .querySelector('meta[name="csrf-token"]')
     .getAttribute("content");
+const form = document.querySelector(".profile-body");
+const guardavidaId = parseInt(form.dataset.guardavidaId); // Esto te da el ID
 
+    const spanEditar = document.querySelector('.puedeEditar').textContent.trim(); // 'Perfil de Guardavidas' o 'Mi Perfil'
+    let puedeEditar = false;
+    if (spanEditar === "Perfil de Guardavidas"){
+        puedeEditar = true;
+    }
+    
 // Función para mostrar alertas
 function mostrarAlerta(tipo, titulo, mensaje) {
     const alertContainer = document.getElementById("alertContainer");
@@ -31,67 +39,48 @@ function mostrarAlerta(tipo, titulo, mensaje) {
 }
 
 // Manejar envío del formulario
-if ($puedeEditar)
-    document
-        .getElementById("profileForm")
-        .addEventListener("submit", async function (e) {
-            e.preventDefault();
+if (puedeEditar){
 
-            const btnGuardar = document.getElementById("btnGuardar");
-            const textoOriginal = btnGuardar.innerHTML;
+document.querySelector(".profile-body").addEventListener("submit", async function (e) {
+    e.preventDefault();
 
-            // Mostrar spinner de carga
-            btnGuardar.innerHTML = '<span class="spinner"></span> Guardando...';
-            btnGuardar.disabled = true;
+    const btnGuardar = document.getElementById("btnGuardar");
+    const textoOriginal = btnGuardar.innerHTML;
 
-            try {
-                const formData = new FormData(this);
-                const data = {};
-                formData.forEach((value, key) => {
-                    if (key !== "_token" && key !== "_method") {
-                        data[key] = value;
-                    }
-                });
+    btnGuardar.innerHTML = '<span class="spinner"></span> Guardando...';
+    btnGuardar.disabled = true;
 
-                const response = await fetch(
-                    '{{ route("guardavidas.actualizar", $guardavida->id) }}',
-                    {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRF-TOKEN": csrfToken,
-                            Accept: "application/json",
-                            "X-Requested-With": "XMLHttpRequest",
-                        },
-                        body: JSON.stringify({
-                            ...data,
-                            _method: "PUT",
-                        }),
-                    }
-                );
+    try {
+        const formData = new FormData(this);
+        formData.append("_method", "PUT"); // necesario para Laravel PUT
 
-                const result = await response.json();
-
-                if (result.success) {
-                    mostrarAlerta("success", result.titulo, result.detalle);
-
-                    // Opcional: recargar la página después de 2 segundos
-                    setTimeout(() => {
-                        location.reload();
-                    }, 2000);
-                } else {
-                    mostrarAlerta("error", result.titulo, result.detalle);
-                }
-            } catch (error) {
-                console.error("Error:", error);
-                mostrarAlerta(
-                    "error",
-                    "¡Error!",
-                    "Ocurrió un error al actualizar el perfil. Por favor, intente nuevamente."
-                );
-            } finally {
-                // Restaurar botón
-                btnGuardar.innerHTML = textoOriginal;
-                btnGuardar.disabled = false;
-            }
+        const response = await fetch(this.action, {
+            method: "POST", // Laravel interpreta _method como PUT
+            headers: {
+                "X-Requested-With": "XMLHttpRequest",
+            },
+            body: formData,
         });
+
+        const result = await response.json();
+
+        if (result.success) {
+            mostrarAlerta("success", result.titulo, result.detalle);
+            setTimeout(() => location.reload(), 2000);
+        } else {
+            mostrarAlerta("error", result.titulo, result.detalle);
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        mostrarAlerta(
+            "error",
+            "¡Error!",
+            "Ocurrió un error al actualizar el perfil. Por favor, intente nuevamente."
+        );
+    } finally {
+        btnGuardar.innerHTML = textoOriginal;
+        btnGuardar.disabled = false;
+    }
+});
+    
+}

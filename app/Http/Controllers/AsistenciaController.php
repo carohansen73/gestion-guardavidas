@@ -7,16 +7,24 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Guardavida;
 use App\Models\Asistencia;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class AsistenciaController extends Controller
 {
-        public function cargarAsistencia(Request $request)
-    {
-        if (!Auth::check()) {
+    public function cargarAsistencia(Request $request){
+        $user = Auth::check() ? Auth::user() : null;
+
+        if (!$user && $request->bearerToken()) {
+            $accessToken = PersonalAccessToken::findToken($request->bearerToken());
+            if ($accessToken) {
+                $user = $accessToken->tokenable; // Usuario asociado al token
+            }
+        }
+
+        if (!$user) {
             return response()->json([
-                'success' => Auth::check(),
+                'success' =>false,
                 'data' => 'Debe loguearse para guardar la asistencia',
-                'valorAuth' => Auth::check()
             ], 401);
         }
 

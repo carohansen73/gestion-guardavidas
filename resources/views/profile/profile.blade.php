@@ -6,21 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perfil Guardavidas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
-    <link rel="stylesheet" href="{{ asset('css/perfilGuardavidas.css') }}">
+    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/css/style.css', 'resources/css/perfilGuardavidas.css'])
+
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 
 <body>
+
+     @include('layouts.navigation')
+
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <button onclick="window.history.back()" class="btn-back">
-                <i class="fas fa-arrow-left"></i>
-                Volver
-            </button>
-            <h1 class="header-title">
+            <h1 class="header-title ">
                 <i class="fas fa-user-shield"></i>
-                {{ $puedeEditar ? 'Perfil de Guardavidas' : 'Mi Perfil' }}
+                <span class="puedeEditar">
+                    {{ $puedeEditar ? 'Perfil de Guardavidas' : 'Mi Perfil' }}
+                </span>
             </h1>
         </div>
 
@@ -47,8 +49,9 @@
             </div>
 
             <!-- Profile Body -->
-            <form action="{{ route('guardavida.updateProfile', $guardavida) }}" method="POST" class="profile-body">
-
+            <form action="{{ route('guardavida.updateProfile', $guardavida->id) }}" method="POST" class="profile-body" data-guardavida-id="{{ $guardavida->id }}">
+                 @csrf
+                 @method('PUT')
                 <!-- Personal Information -->
                 <h3 class="section-title">
                     <i class="fas fa-id-card"></i>

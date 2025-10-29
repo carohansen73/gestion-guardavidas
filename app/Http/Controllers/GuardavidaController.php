@@ -332,7 +332,7 @@ public function updateProfile(Request $request, Guardavida $guardavida)
     $user = Auth::user();
 
     // Verificar permisos                     //ajustar nombre si no coincide con el permiso
-    $esAdmin = $user->hasRole('admin') || $user->hasRole('jefe_guardavidas');
+    $esAdmin = $user->hasRole('admin') || $user->hasRole('encargado');
     $esPropietario = $user->guardavida && $user->guardavida->id === $guardavida->id;
 
     if (!$esAdmin && !$esPropietario) {

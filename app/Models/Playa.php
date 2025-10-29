@@ -9,7 +9,6 @@ class Playa extends Model
 {
     use HasFactory;
 
-    protected $table = 'playa';
     protected $fillable = ['nombre'];
 
     //Un balneario puede estar vinculado a varios puestos

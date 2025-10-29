@@ -25,8 +25,10 @@ function iniciarBaseDatos(){
     solicitud.addEventListener("upgradeneeded", crearAlmacen); // Se dispara cuando se quiere abrir una base de datos no existente
 }
 
-window.addEventListener("load", iniciarBaseDatos);
 
+if (typeof window !== "undefined") {
+  window.addEventListener("load", iniciarBaseDatos);
+}
 function mostrarError(event){
     alert("Tenemos un error: "+ event.code + "/" + event.message);
 }

@@ -21,9 +21,8 @@
     
     body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: linear-gradient(135deg, #66cbea 0%, #4b65a2 100%);
+        /*background: linear-gradient(135deg, #66cbea 0%, #4b65a2 100%);*/
         min-height: 100vh;
-        padding: 20px;
         color: var(--text-primary);
     }
     
@@ -34,8 +33,10 @@
     /* Header */
     
     .header {
+        margin-top: 1.5rem;
         display: flex;
         align-items: center;
+        justify-content: center;
         gap: 15px;
         margin-bottom: 30px;
         flex-wrap: wrap;
@@ -63,17 +64,20 @@
     }
     
     .header-title {
-        color: white;
         font-size: 28px;
         font-weight: 700;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
     }
     /* Profile Card */
     
+    .profile-card{
+        --tw-shadow: 0 4px 6px -1px rgb(123 123 123 / 82%), 0 2px 4px -2px rgb(123 123 123 / 82%);
+        --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
+        box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+    }
+
     .profile-card {
         background: var(--card-bg);
         border-radius: 20px;
-        box-shadow: var(--shadow-lg);
         overflow: hidden;
         margin-bottom: 20px;
     }
@@ -266,11 +270,12 @@
     }
     
     .stat-card {
-        background: linear-gradient(135deg, #66dfea 0%, #4b78a2 100%);
+        --tw-shadow: 0 4px 6px -1px rgb(123 123 123 / 82%), 0 2px 4px -2px rgb(123 123 123 / 82%);
+    --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
         padding: 25px;
         border-radius: 15px;
-        color: white;
-        box-shadow: var(--shadow);
+            border: 2px rgb(201 201 201 / 82%) solid;
     }
     
     .stat-icon {
@@ -348,9 +353,6 @@
     /* Responsive */
     
     @media (max-width: 768px) {
-        body {
-            padding: 15px;
-        }
         .header-title {
             font-size: 22px;
         }

@@ -3,6 +3,7 @@
 
 use App\Http\Controllers\QrController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Auth\ApiAuthController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\GuardavidaController;
 use App\Http\Controllers\HomeController;
@@ -27,7 +28,7 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-     Route::get('/home', [HomeController::class, 'index'])->name('home');
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
 
     Route::resource('intervencion', App\Http\Controllers\IntervencionController::class);
     Route::resource('novedad-de-material', App\Http\Controllers\NovedadMaterialController::class);
@@ -52,12 +53,12 @@ Route::middleware('auth')->group(function () {
     Route::put('/update-rol/{user}', [GuardavidaController::class, 'updateUserRol'])->name('rol.update');
 
     //  NUEVAS RUTAS PARA PERFILES (dentro del middleware)
-    Route::get('/guardavida/{guardavida}/perfil', [GuardavidaController::class, 'showProfile'])
-        ->name('guardavida.profile');
-    Route::get('/mi-perfil', [GuardavidaController::class, 'myProfile'])
-        ->name('guardavida.myProfile');
-    Route::put('/guardavida/{guardavida}/perfil', [GuardavidaController::class, 'updateProfile'])
-        ->name('guardavida.updateProfile');
+    Route::get('/profile', [GuardavidaController::class, 'myProfile']) ->name('guardavida.myProfile');
+
+    Route::put('/profile/{guardavida}', [GuardavidaController::class, 'updateProfile'])->name('guardavida.updateProfile');
+
+    Route::get('/guardavida/{guardavida}/perfil', [GuardavidaController::class, 'showProfile'])->name('guardavida.profile');
+
 
 //para visualizar asistencias de guardavidas
     Route::put('asistencias/guardavidas', [AsistenciaController::class, 'GetasistenciasGuardavidas'])
@@ -73,9 +74,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/asistencias/export', [AsistenciaController::class, 'export'])->name('empleos.export');
 });
 
+Route::post('/loginIdUser', [ApiAuthController::class, 'login']);
 
 
 
-
-//require __DIR__.'/auth.php';
+require __DIR__.'/auth.php';
 
