@@ -280,7 +280,7 @@ public function showProfile(Guardavida $guardavida)
 {
     $user = Auth::user();
 
-    // Verificar permisos                         //despues ajusten si no existe este rol
+    // Verificar permisos
     $esAdmin = $user->hasRole('admin') || $user->hasRole('encargado');
     $esPropietario = $user->guardavida && $user->guardavida->id === $guardavida->id;
 

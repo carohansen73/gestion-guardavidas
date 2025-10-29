@@ -8,17 +8,15 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\GuardavidaController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AsistenciaController;
 use Illuminate\Support\Facades\Route;
+use Maatwebsite\Excel\Facades\Excel;
 
 Route::get('/', function () {
     return view('auth.welcome');
 })->name('welcome');
 
 
-
-// Route::get('/home', function () {
-//     return view('ui.home');
-// })->name('home');
 
 
 Route::get('/template', function () {
@@ -56,8 +54,24 @@ Route::middleware('auth')->group(function () {
 
     //  NUEVAS RUTAS PARA PERFILES (dentro del middleware)
     Route::get('/profile', [GuardavidaController::class, 'myProfile']) ->name('guardavida.myProfile');
+
     Route::put('/profile/{guardavida}', [GuardavidaController::class, 'updateProfile'])->name('guardavida.updateProfile');
+
     Route::get('/guardavida/{guardavida}/perfil', [GuardavidaController::class, 'showProfile'])->name('guardavida.profile');
+
+
+//para visualizar asistencias de guardavidas
+    Route::put('asistencias/guardavidas', [AsistenciaController::class, 'GetasistenciasGuardavidas'])
+        ->name('asistencias');
+
+    Route::put('asistencia/{guardavida}', [AsistenciaController::class, 'AsistenciaPorGuardavidaID'])
+        ->name('asistencia');
+
+    //para descargar el excel de asistencias
+
+    //para exportar excel de asistencias desde el panel de asistencias
+    Route::get("/excel", [AsistenciaController::class, 'descargar']);
+    Route::get('/asistencias/export', [AsistenciaController::class, 'export'])->name('empleos.export');
 });
 
 Route::post('/loginIdUser', [ApiAuthController::class, 'login']);

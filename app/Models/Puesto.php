@@ -18,7 +18,8 @@ class Puesto extends Model
         'nombre',
         'latitud',
         'longitud',
-        'qr_encriptado'
+        'qr_encriptado',
+        'playa_id'
     ];
 
 
