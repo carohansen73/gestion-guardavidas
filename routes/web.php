@@ -30,7 +30,7 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-     Route::get('/home', [HomeController::class, 'index'])->name('home');
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
 
     Route::resource('intervencion', App\Http\Controllers\IntervencionController::class);
     Route::resource('novedad-de-material', App\Http\Controllers\NovedadMaterialController::class);
@@ -53,6 +53,11 @@ Route::middleware('auth')->group(function () {
     //Route::middleware(['auth', 'can:admin'])
     Route::put('/update-user/{user}', [RegisteredUserController::class, 'updateUserByAdmin'])->name('user.update');
     Route::put('/update-rol/{user}', [GuardavidaController::class, 'updateUserRol'])->name('rol.update');
+
+    //  NUEVAS RUTAS PARA PERFILES (dentro del middleware)
+    Route::get('/profile', [GuardavidaController::class, 'myProfile']) ->name('guardavida.myProfile');
+    Route::put('/profile/{guardavida}', [GuardavidaController::class, 'updateProfile'])->name('guardavida.updateProfile');
+    Route::get('/guardavida/{guardavida}/perfil', [GuardavidaController::class, 'showProfile'])->name('guardavida.profile');
 });
 
 Route::post('/loginIdUser', [ApiAuthController::class, 'login']);

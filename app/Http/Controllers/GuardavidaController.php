@@ -247,113 +247,151 @@ class GuardavidaController extends Controller
 
 
 
-
-
-
-
-
-
-
-
-
-
-
     /**
      * Seleccion de guardavidas:
-     * param se recibe el id de identificacion del guardavidas que se desea seleccionar.
+     * @param se recibe el id de identificacion del guardavidas que se desea seleccionar.
      *
-     * return  devuelve en el template el guardavidas seleccionado y encontrado por el identificador.
+     * @return  devuelve en el template el guardavidas seleccionado y encontrado por el identificador.
      *
      */
-/*
+
     public function seleccionarGuardavidaById($id)
     {
 
         $guardavida = Guardavida::showGuardavidaId($id);
 
         if ($guardavida != null) {
-            return view('auth.guardavidasListado', compact('guardavida'));
+            return view('admin.usuarios.index', compact('guardavida'));
         }
     }
 
-    /**
-     * Funcion de asignacion de guardavidas por puesto.
-     * @param recibe $request para l avalidacion de los datos antes de la asignacion.
-     * Se valida :$guardavida_id-> referencia al identificador del guardavida , $puesto_id->referencia al puesto existente en que se encunetre.
-     *
-     * @return mensaje de exito o falla en relacion al resultado de la asignacion
-     *
-     */
+
+
+
+
+// AGREGAR ESTOS MÉTODOS AL FINAL DE TU GuardavidaController
+// (antes del último })
+
+/**
+ * Ver perfil de un guardavidas específico
+ * Puede ser visto por administradores o por el propio guardavidas
+ */
+public function showProfile(Guardavida $guardavida)
+{
+    $user = Auth::user();
+
+    // Verificar permisos                         //despues ajusten si no existe este rol
+    $esAdmin = $user->hasRole('admin') || $user->hasRole('encargado');
+    $esPropietario = $user->guardavida && $user->guardavida->id === $guardavida->id;
+
+    if (!$esAdmin && !$esPropietario) {
+        abort(403, 'No tenés permisos para ver este perfil.');
+    }
+
+    $puedeEditar = $esAdmin || $esPropietario;
 /*
-    public function asignarGuardavidaAPuesto(Request $request)
-    {
-        $validated = $request->validate([
-            'guardavida_id' => 'required|exists:guardavidas,id',
-            'puesto_id' => 'required|exists:puestos,id',
-        ]);
-
-        $guardavida = Guardavida::find($validated['guardavida_id']);
-        $guardavida->puesto_id = $validated['puesto_id'];
-        $guardavida->save();
-
-        return redirect()->back()->with('success', [
-            'titulo' => '¡Asignado!',
-            'detalle' => 'El guardavidas fue asignado correctamente al puesto.'
-        ]);
-    }
-
-
-    /**
-     * Funcion para renderizar el formulario de asignacion de guardavidas a puestos en cada playa del distrito.
-     * @return devuelve dentro del template el listado de guardavidas por puestos.
-     */
-    //muestro las asignaciones de los guardavidas en el template
-    /*
-    public function showFormAsignarGuardavida()
-    {
-        $guardavidas = Guardavida::all();
-        $puestos = Puesto::all();
-
-        return view('auth.guardavidasListado', compact('guardavidas', 'puestos'));
-    }
-
-
-    //registrar licencias (creo que va en otro controller depende quien puede cargar licencias)
-
-
+        // Cargar relaciones necesarias
+        $guardavida->load(['playa', 'puesto', 'turnos', 'funciones', 'user']);
 */
+        // Cargar relaciones necesarias
+        $guardavida->load(['playa', 'puesto','user']);
+    // Obtener listas para los selects (solo si es admin)
+    $playas = $esAdmin ? Playa::all() : null;
+    $puestos = $esAdmin ? Puesto::all() : null;
 
-    /**
-     *  Ver guardavidas asignados a turnos y por puestos en cada balneario.
-     *  Se obtiene desde el model (Guardavidas) el listado en relacion con puesto,turno y balneario.
-     * Luego se renderiza al template donde figura el listado y se le pasa la informacion obtenida desde el model.
-     *
-     */
-/*
-    protected function guardavidasPorPuestoyTurno()
-    {
-        $guardavidas = Guardavida::with(['puesto', 'turnos', 'balnearios'])->get();
+    return view('profile.profile', compact(
+        'guardavida',
+        'puedeEditar',
+        'esAdmin',
+        'playas',
+        'puestos'
+    ));
+}
 
-        // Si quieres agrupar por balneario o puesto, hazlo en el modelo o con Collection
-        return view('auth.guardavidasListado', compact('guardavidas'));
+/**
+ * Mi perfil (guardavida logueado)
+ */
+public function myProfile()
+{
+    $user = Auth::user();
+
+    if (!$user->guardavida) {
+        return redirect()->route('home')
+            ->with('error', 'No tenés un perfil de guardavida asignado.');
     }
 
-*/
+    // Reutilizar el método anterior
+    return $this->showProfile($user->guardavida);
+}
 
-    /**
-     * Saber que hace cada quien segun su funcion
-     *
-     * Se obtiene de desde el modelo (Guardavidas) agrupados por funcion.
-     * Se envia los datos obtenidos al template del listado para guardavidas.
-     */
+/**
+ * Actualizar perfil del guardavidas logueado
+ */
+public function updateProfile(Request $request, Guardavida $guardavida)
+{
+    $user = Auth::user();
 
-/*
-    public function obtenerFuncion()
-    {
-        $guardavidas = Guardavida::with('funciones')->get();
-        return view('auth.guardavidasListado', compact('guardavidas'));
+    // Verificar permisos                     //ajustar nombre si no coincide con el permiso
+    $esAdmin = $user->hasRole('admin') || $user->hasRole('encargado');
+    $esPropietario = $user->guardavida && $user->guardavida->id === $guardavida->id;
+
+    if (!$esAdmin && !$esPropietario) {
+        abort(403, 'No tenés permisos para editar este perfil.');
     }
-        */
+
+        // Validación
+        // Validación base (lo que puede editar cualquier usuario)
+        $rules = [
+            'nombre' => 'required|string|max:100',
+            'apellido' => 'required|string|max:100',
+            'dni' => 'required|string|max:20',
+            'telefono' => 'nullable|string|max:20',
+            'direccion' => 'nullable|string|max:255',
+            'numero' => 'nullable|string|max:10',
+            'piso_dpto' => 'nullable|string|max:10',
+        ];
+    // Solo admin puede cambiar playa/puesto/función
+    if ($esAdmin) {
+        $rules['playa_id'] = 'nullable|exists:playas,id';
+        $rules['puesto_id'] = 'nullable|exists:puestos,id';
+        // agregar cuando haya tabla de funciones $rules['funcion'] = 'nullable|string';
+    }
+
+    $validated = $request->validate($rules);
+        // Si no es admin, remover campos que no puede editar
+        if (!$esAdmin) {
+            unset($validated['playa_id'], $validated['puesto_id']);
+        }
+    if ($guardavida->update($validated)) {
+            // También actualizar el usuario asociado si cambió nombre/apellido
+            if ($guardavida->user) {
+                $guardavida->user->update([
+                    'name' => $validated['nombre'],
+                    'lastname' => $validated['apellido'],
+                    'email' => $validated['email'] ?? $guardavida->user->email,
+                ]);
+            }
+
+            // Si es una petición AJAX, retornar JSON
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'titulo' => 'Éxito',
+                    'detalle' => 'Perfil actualizado correctamente.'
+                ]);
+            }
+
+            return back()->with('success', [
+                'titulo' => 'Éxito',
+                'detalle' => 'Perfil actualizado correctamente.'
+            ]);
+        }
+
+    return back()->withErrors('No se pudo actualizar el perfil.');
+
+}
+
+
     /*
     public function obtenerRol()
     {
@@ -365,27 +403,4 @@ class GuardavidaController extends Controller
     }
 
 */
-
-
-    /*** para futuros filtros de busquedas nombre, por balneario , puesto y turnos ***/
-
-
-    /**
-     * Filtro de busqueda de guardavidas por nombre
-     * param $request se recibe el nombre de guardavida que se necesita encontrar dentro del sistema.
-     * Se compara con lo guardado en la bd.
-     * return se devuelve un json con  el resultado de la busqueda.
-     * */
-
-    /*
-    public function filterGuardavidasByName(Request $request)
-    {
-        $busqueda = $request->query('busqueda');
-        $guardavidas = Guardavidas::with(['balnearios', 'puestos'])
-            ->where('nombre', 'LIKE', '%' . $busqueda . '%')
-
-            ->get();
-        return response()->json($guardavidas);
-    }
-        */
 }
