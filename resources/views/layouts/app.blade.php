@@ -38,7 +38,7 @@
                 @endisset
 
                 <!-- Page Content -->
-                <div class="lg:ml-64 min-h-screen bg-gray-50 dark:bg-gray-800">
+                <div class="lg:ml-64 min-h-screen bg-gray-100 dark:bg-gray-800">
                     <main class="overflow-x-hidden mb-4">
                         @yield('content')
                         {{-- {{ $slot }} --}}
@@ -51,6 +51,6 @@
 
          <script src="{{ asset('resources/js/script.js') }}"></script>
 
-         <script src="https://unpkg.com/flowbite@2.5.1/dist/flowbite.min.js"></script>
+         {{-- <script src="https://unpkg.com/flowbite@2.5.1/dist/flowbite.min.js"></script> --}}
     </body>
 </html>

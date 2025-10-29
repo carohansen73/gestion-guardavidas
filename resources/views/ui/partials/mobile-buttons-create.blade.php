@@ -4,7 +4,7 @@
         <div class="flex flex-col text-center w-full mb-2">
             <h1 class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900">Registrar un evento</h1>
         </div>
-        <div class="flex flex-wrap text-center">
+        <div class="flex flex-wrap justify-center items-center text-center">
             @can('agregar_guardavida')
                 <div class="p-2 lg:w-1/3 md:w-1/3 sm:w-1/2 w-1/2 ">
                     <a href="{{ route('guardavida.create') }}">

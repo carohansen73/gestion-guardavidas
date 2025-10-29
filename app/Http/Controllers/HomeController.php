@@ -19,6 +19,8 @@ class HomeController extends Controller
 
         $bandera = $this->buscarBanderaActual($user);
 
+        // var_dump($bandera);die;
+
         if( $agent->isMobile()) {
             return view('ui.home', compact( 'isMobile', 'bandera'));
         } else{

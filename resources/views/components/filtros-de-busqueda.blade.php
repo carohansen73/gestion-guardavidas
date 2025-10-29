@@ -21,24 +21,14 @@
                     {{ $playa->nombre }}
                 </button>
             @endforeach
-            @if(request()->is('guardavida'))
-            <a href="{{ route('guardavidas.disabled')}}"
-            class="playa-tag px-3 py-1 bg-orange-600 text-gray-100 rounded hover:bg-orange-400 hover:shadow-lg dark:bg-orange-600 dark:hover:bg-orange-500 dark:text-gray-200">
-               Bloqueados
-            </a>
-            @else
-             <a href="{{ route('guardavida.index')}}"
-            class="playa-tag px-3 py-1 bg-sky-500 text-gray-100 rounded hover:bg-gray-300 hover:shadow-lg dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-gray-200">
-               Habilitados
-            </a>
-            @endif
 
-            <a href="{{ route('guardavidas.export') }}" class="px-3 py-1 bg-emerald-600 text-gray-100 rounded hover:bg-emerald-500 hover:shadow-lg dark:bg-emerald-700 dark:hover:bg-teal-500 dark:text-gray-200">
+            @props(['tipo'])
+
+            <a href="{{ route('export.playas', ['tipo' => $tipo]) }}" class="px-3 py-1 bg-emerald-600 text-gray-100 rounded hover:bg-emerald-500 hover:shadow-lg dark:bg-emerald-700 dark:hover:bg-teal-500 dark:text-gray-200">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
                 </svg>
             </a>
-
         </div>
         {{-- Busqueda --}}
         <div class="relative w-full md:w-auto my-3 sm:!my-0">
