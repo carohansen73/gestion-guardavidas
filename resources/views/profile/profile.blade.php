@@ -126,52 +126,15 @@
                             <div class="info-value editable">
                                 <i class="fas fa-envelope"></i>
                                 <input type="email" name="email" class="form-control"
-                                    value="{{ $guardavida->email ?? 'No especificado' }}">
+                                    value="{{ $guardavida->user->email ?? 'No especificado' }}">
                             </div>
                         @else
                             <div class="info-value">
                                 <i class="fas fa-envelope"></i>
-                                {{ $guardavida->email ?? 'No especificado' }}
+                                {{ $guardavida->user->email ?? 'No especificado' }}
                             </div>
                         @endif
                     </div>
-
-
-                    <div class="info-item">
-                        <label class="info-label">Ciudad</label>
-                        @if ($puedeEditar)
-                            <div class="info-value editable">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <input type="text" name="direccion" class="form-control"
-                                    value="{{ $guardavida->ciudad ?? 'No especificado' }}">
-                            </div>
-                        @else
-                            <div class="info-value">
-                                <i class="fas fa-map-marker-alt"></i>
-                                {{ $guardavida->ciudad ?? 'No especificado' }}
-                            </div>
-                        @endif
-                    </div>
-
-
-
-                    <div class="info-item">
-                        <label class="info-label">Calle</label>
-                        @if ($puedeEditar)
-                            <div class="info-value editable">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <input type="text" name="direccion" class="form-control"
-                                    value="{{ $guardavida->calle ?? 'No especificado' }}">
-                            </div>
-                        @else
-                            <div class="info-value">
-                                <i class="fas fa-map-marker-alt"></i>
-                                {{ $guardavida->calle ?? 'No especificado' }}
-                            </div>
-                        @endif
-                    </div>
-
-
 
 
                     <div class="info-item">
@@ -189,126 +152,163 @@
                             </div>
                         @endif
                     </div>
-                </div>
 
-                <!-- Work Information -->
-                <h3 class="section-title">
-                    <i class="fas fa-briefcase"></i>
-                    Información Laboral
-                </h3>
 
-                <div class="info-grid">
                     <div class="info-item">
-                        <label class="info-label">Balneario</label>
-                        @if ($esAdmin && $balnearios)
+                        <label class="info-label">Número</label>
+                        @if ($puedeEditar)
                             <div class="info-value editable">
-                                <i class="fas fa-umbrella-beach"></i>
-                                <select name="balneario_id" class="form-control">
-                                    <option value="">Seleccionar balneario</option>
-                                    @foreach ($balnearios as $balneario)
-                                        <option value="{{ $balneario->id }}"
-                                            {{ $guardavida->balneario_id == $balneario->id ? 'selected' : '' }}>
-                                            {{ ucfirst($balneario->nombre_playa) }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                                <i class="fas fa-hashtag"></i>
+                                <input type="text" name="numero" class="form-control"
+                                    value="{{ $guardavida->numero ?? 'No especificado' }}">
                             </div>
                         @else
                             <div class="info-value">
-                                <i class="fas fa-umbrella-beach"></i>
-                                {{ $guardavida->playa ? $guardavida->playa->nombre : 'No asignado' }}
+                                <i class="fas fa-hashtag"></i>
+                                {{ $guardavida->numero ?? 'No especificado' }}
                             </div>
                         @endif
                     </div>
 
                     <div class="info-item">
-                        <label class="info-label">Puesto</label>
-                        @if ($esAdmin && $puestos)
+                        <label class="info-label">Piso/Dpto</label>
+                        @if ($puedeEditar)
                             <div class="info-value editable">
-                                <i class="fas fa-flag"></i>
-                                <select name="puesto_id" class="form-control">
-                                    <option value="">Seleccionar puesto</option>
-                                    @foreach ($puestos as $puesto)
-                                        <option value="{{ $puesto->id }}"
-                                            {{ $guardavida->puesto_id == $puesto->id ? 'selected' : '' }}>
-                                            {{ $puesto->nombre_puesto }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                                <i class="fas fa-building"></i>
+                                <input type="text" name="piso_dpto" class="form-control"
+                                    value="{{ $guardavida->piso_dpto ?? 'No especificado' }}">
                             </div>
                         @else
                             <div class="info-value">
-                                <i class="fas fa-flag"></i>
-                                {{ $guardavida->puesto ? $guardavida->puesto->nombre : 'No asignado' }}
+                                <i class="fas fa-building"></i>
+                                {{ $guardavida->piso_dpto ?? 'No especificado' }}
                             </div>
                         @endif
                     </div>
 
-                    <div class="info-item">
-                        <label class="info-label">Turno</label>
-                        <div class="info-value">
-                            <i class="fas fa-clock"></i>
-                            @if ($guardavida->turnos && $guardavida->turnos->isNotEmpty())
-                                {{ $guardavida->turnos->first()->nombre_turno }}
+
+
+
+
+
+                    <!-- Work Information -->
+                    <h3 class="section-title">
+                        <i class="fas fa-briefcase"></i>
+                        Información Laboral
+                    </h3>
+
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label class="info-label">Balneario</label>
+                            @if ($esAdmin && $balnearios)
+                                <div class="info-value editable">
+                                    <i class="fas fa-umbrella-beach"></i>
+                                    <select name="balneario_id" class="form-control">
+                                        <option value="">Seleccionar balneario</option>
+                                        @foreach ($balnearios as $balneario)
+                                            <option value="{{ $balneario->id }}"
+                                                {{ $guardavida->balneario_id == $balneario->id ? 'selected' : '' }}>
+                                                {{ ucfirst($balneario->nombre_playa) }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
                             @else
-                                No asignado
+                                <div class="info-value">
+                                    <i class="fas fa-umbrella-beach"></i>
+                                    {{ $guardavida->playa ? $guardavida->playa->nombre : 'No asignado' }}
+                                </div>
                             @endif
+                        </div>
+
+                        <div class="info-item">
+                            <label class="info-label">Puesto</label>
+                            @if ($esAdmin && $puestos)
+                                <div class="info-value editable">
+                                    <i class="fas fa-flag"></i>
+                                    <select name="puesto_id" class="form-control">
+                                        <option value="">Seleccionar puesto</option>
+                                        @foreach ($puestos as $puesto)
+                                            <option value="{{ $puesto->id }}"
+                                                {{ $guardavida->puesto_id == $puesto->id ? 'selected' : '' }}>
+                                                {{ $puesto->nombre_puesto }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            @else
+                                <div class="info-value">
+                                    <i class="fas fa-flag"></i>
+                                    {{ $guardavida->puesto ? $guardavida->puesto->nombre : 'No asignado' }}
+                                </div>
+                            @endif
+                        </div>
+
+                        <div class="info-item">
+                            <label class="info-label">Turno</label>
+                            <div class="info-value">
+                                <i class="fas fa-clock"></i>
+                                @if ($guardavida->turnos && $guardavida->turnos->isNotEmpty())
+                                    {{ $guardavida->turnos->first()->nombre_turno }}
+                                @else
+                                    No asignado
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <label class="info-label">Función</label>
+                            <div class="info-value">
+                                <i class="fas fa-tasks"></i>
+                                @if ($guardavida->funciones && $guardavida->funciones->isNotEmpty())
+                                    {{ $guardavida->funciones->first()->nombre_funcion }}
+                                @else
+                                    Guardavidas
+                                @endif
+                            </div>
                         </div>
                     </div>
 
-                    <div class="info-item">
-                        <label class="info-label">Función</label>
-                        <div class="info-value">
-                            <i class="fas fa-tasks"></i>
-                            @if ($guardavida->funciones && $guardavida->funciones->isNotEmpty())
-                                {{ $guardavida->funciones->first()->nombre_funcion }}
-                            @else
-                                Guardavidas
-                            @endif
+                    <!-- Statistics -->
+                    <h3 class="section-title">
+                        <i class="fas fa-chart-line"></i>
+                        Estadísticas
+                    </h3>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+                            <div class="stat-value">{{ $guardavida->asistencias_count ?? 0 }}</div>
+                            <div class="stat-label">Asistencias</div>
                         </div>
-                    </div>
-                </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-life-ring"></i></div>
+                            <div class="stat-value">{{ $guardavida->intervenciones_count ?? 0 }}</div>
+                            <div class="stat-label">Intervenciones</div>
+                        </div>
 
-                <!-- Statistics -->
-                <h3 class="section-title">
-                    <i class="fas fa-chart-line"></i>
-                    Estadísticas
-                </h3>
-
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
-                        <div class="stat-value">{{ $guardavida->asistencias_count ?? 0 }}</div>
-                        <div class="stat-label">Asistencias</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-life-ring"></i></div>
-                        <div class="stat-value">{{ $guardavida->intervenciones_count ?? 0 }}</div>
-                        <div class="stat-label">Intervenciones</div>
                     </div>
 
-                </div>
-
-                <!-- Action Buttons -->
-                @if ($puedeEditar)
-                    <div class="action-buttons">
-                        <button type="submit" class="btn btn-primary" id="btnGuardar">
-                            <i class="fas fa-save"></i>
-                            Guardar Cambios
-                        </button>
-                        <button type="button" class="btn btn-secondary" onclick="window.history.back()">
-                            <i class="fas fa-times"></i>
-                            Cancelar
-                        </button>
-                    </div>
-                @else
-                    <div class="action-buttons">
-                        <button type="button" class="btn btn-secondary" onclick="window.history.back()">
-                            <i class="fas fa-arrow-left"></i>
-                            Volver
-                        </button>
-                    </div>
-                @endif
+                    <!-- Action Buttons -->
+                    @if ($puedeEditar)
+                        <div class="action-buttons">
+                            <button type="submit" class="btn btn-primary" id="btnGuardar">
+                                <i class="fas fa-save"></i>
+                                Guardar Cambios
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="window.history.back()">
+                                <i class="fas fa-times"></i>
+                                Cancelar
+                            </button>
+                        </div>
+                    @else
+                        <div class="action-buttons">
+                            <button type="button" class="btn btn-secondary" onclick="window.history.back()">
+                                <i class="fas fa-arrow-left"></i>
+                                Volver
+                            </button>
+                        </div>
+                    @endif
             </form>
         </div>
     </div>

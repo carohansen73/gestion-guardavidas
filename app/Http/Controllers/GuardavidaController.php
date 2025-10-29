@@ -280,8 +280,8 @@ public function showProfile(Guardavida $guardavida)
 {
     $user = Auth::user();
 
-    // Verificar permisos
-    $esAdmin = $user->hasRole('admin') || $user->hasRole('encargado');
+    // Verificar permisos                         //despues ajusten si no existe este rol
+    $esAdmin = $user->hasRole('admin') || $user->hasRole('jefe_guardavidas');
     $esPropietario = $user->guardavida && $user->guardavida->id === $guardavida->id;
 
     if (!$esAdmin && !$esPropietario) {
@@ -289,12 +289,17 @@ public function showProfile(Guardavida $guardavida)
     }
 
     $puedeEditar = $esAdmin || $esPropietario;
-
+/*
+        // Cargar relaciones necesarias
+        $guardavida->load(['playa', 'puesto', 'turnos', 'funciones', 'user']);
+*/
+        // Cargar relaciones necesarias
+        $guardavida->load(['playa', 'puesto','user']);
     // Obtener listas para los selects (solo si es admin)
     $playas = $esAdmin ? Playa::all() : null;
     $puestos = $esAdmin ? Puesto::all() : null;
 
-    return view('ui.guardavidas.profile', compact(
+    return view('profile.profile', compact(
         'guardavida',
         'puedeEditar',
         'esAdmin',
@@ -320,44 +325,71 @@ public function myProfile()
 }
 
 /**
- * Actualizar perfil
+ * Actualizar perfil del guardavidas logueado
  */
 public function updateProfile(Request $request, Guardavida $guardavida)
 {
     $user = Auth::user();
 
-    // Verificar permisos
-    $esAdmin = $user->hasRole('admin') || $user->hasRole('encargado');
+    // Verificar permisos                     //ajustar nombre si no coincide con el permiso
+    $esAdmin = $user->hasRole('admin') || $user->hasRole('jefe_guardavidas');
     $esPropietario = $user->guardavida && $user->guardavida->id === $guardavida->id;
 
     if (!$esAdmin && !$esPropietario) {
         abort(403, 'No tenés permisos para editar este perfil.');
     }
 
-    // Validación
-    $rules = [
-        'telefono' => 'nullable|string|max:20',
-        'direccion' => 'nullable|string|max:255',
-        'numero' => 'nullable|string|max:10',
-        'piso_dpto' => 'nullable|string|max:10',
-    ];
-
+        // Validación
+        // Validación base (lo que puede editar cualquier usuario)
+        $rules = [
+            'nombre' => 'required|string|max:100',
+            'apellido' => 'required|string|max:100',
+            'dni' => 'required|string|max:20',
+            'telefono' => 'nullable|string|max:20',
+            'direccion' => 'nullable|string|max:255',
+            'numero' => 'nullable|string|max:10',
+            'piso_dpto' => 'nullable|string|max:10',
+        ];
     // Solo admin puede cambiar playa/puesto/función
     if ($esAdmin) {
         $rules['playa_id'] = 'nullable|exists:playas,id';
         $rules['puesto_id'] = 'nullable|exists:puestos,id';
-        $rules['funcion'] = 'nullable|string';
+        // agregar cuando haya tabla de funciones $rules['funcion'] = 'nullable|string';
     }
 
     $validated = $request->validate($rules);
-
+        // Si no es admin, remover campos que no puede editar
+        if (!$esAdmin) {
+            unset($validated['playa_id'], $validated['puesto_id']);
+        }
     if ($guardavida->update($validated)) {
-        return back()->with('success', 'Perfil actualizado correctamente.');
-    }
+            // También actualizar el usuario asociado si cambió nombre/apellido
+            if ($guardavida->user) {
+                $guardavida->user->update([
+                    'name' => $validated['nombre'],
+                    'lastname' => $validated['apellido'],
+                    'email' => $validated['email'] ?? $guardavida->user->email,
+                ]);
+            }
+
+            // Si es una petición AJAX, retornar JSON
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'titulo' => 'Éxito',
+                    'detalle' => 'Perfil actualizado correctamente.'
+                ]);
+            }
+
+            return back()->with('success', [
+                'titulo' => 'Éxito',
+                'detalle' => 'Perfil actualizado correctamente.'
+            ]);
+        }
 
     return back()->withErrors('No se pudo actualizar el perfil.');
-}
 
+}
 
 
     /*
