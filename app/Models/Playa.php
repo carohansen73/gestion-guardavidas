@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Playa extends Model
 {
-    protected $fillable = ['nombre'];
+    protected $fillable = ['nombre', 'color'];
 
     public function puestos()
     {

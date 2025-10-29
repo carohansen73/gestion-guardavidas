@@ -259,9 +259,24 @@
                         </a>
                     </li>
                     @can('ver_licencia')
-                        <li class="p-3 text-sky-600 hover:bg-sky-600 hover:text-white rounded-b-xl">
+                       <li class="border-b border-gray-200 p-3 text-sky-600 hover:bg-sky-600 hover:text-white">
                             <a href="{{ route('licencia.index') }}" class="flex justify-content-between align-center">
                                 <p>Licencias</h2>
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke-width="3"
+                                    stroke="currentColor"
+                                    class="w-6 h-6 py-1 px-1 ">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                                </svg>
+                            </a>
+                        </li>
+                    @endcan
+                    @can('ver_cambio_turno')
+                        <li class="p-3 text-sky-600 hover:bg-sky-600 hover:text-white rounded-b-xl">
+                            <a href="{{ route('cambio-de-turno.index') }}" class="flex justify-content-between align-center">
+                                <p>Cambios de turno</h2>
                                 <svg xmlns="http://www.w3.org/2000/svg"
                                     fill="none"
                                     viewBox="0 0 24 24"

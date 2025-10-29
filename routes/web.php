@@ -31,17 +31,21 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-     Route::get('/home', [HomeController::class, 'index'])->name('home');
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
 
+    Route::resource('bandera', App\Http\Controllers\BanderaController::class);
     Route::resource('intervencion', App\Http\Controllers\IntervencionController::class);
     Route::resource('novedad-de-material', App\Http\Controllers\NovedadMaterialController::class);
-    Route::resource('bandera', App\Http\Controllers\BanderaController::class);
 
     Route::resource('guardavida', App\Http\Controllers\GuardavidaController::class);
     Route::patch('usuario-toggle/{user}', [UserController::class, 'toggle'])->name('user.toggle');
     Route::get('guardavidas-deshabilitados', [GuardavidaController::class, 'getAllDisabled'])->name('guardavidas.disabled');
     Route::get('/get-all-guardavidas', [GuardavidaController::class, 'getAll']);
 
+    Route::resource('licencia', App\Http\Controllers\LicenciaController::class)->parameters(['licencia' => 'licencia']);
+    Route::resource('cambio-de-turno', App\Http\Controllers\CambioDeTurnoController::class);
+
+    //Excel
     Route::get('/guardavidas/export', function () {
         return Excel::download(new GuardavidasExport, 'guardavidas.xlsx');
     })->name('guardavidas.export');
@@ -57,7 +61,7 @@ Route::middleware('auth')->group(function () {
     //Route::middleware(['auth', 'can:admin'])
     Route::put('/update-user/{user}', [RegisteredUserController::class, 'updateUserByAdmin'])->name('user.update');
     Route::put('/update-rol/{user}', [GuardavidaController::class, 'updateUserRol'])->name('rol.update');
-    Route::resource('licencia', App\Http\Controllers\LicenciaController::class)->parameters(['licencia' => 'licencia']);
+
 });
 
 require __DIR__.'/auth.php';

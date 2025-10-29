@@ -94,12 +94,15 @@
 
 
 
+
+
       <div id="default-carousel" class="relative mx-4 my-4" data-carousel="slide">
 
     <!-- Carousel wrapper -->
     <div class="relative h-56 md:h-96 overflow-hidden rounded-lg">
 
         @foreach ($bandera as $index => $b)
+
             <div class="hidden duration-700 ease-in-out"
                  data-carousel-item
                  @if($index === 0) data-carousel-item-active @endif>
@@ -107,7 +110,7 @@
                 {{-- ✅ Card personalizada --}}
                 <div class="bg-gray-200 dark:bg-gray-600 text-gray-500 dark:text-gray-300 rounded-2xl p-6 mx-auto max-w-lg transform transition focus:scale-105 duration-300">
                     <div class="flex justify-between items-center pb-2">
-                        <h2 class="text-2xl md:text-3xl font-bold">{{ $b->playa->nombre }}</h2>
+                        <h2 class="text-2xl md:text-3xl font-bold">{{ $b->playa->nombre }} </h2>
                         <a href="{{ route('bandera.index') }}">
                             <svg xmlns="http://www.w3.org/2000/svg"
                                 fill="none"
