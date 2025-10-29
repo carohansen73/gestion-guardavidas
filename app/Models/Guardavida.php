@@ -69,7 +69,7 @@ class Guardavida extends Model
 
 
     //***  Relaciones que se mencionan en la vista pero no estaban definidas agregar cuando se definan los turnos de cada usuario***
-  /*
+    /*
     public function turnos()
     {
         return $this->belongsToMany(Turno::class, 'guardavida_turno');
@@ -77,7 +77,7 @@ class Guardavida extends Model
         */
 
     //vi que habia como atributo pero falta la tabla para definirlos por grupos de funciones asi es mas facil filtrar y seleccionar
-/*
+    /*
     public function funciones()
     {
         return $this->belongsToMany(Funcion::class, 'guardavida_funcion');
@@ -85,19 +85,21 @@ class Guardavida extends Model
 */
     public static function obtenerGuardavidas($idUser, $idPlaya)
     {
-        $datosGuardavidas = Guardavida::select('guardavidas.*', 'puestos.nombre as puesto', 'playas.nombre as playa', 'playas.id as playas_id')
+        return self::with(['puesto.playa'])
             ->where('user_id', $idUser)
-            ->join('puestos', 'guardavidas.puesto_id', '=', 'puestos.id')
-            ->join('playas', 'puestos.playa_id', '=', 'playas.id')
-            ->where('playas.id', $idPlaya)
+            ->whereHas('puesto.playa', fn($q) => $q->where('id', $idPlaya))
             ->first();
-
-        return !empty($datosGuardavidas) ? $datosGuardavidas : null;
     }
+
 
     public static function showGuardavidaId($id)
     {
         $guardavida = Guardavida::where('id', $id)->first();
         return $guardavida ?? null;
+    }
+
+    public function playa()
+    {
+        return $this->hasOneThrough(Playa::class, Puesto::class, 'id', 'id', 'puesto_id', 'playa_id');
     }
 }
