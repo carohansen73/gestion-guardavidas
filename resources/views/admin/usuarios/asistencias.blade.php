@@ -57,7 +57,7 @@
         {{-- TÍTULO --}}
         <h2 class="titulo">Listado asistencia del personal</h2>
 
-        {{-- LISTA DE GUARDAVIDAS  modificar esto --}}
+        {{-- LISTA DE GUARDAVIDAS  modificar esto bien con como trae la info desde el controller --}}
 
 
         <ul class="lista-guardavidas">
