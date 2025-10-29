@@ -17,10 +17,6 @@ Route::get('/', function () {
 
 
 
-// Route::get('/home', function () {
-//     return view('ui.home');
-// })->name('home');
-
 
 Route::get('/template', function () {
     return view('ui.template');
