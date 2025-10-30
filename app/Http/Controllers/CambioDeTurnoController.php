@@ -18,14 +18,14 @@ class CambioDeTurnoController extends Controller
     {
         $user = Auth::user();
 
-        $cambiosTurno = CambioDeTurno::with(['guardavida', 'playa', 'puesto'])
+        $cambiosDeTurno = CambioDeTurno::with(['guardavida', 'playa', 'puesto'])
         ->latest()
         ->get();
 
         $playas = Playa::all();
 
         return view('ui.cambios-de-turno.index')
-        ->with('registros', $cambiosTurno)
+        ->with('registros', $cambiosDeTurno)
         ->with('playas', $playas)
         ->with('user', $user);
     }
@@ -36,10 +36,10 @@ class CambioDeTurnoController extends Controller
     public function create()
     {
         $guardavidas = Guardavida::with('playa', 'puesto')->get();
-        $cambioTurno = null;
+        $cambioDeTurno = null;
 
         return view('ui.cambios-de-turno.fields', compact(
-            'guardavidas', 'cambioTurno'
+            'guardavidas', 'cambioDeTurno'
         ));
     }
 
@@ -48,7 +48,26 @@ class CambioDeTurnoController extends Controller
      */
     public function store(StoreCambioDeTurnoRequest $request)
     {
-        //
+          $guardavida = Guardavida::findOrFail($request->guardavida_id);
+
+        //AUTOCOMPLETE DEL GUARDAVIDA
+        $cambioDeTurno = new CambioDeTurno();
+        $cambioDeTurno->guardavida_id = $request->guardavida_id;
+        if ($guardavida->turno === 'M') {
+            $cambioDeTurno->turno_nuevo = 'T';
+        } else{
+            $cambioDeTurno->turno_nuevo = 'M';
+        }
+        $cambioDeTurno->playa_id = $guardavida->playa_id;
+        $cambioDeTurno->puesto_id = $guardavida->puesto_id;
+        $cambioDeTurno->funcion = $guardavida->funcion;
+
+        // Campos ingresados por el usuario
+        $cambioDeTurno->fecha = $request->fecha;
+        $cambioDeTurno->detalles = $request->detalles;
+
+        $cambioDeTurno->save();
+        return redirect()->route('cambio-de-turno.index')->with('success', 'Cambio de turno registrado correctamente.');
     }
 
     /**
@@ -56,7 +75,8 @@ class CambioDeTurnoController extends Controller
      */
     public function show(CambioDeTurno $cambioDeTurno)
     {
-        //
+        return view('ui.cambios-de-turno.show-fields', compact(
+            'cambioDeTurno'));
     }
 
     /**
@@ -64,7 +84,15 @@ class CambioDeTurnoController extends Controller
      */
     public function edit(CambioDeTurno $cambioDeTurno)
     {
-        //
+        $user = Auth::user();
+        $guardavidaAuth = $user->guardavida;
+
+        $guardavidas = Guardavida::with('playa', 'puesto')->get();
+        $playas = Playa::with('puestos')->get();
+
+        return view('ui.cambios-de-turno.fields', compact(
+            'guardavidaAuth', 'guardavidas', 'cambioDeTurno', 'playas'
+        ));
     }
 
     /**
@@ -72,7 +100,9 @@ class CambioDeTurnoController extends Controller
      */
     public function update(UpdateCambioDeTurnoRequest $request, CambioDeTurno $cambioDeTurno)
     {
-        //
+        $cambioDeTurno->update($request->validated());
+
+        return redirect()->route('cambio-de-turno.index')->with('success', 'Cambio de turno actualizado correctamente.');
     }
 
     /**
@@ -80,6 +110,8 @@ class CambioDeTurnoController extends Controller
      */
     public function destroy(CambioDeTurno $cambioDeTurno)
     {
-        //
+        $cambioDeTurno->delete();
+
+        return redirect()->route('cambio-de-turno.index')->with('success', 'Cambio de turno eliminado correctamente.');
     }
 }

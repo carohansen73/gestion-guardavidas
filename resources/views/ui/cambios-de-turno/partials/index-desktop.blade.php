@@ -4,7 +4,7 @@
             <thead class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
                 <tr>
                     <th class="px-4 py-2 text-left cursor-pointer" onclick="toggleSort()">Fecha</th>
-                    <th class="px-4 py-2 text-left">Turno</th>
+                    <th class="px-4 py-2 text-left">Nuevo turno</th>
                     <th class="px-4 py-2 text-left">Guardavida</th>
                     <th class="px-4 py-2 text-left">Playa - Puesto</th>
                     <th class="px-4 py-2 text-left">Acciones</th>
@@ -14,11 +14,11 @@
                 @foreach ($registros as $registro)
                     <tr class="registro-item-tabla hover:bg-gray-50 dark:hover:bg-gray-800 "
                         data-playa="{{ $registro->playa->id ?? '' }}"
-                        data-fecha="{{ $registro->fecha_inicio->format('Y-m-d') }}">
+                        data-fecha="{{ $registro->fecha->format('Y-m-d') }}">
                         <td class="px-4 py-2">{{ $registro->fecha->format('d/m/y') }} </td>
                         <td class="px-4 py-2">
                             <a href="{{ route('cambio-de-turno.show', $registro) }}" class="text-sky-600 hover:text-sky-400">
-                                {{ $registro->turno }}
+                                {{ $registro->turno_nuevo }}
                             </a>
                         </td>
                         <td class="px-4 py-2">

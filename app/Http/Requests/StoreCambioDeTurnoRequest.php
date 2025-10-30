@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\CambioDeTurno;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreCambioDeTurnoRequest extends FormRequest
@@ -11,8 +12,9 @@ class StoreCambioDeTurnoRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+       return auth()->user()->can('agregar_cambio_turno', CambioDeTurno::class);
     }
+
 
     /**
      * Get the validation rules that apply to the request.
@@ -22,7 +24,13 @@ class StoreCambioDeTurnoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'fecha'             => 'required|date',
+            'guardavida_id'     => 'required|exists:guardavidas,id',
+            'turno_nuevo'       => 'nullable',
+            'playa_id'          => 'nullable|exists:playas,id',
+            'puesto_id'         => 'nullable|exists:puestos,id',
+            'funcion'           => 'nullable',
+            'detalles'          => 'nullable|string',
         ];
     }
 }

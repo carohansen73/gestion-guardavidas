@@ -12,9 +12,9 @@ class CambioDeTurno extends Model
 
         protected $fillable = [
             'fecha',
-            'turno' ,
-            'guardavida_id' ,
-            'playa_id' ,
+            'turno_nuevo',
+            'guardavida_id',
+            'playa_id',
             'puesto_id',
             'funcion',
             'detalles',

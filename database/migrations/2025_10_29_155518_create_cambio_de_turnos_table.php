@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('cambio_de_turnos', function (Blueprint $table) {
             $table->id();
             $table->date('fecha');
-            $table->enum('turno', ['M', 'T']);
+            $table->enum('turno_nuevo', ['M', 'T']);
             $table->unsignedBigInteger('guardavida_id')->nullable();
             $table->foreign('guardavida_id')->references('id')->on('guardavidas')->onDelete('cascade');
             $table->unsignedBigInteger('playa_id');
@@ -22,7 +22,7 @@ return new class extends Migration
             $table->unsignedBigInteger('puesto_id');
             $table->foreign('puesto_id')->references('id')->on('puestos')->onDelete('cascade');
             $table->string('funcion');
-            $table->longText('detalles');
+            $table->longText('detalles')->nullable();
             $table->timestamps();
         });
     }

@@ -11,7 +11,7 @@
                             {{-- <a href="{{ route('intervencion.show', $intervencion) }}"> --}}
                             <div>
                                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                                 {{ $registro->guardavida->nombre }} {{ $registro->guardavida->apellido }} cambió al turno {{ $registro->turno }}
+                                 {{ $registro->guardavida->nombre }} {{ $registro->guardavida->apellido }} cambió al turno {{ $registro->turno_nuevo }}
                                 </h3>
                                     <span class="text-sm text-gray-500 dark:text-gray-300">
                                     {{ $registro->fecha->format('d/m/Y') }}
@@ -46,6 +46,12 @@
                                     </svg>
                                 </button>
                             </div>
+                            <p class="text-sm text-gray-800 dark:text-gray-400 font-medium mt-1 line-clamp-2">
+                               Turno nuevo:
+                                <span class="text-sm text-gray-500 dark:text-gray-300">
+                                    {!!$registro->turno_nuevo !!}
+                                </span>
+                            </p>
                             <p class="text-sm text-gray-800 dark:text-gray-400 font-medium mt-1 line-clamp-2">
                                Función:
                                 <span class="text-sm text-gray-500 dark:text-gray-300">
