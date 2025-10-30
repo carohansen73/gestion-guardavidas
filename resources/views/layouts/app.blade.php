@@ -50,7 +50,7 @@
         @include('layouts.bottom-navigation')
 
         <!---<script src="{{ asset('js/script.js') }}"></script>-->
-        <script src="{{ asset('app.js') }}"></script>
+        <script type="module" src="{{ asset('app.js') }}"></script>
          <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
          <script src="{{ asset('js/mensajesSW.js') }}"></script>
          <script src="https://unpkg.com/flowbite@2.5.1/dist/flowbite.min.js"></script>

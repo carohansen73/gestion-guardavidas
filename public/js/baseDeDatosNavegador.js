@@ -94,7 +94,7 @@ export async function agregarBaseDeDatosErrores(idIndexed, asistencia){
 
     request.onsuccess = () => {
       const db = request.result;
-      const tx = db.transaction('erroresDeAsistencia', 'readwrite'); // readonly → readwrite
+      const tx = db.transaction('erroresDeAsistencia', 'readwrite');
       const store = tx.objectStore('erroresDeAsistencia');
       const resultado = store.add(asistencia);
             resultado.onsuccess = () => {
@@ -109,6 +109,65 @@ export async function agregarBaseDeDatosErrores(idIndexed, asistencia){
 
     };
   });
+}
+
+// Inicializa la base y elimina registros viejos automáticamente
+export function inicializarBaseDeDatos() {
+  const request = indexedDB.open('datosAsistencia', 1);
+
+  // Se ejecuta solo si la base no existe o se actualiza
+  request.onupgradeneeded = (event) => {
+    crearAlmacen(event);
+  };
+
+  request.onsuccess = () => {
+    console.log("Base de datos abierta correctamente");
+    limpiarErroresViejos(); // Ejecutar limpieza al iniciar
+  };
+
+  request.onerror = () => {
+    console.error("Error abriendo la base de datos");
+  };
+}
+
+// Elimina registros de más de 10 días
+export function limpiarErroresViejos() {
+  const request = indexedDB.open('datosAsistencia', 1);
+
+  request.onsuccess = () => {
+    const db = request.result;
+    const tx = db.transaction('erroresDeAsistencia', 'readwrite');
+    const store = tx.objectStore('erroresDeAsistencia');
+    const cursorRequest = store.openCursor();
+
+    cursorRequest.onsuccess = (event) => {
+      const cursor = event.target.result;
+      if (cursor) {
+        const registro = cursor.value;
+        const fechaGuardado = new Date(registro.fecha_hora);
+        const ahora = new Date();
+        const diasPasados = (ahora - fechaGuardado) / (1000 * 60 * 60 * 24);
+
+        //Eliminar todos los registros con más de 1 minuto
+         if (diasPasados > 10) {
+          store.delete(cursor.key);
+          console.log(`Registro eliminado (${Math.round(diasPasados)} días):`, registro);
+        }
+
+        cursor.continue(); //muy importante para seguir recorriendo TODOS
+      } else {
+        console.log("Limpieza completa de registros viejos");
+      }
+    };
+
+    cursorRequest.onerror = (event) => {
+      console.error("Error al recorrer IndexedDB:", event.target.error);
+    };
+  };
+
+  request.onerror = () => {
+    console.error("Error al abrir la base de datos.");
+  };
 }
 
 
