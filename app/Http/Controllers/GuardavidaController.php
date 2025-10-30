@@ -269,8 +269,8 @@ class GuardavidaController extends Controller
 
 
 
-// AGREGAR ESTOS MÉTODOS AL FINAL DE TU GuardavidaController
-// (antes del último })
+//
+
 
 /**
  * Ver perfil de un guardavidas específico

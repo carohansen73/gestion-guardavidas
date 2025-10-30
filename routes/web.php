@@ -60,15 +60,18 @@ Route::middleware('auth')->group(function () {
     Route::get('/guardavida/{guardavida}/perfil', [GuardavidaController::class, 'showProfile'])->name('guardavida.profile');
 
 
-//para visualizar asistencias de guardavidas
-    Route::put('asistencias/guardavidas', [AsistenciaController::class, 'GetasistenciasGuardavidas'])
-        ->name('asistencias');
+    // Listado general (admin)
+    Route::get('/admin/asistencias', [AsistenciaController::class, 'index'])->name('asistencias.index');
 
-    Route::put('asistencia/{guardavida}', [AsistenciaController::class, 'AsistenciaPorGuardavidaID'])
-        ->name('asistencia');
+    // Historial individual por guardavida
+    Route::get('/admin/asistencias/{id}', [AsistenciaController::class, 'asistenciasPorGuardavida'])->name('asistencias.guardavida');
 
-    //para descargar el excel de asistencias
+    //para la seccion de "mis asistencias" cerca de "ver perfil"
+    Route::get('/mis-asistencias', [AsistenciaController::class, 'misAsistencias'])
+        ->name('guardavida.misAsistencias');
 
+    //para  ir a la seccion de descarga  del excel de asistencias y aplicar filtros(puestos,dias,todos)
+    Route::get("guardavidas/excel", [AsistenciaController::class, 'guardavidasPanelExcelAsistencias'])->name('guardavidas.excel');
     //para exportar excel de asistencias desde el panel de asistencias
     Route::get("/excel", [AsistenciaController::class, 'descargar']);
     Route::get('/asistencias/export', [AsistenciaController::class, 'export'])->name('excel.export');

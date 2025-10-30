@@ -1,12 +1,12 @@
 <?php
 
 namespace App\Http\Controllers;
-
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Guardavida;
 use App\Models\Asistencia;
+use App\Models\Playa;
+use App\Models\Puesto;
 use Laravel\Sanctum\PersonalAccessToken;
 
 class AsistenciaController extends Controller
@@ -61,32 +61,69 @@ class AsistenciaController extends Controller
     }
 
 
+
     /**
-     * Muestra el listado completo de asistencias
-     * (usado en la vista admin/usuarios/asistencias.blade.php)
+     * Listado general de asistencias (vista admin)
+     * Muestra todas las asistencias de todos los guardavidas.
      */
     public function index()
     {
-        //  Cargamos relaciones completas para evitar consultas N+1
-        $asistencias = Asistencia::with(['guardavida.puesto.playa', 'puesto.playa'])
-            ->orderByDesc('fecha_hora')
-            ->get();
 
-        return view('admin.usuarios.asistencias', compact('asistencias'));
+        if (!auth()->user()->hasAnyRole(['admin', 'encargado'])) {
+            // Si no tiene permiso, devolvemos vista vacía o redirige (eso no me acuerdo como se veia en la interfaz)
+            return view('admin.usuarios.asistencias', ['guardavidas' => collect()]);
+        }
+        $guardavidas = Guardavida::with(['puesto.playa'])
+            ->paginate(10);
+
+        return view('admin.usuarios.asistencias', compact('guardavidas'));
     }
     /**
-     * Muestra todas las asistencias de un guardavida específico
-     * (usado en profile/profile.blade.php)
+     * Muestra todas las asistencias de un guardavida en especifico*cuando el admin lo selecciona o cuando el propio usuario
+     * ingresa a la seccion "mis asistencias o asistencia"
+     * (usado en admin/asistenciaPorPerfil.blade.php)
      */
     public function asistenciasPorGuardavida($id)
     {
-        $guardavida = Guardavida::with([
-            'puesto.playa',
-            'asistencias.puesto.playa'
-        ])->findOrFail($id);
+        $guardavida = Guardavida::with(['puesto.playa', 'asistencias.puesto.playa'])->findOrFail($id);
+         /**si falla aca en anyrole es porque
+         * no me dejaba ejecutar
+         *  la migracion.
+         El composer require spatie/laravel-permission
+         de permissions ya lo instale
+         * */
+        $esAdmin = auth()->user()->hasAnyRole(['admin', 'encargado']); // o el método que uses para validar admin
 
-        return view('profile.profile', compact('guardavida'));
+        // Solo si es admin, mandamos balnearios y puestos
+        $balnearios = $esAdmin ?Playa::all() : null;
+        $puestos = $esAdmin ?Puesto::all() : null;
+
+        return view('admin.asistenciaPorPerfil', compact('guardavida', 'esAdmin', 'balnearios', 'puestos'));
     }
+
+
+    /**
+     * metodo para que muestre en la seccion "mis asistencias" las asistencias del usuario logueado (solo las ve no puede descargar ni nada
+     * como administradores)
+     */
+
+    public function misAsistencias()
+    {
+        $guardavida = auth()->user()->guardavida;
+        if (!$guardavida) {
+            abort(403, 'No tiene un perfil de guardavida asignado.');
+        }
+
+        // Cargar relaciones
+        $guardavida->load('asistencias.puesto.playa');
+
+        // Pasamos $esAdmin = false para que el Blade detecte que no es vista administrativa
+        $esAdmin = false;
+        // No necesitamos filtros ni balnearios/puestos para este caso
+        return view('admin.asistenciaPorPerfil', compact('guardavida','esAdmin'));
+    }
+
+
 
 
     /**
@@ -99,6 +136,15 @@ class AsistenciaController extends Controller
             ->orderByDesc('fecha_hora')
             ->get();
 
-        return view('admin.usuarios.asistencias', compact('asistencias'));
+        // Extraigo los guardavidas únicos
+        $guardavidas = $asistencias->pluck('guardavida')->unique('id')->values();
+
+        return view('admin.usuarios.asistencias', compact('guardavidas'));
+    }
+
+
+
+    public function guardavidasPanelExcelAsistencias(){
+        return view('admin.panelExcelAsistencias');
     }
 }

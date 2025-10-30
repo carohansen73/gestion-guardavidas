@@ -105,7 +105,7 @@
                 @endcan
                 @can('ver_asistencias')
                     <li>
-                        <a href="#"
+                        <a href="{{ route('asistencias.index') }}"
                             class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22" fill="currentColor"
                                 class="shrink-0 w-5 h-5 scale-[1.15] -translate-x-[3px] text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white">
