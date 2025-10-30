@@ -24,7 +24,7 @@ return new class extends Migration
             $table->foreign('playa_id')->references('id')->on('playas')->onDelete('cascade');
             $table->unsignedBigInteger('puesto_id');
             $table->foreign('puesto_id')->references('id')->on('puestos')->onDelete('cascade');
-            $table->longText('detalles');
+            $table->longText('detalles')->nullable();
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();

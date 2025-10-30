@@ -23,7 +23,7 @@
         @endcan
     </div>
 
-   @include('ui.banderas.partials.filtros-de-busqueda')
+    <x-filtros-de-busqueda :playas="$playas" tipo="licencias" />
 
     @if (session('success'))
         <div class="bg-green-100 text-green-700 p-3 rounded my-2">
