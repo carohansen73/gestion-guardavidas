@@ -46,11 +46,11 @@ class Guardavida extends Model
     {
         return $this->belongsTo(User::class);
     }
-
+/*
     public function playa()
     {
         return $this->belongsTo(Playa::class);
-    }
+    }*/
 
     public function puesto()
     {

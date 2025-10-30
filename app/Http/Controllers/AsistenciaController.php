@@ -9,6 +9,7 @@ use App\Models\Playa;
 use App\Models\Puesto;
 use Laravel\Sanctum\PersonalAccessToken;
 
+
 class AsistenciaController extends Controller
 {
     public function cargarAsistencia(Request $request){
@@ -145,6 +146,11 @@ class AsistenciaController extends Controller
 
 
     public function guardavidasPanelExcelAsistencias(){
-        return view('admin.panelExcelAsistencias');
+        return view('admin.DescargaDelExcelAsistencias');
+
+
     }
+
+
+
 }

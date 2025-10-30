@@ -85,8 +85,8 @@ Route::middleware('auth')->group(function () {
     Route::get("guardavidas/excel", [AsistenciaController::class, 'guardavidasPanelExcelAsistencias'])->name('guardavidas.excel');
     //para exportar excel de asistencias desde el panel de asistencias
     Route::get("/excel", [AsistenciaController::class, 'descargar']);
-    Route::get('/asistencias/export', [AsistenciaController::class, 'export'])->name('excel.export');
-
+    Route::get('/admin/asistencias/export-dia', [AsistenciaController::class, 'exportAsistenciasPorDia'])
+        ->name('asistencias.exportDia');
 });
 
 Route::post('/loginIdUser', [ApiAuthController::class, 'login']);

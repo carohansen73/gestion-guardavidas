@@ -8,6 +8,8 @@ use App\Exports\PlayaMultiSheetExport;
 use App\Exports\IntervencionesExport;
  use App\Exports\BanderasExport;
 use App\Exports\GuardavidasExport;
+use App\Exports\AsistenciasExport;
+
 
 class ExportController extends Controller
 {
@@ -74,5 +76,17 @@ class ExportController extends Controller
         }
 
 
+    }
+
+    public function exportAsistenciasPorDia(Request $request)
+    {
+        $request->validate([
+            'fecha_inicio' => 'required|date',
+            'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
+        ]);
+
+        $inicio = $request->input('fecha_inicio');
+        $fin = $request->input('fecha_fin');
+        return Excel::download(new AsistenciasExport(($inicio, $fin),), "asistencias_$fecha.xlsx");
     }
 }

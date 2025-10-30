@@ -267,12 +267,6 @@ class GuardavidaController extends Controller
     }
 
 
-
-
-
-//
-
-
 /**
  * Ver perfil de un guardavidas específico
  * Puede ser visto por administradores o por el propio guardavidas
