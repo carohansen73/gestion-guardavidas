@@ -202,16 +202,16 @@
 
                     <div class="info-grid">
                         <div class="info-item">
-                            <label class="info-label">Balneario</label>
-                            @if ($esAdmin && $balnearios)
+                            <label class="info-label">Playa</label>
+                            @if ($esAdmin && $playas)
                                 <div class="info-value editable">
                                     <i class="fas fa-umbrella-beach"></i>
                                     <select name="balneario_id" class="form-control">
                                         <option value="">Seleccionar balneario</option>
-                                        @foreach ($balnearios as $balneario)
+                                        @foreach ($playas as $balneario)
                                             <option value="{{ $balneario->id }}"
                                                 {{ $guardavida->balneario_id == $balneario->id ? 'selected' : '' }}>
-                                                {{ ucfirst($balneario->nombre_playa) }}
+                                                {{ ucfirst($balneario->nombre) }}
                                             </option>
                                         @endforeach
                                     </select>

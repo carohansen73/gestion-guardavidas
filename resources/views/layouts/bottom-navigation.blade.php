@@ -30,14 +30,13 @@
     <!-- Íconos de la navbar -->
     <a aria-current="page" class="flex flex-1 flex-col items-center justify-center text-xs font-medium py-2 px-4 text-gray-500 flex-grow text-center"
      href="{{ route('intervencion.create') }}">
-
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                    class="w-9 h-9">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                </svg>
-                {{-- <span class="sr-only">Home</span> --}}
-                <p> Intervención </p>
-            </a>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+            class="w-9 h-9">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+        </svg>
+        {{-- <span class="sr-only">Home</span> --}}
+        <p> Intervención </p>
+    </a>
 
     <!-- Botón flotante en el centro -->
     <a href="{{route('home')}}" class="relative flex flex-1 flex-col items-center justify-center text-xs font-medium  text-gray-700 py-3 px-6 flex-grow text-center">

@@ -51,6 +51,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/export/playas', [ExportController::class, 'exportPorPlaya'])
         ->name('export.playas');
 
+    /*Nuevas rutas*/
+    Route::get('/my-profile', [GuardavidaController::class, 'myProfile'])->name('guardavida.myProfile');
+    Route::put('/my-profile/{guardavida}', [GuardavidaController::class, 'updateProfile'])->name('guardavida.updateProfile');
+    Route::get('/guardavida/{guardavida}/perfil', [GuardavidaController::class, 'showProfile'])->name('guardavida.profile');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -64,7 +68,7 @@ Route::middleware('auth')->group(function () {
 
 });
 
-Route::post('/loginIdUser', [ApiAuthController::class, 'login']);
+// Route::post('/loginIdUser', [ApiAuthController::class, 'login']);
 
 
 
