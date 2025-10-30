@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('nombre');
             $table->decimal('lat', 10, 6);
             $table->decimal('lon', 10, 6);
+            $table->string('color', 50);
             $table->timestamps();
         });
     }

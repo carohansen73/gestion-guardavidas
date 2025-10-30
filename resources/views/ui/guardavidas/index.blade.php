@@ -23,8 +23,9 @@
         </a>
         @endcan
     </div>
-    {{-- Acomodar js sin fecha para guardavidas! --}}
-    @include('ui.guardavidas.partials.filtros-de-busqueda')
+
+
+    <x-filtros-de-busqueda :playas="$playas" tipo="guardavidas" />
 
     @if (session('success'))
         <div class="bg-green-100 text-green-700 p-3 rounded my-2">

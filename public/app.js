@@ -1,6 +1,5 @@
 //Sincronizacion de Service Worker para poder escuchar cuando vuelva el internet para guardar las asistencias
 //que quedaron en la base de datos del navegador
-
 import { inicializarBaseDeDatos } from './js/baseDeDatosNavegador.js';
 
 

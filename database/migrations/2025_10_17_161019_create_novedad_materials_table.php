@@ -19,7 +19,7 @@ return new class extends Migration
             $table->timestamp('fecha');
             $table->unsignedBigInteger('playa_id');
             $table->foreign('playa_id')->references('id')->on('playas')->onDelete('cascade');
-            $table->longText('detalles');
+            $table->longText('detalles')->nullable();
             $table->timestamps();
         });
     }

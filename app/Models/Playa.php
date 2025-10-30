@@ -7,9 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Playa extends Model
 {
-    use HasFactory;
-
-    protected $fillable = ['nombre'];
+    protected $fillable = ['nombre', 'color'];
 
     //Un balneario puede estar vinculado a varios puestos
     public function puestos()
@@ -17,10 +15,7 @@ class Playa extends Model
         return $this->hasMany(Puesto::class);  // Relación de un-a-muchos
     }
 
-    //  public function guardavidas()
-    // {
-    //     return $this->hasMany(Guardavida::class);
-    // }
+
 
     // public function incidentes()
     // {

@@ -38,6 +38,12 @@
                   </span>
             </p>
             <p class="text-sm text-gray-800 dark:text-gray-400 font-medium mt-1 line-clamp-2">
+                Turno:
+                <span class="text-sm text-gray-500 dark:text-gray-300">
+                {{ $guardavida->turno }}
+                  </span>
+            </p>
+            <p class="text-sm text-gray-800 dark:text-gray-400 font-medium mt-1 line-clamp-2">
                 DNI
                 <span class="text-sm text-gray-500 dark:text-gray-300">
                 {{ $guardavida->dni }}

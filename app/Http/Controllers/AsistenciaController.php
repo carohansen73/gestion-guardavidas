@@ -59,4 +59,46 @@ class AsistenciaController extends Controller
             'data' => $asistencia
         ], 200);
     }
+
+
+    /**
+     * Muestra el listado completo de asistencias
+     * (usado en la vista admin/usuarios/asistencias.blade.php)
+     */
+    public function index()
+    {
+        //  Cargamos relaciones completas para evitar consultas N+1
+        $asistencias = Asistencia::with(['guardavida.puesto.playa', 'puesto.playa'])
+            ->orderByDesc('fecha_hora')
+            ->get();
+
+        return view('admin.usuarios.asistencias', compact('asistencias'));
+    }
+    /**
+     * Muestra todas las asistencias de un guardavida específico
+     * (usado en profile/profile.blade.php)
+     */
+    public function asistenciasPorGuardavida($id)
+    {
+        $guardavida = Guardavida::with([
+            'puesto.playa',
+            'asistencias.puesto.playa'
+        ])->findOrFail($id);
+
+        return view('profile.profile', compact('guardavida'));
+    }
+
+
+    /**
+     * Muestra todas las asistencias de un puesto específico
+     */
+    public function asistenciasPorPuesto($idPuesto)
+    {
+        $asistencias = Asistencia::with(['guardavida', 'puesto.playa'])
+            ->where('puesto_id', $idPuesto)
+            ->orderByDesc('fecha_hora')
+            ->get();
+
+        return view('admin.usuarios.asistencias', compact('asistencias'));
+    }
 }

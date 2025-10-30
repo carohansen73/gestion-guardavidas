@@ -58,7 +58,7 @@ export async function guardarAsistenciaOffline(data) {
         // Registrar la sincronización solo después de guardar los datos
         if ('serviceWorker' in navigator && 'SyncManager' in window) {
             const swReg = await navigator.serviceWorker.ready; // Ver razon por la que no carga
-            await swReg.sync.register('sincronizacion-asistencias');
+            await swReg.sync.register('sincronizar-asistencias');
             console.log('Sincronización registrada');
         }
         return true;

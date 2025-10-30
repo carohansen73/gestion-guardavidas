@@ -14,8 +14,11 @@
         @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/css/style.css'])
         {{-- estilo del template --}}
         {{-- <link rel="stylesheet" href="{{ asset('resources/css/style.css') }}"> --}}
+
+       
     </head>
     <body class="font-sans antialiased  md:pb-0 pb-14" x-data="{ darkMode: false }" :class="{ 'dark': darkMode }">
+
 
             @include('layouts.navigation')
 
@@ -37,7 +40,7 @@
                 @endisset
 
                 <!-- Page Content -->
-                <div class="lg:ml-64 min-h-screen bg-gray-50 dark:bg-gray-800">
+                <div class="lg:ml-64 min-h-screen bg-gray-100 dark:bg-gray-800">
                     <main class="overflow-x-hidden mb-4">
                         @yield('content')
                         {{-- {{ $slot }} --}}
@@ -53,6 +56,8 @@
         <script type="module" src="{{ asset('app.js') }}"></script>
          <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
          <script src="{{ asset('js/mensajesSW.js') }}"></script>
-         <script src="https://unpkg.com/flowbite@2.5.1/dist/flowbite.min.js"></script>
+         <script src="{{ asset('resources/js/script.js') }}"></script>
+
+         {{-- <script src="https://unpkg.com/flowbite@2.5.1/dist/flowbite.min.js"></script> --}}
     </body>
 </html>
