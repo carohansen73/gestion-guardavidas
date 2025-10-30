@@ -7,11 +7,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, Notifiable, HasRoles, HasApiTokens;
 
     /**
      * The attributes that are mass assignable.
@@ -64,5 +65,17 @@ class User extends Authenticatable
 
     public function scopeDeshabilitados($query){
         return $query->where('enabled', false);
+    }
+
+    public static function obtenerPuesto($idUser, $idPuesto){
+        $datosGuardavidas = User::select('*')
+        ->where('user_id', $idUser)
+        ->join('guardavidas', 'guardavidas.user_id', '=','users.id')
+        ->join('puestos', 'guardavidas.puesto_id', '=', 'puestos.id')
+        ->where('puestos.id', $idPuesto)
+        ->first();
+        
+        return !empty($datosGuardavidas) ? $datosGuardavidas : null;
+        
     }
 }

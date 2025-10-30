@@ -1,5 +1,6 @@
 <x-guest-layout>
     <!-- Session Status -->
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
     <form method="POST" action="{{ route('login') }}">
@@ -39,11 +40,14 @@
                 </a>
             @endif
 
-            <x-primary-button class="ms-3">
+            <x-primary-button class="ms-3" id="botonEnviarLogin">
                 {{ __('Log in') }}
             </x-primary-button>
         </div>
     </form>
 
+    <div id="error" class="mt-3 text-sm font-semibold text-red-600"></div>
 
 </x-guest-layout>
+
+<script src="{{ asset('js/loginIdUserOffline.js') }}"></script>

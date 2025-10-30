@@ -22,6 +22,28 @@ class UserController extends Controller
         return back()->with('success', 'El estado del usuario fue actualizado correctamente.');
     }
 
+    public function verPuestoUsuario(Request $request){
+        $validated = $request->validate([
+            'user_id' => 'required|integer|exists:users,id',
+            'puesto_id' => 'required|integer|exists:puestos,id',
+        ]);
+        $idUser = $validated['user_id'];
+        $idPuesto = $validated['puesto_id'];
+
+        $guardavida = User::obtenerPuesto($idUser, $idPuesto);
+        if (is_null($guardavida)) {
+            return response()->json([
+                'success' => false,
+                'data' => 'Escaneo en puesto incorrecto'
+            ]);
+        }
+        else{
+             return response()->json([
+                'success' => true,
+                'data' => 'Escaneo en puesto correcto'
+            ]);
+        }
+    }
     /**
      * Display a listing of the resource.
      */

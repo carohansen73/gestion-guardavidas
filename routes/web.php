@@ -3,6 +3,7 @@
 use App\Exports\GuardavidasExport;
 use App\Exports\IntervencionesExport;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Auth\ApiAuthController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\GuardavidaController;
 use App\Http\Controllers\HomeController;
@@ -57,6 +58,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+
     //pasar a moddleware admin
     //Route::middleware(['auth', 'can:admin'])
     Route::put('/update-user/{user}', [RegisteredUserController::class, 'updateUserByAdmin'])->name('user.update');
@@ -64,4 +66,9 @@ Route::middleware('auth')->group(function () {
 
 });
 
+Route::post('/loginIdUser', [ApiAuthController::class, 'login']);
+
+
+
 require __DIR__.'/auth.php';
+

@@ -1,0 +1,135 @@
+*, *:after, *:before{
+    margin: 0;
+    padding: 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+#contenedorCarga{
+    display: none;
+    background-color: rgba(123,123,123, 0.9);
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    -webkit-transition: all 1s ease;
+    -o-transition: all 1s ease;
+    transition: all 1s ease;
+    z-index: 10000;
+}
+
+#carga{
+    border: 15px solid #ccc;
+    border-top-color: rgb(13, 116, 189);
+    border-top-style: groove;
+    height: 100px;
+    width: 100px;
+    border-radius: 100%;
+}
+
+.position{
+    position: absolute;
+     top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center; 
+        display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.animacion{
+     -webkit-animation: girar 1.5s linear infinite;
+    -o-animation: girar 1.5s linear infinite;
+    animation: girar 1.5s linear infinite;
+}
+
+@keyframes girar{
+    from{
+        transform: rotate(0deg);
+    }
+    to{
+        transform: rotate(360deg);
+    }
+}
+
+body{
+    height: 100vh;
+}
+
+nav{
+    position:absolute;
+    width: 100%;
+}
+
+
+#resultadoQR {
+    margin-top: 15px;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+.contenedorQR{
+    display: flex;
+    height: 100vh;
+}
+
+.qr-frame, #video{
+    position: absolute;
+    width: 300px;
+    height: 400px;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
+    margin: auto;
+}
+
+#video{
+    border: solid 2px #292929;
+}
+
+.qr-frame::before, .qr-frame::after, .qr-frame span::before, .qr-frame span::after{
+    content: "";
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    border: 4px solid #292929;
+    z-index: 10000;
+}
+
+.qr-frame::before{
+    top: 0;
+    left: 0;
+    border-right: none;
+    border-bottom: none;
+}
+
+.qr-frame::after{
+    top: 0;
+    right: 0;
+    border-left: none;
+    border-bottom: none;
+}
+
+.qr-frame span{
+    position: absolute;
+    inset: 0;
+}
+
+.qr-frame span::before{
+    bottom: 0;
+    left: 0;
+    border-right: none;
+    border-top: none;
+}
+
+.qr-frame span::after{
+    bottom: 0;
+    right: 0;
+    border-left: none;
+    border-top: none;
+}
+
+nav{
+    z-index: 20000;
+}
+
