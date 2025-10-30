@@ -1,5 +1,5 @@
 <?php
-
+use App\Http\Controllers\QrController;
 use App\Exports\GuardavidasExport;
 use App\Exports\IntervencionesExport;
 use App\Http\Controllers\Auth\RegisteredUserController;
@@ -33,6 +33,7 @@ Route::get('/dashboard', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
+    Route::get('/activeCamera', [QrController::class, 'activeCamera'])->name('activeCamera');
 
     Route::resource('bandera', App\Http\Controllers\BanderaController::class);
     Route::resource('intervencion', App\Http\Controllers\IntervencionController::class);
