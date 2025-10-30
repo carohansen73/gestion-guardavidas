@@ -71,7 +71,7 @@ Route::middleware('auth')->group(function () {
 
     //para exportar excel de asistencias desde el panel de asistencias
     Route::get("/excel", [AsistenciaController::class, 'descargar']);
-    Route::get('/asistencias/export', [AsistenciaController::class, 'export'])->name('empleos.export');
+    Route::get('/asistencias/export', [AsistenciaController::class, 'export'])->name('excel.export');
 });
 
 Route::post('/loginIdUser', [ApiAuthController::class, 'login']);
