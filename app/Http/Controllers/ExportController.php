@@ -10,6 +10,7 @@ use App\Exports\IntervencionesExport;
 use App\Exports\CambiosDeTurnoExport;
 use App\Exports\GuardavidasExport;
 use App\Exports\LicenciasExport;
+use App\Exports\NovedadesDeMaterialesExport;
 
 class ExportController extends Controller
 {
@@ -59,6 +60,14 @@ class ExportController extends Controller
             case 'banderas':
                 $exportClass = BanderasExport::class;
                 $nombreArchivo = 'banderas.xlsx';
+                return Excel::download(
+                    new PlayaMultiSheetExport($exportClass),
+                    $nombreArchivo
+                );
+
+            case 'novedad-material':
+                $exportClass = NovedadesDeMaterialesExport::class;
+                $nombreArchivo = 'novedades-de-materiales.xlsx';
                 return Excel::download(
                     new PlayaMultiSheetExport($exportClass),
                     $nombreArchivo
