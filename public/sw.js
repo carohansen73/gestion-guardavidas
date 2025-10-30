@@ -67,8 +67,6 @@ async function cargarAsistenciaReconexion(asistencia) {
 
 async function desencriptarQR(valorQR, token_bearer) {
     try{
-      const fullAuthHeader = `Bearer ${token_bearer}`;
-    console.log("Cabecera de Autorización enviada:", fullAuthHeader);
         const res = await fetch("api/desencriptar-qr", {
             method: "POST",
             headers: {
@@ -166,9 +164,9 @@ async function cargarDatos(datos, idIndexed, token_bearer) {
         let res = await response.json(); 
         if (res.success) {
            eliminarDatosIndexed(idIndexed);
-           await notificarClientes('success', 'Asistencia sincronizada correctamente!');
+           await notificarClientes('success', `Asistencia sincronizada correctamente con fecha ${datos.fecha_hora}`);
         } else {
-            await notificarClientes('error', 'El servidor respondió con error');
+            await notificarClientes('error', `Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente.`);
         }
     } catch (err) {
         console.log("Error catch: ",err);
@@ -212,9 +210,10 @@ async function agregarBaseDeDatosErrores(asistencia){
       const db = request.result;
       const tx = db.transaction('erroresDeAsistencia', 'readwrite'); // readonly → readwrite
       const store = tx.objectStore('erroresDeAsistencia');
-      const resultado = almacen.add(asistencia);
+      const resultado = store.add(asistencia);
             resultado.onsuccess = () => {
                 console.log("error en asistencia guardado:", asistencia);
+                eliminarDatosIndexed(asistencia.id);
                 resolve();
             };
             resultado.onerror = (event) => {
@@ -224,32 +223,4 @@ async function agregarBaseDeDatosErrores(asistencia){
 
     };
   });
-  try {
-        const transaccion = bd.transaction(["erroresDeAsistencia"], "readwrite");
-        const almacen = transaccion.objectStore("erroresDeAsistencia");
-
-        // Convertimos la operación de add a promesa para poder usar await
-        await new Promise((resolve, reject) => {
-            const request = almacen.add(asistencia);
-            request.onsuccess = () => {
-                console.log("error en asistencia guardado:", asistencia);
-                resolve();
-            };
-            request.onerror = (event) => {
-                console.error("Error guardando en IndexedDB:", event.target.error);
-                reject(event.target.error);
-            };
-        });
-
-        // Registrar la sincronización solo después de guardar los datos
-        if ('serviceWorker' in navigator && 'SyncManager' in window) {
-            const swReg = await navigator.serviceWorker.ready; // Ver razon por la que no carga
-            await swReg.sync.register('sincronizacion-asistencias');
-            console.log('Sincronización registrada');
-        }
-        return true;
-    } catch (error) {
-        console.error("Error en guardarAsistenciaOffline:", error);
-        throw error;
-    }
 }
