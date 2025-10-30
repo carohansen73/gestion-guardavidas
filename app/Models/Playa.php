@@ -15,10 +15,7 @@ class Playa extends Model
         return $this->hasMany(Puesto::class);  // Relación de un-a-muchos
     }
 
-    //  public function guardavidas()
-    // {
-    //     return $this->hasMany(Guardavida::class);
-    // }
+
 
     // public function incidentes()
     // {

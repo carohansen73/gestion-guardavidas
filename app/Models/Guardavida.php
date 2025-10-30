@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Guardavida extends Model
 {
-    /** @use HasFactory<\Database\Factories\GuardavidaFactory> */
+
     use HasFactory;
 
     protected $perPage = 10;
@@ -27,6 +27,20 @@ class Guardavida extends Model
         'puesto_id',
         'turno',
     ];
+    // Agregar accessor para contar asistencias
+    protected $appends = ['asistencias_count', 'intervenciones_count'];
+
+    public function getAsistenciasCountAttribute()
+    {
+        return $this->asistencias()->count();
+    }
+
+    public function getIntervencionesCountAttribute()
+    {
+        return $this->intervenciones()->count();
+    }
+
+
 
     public function user()
     {
@@ -43,55 +57,50 @@ class Guardavida extends Model
         return $this->belongsTo(Puesto::class);
     }
 
-    //many to many
-     public function intervenciones()
+
+    public function asistencias()
+    {
+        return $this->hasMany(Asistencia::class, 'guardavidas_id');
+    }
+
+    public function intervenciones()
     {
         return $this->belongsToMany(Intervencion::class, 'guardavidas_intervenciones', 'guardavida_id', 'intervencion_id');
     }
 
-    public static function obtenerGuardavidas($idUser, $idPlaya){
-        $datosGuardavidas = Guardavida::select('guardavidas.*', 'puestos.nombre as puesto', 'playas.nombre as playa','playas.id as playas_id')
-        ->where('user_id', $idUser)
-        ->join('puestos', 'guardavidas.puesto_id', '=','puestos.id')
-        ->join('playas', 'puestos.playa_id', '=', 'playas.id')
-        ->where('playas.id', $idPlaya)
-        ->first();
 
-        return !empty($datosGuardavidas) ? $datosGuardavidas : null;
-
-    }
-
-/*
-    //guardavidas solos sin criterios de orden
-    public static function showGuardavidas()
+    //***  Relaciones que se mencionan en la vista pero no estaban definidas agregar cuando se definan los turnos de cada usuario***
+    /*
+    public function turnos()
     {
-        $guardavidas = Guardavida::all();
-        return $guardavidas->isNotEmpty() ? $guardavidas : null;
+        return $this->belongsToMany(Turno::class, 'guardavida_turno');
+    }
+        */
+
+    //vi que habia como atributo pero falta la tabla para definirlos por grupos de funciones asi es mas facil filtrar y seleccionar
+    /*
+    public function funciones()
+    {
+        return $this->belongsToMany(Funcion::class, 'guardavida_funcion');
+    }
+*/
+    public static function obtenerGuardavidas($idUser, $idPlaya)
+    {
+        return self::with(['puesto.playa'])
+            ->where('user_id', $idUser)
+            ->whereHas('puesto.playa', fn($q) => $q->where('id', $idPlaya))
+            ->first();
     }
 
 
     public static function showGuardavidaId($id)
     {
         $guardavida = Guardavida::where('id', $id)->first();
-
-        //return Guardavidas::find($id);
-
         return $guardavida ?? null;
     }
-*/
 
-/*
-    public static function obtenerCategoriasGuardavidasAgrupados()
+    public function playa()
     {
-
-        $balnearios = Guardavida::all()->groupBy('playa');
-        return $balnearios;
+        return $this->hasOneThrough(Playa::class, Puesto::class, 'id', 'id', 'puesto_id', 'playa_id');
     }
-*/
-    //no encontre la tabla pero hay que agregarla
-   /* public function turnos()
-    {
-        return $this->belongsTo(Turnos::class);
-    }
-        */
 }
