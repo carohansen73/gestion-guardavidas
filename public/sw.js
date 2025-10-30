@@ -1,3 +1,4 @@
+import { agregarBaseDeDatosErrores, eliminarDatosIndexed } from "./js/baseDeDatosNavegador.js";
 
 self.addEventListener('install', event => {
     console.log("instalando SW");
@@ -38,17 +39,6 @@ async function cargarAsistenciaReconexion(asistencia) {
             let latitudPuesto = data.puesto_lat;
             let longitudPuesto = data.puesto_lng;
 
-            let resultado = await calcularDistancia(asistencia.lat, asistencia.lng, latitudPuesto, longitudPuesto);
-            if (resultado > 200){
-                agregarBaseDeDatosErrores(asistencia);
-                throw new Error(`No se pudo registrar la asistencia: el QR fue escaneado a más de 200 metros de distancia el día: ${asistencia.fecha_hora}.`);
-            }
-
-            let puestoCorrecto = await perteneceQRAlPuesto(asistencia.user_id, idPuesto, asistencia.token_bearer);
-            if (!puestoCorrecto || puestoCorrecto.success == false){
-                agregarBaseDeDatosErrores(asistencia);
-                throw new Error(`No se pudo registrar la asistencia: el QR fue escaneado en el puesto incorrecto el día: ${asistencia.fecha_hora}.`);
-            }
             let datos = {
               idPlaya: idPlaya,
               userLat: asistencia.lat,
@@ -58,6 +48,19 @@ async function cargarAsistenciaReconexion(asistencia) {
               idPuesto: idPuesto,
               fecha_hora: asistencia.fecha_hora,
             };
+
+            let resultado = await calcularDistancia(asistencia.lat, asistencia.lng, latitudPuesto, longitudPuesto);
+            if (resultado > 200){
+                agregarBaseDeDatosErrores(asistencia.id, datos);
+                throw new Error(`No se pudo registrar la asistencia: el QR fue escaneado a más de 200 metros de distancia el día: ${asistencia.fecha_hora}.`);
+            }
+
+            let puestoCorrecto = await perteneceQRAlPuesto(asistencia.user_id, idPuesto, asistencia.token_bearer);
+            if (!puestoCorrecto || puestoCorrecto.success == false){
+                agregarBaseDeDatosErrores(asistencia.id, datos);
+                throw new Error(`No se pudo registrar la asistencia: el QR fue escaneado en el puesto incorrecto el día: ${asistencia.fecha_hora}.`);
+            }
+
             cargarDatos(datos, asistencia.id, asistencia.token_bearer);
 
     } catch (err) {
@@ -164,7 +167,7 @@ async function cargarDatos(datos, idIndexed, token_bearer) {
         let res = await response.json(); 
         if (res.success) {
            eliminarDatosIndexed(idIndexed);
-           await notificarClientes('success', `Asistencia sincronizada correctamente con fecha ${datos.fecha_hora}`);
+           await notificarClientes('success', `Asistencia sincronizada correctamente con fecha: ${datos.fecha_hora}`);
         } else {
             await notificarClientes('error', `Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente.`);
         }
@@ -172,24 +175,6 @@ async function cargarDatos(datos, idIndexed, token_bearer) {
         console.log("Error catch: ",err);
         await notificarClientes('error', `Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente.`);
     }
-}
-
-function eliminarDatosIndexed(id) {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open('datosAsistencia', 1);
-
-    request.onerror = () => reject('Error abriendo la DB');
-
-    request.onsuccess = () => {
-      const db = request.result;
-      const tx = db.transaction('Asistencia', 'readwrite'); // readonly → readwrite
-      const store = tx.objectStore('Asistencia');
-      const deleteRequest = store.delete(id); // nueva variable para no chocar con "request"
-
-      deleteRequest.onsuccess = () => resolve(`Registro ${id} eliminado`);
-      deleteRequest.onerror = () => reject('Error eliminando el registro');
-    };
-  });
 }
 
 async function notificarClientes(status, message){
@@ -200,27 +185,3 @@ async function notificarClientes(status, message){
   });
 }
 
-async function agregarBaseDeDatosErrores(asistencia){
-    return new Promise((resolve, reject) => {
-    const request = indexedDB.open('datosAsistencia', 1);
-
-    request.onerror = () => reject('Error abriendo la DB');
-
-    request.onsuccess = () => {
-      const db = request.result;
-      const tx = db.transaction('erroresDeAsistencia', 'readwrite'); // readonly → readwrite
-      const store = tx.objectStore('erroresDeAsistencia');
-      const resultado = store.add(asistencia);
-            resultado.onsuccess = () => {
-                console.log("error en asistencia guardado:", asistencia);
-                eliminarDatosIndexed(asistencia.id);
-                resolve();
-            };
-            resultado.onerror = (event) => {
-                console.error("Error guardando en IndexedDB:", event.target.error);
-                reject(event.target.error);
-            };
-
-    };
-  });
-}
