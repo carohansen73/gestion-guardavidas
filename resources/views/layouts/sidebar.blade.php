@@ -83,6 +83,7 @@
                 <li>
                     <h2>Personal</h2>
                 </li>
+
                 @can('ver_guardavida')
                     <li>
                         <a href="{{ route('guardavida.index') }}"
@@ -122,6 +123,22 @@
                     <li>
                         <a href="#"
                             class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+
+            @endcan
+            {{-- @can('ver_novedad_material') --}}
+                <li>
+                    <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22" fill="currentColor" class="shrink-0 w-5 h-5 scale-[1.15] -translate-x-[3px] text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white">
+                    <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="flex-1 ms-3 whitespace-nowrap">Materiales</span>
+                    </a>
+                </li>
+            {{-- @endcan --}}
+           @can('ver_licencia')
+                <li>
+                    <a href="{{ route('licencia.index') }}" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+
 
 
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22" fill="currentColor"

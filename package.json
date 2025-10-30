@@ -20,6 +20,7 @@
     },
     "dependencies": {
         "bootstrap": "^5.3.8",
+        "flowbite": "^3.1.2",
         "tom-select": "^2.4.3"
     }
 }

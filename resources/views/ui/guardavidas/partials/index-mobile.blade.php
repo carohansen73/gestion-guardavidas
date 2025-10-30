@@ -13,7 +13,7 @@
                                     {{ $registro->apellido }} {{ $registro->nombre }}
                                 </h3>
                                  <p class="text-sm text-gray-600 dark:text-gray-200">
-                                    {{ str_replace('_', ' ', $registro->funcion) }}
+                                    {{ str_replace('_', ' ', $registro->funcion) }} - T.{{ $registro->turno }}.
                                  </p>
                                     <span class="text-sm text-gray-500 dark:text-gray-300">
                                     {{ $registro->playa->nombre }}-{{ $registro->puesto->nombre }}

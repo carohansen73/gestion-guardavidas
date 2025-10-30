@@ -16,8 +16,7 @@ import { guardarAsistenciaOffline } from "./baseDeDatosNavegador.js";
 const video = document.getElementById("video");
 const contenedorAnimacionCarga = document.getElementById("contenedorCarga");
 const animacionCarga = document.getElementById("carga");
-const mensaje = document.getElementById("mensaje"); // para feedback al usuario
-const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
 
 let scanning = false;
 let detector;
@@ -32,7 +31,7 @@ let timeoutId;
 // -----------------------------------------------------------
 // Inicializa la cámara trasera del dispositivo.
 // Decide si usar BarcodeDetector nativo o Html5Qrcode (fallback).
-// Controla timeout de 8 minutos y errores de permisos.
+// Controla timeout de 2 minutos y errores de permisos.
 
 async function iniciarCamara() {
     try {
@@ -46,6 +45,11 @@ async function iniciarCamara() {
             video.play();
             scanning = true;
             requestAnimationFrame(scanFrame);
+            timeoutId = setTimeout(() => {
+                detenerScanner();
+                alertaError("El tiempo de escaneo expiró. Intenta nuevamente.", "warning");
+            }, 2 * 60 * 1000);
+
         } else {
             // fallback a html5-qrcode
             html5Scanner = new Html5Qrcode("video");
@@ -55,18 +59,15 @@ async function iniciarCamara() {
                 (decodedText) => manejarQRLeido(decodedText),
                 (errorMessage) => console.log("Escaneando...", errorMessage)
             );
-            // Timeout de 8 minutos
+            // Timeout de 2 minutos
             timeoutId = setTimeout(() => {
                 detenerScanner();
-                mostrarMensaje(
-                    "⏱️ Tiempo de escaneo expiró. Intenta de nuevo.",
-                    "warning"
-                );
-            }, 8 * 60 * 1000);
+                alertaError("El tiempo de escaneo expiró. Intenta nuevamente.", "warning");
+            }, 2 * 60 * 1000);
         }
     } catch (error) {
         console.error("No se pudo acceder a la cámara:", error);
-        Swal.fire("Error", "No se pudo acceder a la cámara.", "error");
+        alertaError( "No se pudo acceder a la cámara.");
     }
 }
 
@@ -104,6 +105,7 @@ async function scanFrame() {
 
 async function manejarQRLeido(valorQR) {
     scanning = false;
+    clearTimeout(timeoutId);
     detenerScanner();
     await registrarAsistencia(valorQR);
 }
@@ -140,28 +142,6 @@ function detenerScanner() {
     }
 }
 
-// -----------------------------------------------------------
-// Mostrar mensaje al usuario
-// -----------------------------------------------------------
-// -----------------------------------------------------------
-// mostrarMensaje(texto, tipo)
-// -----------------------------------------------------------
-// Muestra feedback al usuario en el DOM o por consola.
-// tipo = 'error', 'success', 'warning'.
-
-function mostrarMensaje(texto, tipo = "error") {
-    if (mensaje) {
-        mensaje.innerText = texto;
-        mensaje.style.color =
-            tipo === "success"
-                ? "green"
-                : tipo === "warning"
-                ? "orange"
-                : "red";
-    } else {
-        console.log(`${tipo.toUpperCase()}: ${texto}`);
-    }
-}
 
 // -----------------------------------------------------------
 // Registrar asistencia (online/offline)
@@ -296,9 +276,7 @@ async function perteneceQRAlPuesto(user_id, idPuesto) {
     } catch (error) {
         contenedorAnimacionCarga.style.display = "none";
         animacionCarga.classList.remove("animacion");
-        alertaError(
-            "Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente."
-        );
+        alertaError("Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente.");
         return null;
     }
 }
@@ -326,7 +304,7 @@ async function guardarDatosOffline(user_id, valorQR, userLat, userLng, userPreci
             if (guardado) {
                 Swal.fire({
                     title: "OK",
-                    text: "¡Asistencia guardada para cuando vuelve el wifi se pueda registrar!",
+                    text: "Asistencia guardada. Se registrará automáticamente cuando vuelvas a tener conexión.",
                     icon: "success",
                     confirmButtonColor: "#36be7f",
                 }).then(() => {
@@ -461,11 +439,11 @@ function obtenerUbicacion() {
 // Muestra un popup Swal con el mensaje de error.
 // Reutilizable para todos los errores en el flujo.
 
-export function alertaError(text) {
+export function alertaError(text, icon = "error") {
     Swal.fire({
         title: "Error",
         text: text,
-        icon: "error",
+        icon: icon,
         confirmButtonColor: "#36be7f",
     }).then(() => {
         //window.location.href = "/dashboard"; // Redireccion despues de cerrar el alert

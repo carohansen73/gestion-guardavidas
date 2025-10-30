@@ -25,6 +25,7 @@ class Guardavida extends Model
         'user_id',
         'playa_id',
         'puesto_id',
+        'turno',
     ];
     // Agregar accessor para contar asistencias
     protected $appends = ['asistencias_count', 'intervenciones_count'];

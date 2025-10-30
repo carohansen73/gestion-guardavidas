@@ -61,7 +61,7 @@
 
 @if($rol !== 'admin' && $playaUsuario)
     <div class="p-2">
-        <div class="bg-gray-100 dark:from-blue-700 dark:to-teal-700 text-blackrounded-2xl shadow-sm p-6 transform transition hover:scale-105 duration-300">
+        <div class="bg-gray-200 dark:from-blue-700 dark:to-teal-700 text-black rounded shadow-sm p-6 transform transition hover:scale-105 duration-300">
             <div class="flex justify-content-between align-center">
                 <h2 class="text-2xl md:text-3xl font-bold text-black">Bandera del día</h2>
                 @if(!$bandera)
@@ -259,9 +259,24 @@
                         </a>
                     </li>
                     @can('ver_licencia')
-                        <li class="p-3 text-sky-600 hover:bg-sky-600 hover:text-white rounded-b-xl">
-                            <a href="{{ route('bandera.create') }}" class="flex justify-content-between align-center">
+                       <li class="border-b border-gray-200 p-3 text-sky-600 hover:bg-sky-600 hover:text-white">
+                            <a href="{{ route('licencia.index') }}" class="flex justify-content-between align-center">
                                 <p>Licencias</h2>
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke-width="3"
+                                    stroke="currentColor"
+                                    class="w-6 h-6 py-1 px-1 ">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                                </svg>
+                            </a>
+                        </li>
+                    @endcan
+                    @can('ver_cambio_turno')
+                        <li class="p-3 text-sky-600 hover:bg-sky-600 hover:text-white rounded-b-xl">
+                            <a href="{{ route('cambio-de-turno.index') }}" class="flex justify-content-between align-center">
+                                <p>Cambios de turno</h2>
                                 <svg xmlns="http://www.w3.org/2000/svg"
                                     fill="none"
                                     viewBox="0 0 24 24"

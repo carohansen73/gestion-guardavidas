@@ -7,9 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Playa extends Model
 {
-    use HasFactory;
-
-    protected $fillable = ['nombre'];
+    protected $fillable = ['nombre', 'color'];
 
     //Un balneario puede estar vinculado a varios puestos
     public function puestos()
