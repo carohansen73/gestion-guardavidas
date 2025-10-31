@@ -68,8 +68,8 @@ class GuardavidaSeeder extends Seeder
             'direccion' => 'Av. Costanera',
             'numero' => '123',
             'piso_dpto' => null,
-            'playa_id' => 5,
-            'puesto_id' => 17,
+            'playa_id' => 4,
+            'puesto_id' => 11,
             'user_id' => 5,
         ]);
 
