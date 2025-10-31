@@ -31,6 +31,40 @@ class CambioDeTurnoController extends Controller
     }
 
     /**
+     * Panel admin independiente (/admin/turnos)
+
+      Filtros funcionales
+
+      Paginación
+
+      En el blade estilos básicos que se adaptan a las pantallas
+     */
+    public function indexAdmin(StoreCambioDeTurnoRequest $request)
+    {
+        $query = CambioDeTurno::with(['guardavida', 'playa', 'puesto'])
+            ->orderBy('fecha', 'desc');
+
+        if ($request->filled('playa_id')) {
+            $query->where('playa_id', $request->playa_id);
+        }
+
+        if ($request->filled('fecha')) {
+            $query->whereDate('fecha', $request->fecha);
+        }
+
+        // PAGINACIÓN
+        $registros = $query->paginate(10)->withQueryString(); // 10 por página, mantiene filtros
+        $playas = Playa::all();
+
+
+        return view('admin.usuarios.ListadoTurnos', compact('registros', 'playas'));
+    }
+
+
+
+
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()
@@ -67,6 +101,9 @@ class CambioDeTurnoController extends Controller
         $cambioDeTurno->detalles = $request->detalles;
 
         $cambioDeTurno->save();
+        //
+        $guardavida->update(['turno' => $cambioDeTurno->turno_nuevo]);
+
         return redirect()->route('cambio-de-turno.index')->with('success', 'Cambio de turno registrado correctamente.');
     }
 

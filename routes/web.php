@@ -9,6 +9,7 @@ use App\Http\Controllers\GuardavidaController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AsistenciaController;
+use App\Http\Controllers\CambioDeTurnoController;
 use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\ExportController;
@@ -76,6 +77,16 @@ Route::middleware('auth')->group(function () {
 
     // Listado general (admin)
     Route::get('/admin/asistencias', [AsistenciaController::class, 'index'])->name('asistencias.index');
+
+
+
+    //listado de cambios de turno
+    Route::get('/admin/turnos', [CambioDeTurnoController::class, 'indexAdmin'])->name('cambio-de-turno.index');
+
+
+
+
+
 
     // Historial individual por guardavida
     Route::get('/admin/asistencias/{id}', [AsistenciaController::class, 'asistenciasPorGuardavida'])->name('asistencias.guardavida');
