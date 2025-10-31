@@ -7,6 +7,7 @@
     <title>Perfil Guardavidas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('perfilGuardavidas.css') }}">
+    <script src="{{ asset('js/historialLicencias.js') }}"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 
@@ -57,7 +58,7 @@
                     Registro de asistencias
                 </h3>
 
-                <!-- 📅 Listado de asistencias -->
+                <!--  Listado de asistencias -->
                 @if ($guardavida->asistencias->isNotEmpty())
                     <div class="info-grid">
                         @foreach ($guardavida->asistencias as $asistencia)
@@ -82,7 +83,7 @@
                                 <label class="info-label">Fecha</label>
                                 <div class="info-value">
                                     <i class="fas fa-calendar"></i>
-                                    {{ $asistencia->fecha }}
+                                    {{ $asistencia->fecha ?? 'No se registra asistencia en esta fecha' }}
                                 </div>
                             </div>
 
@@ -160,10 +161,74 @@
                         <div class="stat-value">{{ $guardavida->intervenciones_count }}</div>
                         <div class="stat-label">Intervenciones</div>
                     </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-life-ring"></i></div>
+                        <div class="stat-value">{{ $guardavida->licencias_count }}</div>
+                        <div class="stat-label">Licencias</div>
+                        <a href="#" id="verLicenciasBtn"> click para ver historial</a>
+                    </div>
+
+
+
                 </div>
             </form>
         </div>
     </div>
+
+    <!--popap para ver historial de licencias -->
+    <!-- Esto: Carga todas las licencias del guardavida.
+               El script de paginación las divide en páginas de 4 ítems (itemsPorPagina = 4).
+               Mantiene los links a los archivos si existen.
+-->
+    <div id="modal-licencias" class="modal-licencias">
+        <div class="modal-content">
+            <h3>Historial de licencias</h3>
+
+            <!-- Contenedor scrollable -->
+            <div class="lista-container">
+                <ul class="lista-licencias" id="lista-licencias">
+                    <!-- aca traigo el listado de las licencias existentes  -->
+                    @forelse ($guardavida->licencias as $licencia)
+                        <li>
+                            <div class="licencia-info">
+                                <strong>{{ $licencia->tipo_licencia }}</strong><br>
+                                <span>
+                                    <i class="fas fa-calendar"></i>
+                                    {{ $licencia->fecha_inicio->format('d/m/Y') }}
+                                    - {{ $licencia->fecha_fin->format('d/m/Y') }}
+                                </span><br>
+                                <small>
+                                    {{ $licencia->detalle ?? 'Sin detalles adicionales.' }}
+                                </small>
+                                @if ($licencia->archivo)
+                                    <br><a href="{{ $licencia->archivo_url }}" target="_blank">
+                                        <i class="fas fa-file-download"></i> Ver archivo
+                                    </a>
+                                @endif
+                            </div>
+                        </li>
+                    @empty
+                        <li class="no-data">No hay licencias registradas.</li>
+                    @endforelse
+
+                </ul>
+            </div>
+
+            <!-- Paginación -->
+            <div class="paginacion">
+                <button class="pag-btn" id="prev-page">&lt;</button>
+                <span id="page-num">1</span>
+                <button class="pag-btn" id="next-page">&gt;</button>
+            </div>
+
+            <button id="cerrar-modal">Cerrar</button>
+        </div>
+    </div>
+
+
+
+
     <!-- Mostrar mensajes de sesión si existen -->
     @if (session('success'))
         <script>

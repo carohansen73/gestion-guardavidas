@@ -3,11 +3,11 @@ namespace App\Exports;
 use App\Models\Licencia;
 use App\Models\Guardavida;
 use App\Models\Asistencia;
-//use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Carbon\Carbon;
-class LicenciasExport implements FromCollection, WithHeadings
+class LicenciasExport implements FromCollection, WithHeadings,WithMapping
 {
 
     protected $fechaInicio;

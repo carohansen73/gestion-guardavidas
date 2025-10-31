@@ -83,7 +83,7 @@
 
     @auth
         @if (Auth::user()->hasRole('admin' || 'encargado'))
-            {{-- BOTÓN DESCARGAR EXCEL DE ASISTENCIAS ULTIMO MES  --}}
+            {{-- BOTÓN DESCARGAR EXCEL DE ASISTENCIAS   --}}
             <div class="excel">
                 <a href="{{ route('guardavidas.excel') }}"><i class="fa fa-plus"></i>
                     Descargar asistencias</a>
