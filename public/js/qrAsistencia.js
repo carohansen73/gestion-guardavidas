@@ -1,17 +1,12 @@
 import { guardarAsistenciaOffline } from "./baseDeDatosNavegador.js";
 
-// ===========================================================
-// qrAsistencia.js - Versión Final Integrada
-// BarcodeDetector + Html5Qrcode + manejo de errores + registro
-// ===========================================================
 // -----------------------------------------------------------
 // Constantes y elementos HTML
 // -----------------------------------------------------------
 // video: elemento <video> donde se mostrará la cámara
 // contenedorAnimacionCarga: overlay con animación mientras se procesa
 // animacionCarga: elemento animado de carga
-// mensaje: feedback textual al usuario (errores, advertencias, éxito)
-// csrfToken: token de seguridad para peticiones POST
+
 
 const video = document.getElementById("video");
 const contenedorAnimacionCarga = document.getElementById("contenedorCarga");
@@ -80,6 +75,7 @@ async function iniciarCamara() {
 // Función recursiva que analiza cada frame usando BarcodeDetector
 // para detectar QR. Si encuentra uno, llama a manejarQRLeido.
 
+
 async function scanFrame() {
     if (!scanning) return;
     try {
@@ -99,9 +95,11 @@ async function scanFrame() {
 // -----------------------------------------------------------
 // -----------------------------------------------------------
 // manejarQRLeido(valorQR)
+// valorQR: string => QR detectado por la cámara
 // -----------------------------------------------------------
 // Función que se ejecuta cuando se detecta un QR.
 // Detiene la cámara/scanner y llama a registrarAsistencia.
+
 
 async function manejarQRLeido(valorQR) {
     scanning = false;
@@ -125,8 +123,7 @@ function detenerScanner() {
     }
     if (html5Scanner) {
         html5Scanner
-            .stop()
-            .catch((err) =>
+            .stop().catch((err) =>
                 console.error("Error al detener html5Scanner:", err)
             );
         html5Scanner.clear();
@@ -148,6 +145,7 @@ function detenerScanner() {
 // -----------------------------------------------------------
 // -----------------------------------------------------------
 // registrarAsistencia(valorQR)
+// valorQR: string => QR leido por la cámara
 // -----------------------------------------------------------
 // Función principal de registro de asistencia.
 // Si hay internet:
@@ -202,13 +200,7 @@ async function registrarAsistencia(valorQR) {
         } else {
             // Offline
             const resultado = await obtenerUbicacion();
-            await guardarDatosOffline(
-                user_id,
-                valorQR,
-                resultado.coords.latitude,
-                resultado.coords.longitude,
-                resultado.coords.accuracy
-            );
+            await guardarDatosOffline(user_id, valorQR, resultado.coords.latitude, resultado.coords.longitude, resultado.coords.accuracy);
         }
     } catch (err) {
         contenedorAnimacionCarga.style.display = "none";
@@ -236,7 +228,7 @@ async function desencriptarQR(valorQR) {
     
 }
 
-//Obtenemos la fecha y hora Argentina para que se guarde en la base de datos
+
 // -----------------------------------------------------------
 // fechaHoraArgentinaDatetime()
 // -----------------------------------------------------------
@@ -256,6 +248,8 @@ function fechaHoraArgentinaDatetime() {
 
 // -----------------------------------------------------------
 // perteneceQRAlPuesto(user_id, idPuesto)
+// user_id: int => id del usuario
+// dPuesto: int => id del puesto
 // -----------------------------------------------------------
 // Consulta al backend si el QR pertenece al puesto del usuario.
 // Permite evitar registros incorrectos fuera del puesto asignado.
@@ -283,6 +277,11 @@ async function perteneceQRAlPuesto(user_id, idPuesto) {
 
 // -----------------------------------------------------------
 // guardarDatosOffline(user_id, valorQR, userLat, userLng, userPrecision)
+// user_id: int => id del usuario
+// valorQR: string => codigo QR leido por la cámara 
+// userLat: number => latitud del usuario
+// userLng: number => longitud del usuario
+// userPrecision: number => Precisión del GPS en metros
 // -----------------------------------------------------------
 // Guarda localmente los datos de asistencia cuando no hay internet.
 // Posteriormente se sincronizan automáticamente (implementación aparte).
@@ -324,11 +323,12 @@ async function guardarDatosOffline(user_id, valorQR, userLat, userLng, userPreci
 
 // -----------------------------------------------------------
 // cargarDatos(datos)
+// datos: JSON => datos a guardar en la base de datos de asistencia
 // -----------------------------------------------------------
 // Envía al backend los datos de asistencia verificados
 // y muestra confirmación al usuario mediante Swal.
 
-//Guardamos la asistencia del guardavida en la base de datos
+
 async function cargarDatos(datos) {
     try {
         let response = await fetch("api/cargarAsistencia", {
@@ -358,7 +358,7 @@ async function cargarDatos(datos) {
                 icon: "success",
                 confirmButtonColor: "#36be7f",
             }).then(() => {
-                window.location.href = "/dashboard"; // Redireccion despues de cerrar el alert
+                window.location.href = "/dashboard"; // Redireccion despues de cerrar el Swal
             });
         } else {
             throw new Error("Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente.");
@@ -374,13 +374,13 @@ async function cargarDatos(datos) {
 
 // -----------------------------------------------------------
 // cargarDistancia(latitudPuesto, longitudPuesto)
+// latitudPuesto: numeric => latitud del puesto (coordenadas)
+// longitudPuesto: numeric => longitud del puesto (coordenadas)
 // -----------------------------------------------------------
 // Obtiene la ubicación del usuario y calcula la distancia
-// en metros entre usuario y puesto usando fórmula Haversine.
+// en metros entre usuario y puesto usando fórmula Haversine (calcularDistancia).
 
-//Obtiene las coordenas del usuario y calcula la distancia entre el usuario y el puesto
-// -----------------------------------------------------------
-//Obtiene las coordenas del usuario y calcula la distancia entre el usuario y el puesto
+
 async function cargarDistancia(latitudPuesto, longitudPuesto) {
     try {
         let position = await obtenerUbicacion();
@@ -407,7 +407,6 @@ async function cargarDistancia(latitudPuesto, longitudPuesto) {
 // -----------------------------------------------------------
 // Retorna el user_id almacenado en localStorage (ID del guardavidas)
 
-//Obtiene el ID del usuario que se guarda en el navegador para guardar en la asistencia
 async function obtenerId() {
     let local_user_id = localStorage.getItem("user_id");
     let user_id = parseInt(local_user_id);
@@ -418,9 +417,6 @@ async function obtenerId() {
 // obtenerUbicacion()
 // -----------------------------------------------------------
 // Retorna la ubicación GPS actual del usuario usando Promises.
-// Permite await para mayor control de errores.
-
-// Le pedimos al usuario que permita saber su ubicación para poder comparar
 
 function obtenerUbicacion() {
     const opciones ={
@@ -434,10 +430,11 @@ function obtenerUbicacion() {
 }
 
 // -----------------------------------------------------------
-// alertaError(text)
+// alertaError(text, icon)
+// text: string => Mensaje que se le muestra al usuario
+// icon: string => tiene por defecto el valor "error", icono que acompaña al texto
 // -----------------------------------------------------------
 // Muestra un popup Swal con el mensaje de error.
-// Reutilizable para todos los errores en el flujo.
 
 export function alertaError(text, icon = "error") {
     Swal.fire({
@@ -446,12 +443,17 @@ export function alertaError(text, icon = "error") {
         icon: icon,
         confirmButtonColor: "#36be7f",
     }).then(() => {
-        //window.location.href = "/dashboard"; // Redireccion despues de cerrar el alert
+        iniciarCamara();
+        //window.location.href = "/dashboard"; 
     });
 }
 
 // -----------------------------------------------------------
 // calcularDistancia(lat1, lon1, lat2, lon2)
+// lat1: number  => latitud del usuario
+// lon1: number  => longitud del usuario
+// lat2: numeric => latitud del puesto
+// lon2: numeric => longitud del puesto
 // -----------------------------------------------------------
 // Implementa la fórmula Haversine para calcular la distancia
 // en metros entre dos coordenadas geográficas.

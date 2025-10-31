@@ -28,6 +28,16 @@ async function sincronizarAsistencias() {
   }
 }
 
+// -----------------------------------------------------------
+// cargarAsistenciaReconexion (asistencia)
+// -----------------------------------------------------------
+// -----------------------------------------------------------
+// Registra la asistencia cuando se reconecta al internet
+//    - desencripta QR
+//    - verifica distancia (≤ 200m)
+//    - valida que el QR pertenezca al puesto correcto
+//    - guarda asistencia en base de datos
+
 async function cargarAsistenciaReconexion(asistencia) {
     try {
             let data = await desencriptarQR(asistencia.encrypted, asistencia.token_bearer);
@@ -64,9 +74,11 @@ async function cargarAsistenciaReconexion(asistencia) {
             cargarDatos(datos, asistencia.id, asistencia.token_bearer);
 
     } catch (err) {
+        console.error(err.message);
         await notificarClientes('error', err);
     }
 }
+
 
 async function desencriptarQR(valorQR, token_bearer) {
     try{
@@ -87,6 +99,14 @@ async function desencriptarQR(valorQR, token_bearer) {
     
 }
 
+// -----------------------------------------------------------
+// recuperarDatos ()
+// -----------------------------------------------------------
+// -----------------------------------------------------------
+// Abre la base de datos IndexedDB llamada "datosAsistencia" en modo lectura,
+// accede al almacén de objetos "Asistencia" y recupera todos los registros guardados.
+// Devuelve una Promesa que se resuelve con los datos o se rechaza si ocurre un error.
+// -----------------------------------------------------------
 async function recuperarDatos() {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open('datosAsistencia', 1);
@@ -94,7 +114,7 @@ async function recuperarDatos() {
     request.onerror = () => reject('Error abriendo la DB');
     request.onsuccess = () => {
       const db = request.result;
-      const tx = db.transaction('Asistencia', 'readonly'); // tu store
+      const tx = db.transaction('Asistencia', 'readonly'); 
       const store = tx.objectStore('Asistencia');
       const getAllRequest = store.getAll();
 
@@ -138,7 +158,16 @@ async function calcularDistancia(lat1, lon1, lat2, lon2) {
     return R * c; // en metros
 }
 
-//Guardamos la asistencia del guardavida en la base de datos
+
+// -----------------------------------------------------------
+// cargarDatos(datos)
+// -----------------------------------------------------------
+// Envía los datos de asistencia verificados al backend mediante un POST a la API.
+// Si el registro es exitoso, elimina los datos correspondientes de IndexedDB.
+// Notifica al usuario el resultado mediante mensajes enviados a los clientes.
+// En caso de error, muestra una notificación de fallo y mantiene los datos en IndexedDB.
+// -----------------------------------------------------------
+
 async function cargarDatos(datos, idIndexed, token_bearer) {
     try {
         let response = await fetch("/api/cargarAsistencia", {
@@ -176,6 +205,14 @@ async function cargarDatos(datos, idIndexed, token_bearer) {
         await notificarClientes('error', `Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente.`);
     }
 }
+
+
+// -----------------------------------------------------------
+// notificarClientes(status, message)
+// -----------------------------------------------------------
+// Envía un mensaje a todas las ventanas o pestañas controladas por el service worker.
+// Permite notificar al usuario sobre el estado de una operación (éxito, error, etc.)
+// -----------------------------------------------------------
 
 async function notificarClientes(status, message){
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientes => {

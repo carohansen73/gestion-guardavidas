@@ -68,7 +68,7 @@ Route::middleware('auth')->group(function () {
 
 });
 
-// Route::post('/loginIdUser', [ApiAuthController::class, 'login']);
+Route::post('/loginIdUser', [ApiAuthController::class, 'login']);
 
 
 
