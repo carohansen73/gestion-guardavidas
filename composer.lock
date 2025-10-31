@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ccbfefd146a2c11200a75048a63377be",
+    "content-hash": "4328ca4fdc3a18833a7c78744d44e89d",
     "packages": [{
             "name": "brick/math",
             "version": "0.14.0",
@@ -208,7 +208,10 @@
         {
             "name": "dasprid/enum",
             "version": "1.0.7",
-            "source": {
+            ===
+            === ===
+            >>>
+            >>> >>> Temporary merge branch 2 "source": {
                 "type": "git",
                 "url": "https://github.com/composer/pcre.git",
                 "reference": "b2bed4734f0cc156ee1fe9c0da2550420d99a21e"
@@ -250,21 +253,23 @@
             "license": [
                 "MIT"
             ],
-            "authors": [{
-                "name": "Ben Scholzen 'DASPRiD'",
+            "authors": [{ <<
+                << << << < Temporary merge branch 1 "name": "Ben Scholzen 'DASPRiD'",
                 "email": "mail@dasprids.de",
                 "homepage": "https://dasprids.de/",
                 "role": "Developer"
             }],
             "description": "PHP 7.1 enum implementation",
-
+            ===
+            === ===
             "name": "Jordi Boggiano",
             "email": "j.boggiano@seld.be",
             "homepage": "http://seld.be"
         }
     ],
     "description": "PCRE wrapping library that offers type-safe preg_* replacements.",
-    "keywords": [
+    >>>
+    >>> >>> Temporary merge branch 2 "keywords": [
         "PCRE",
         "preg",
         "regex",
@@ -286,13 +291,9 @@
             "url": "https://tidelift.com/funding/github/packagist/composer/composer",
             "type": "tidelift"
         }
-    ]
-},
-
-
-
-{
+    ],
     "time": "2024-11-12T16:29:46+00:00"
+}, {
     "name": "composer/semver",
     "version": "3.4.4",
     "source": {
@@ -2414,12 +2415,8 @@
     }],
     "time": "2024-12-08T08:18:47+00:00"
 }, { <<
-    <<
-    <<
-    <
-    HEAD ===
-    ===
-    =
+    << << << < Temporary merge branch 1 ===
+    === ===
     "name": "maatwebsite/excel",
     "version": "3.1.67",
     "source": {
@@ -2497,9 +2494,7 @@
     ],
     "time": "2025-08-26T09:13:16+00:00"
 }, { >>>
-    >>>
-    >
-    main "name": "maennchen/zipstream-php",
+    >>> >>> Temporary merge branch 2 "name": "maennchen/zipstream-php",
     "version": "3.1.2",
     "source": {
         "type": "git",
@@ -6940,13 +6935,9 @@
     },
     "time": "2025-10-20T12:43:39+00:00"
 }], <<
-<<
-<<
-<
-HEAD
+<< << << < Temporary merge branch 1
     "packages-dev": [ ===
-        ===
-        =
+        === ===
         "packages-dev": [{
                 "name": "archtechx/enums",
                 "version": "v1.1.2",
@@ -7217,9 +7208,7 @@ HEAD
                 ],
                 "time": "2025-02-24T14:01:52+00:00"
             }, >>>
-            >>>
-            >
-            main {
+            >>> >>> Temporary merge branch 2 {
                 "name": "fakerphp/faker",
                 "version": "v1.24.1",
                 "source": {

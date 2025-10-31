@@ -83,6 +83,7 @@
                 <li>
                     <h2>Personal</h2>
                 </li>
+<<<<<<< HEAD
 
                 @can('ver_guardavida')
                     <li>
@@ -125,6 +126,8 @@
                             class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
 
             @endcan
+=======
+>>>>>>> qr
             {{-- @can('ver_novedad_material') --}}
                 <li>
                     <a href="#" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
@@ -138,7 +141,10 @@
            @can('ver_licencia')
                 <li>
                     <a href="{{ route('licencia.index') }}" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+<<<<<<< HEAD
 
+=======
+>>>>>>> qr
 
 
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22" fill="currentColor"

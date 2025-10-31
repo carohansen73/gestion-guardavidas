@@ -108,8 +108,5 @@ class Guardavida extends Model
         return $guardavida ?? null;
     }
 
-    public function playa()
-    {
-        return $this->hasOneThrough(Playa::class, Puesto::class, 'id', 'id', 'puesto_id', 'playa_id');
-    }
+
 }

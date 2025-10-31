@@ -1,5 +1,5 @@
 <?php
-
+use App\Http\Controllers\QrController;
 use App\Exports\GuardavidasExport;
 use App\Exports\IntervencionesExport;
 use App\Http\Controllers\Auth\RegisteredUserController;
@@ -11,9 +11,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AsistenciaController;
 use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
-
 use App\Http\Controllers\ExportController;
-
 
 Route::get('/', function () {
     return view('auth.welcome');
@@ -32,6 +30,7 @@ Route::get('/dashboard', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
+    Route::get('/activeCamera', [QrController::class, 'activeCamera'])->name('activeCamera');
 
     Route::resource('bandera', App\Http\Controllers\BanderaController::class);
     Route::resource('intervencion', App\Http\Controllers\IntervencionController::class);
@@ -52,6 +51,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/export/playas', [ExportController::class, 'exportPorPlaya'])
         ->name('export.playas');
 
+    /*Nuevas rutas*/
+    Route::get('/my-profile', [GuardavidaController::class, 'myProfile'])->name('guardavida.myProfile');
+    Route::put('/my-profile/{guardavida}', [GuardavidaController::class, 'updateProfile'])->name('guardavida.updateProfile');
+    Route::get('/guardavida/{guardavida}/perfil', [GuardavidaController::class, 'showProfile'])->name('guardavida.profile');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -89,7 +92,7 @@ Route::middleware('auth')->group(function () {
         ->name('asistencias.exportDia');
 });
 
-Route::post('/loginIdUser', [ApiAuthController::class, 'login']);
+// Route::post('/loginIdUser', [ApiAuthController::class, 'login']);
 
 
 

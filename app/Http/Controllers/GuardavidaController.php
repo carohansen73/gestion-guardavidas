@@ -248,78 +248,64 @@ class GuardavidaController extends Controller
 
 
 
+
+
+
     /**
-     * Seleccion de guardavidas:
-     * @param se recibe el id de identificacion del guardavidas que se desea seleccionar.
-     *
-     * @return  devuelve en el template el guardavidas seleccionado y encontrado por el identificador.
-     *
+     * Ver perfil de un guardavidas específico
+     * Puede ser visto por administradores o por el propio guardavidas
      */
-
-    public function seleccionarGuardavidaById($id)
+    public function showProfile(Guardavida $guardavida)
     {
+        $user = Auth::user();
 
-        $guardavida = Guardavida::showGuardavidaId($id);
+        // Verificar permisos
+        $esAdmin = $user->hasRole('admin') || $user->hasRole('encargado');
+        $esPropietario = $user->guardavida && $user->guardavida->id === $guardavida->id;
 
-        if ($guardavida != null) {
-            return view('admin.usuarios.index', compact('guardavida'));
+        if (!$esAdmin && !$esPropietario) {
+            abort(403, 'No tenés permisos para ver este perfil.');
         }
+
+        $puedeEditar = $esAdmin || $esPropietario;
+    /*
+            // Cargar relaciones necesarias
+            $guardavida->load(['playa', 'puesto', 'turnos', 'funciones', 'user']);
+    */
+            // Cargar relaciones necesarias
+            $guardavida->load(['playa', 'puesto','user']);
+        // Obtener listas para los selects (solo si es admin)
+        $playas = $esAdmin ? Playa::all() : null;
+        $puestos = $esAdmin ? Puesto::all() : null;
+
+        return view('profile.profile', compact(
+            'guardavida',
+            'puedeEditar',
+            'esAdmin',
+            'playas',
+            'puestos'
+        ));
     }
 
 
-/**
- * Ver perfil de un guardavidas específico
- * Puede ser visto por administradores o por el propio guardavidas
- */
-public function showProfile(Guardavida $guardavida)
-{
-    $user = Auth::user();
+    /**
+     * Mi perfil (guardavida logueado)
+     */
+    public function myProfile()
+    {
+        $user = Auth::user();
 
-    // Verificar permisos
-    $esAdmin = $user->hasRole('admin') || $user->hasRole('encargado');
-    $esPropietario = $user->guardavida && $user->guardavida->id === $guardavida->id;
+        if (!$user->guardavida) {
+            return redirect()->route('home')
+                ->with('error', 'No tenés un perfil de guardavida asignado.');
+        }
 
-    if (!$esAdmin && !$esPropietario) {
-        abort(403, 'No tenés permisos para ver este perfil.');
+        // Reutilizar el método anterior
+        return $this->showProfile($user->guardavida);
     }
 
-    $puedeEditar = $esAdmin || $esPropietario;
-/*
-        // Cargar relaciones necesarias
-        $guardavida->load(['playa', 'puesto', 'turnos', 'funciones', 'user']);
-*/
-        // Cargar relaciones necesarias
-        $guardavida->load(['playa', 'puesto','user']);
-    // Obtener listas para los selects (solo si es admin)
-    $playas = $esAdmin ? Playa::all() : null;
-    $puestos = $esAdmin ? Puesto::all() : null;
 
-    return view('profile.profile', compact(
-        'guardavida',
-        'puedeEditar',
-        'esAdmin',
-        'playas',
-        'puestos'
-    ));
-}
-
-/**
- * Mi perfil (guardavida logueado)
- */
-public function myProfile()
-{
-    $user = Auth::user();
-
-    if (!$user->guardavida) {
-        return redirect()->route('home')
-            ->with('error', 'No tenés un perfil de guardavida asignado.');
-    }
-
-    // Reutilizar el método anterior
-    return $this->showProfile($user->guardavida);
-}
-
-/**
+    /**
  * Actualizar perfil del guardavidas logueado
  */
 public function updateProfile(Request $request, Guardavida $guardavida)
@@ -385,18 +371,5 @@ public function updateProfile(Request $request, Guardavida $guardavida)
     return back()->withErrors('No se pudo actualizar el perfil.');
 
 }
-
-
-    /*
-    public function obtenerRol()
-    {
-        $rol = false;
-        if (Auth::check() && Auth::user()->hasRole('jefe_guardavidas')) {
-            $rol = true;
-        }
-        return response()->json($rol);
-    }
-
-*/
 
 }

@@ -40,7 +40,7 @@
                 </a>
             @endif
 
-            <x-primary-button class="ms-3" id="botonEnviarLogin">
+            <x-primary-button class="ms-3" >
                 {{ __('Log in') }}
             </x-primary-button>
         </div>
@@ -50,4 +50,4 @@
 
 </x-guest-layout>
 
-<script src="{{ asset('js/loginIdUserOffline.js') }}"></script>
+{{-- <script src="{{ asset('js/loginIdUserOffline.js') }}"></script> --}}
