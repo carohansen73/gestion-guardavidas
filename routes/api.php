@@ -5,7 +5,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\QrController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AsistenciaController;
-use App\Http\Controllers\Auth\ApiAuthController;
 
 // Rutas API
     Route::middleware(['auth:sanctum'])->group(function () {
