@@ -1,8 +1,6 @@
 let bd;
 
 function iniciarBaseDatos(){
-
-    //Abre la bd, si no existe la crea
     let solicitud = indexedDB.open("datosAsistencia");
     solicitud.addEventListener("error", mostrarError);
     solicitud.addEventListener("success", comenzar);
@@ -21,7 +19,6 @@ function comenzar(event){
     bd = event.target.result;
 }
 
-//Creacion de bd
 function crearAlmacen(event){
     let baseDeDatos = event.target.result;
     if (!baseDeDatos.objectStoreNames.contains("Asistencia")) {
@@ -32,17 +29,26 @@ function crearAlmacen(event){
     }
 }
 
+// -----------------------------------------------------------
+// Guarda asistencia offline en la tabla del Indexed para cuando vuelva el wifi tenga los datos a guardar
+// -----------------------------------------------------------
+// -----------------------------------------------------------
+// agregarBaseDeDatosErrores(data)
+// asistencia = json , todos los datos que se guarda del usuario al escanear el QR 
+// -----------------------------------------------------------
+// Abre la tabla que guarda los datos al escanear el QR para poder escribir nuevos registros
+// Guarda los datos en la tabla 
+// Registra la sincronización solo después de guardar los datos
+
 export async function guardarAsistenciaOffline(data) {
     if (!bd) {
         console.warn("BD aún no lista, reintentá más tarde");
         return;
     }
-
     try {
         const transaccion = bd.transaction(["Asistencia"], "readwrite");
         const almacen = transaccion.objectStore("Asistencia");
 
-        // Convertimos la operación de add a promesa para poder usar await
         await new Promise((resolve, reject) => {
             const request = almacen.add(data);
             request.onsuccess = () => {
@@ -55,9 +61,8 @@ export async function guardarAsistenciaOffline(data) {
             };
         });
 
-        // Registrar la sincronización solo después de guardar los datos
         if ('serviceWorker' in navigator && 'SyncManager' in window) {
-            const swReg = await navigator.serviceWorker.ready; // Ver razon por la que no carga
+            const swReg = await navigator.serviceWorker.ready;
             await swReg.sync.register('sincronizar-asistencias');
             console.log('Sincronización registrada');
         }
@@ -67,6 +72,19 @@ export async function guardarAsistenciaOffline(data) {
         throw error;
     }
 }
+
+// -----------------------------------------------------------
+// Ante un error en el escaneo en modo offline(puesto incorrecto, más de 200 mts), 
+// se pasa esos datos de la tabla Asistencia a erroresDeAsistencia para tener una copia al menos por 10 dias. 
+// -----------------------------------------------------------
+// -----------------------------------------------------------
+// agregarBaseDeDatosErrores(idIndexed, asistencia)
+// idIndexed = int , referencia al ID del elemento a eliminar en la tabla Asistencia
+// asistencia = json , todos los datos que se guarda del usuario al escanear el QR 
+// -----------------------------------------------------------
+// Abre la base de datos.
+// Abre la tabla que guarda los datos al escanear mal el QR para poder escribir nuevos registros
+// Guarda los datos en la tabla y elimina de la tabla asistencia (asi no se encuentran los datos duplicados)
 
 export function eliminarDatosIndexed(id) {
   return new Promise((resolve, reject) => {
@@ -86,8 +104,21 @@ export function eliminarDatosIndexed(id) {
   });
 }
 
-export async function agregarBaseDeDatosErrores(idIndexed, asistencia){
-    return new Promise((resolve, reject) => {
+// -----------------------------------------------------------
+// Ante un error en el escaneo en modo offline(puesto incorrecto, más de 200 mts), 
+// se pasa esos datos de la tabla Asistencia a erroresDeAsistencia para tener una copia al menos por 10 dias. 
+// -----------------------------------------------------------
+// -----------------------------------------------------------
+// agregarBaseDeDatosErrores(idIndexed, asistencia)
+// idIndexed = int , referencia al ID del elemento a eliminar en la tabla Asistencia
+// asistencia = json , todos los datos que se guarda del usuario al escanear el QR 
+// -----------------------------------------------------------
+// Abre la base de datos.
+// Abre la tabla que guarda los datos al escanear mal el QR para poder escribir nuevos registros
+// Guarda los datos en la tabla y elimina de la tabla asistencia (asi no se encuentran los datos duplicados)
+
+export async function agregarBaseDeDatosErrores(idIndexed, asistencia) {
+  return new Promise((resolve, reject) => {
     const request = indexedDB.open('datosAsistencia', 1);
 
     request.onerror = () => reject('Error abriendo la DB');
@@ -97,25 +128,31 @@ export async function agregarBaseDeDatosErrores(idIndexed, asistencia){
       const tx = db.transaction('erroresDeAsistencia', 'readwrite');
       const store = tx.objectStore('erroresDeAsistencia');
       const resultado = store.add(asistencia);
-            resultado.onsuccess = () => {
-                console.log("error en asistencia guardado:", asistencia);
-                eliminarDatosIndexed(idIndexed);
-                resolve();
-            };
-            resultado.onerror = (event) => {
-                console.error("Error guardando en IndexedDB:", event.target.error);
-                reject(event.target.error);
-            };
-
+      resultado.onsuccess = () => {
+        eliminarDatosIndexed(idIndexed);
+        resolve();
+      };
+      resultado.onerror = (event) => {
+        console.error("Error guardando en IndexedDB:", event.target.error);
+        reject(event.target.error);
+      };
     };
   });
 }
 
-// Inicializa la base y elimina registros viejos automáticamente
+// -----------------------------------------------------------
+// Inicializa la base de datos para eliminar datos viejos (si existen).
+// -----------------------------------------------------------
+// -----------------------------------------------------------
+// inicializarBaseDeDatos()
+// -----------------------------------------------------------
+// Inicializa la base de datos.
+// En caso de no existir la base de datos, la crea y agrega las tablas declaradas en crearAlmacen
+// Llama a la función limpiarErroresViejos()
+
 export function inicializarBaseDeDatos() {
   const request = indexedDB.open('datosAsistencia', 1);
 
-  // Se ejecuta solo si la base no existe o se actualiza
   request.onupgradeneeded = (event) => {
     crearAlmacen(event);
   };
@@ -130,7 +167,17 @@ export function inicializarBaseDeDatos() {
   };
 }
 
-// Elimina registros de más de 10 días
+// -----------------------------------------------------------
+// Eliminar datos erroneos con más de 10 dias
+// -----------------------------------------------------------
+// -----------------------------------------------------------
+// limpiarErroresViejos()
+// -----------------------------------------------------------
+// Abre la base de datos.
+// De los registros, toma el valor de la fecha cuando se escaneo el QR y se genera una variable con la fecha de hoy.
+// Compara las fechas y obtiene la diferencia de dias que tienen
+// Si es superior a 10, borra los datos sino continua con otro registro
+
 export function limpiarErroresViejos() {
   const request = indexedDB.open('datosAsistencia', 1);
 
@@ -148,8 +195,7 @@ export function limpiarErroresViejos() {
         const ahora = new Date();
         const diasPasados = (ahora - fechaGuardado) / (1000 * 60 * 60 * 24);
 
-        //Eliminar todos los registros con más de 1 minuto
-         if (diasPasados > 10) {
+        if (diasPasados > 10) {
           store.delete(cursor.key);
           console.log(`Registro eliminado (${Math.round(diasPasados)} días):`, registro);
         }

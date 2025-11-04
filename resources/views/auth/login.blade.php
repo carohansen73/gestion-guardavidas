@@ -40,7 +40,7 @@
                 </a>
             @endif
 
-            <x-primary-button class="ms-3" >
+            <x-primary-button class="ms-3" id="botonEnviarLogin">
                 {{ __('Log in') }}
             </x-primary-button>
         </div>
@@ -49,5 +49,7 @@
     <div id="error" class="mt-3 text-sm font-semibold text-red-600"></div>
 
 </x-guest-layout>
-
-{{-- <script src="{{ asset('js/loginIdUserOffline.js') }}"></script> --}}
+<script>
+    const BASE_URL = "{{ url('/') }}";
+</script>
+ <script src="{{ asset('js/loginIdUserOffline.js') }}"></script>
