@@ -113,6 +113,6 @@ class ExportController extends Controller
 
         $inicio = $request->input('fecha_inicio');
         $fin = $request->input('fecha_fin');
-        return Excel::download(new AsistenciasExport(($inicio, $fin)), "asistencias_$fecha.xlsx");
+        return Excel::download(new AsistenciasExport(($inicio, $fin)) "asistencias_$fecha.xlsx");
     }
 }

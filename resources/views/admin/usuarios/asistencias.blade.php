@@ -81,15 +81,15 @@
     @endforeach
     </ul>
 
-    @auth
-        @if (Auth::user()->hasRole('admin' || 'encargado'))
+    {{-- @auth
+        @if (Auth::user()->hasRole('admin' || 'encargado')) --}}
             {{-- BOTÓN DESCARGAR EXCEL DE ASISTENCIAS   --}}
             <div class="excel">
                 <a href="{{ route('guardavidas.excel') }}"><i class="fa fa-plus"></i>
                     Descargar asistencias</a>
             </div>
-        @endif
-    @endauth
+        {{-- @endif
+    @endauth --}}
 
     {{-- PAGINACIÓN --}}
     @if (method_exists($guardavidas, 'links'))

@@ -31,31 +31,16 @@ class Guardavida extends Model
     protected $appends = ['asistencias_count', 'intervenciones_count','licencias_count'];
 
 
-    // ******************** Contadores ******************************************
-    public function getAsistenciasCountAttribute()
-    {
-        return $this->asistencias()->count();
-    }
-
-    public function getIntervencionesCountAttribute()
-    {
-        return $this->intervenciones()->count();
-    }
-
-    public function getLicenciasCountAttribute(){
-        return $this->licencias()->count();
-    }
-
-////------------------------------------------ Relaciones -------------------------------------------------------
+    ////------------------------------------------ Relaciones -------------------------------------------------------
     public function user()
     {
         return $this->belongsTo(User::class);
     }
-/*
+
     public function playa()
     {
         return $this->belongsTo(Playa::class);
-    }*/
+    }
 
     public function puesto()
     {
@@ -72,27 +57,30 @@ class Guardavida extends Model
     {
         return $this->belongsToMany(Intervencion::class, 'guardavidas_intervenciones', 'guardavida_id', 'intervencion_id');
     }
+
     public function licencias()
     {
         return $this->hasMany(Licencia::class, 'guardavida_id');
     }
 
 
-    //***  Relaciones que se mencionan en la vista pero no estaban definidas agregar cuando se definan los turnos de cada usuario***
-    /*
-    public function turnos()
+    // ******************** Contadores ******************************************
+    public function getAsistenciasCountAttribute()
     {
-        return $this->belongsToMany(Turno::class, 'guardavida_turno');
+        return $this->asistencias()->count();
     }
-        */
 
-    //vi que habia como atributo pero falta la tabla para definirlos por grupos de funciones asi es mas facil filtrar y seleccionar
-    /*
-    public function funciones()
+    public function getIntervencionesCountAttribute()
     {
-        return $this->belongsToMany(Funcion::class, 'guardavida_funcion');
+        return $this->intervenciones()->count();
     }
-*/
+
+    public function getLicenciasCountAttribute(){
+        return $this->licencias()->count();
+    }
+
+
+
     public static function obtenerGuardavidas($idUser, $idPlaya)
     {
         return self::with(['puesto.playa'])
