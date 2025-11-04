@@ -18,18 +18,10 @@ Route::get('/', function () {
 })->name('welcome');
 
 
-
-
-Route::get('/template', function () {
-    return view('ui.template');
-});
-
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
 Route::middleware('auth')->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
+     Route::get('/dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
+
     Route::get('/activeCamera', [QrController::class, 'activeCamera'])->name('activeCamera');
 
     Route::resource('bandera', App\Http\Controllers\BanderaController::class);
