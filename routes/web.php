@@ -95,7 +95,9 @@ Route::middleware('auth')->group(function () {
         ->name('asistencias.exportDia');
 });
 
-// Route::post('/loginIdUser', [ApiAuthController::class, 'login']);
+// Ruta para obtener el Token Bearer para ser usado en el QR
+// Ademas guarda Id_user para casos sin wifi.
+Route::post('/loginIdUser', [ApiAuthController::class, 'login']);
 
 
 

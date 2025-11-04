@@ -28,7 +28,7 @@ async function loginOffline() {
         if (data.success) {
             localStorage.setItem('user_id', data.user.id);
             localStorage.setItem('token', data.token);
-            window.location.href = '/dashboard';
+            window.location.href = '/home';
         } else {
             // Mostrar el mensaje del backend
             errorDiv.textContent = data.message || 'Error al iniciar sesión';

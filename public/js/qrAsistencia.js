@@ -166,7 +166,7 @@ async function registrarAsistencia(valorQR) {
         if (navigator.onLine) {
             let data = await desencriptarQR(valorQR);
             if (!data){
-                throw new Error('"Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente."');
+                throw new Error("Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente.");
             }
             let idPlaya = data.playa_id;
             let idPuesto = data.puesto_id;
