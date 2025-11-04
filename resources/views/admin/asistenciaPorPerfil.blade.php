@@ -166,8 +166,11 @@
                     <div class="stat-card">
                         <div class="stat-icon"><i class="fas fa-life-ring"></i></div>
                         <div class="stat-value">{{ $guardavida->licencias_count }}</div>
-                        <div class="stat-label">Licencias</div>
-                        <a href="#" id="verLicenciasBtn"> click para ver historial</a>
+                        <div class="stat-label">Licencias
+
+
+                            <a href="#" id="verLicenciasBtn"> ver historial</a>
+                        </div>
                     </div>
 
 

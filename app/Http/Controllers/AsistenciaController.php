@@ -70,7 +70,8 @@ class AsistenciaController extends Controller
     public function index()
     {
 
-        if (auth()->user()->hasAnyRole(['admin', 'encargado'])) {
+
+        if (!auth()->user()->hasAnyRole(['admin', 'encargado'])) {
             // Si no tiene permiso, devolvemos vista vacía o redirige (eso no me acuerdo como se veia en la interfaz)
             return view('admin.usuarios.asistencias', ['guardavidas' => collect()]);
         }

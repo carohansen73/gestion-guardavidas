@@ -67,18 +67,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/guardavida/{guardavida}/perfil', [GuardavidaController::class, 'showProfile'])->name('guardavida.profile');
 
 
-    // Listado general (admin)
-    Route::get('/admin/asistencias', [AsistenciaController::class, 'index'])->name('asistencias.index');
-
-
-
     //listado de cambios de turno
     Route::get('/admin/turnos', [CambioDeTurnoController::class, 'indexAdmin'])->name('cambio-de-turno.index');
 
-
-
-
-
+        // Listado general (admin)
+    Route::get('/admin/asistencias', [AsistenciaController::class, 'index'])->name('asistencias.index');
 
     // Historial individual por guardavida
     Route::get('/admin/asistencias/{id}', [AsistenciaController::class, 'asistenciasPorGuardavida'])->name('asistencias.guardavida');
@@ -91,8 +84,8 @@ Route::middleware('auth')->group(function () {
     Route::get("guardavidas/excel", [AsistenciaController::class, 'guardavidasPanelExcelAsistencias'])->name('guardavidas.excel');
     //para exportar excel de asistencias desde el panel de asistencias
     //Route::get("/excel", [AsistenciaController::class, 'descargar']);
-    Route::get('/admin/asistencias/export-dia', [AsistenciaController::class, 'index'])
-        ->name('asistencias.exportDia');
+   // Route::get('/admin/asistencias/export-dia', [AsistenciaController::class, 'index'])
+     //   ->name('asistencias.exportDia');
 });
 
 // Ruta para obtener el Token Bearer para ser usado en el QR
