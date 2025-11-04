@@ -97,7 +97,7 @@ Route::middleware('auth')->group(function () {
 
 // Ruta para obtener el Token Bearer para ser usado en el QR
 // Ademas guarda Id_user para casos sin wifi.
-Route::post('/loginIdUser', [ApiAuthController::class, 'login']);
+Route::post('/loginIdUser', [ApiAuthController::class, 'login'])->name('loginIdUser');
 
 
 

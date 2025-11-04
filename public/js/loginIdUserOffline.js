@@ -13,7 +13,7 @@ async function loginOffline() {
     const password = document.querySelector('#password').value;
 
     try {
-        const res = await fetch('/loginIdUser', {
+        const res = await fetch(`${BASE_URL}/loginIdUser`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -28,7 +28,7 @@ async function loginOffline() {
         if (data.success) {
             localStorage.setItem('user_id', data.user.id);
             localStorage.setItem('token', data.token);
-            window.location.href = '/home';
+            window.location.href = `${BASE_URL}/home`;
         } else {
             // Mostrar el mensaje del backend
             errorDiv.textContent = data.message || 'Error al iniciar sesión';
