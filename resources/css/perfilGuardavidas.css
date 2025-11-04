@@ -69,12 +69,12 @@
     }
     /* Profile Card */
     
-    .profile-card{
+    .profile-card {
         --tw-shadow: 0 4px 6px -1px rgb(123 123 123 / 82%), 0 2px 4px -2px rgb(123 123 123 / 82%);
         --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
         box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
     }
-
+    
     .profile-card {
         background: var(--card-bg);
         border-radius: 20px;
@@ -271,11 +271,11 @@
     
     .stat-card {
         --tw-shadow: 0 4px 6px -1px rgb(123 123 123 / 82%), 0 2px 4px -2px rgb(123 123 123 / 82%);
-    --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
-    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+        --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
+        box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
         padding: 25px;
         border-radius: 15px;
-            border: 2px rgb(201 201 201 / 82%) solid;
+        border: 2px rgb(201 201 201 / 82%) solid;
     }
     
     .stat-icon {
@@ -387,4 +387,137 @@
         .profile-header {
             padding: 30px 20px;
         }
+    }
+    /*------------------------------------------------------------------------------------*/
+    /******************** Estilos del Popap Historial De Licencias ************************/
+    /* --- Fondo del modal --- */
+    
+    .modal-licencias {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        /* centrado vertical */
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 9999;
+    }
+    /* --- Contenido del modal --- */
+    
+    .modal-content {
+        background: #fff;
+        width: 90%;
+        max-width: 380px;
+        border-radius: 16px;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        transform: translateY(100px);
+        opacity: 0;
+        transition: transform 0.4s ease, opacity 0.4s ease;
+    }
+    /* --- Mostrar animación --- */
+    
+    .modal-licencias.show .modal-content {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    /* --- Título --- */
+    
+    .modal-content h3 {
+        margin-top: 0;
+        color: #1273b4;
+    }
+    /* --- Contenedor scrollable --- */
+    
+    .lista-container {
+        max-height: 220px;
+        /* limita altura */
+        overflow-y: auto;
+        margin: 1rem 0;
+        border: 1px solid #eee;
+        border-radius: 10px;
+        padding: 0.5rem;
+    }
+    /* --- Lista de guardavidas --- */
+    
+    .lista-licencias {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .lista-licencias li {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+        font-size: 16px;
+        color: #333;
+    }
+    /*  .lista-licencias img {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+    }*/
+    /* --- Paginación --- */
+    
+    .paginacion {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 1rem;
+    }
+    
+    .pag-btn {
+        background-color: #1273b4;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        width: 28px;
+        height: 28px;
+        cursor: pointer;
+    }
+    
+    .pag-btn:hover {
+        background-color: #0f5c90;
+    }
+    /* --- Botón cerrar --- */
+    
+    #cerrar-modal {
+        background-color: #1273b4;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 20px;
+        cursor: pointer;
+    }
+    
+    #cerrar-modal:hover {
+        background-color: #0f5c90;
+    }
+    
+    .licencia-info {
+        text-align: left;
+        line-height: 1.4;
+        color: #333;
+    }
+    
+    .licencia-info strong {
+        color: #1273b4;
+    }
+    
+    .licencia-info a {
+        color: #1273b4;
+        font-size: 0.9rem;
+        text-decoration: none;
+    }
+    
+    .licencia-info a:hover {
+        text-decoration: underline;
     }

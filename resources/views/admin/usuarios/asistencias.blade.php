@@ -62,8 +62,8 @@
 
         <ul class="lista-guardavidas">
             @foreach ($guardavidas as $g)
-                <li data-balneario="{{ strtolower($g->playa->nombre ?? '') }}"
-                    data-puesto="{{ strtolower($g->puestos->nombre ?? '') }}" {{--   data-turno="{{ strtolower($g->turnos->nombre_turno ?? '') }}"> --}} <div class="info">
+                <li data-balneario="{{ strtolower($g->puesto->playa->nombre ?? '') }}"
+                    data-puesto="{{ strtolower($g->puesto->nombre ?? '') }}" {{--   data-turno="{{ strtolower($g->turnos->nombre_turno ?? '') }}"> --}} <div class="info">
                     <h4>{{ $g->nombre ?? 'Sin nombre' }}</h4>
                     <p>
                         {{ $g->updated_at ? $g->updated_at->diffForHumans() : '' }}
@@ -71,8 +71,10 @@
                     </p>
     </div>
     <div class="acciones">
-        <i class="fa fa-user" onclick="event.stopPropagation(); verPerfilAsistencia({{ $g->id }})">ver
-            perfil</i>
+        <a href="{{ route('asistencias.guardavida', $g->id) }}" class="fa fa-user">
+            ver Historial
+        </a>
+
 
     </div>
     </li>
@@ -81,10 +83,10 @@
 
     @auth
         @if (Auth::user()->hasRole('admin' || 'encargado'))
-            {{-- BOTÓN DESCARGAR EXCEL DE ASISTENCIAS ULTIMO MES Y ULTIMOS 2 MESES --}}
+            {{-- BOTÓN DESCARGAR EXCEL DE ASISTENCIAS   --}}
             <div class="excel">
                 <a href="{{ route('guardavidas.excel') }}"><i class="fa fa-plus"></i>
-                    Descargar asistencia</a>
+                    Descargar asistencias</a>
             </div>
         @endif
     @endauth

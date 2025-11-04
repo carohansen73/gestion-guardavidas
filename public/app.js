@@ -25,3 +25,4 @@ if ('serviceWorker' in navigator && !window._swRegistrado) {
         })
         .catch(err => console.error('Error al registrar SW o Sync:', err));
 }
+
