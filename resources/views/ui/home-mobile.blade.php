@@ -85,7 +85,7 @@
                     <div class="flex flex-col items-center rounded-lg">
                         <div class="bg-gray-200/50 rounded mb-1">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
-                            stroke="{{$bandera->bandera->borde}}"
+
                             class="bandera
                             text-{{$bandera->bandera->color}}-500 dark:text-{{$bandera->bandera->color}}-300
                                 w-12 h-12 flex-shrink-0 animate-ondear">

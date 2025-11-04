@@ -34,7 +34,7 @@ class NovedadesDeMaterialesExport implements FromCollection, WithHeadings, WithT
     public function map($i): array {
         return [
             optional($i->fecha)->format('d/m/Y'),
-             optional($i->tipo_novedad)->value ?? '—',
+            optional($i->tipo_novedad)->value ?? '—',
 
             optional($i->material)->nombre ?? '—',
             optional($i->playa)->nombre ?? '—',

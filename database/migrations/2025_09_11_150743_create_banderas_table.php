@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->string('codigo');
             $table->string('color');
-            $table->string('borde');
             $table->timestamps();
         });
     }

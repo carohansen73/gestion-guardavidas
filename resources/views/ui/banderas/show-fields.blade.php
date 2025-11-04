@@ -24,20 +24,12 @@
         </a>
     </div>
 
-
-
-
     <div class="container bg-white rounded shadow-md  px-4 py-4 ">
-
-
         <div class="pb-12">
             <div class="flex items-center rounded-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
-                stroke="{{$bandera->bandera->borde}}"
-                class="bandera
-                text-{{$bandera->bandera->color}}-500 dark:text-{{$bandera->bandera->color}}-300
-                    w-8 h-8 flex-shrink-0 mr-4 animate-ondear">
-                <path fill-rule="evenodd" d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z" clip-rule="evenodd" />
+                    class="bandera {{$bandera->bandera->color}} w-8 h-8 flex-shrink-0 mr-4 animate-ondear">
+                    <path fill-rule="evenodd" d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z" clip-rule="evenodd" />
                 </svg>
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                     {{ $bandera->bandera->codigo }}

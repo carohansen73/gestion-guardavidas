@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -40,4 +41,24 @@ class Bandera extends Model
     {
         return $this->belongsTo(BanderaTipo::class);
     }
+
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($bandera) {
+            if ($bandera->fecha) {
+                $hora = Carbon::parse($bandera->fecha)->format('H');
+
+                // Asignar turno según hora (si cargan fuera de horario queda TT)
+                if ($hora >= 5 && $hora < 13) {
+                    $bandera->turno = 'M';
+                } else {
+                    $bandera->turno = 'T';
+                }
+            }
+        });
+    }
 }
+

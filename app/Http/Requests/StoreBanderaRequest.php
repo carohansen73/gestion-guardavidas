@@ -26,7 +26,7 @@ class StoreBanderaRequest extends FormRequest
     {
         return [
             'fecha'             => 'required|date',
-            'turno'             => 'required|in:mañana,tarde',
+            'turno'             => 'nullable|in:M,T',
             'bandera_id'        => 'required|exists:bandera_tipos,id',
             'playa_id'          => 'required|exists:playas,id',
             'viento_intensidad' => 'nullable|numeric|min:0',   // velocidad en km/h o m/s

@@ -30,7 +30,7 @@
     <x-filtros-de-busqueda :playas="$playas" tipo="intervenciones" />
 
     @if (session('success'))
-        <div class="bg-green-100 text-green-700 p-3 rounded my-2">
+         <div class="bg-green-100 text-green-700 p-3 rounded my-2">
             {{ session('success') }}
         </div>
     @endif

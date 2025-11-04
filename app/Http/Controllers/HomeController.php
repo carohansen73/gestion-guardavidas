@@ -3,9 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Bandera;
+use App\Models\Guardavida;
+use App\Models\Intervencion;
+use App\Models\Novedad;
+use App\Models\NovedadMaterial;
 use Jenssegers\Agent\Agent;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 class HomeController extends Controller
 {
@@ -22,9 +27,10 @@ class HomeController extends Controller
         // var_dump($bandera);die;
 
         if( $agent->isMobile()) {
-            return view('ui.home', compact( 'isMobile', 'bandera'));
+            return view('ui.home-mobile', compact( 'isMobile', 'bandera'));
         } else{
-               return view('ui.dashboard', compact( 'isMobile', 'bandera'));
+                $novedades = Novedad::orderBy('fecha', 'desc')->take(10)->get();
+               return view('ui.home-desktop', compact( 'isMobile', 'bandera', 'novedades'));
         }
     }
 
@@ -57,5 +63,63 @@ class HomeController extends Controller
         }
 
         return $bandera;
+    }
+
+    public function dashboard(){
+        $novedades = Novedad::orderBy('fecha', 'desc')->take(10)->get();
+        $mesActual = Carbon::now()->month;
+        $anioActual = Carbon::now()->year;
+
+        //Intervenciones
+        $totalIntervenciones = Intervencion::count(); // total de intervenciones
+
+        $intervencionesPorPlaya = Intervencion::select('playa_id') //count por playa
+            ->selectRaw('COUNT(*) as total')
+            ->groupBy('playa_id')
+            ->with('playa')
+            ->get();
+
+        // Agrego porcentaje
+        $intervencionesPorPlaya->transform(function ($item) use ($totalIntervenciones) {
+            $item->porcentaje = round(($item->total / $totalIntervenciones) * 100);
+             $item->sigla = Str::substr($item->playa->nombre, 0, 3);
+            return $item;
+        });
+
+        //Novedades de materiales
+        $totalNovedadesMateriales = NovedadMaterial::count(); // total de intervenciones
+
+        $novedadesMaterialesPorPlaya = NovedadMaterial::select('playa_id') //count por playa
+            ->selectRaw('COUNT(*) as total')
+            ->groupBy('playa_id')
+            ->with('playa')
+            ->get();
+
+        // Agrego porcentaje
+        $novedadesMaterialesPorPlaya->transform(function ($item) use ($totalNovedadesMateriales) {
+            $item->porcentaje = round(($item->total / $totalNovedadesMateriales) * 100);
+            $item->sigla = Str::substr($item->playa->nombre, 0, 3);
+            return $item;
+        });
+
+
+
+        //
+        $intervenciones = Intervencion::whereMonth('fecha', $mesActual)
+            ->whereYear('fecha', $anioActual)
+            ->get();
+        $banderas = Bandera::whereMonth('fecha', $mesActual)
+            ->whereYear('fecha', $anioActual)
+            ->get();
+        $novedadesMateriales = NovedadMaterial::whereMonth('fecha', $mesActual)
+            ->whereYear('fecha', $anioActual)
+            ->get();
+       $guardavidas = Guardavida::whereHas('user', function ($query) {
+            $query->where('enabled', true);
+        })->get();
+
+        return view('ui.dashboard',
+        compact( 'novedades', 'intervenciones', 'banderas','novedadesMateriales', 'guardavidas',
+        'totalIntervenciones', 'intervencionesPorPlaya', 'totalNovedadesMateriales', 'novedadesMaterialesPorPlaya'));
     }
 }

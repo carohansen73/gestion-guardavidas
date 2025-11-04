@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('banderas', function (Blueprint $table) {
             $table->id();
             $table->timestamp('fecha');
-            $table->enum('turno', ['mañana','tarde']);
+            $table->enum('turno', ['M','T']);
             $table->unsignedBigInteger('bandera_id');
             $table->foreign('bandera_id')->references('id')->on('bandera_tipos')->onDelete('cascade');
             // $table->enum('viento_direccion', ['N','S', 'E', 'O', 'NE', 'NO', 'SE', 'SO']);
@@ -24,6 +24,8 @@ return new class extends Migration
             $table->string('temperatura')->nullable();
             $table->unsignedBigInteger('playa_id');
             $table->foreign('playa_id')->references('id')->on('playas')->onDelete('cascade');
+            $table->unsignedBigInteger('puesto_id')->nullable();
+            $table->foreign('puesto_id')->references('id')->on('puestos')->onDelete('cascade');
             $table->longText('detalles')->nullable();
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

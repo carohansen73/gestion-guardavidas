@@ -26,7 +26,7 @@ class UpdateBanderaRequest extends StoreBanderaRequest
         // return parent::rules();
         return [
             'fecha'             => 'sometimes|date',
-            'turno'             => 'sometimes|in:mañana,tarde',
+            'turno'             => 'sometimes|in:M,T',
             'bandera_id'        => 'sometimes|exists:bandera_tipos,id',
             'playa_id'          => 'sometimes|exists:playas,id',
             'viento_intensidad' => 'nullable|numeric|min:0',

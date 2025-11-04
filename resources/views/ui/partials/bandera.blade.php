@@ -30,13 +30,10 @@
                         <!-- Columna 1 -->
                         <div class="flex flex-col items-center rounded-lg">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
-                            stroke="{{$bandera->bandera->borde}}"
-                            class="bandera
-                            text-{{$bandera->bandera->color}}-500 dark:text-{{$bandera->bandera->color}}-300
-                                w-12 h-12 flex-shrink-0 mr-4 animate-ondear">
+                                class="bandera {{ $bandera->bandera->color }} w-12 h-12 flex-shrink-0 mr-4 animate-ondear">
                             <path fill-rule="evenodd" d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z" clip-rule="evenodd" />
                             </svg>
-                                <p class="text-sm font-medium">{{$bandera->bandera->codigo}}</p>
+                            <p class="text-sm font-medium">{{$bandera->bandera->codigo}}</p>
                         </div>
 
                         <!-- Columna 2 -->
@@ -127,8 +124,8 @@
                         <!-- Columna 1: bandera -->
                         <div class="flex flex-col items-center rounded-lg">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
-                                stroke="{{ $b->bandera->borde ?? '#000' }}"
-                                class="bandera text-{{ $b->bandera->color ?? 'gray' }}-500 dark:text-{{ $b->bandera->color ?? 'gray' }}-300 w-12 h-12 flex-shrink-0 mr-4 animate-ondear">
+
+                                class="bandera {{ $b->bandera->color }} w-12 h-12 flex-shrink-0 mr-4 animate-ondear">
                                 <path fill-rule="evenodd" d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z" clip-rule="evenodd" />
                             </svg>
                             <p class="text-sm font-medium">{{ $b->bandera->codigo ?? '—' }}</p>
