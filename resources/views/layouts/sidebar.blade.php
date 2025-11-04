@@ -13,7 +13,7 @@
             <ul class="space-y-2 font-medium">
                 <li>
                     <a href="{{ route('home') }}"
-                        class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                        class="{{ request()->routeIs('home') ? 'text-sky-600 bg-sky-100' : 'text-gray-800' }} flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                         <svg class="shrink-0 w-5 h-5 text-orange-600 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
                             aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
                             viewBox="0 0 18 18">
@@ -29,7 +29,7 @@
                 @can('ver_bandera')
                     <li>
                         <a href="{{ route('bandera.index') }}"
-                            class="flex items-center p-2 text-gray-800 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                            class="{{ request()->routeIs('bandera.*') ? 'text-sky-600 bg-sky-100' : 'text-gray-800' }} flex items-center p-2 text-gray-800 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                             {{-- <svg  aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 18">
                         <path d="M6.143 0H1.857A1.857 1.857 0 0 0 0 1.857v4.286C0 7.169.831 8 1.857 8h4.286A1.857 1.857 0 0 0 8 6.143V1.857A1.857 1.857 0 0 0 6.143 0Zm10 0h-4.286A1.857 1.857 0 0 0 10 1.857v4.286C10 7.169 10.831 8 11.857 8h4.286A1.857 1.857 0 0 0 18 6.143V1.857A1.857 1.857 0 0 0 16.143 0Zm-10 10H1.857A1.857 1.857 0 0 0 0 11.857v4.286C0 17.169.831 18 1.857 18h4.286A1.857 1.857 0 0 0 8 16.143v-4.286A1.857 1.857 0 0 0 6.143 10Zm10 0h-4.286A1.857 1.857 0 0 0 10 11.857v4.286c0 1.026.831 1.857 1.857 1.857h4.286A1.857 1.857 0 0 0 18 16.143v-4.286A1.857 1.857 0 0 0 16.143 10Z"/>
                     </svg> --}}
@@ -49,7 +49,7 @@
                 @can('ver_intervencion')
                     <li>
                         <a href="{{ route('intervencion.index') }}"
-                            class="flex items-center p-2 text-gray-800 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                            class="{{ request()->routeIs('intervencion.*') ? 'text-sky-600 bg-sky-100' : 'text-gray-800' }} flex items-center p-2 text-gray-800 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-hidden="true"
                                 viewBox="0 0 22 22" stroke-width="1.5" stroke="currentColor"
                                 class="shrink-0 w-5 h-5 text-sky-600 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white scale-[1.09]">
@@ -66,7 +66,7 @@
                 @can('ver_novedad_material')
                     <li>
                         <a href="{{ route('novedad-de-material.index') }}"
-                            class="flex items-center p-2 text-gray-800 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                            class="{{ request()->routeIs('novedad-de-material.*') ? 'text-sky-600 bg-sky-100' : 'text-gray-800' }} flex items-center p-2 text-gray-800 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 22"
                                 aria-hidden="true" stroke-width="1.5" stroke="white"
                                 class="shrink-0 w-5 h-5 text-sky-600 scale-[1.09] transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white">
@@ -87,7 +87,7 @@
                 @can('ver_guardavida')
                     <li>
                         <a href="{{ route('guardavida.index') }}"
-                            class="flex items-center p-2 text-gray-800 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                            class="{{ request()->routeIs('guardavida.*') ? 'text-sky-600 bg-sky-100' : 'text-gray-800' }} flex items-center p-2 text-gray-800 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 148.42 68.38"
                                 class="shrink-0 w-5 h-7 scale-[1.5] -translate-x-[3px] text-sky-600 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white">
                                 <path
@@ -107,7 +107,7 @@
                 @can('ver_asistencias')
                     <li>
                         <a href="{{ route('asistencias.index') }}"
-                            class="flex items-center p-2 text-gray-800 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                            class="{{ request()->routeIs('asistencias.*') ? 'text-sky-600 bg-sky-100' : 'text-gray-800' }} flex items-center p-2 text-gray-800 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22" fill="currentColor"
                                 class="shrink-0 w-5 h-5 scale-[1.15] -translate-x-[3px] text-sky-600 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white">
                                 <path fill-rule="evenodd"
@@ -121,7 +121,7 @@
                 @can('ver_licencia')
                     <li>
                         <a href="{{ route('licencia.index') }}"
-                            class="flex items-center p-2 {{ request()->routeIs('licencia.*') ? 'text-sky-600' : 'text-gray-800' }} rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                            class="{{ request()->routeIs('licencia.*') ? 'text-sky-600 bg-sky-100' : 'text-gray-800' }} flex items-center p-2 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22" fill="currentColor"
                                 class="shrink-0 w-5 h-5 scale-[1.15] -translate-x-[3px] text-sky-600 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white">
                                 <path
@@ -137,7 +137,7 @@
                 @can('ver_cambio_turno')
                     <li>
                         <a href="{{ route('cambio-de-turno.index') }}"
-                            class="flex items-center p-2 text-gray-800 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                            class="{{ request()->routeIs('cambio-de-turno.*') ? 'text-sky-600 bg-sky-100' : 'text-gray-800' }} flex items-center p-2 text-gray-800 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 22"
                                 class="shrink-0 w-5 h-5 scale-[1.15] -translate-x-[3px] text-sky-600 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white">
                                 <path fill-rule="evenodd"
