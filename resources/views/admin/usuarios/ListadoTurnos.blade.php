@@ -1,7 +1,7 @@
 @extends('layouts.dashboard')
 
 @section('content')
-    <link rel="stylesheet" href="{{ asset('css/listadoTurnos.css') }}">
+    @vite('resources/css/listadoTurnos.css')
 
     <div class="container mx-auto mt-4 px-4">
 

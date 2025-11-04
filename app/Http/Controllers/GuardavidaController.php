@@ -253,7 +253,7 @@ class GuardavidaController extends Controller
 
     /**
      * Ver perfil de un guardavidas específico
-     * Puede ser visto por administradores o por el propio guardavidas
+     * Puede ser visto  por el propio guardavidas (loguarse como guardavidas)
      */
     public function showProfile(Guardavida $guardavida)
     {

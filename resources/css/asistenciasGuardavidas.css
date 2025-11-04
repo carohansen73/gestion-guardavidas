@@ -386,3 +386,10 @@
             padding: 30px 20px;
         }
     }
+    
+    .phone {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
