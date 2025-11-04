@@ -446,6 +446,7 @@ export function alertaError(text, icon = "error") {
         icon: icon,
         confirmButtonColor: "#36be7f",
     }).then(() => {
+        iniciarCamara();
         //window.location.href = "/dashboard"; // Redireccion despues de cerrar el alert
     });
 }
