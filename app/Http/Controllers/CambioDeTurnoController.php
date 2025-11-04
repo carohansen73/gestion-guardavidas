@@ -8,7 +8,7 @@ use App\Http\Requests\UpdateCambioDeTurnoRequest;
 use App\Models\Guardavida;
 use App\Models\Playa;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Http\Request;
 class CambioDeTurnoController extends Controller
 {
     /**
@@ -39,7 +39,7 @@ class CambioDeTurnoController extends Controller
 
       En el blade estilos básicos que se adaptan a las pantallas
      */
-    public function indexAdmin(StoreCambioDeTurnoRequest $request)
+    public function indexAdmin(Request $request)
     {
         $query = CambioDeTurno::with(['guardavida', 'playa', 'puesto'])
             ->orderBy('fecha', 'desc');
@@ -52,13 +52,12 @@ class CambioDeTurnoController extends Controller
             $query->whereDate('fecha', $request->fecha);
         }
 
-        // PAGINACIÓN
-        $registros = $query->paginate(10)->withQueryString(); // 10 por página, mantiene filtros
+        $registros = $query->paginate(10)->withQueryString();
         $playas = Playa::all();
 
-
-        return view('admin.usuarios.ListadoTurnos', compact('registros', 'playas'));
+        return view('admin.usuarios.listadoTurnos', compact('registros', 'playas'));
     }
+
 
 
 

@@ -1,8 +1,6 @@
-@extends('layouts.dashboard')
+@extends('layouts.app')
 
 @section('content')
-    @vite('resources/css/listadoTurnos.css')
-
     <div class="container mx-auto mt-4 px-4">
 
         <h2 class="mb-4 text-xl font-semibold text-gray-800 dark:text-gray-100">Historial de Cambios de Turno</h2>
