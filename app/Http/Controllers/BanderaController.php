@@ -11,6 +11,8 @@ use App\Http\Requests\UpdateBanderaRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
+
 
 
 class BanderaController extends Controller
@@ -242,7 +244,160 @@ class BanderaController extends Controller
      * @param [type] $fechaHora
      * @return [temperatura y viento direccion y velocidad]
      */
-    public function obtenerClimaFechaYHora($playa, $fechaHora = null){
+    // public function obtenerClimaFechaYHora($playa, $fechaHora = null){
+
+    //     $params = [
+    //         'latitude' => $playa->lat,
+    //         'longitude' => $playa->lon,
+    //         'timezone'  => 'auto',
+    //     ];
+
+    //     if($fechaHora) {
+
+    //         $fecha = Carbon::parse($fechaHora)->startOfDay();
+    //         $hoy = Carbon::today();
+
+    //         if ($fecha->greaterThanOrEqualTo($hoy)) {
+    //             // Si la fecha es hoy o futura → usar forecast (datos actuales)
+    //             $params['current_weather'] = true;
+    //             $params['hourly'] = 'temperature_2m,windspeed_10m,winddirection_10m,windgusts_10m';
+    //             $url = 'https://api.open-meteo.com/v1/forecast';
+    //         } else {
+    //             // Si es una fecha pasada → usar archive (datos históricos)
+    //             $params['hourly'] = 'temperature_2m,windspeed_10m,winddirection_10m,windgusts_10m';
+    //             $params['start_date'] = $fecha->toDateString();
+    //             $params['end_date'] =  $fecha->copy()->addHour()->toDateString();
+    //             $url = "https://archive-api.open-meteo.com/v1/archive";
+    //         }
+
+
+    //         //API de datos historicos
+    //         // $params['hourly'] = 'temperature_2m,windspeed_10m,winddirection_10m,windgusts_10m';
+    //         // $params['start_date'] = Carbon::parse($fechaHora)->toDateString();
+    //         // $params['end_date'] = Carbon::parse($fechaHora)->addHour()->toDateString();
+    //         // $url = "https://archive-api.open-meteo.com/v1/archive";
+
+    //     } else{
+    //         //API de datos actuales
+    //         $params['current_weather'] = true;
+    //         $params['hourly'] = 'temperature_2m,windspeed_10m,winddirection_10m,windgusts_10m';
+    //         $url = 'https://api.open-meteo.com/v1/forecast';
+    //     }
+    //      $response = Http::timeout(20)->get($url, $params);
+
+    //     //Chequeo que traiga una respuesta satisfactoria
+    //     if (!$response->successful()) {
+    //         // registro el error
+    //         \Log::error('Error al consultar la API del clima', [
+    //             'status' => $response->status(),
+    //             'body' => $response->body(),
+    //         ]);
+    //         return [
+    //             'temperatura' => null,
+    //             'viento_intensidad' => null,
+    //             'viento_direccion' => null,
+    //         ];
+    //     }
+
+    //     $data = $response->json();
+
+    //     //Armo respuesta con/sin fecha hora
+    //     if ($fechaHora && isset($data['hourly'])) {
+
+    //         $times = $data['hourly']['time'];
+    //         $temps = $data['hourly']['temperature_2m'];
+    //         $winds = $data['hourly']['windspeed_10m'];
+    //         $dirs = $data['hourly']['winddirection_10m'];
+    //         $gusts = $data['hourly']['windgusts_10m'];
+
+    //         // Buscar la hora más cercana
+    //         $targetTs = strtotime($fechaHora);
+    //         $closestIndex = null;
+    //         $minDiff = PHP_INT_MAX;
+    //         foreach ($times as $i => $t) {
+    //             $diff = abs(strtotime($t) - $targetTs);
+    //             if ($diff < $minDiff) {
+    //                 $minDiff = $diff;
+    //                 $closestIndex = $i;
+    //             }
+    //         }
+
+    //         $velocidad = round($winds[$closestIndex]);
+    //         $rafagas = isset($gusts[$closestIndex]) ? round($gusts[$closestIndex]) : null;
+
+    //         //Salida
+    //         if ($rafagas) {
+    //             $viento_intensidad = "{$velocidad}  - {$rafagas} km/h";
+    //         } else {
+    //             $viento_intensidad =  "{$velocidad} km/h";
+    //         }
+
+    //         return [
+    //             'temperatura' => round($temps[$closestIndex]),
+    //             'viento_intensidad' =>  $viento_intensidad,
+    //             'viento_direccion' => $this->gradosACardinal($dirs[$closestIndex]),
+    //         ];
+
+    //     } elseif (isset($data['current_weather'])) {
+
+    //         // 🌡️ Temperatura actual (°C)
+    //         $temperatura = isset($data['current_weather']['temperature'])
+    //         ? round($data['current_weather']['temperature'])
+    //         : null;
+
+    //         //Viento medio km/h
+    //         $velocidad = round($data['current_weather']['windspeed']); // km/h
+
+    //         //Direccion en grados
+    //         $windDeg = $data['current_weather']['winddirection'];
+    //         $direccion = $this->gradosACardinal($windDeg);
+
+    //         // Hora actual del reporte -para encontrar rafagas
+    //         $currentTime = $data['current_weather']['time'];
+
+    //         //Ráfaga mas cercana
+    //         $rafagas = null;
+    //         if (isset($data['hourly']['time'])) {
+    //             $times = $data['hourly']['time'];
+    //             $gusts = $data['hourly']['windgusts_10m'];
+
+    //             // Convertir a timestamps
+    //             $currentTs = strtotime($currentTime);
+    //             $closestIndex = null;
+    //             $minDiff = PHP_INT_MAX;
+
+    //             foreach ($times as $i => $t) {
+    //                 $diff = abs(strtotime($t) - $currentTs);
+    //                 if ($diff < $minDiff) {
+    //                     $minDiff = $diff;
+    //                     $closestIndex = $i;
+    //                 }
+    //             }
+
+    //             if ($closestIndex !== null) {
+    //                 $rafagas = round($gusts[$closestIndex]);
+    //             }
+    //         }
+
+    //         //Salida
+    //         if ($rafagas) {
+    //             $viento_intensidad = "{$velocidad} - {$rafagas} km/h";
+    //         } else {
+    //             $viento_intensidad = "{$velocidad} km/h";
+    //         }
+
+    //         return(['viento_intensidad' => $viento_intensidad,
+    //             'viento_direccion' =>  $direccion,
+    //             'temperatura' =>  $temperatura,]);
+    //     }
+    //     return null;
+    // }
+
+
+
+public function obtenerClimaFechaYHora($playa, $fechaHora = null)
+{
+    try{
 
         $params = [
             'latitude' => $playa->lat,
@@ -250,23 +405,44 @@ class BanderaController extends Controller
             'timezone'  => 'auto',
         ];
 
-        if($fechaHora) {
-            $params['hourly'] = 'temperature_2m,windspeed_10m,winddirection_10m,windgusts_10m';
-            $params['start_date'] = Carbon::parse($fechaHora)->toDateString();
-            $params['end_date'] = Carbon::parse($fechaHora)->addHour()->toDateString();
-            $url = "https://archive-api.open-meteo.com/v1/archive";
+        // Si recibe fecha
+        if ($fechaHora) {
+            $fecha = Carbon::parse($fechaHora)->startOfDay();
+            $hoy = Carbon::today();
+            $diferenciaDias = $fecha->diffInDays($hoy);
 
-        } else{
+            if ($diferenciaDias === 0) {
+                // 🌤️ Hoy → forecast con current_weather
+                $params['current_weather'] = true;
+                $params['hourly'] = 'temperature_2m,windspeed_10m,winddirection_10m,windgusts_10m';
+                $url = 'https://api.open-meteo.com/v1/forecast';
+
+            } elseif ($diferenciaDias <= 7) {
+                // ✅ Fecha actual o futura → forecast
+                $params['start_date'] = $fecha->toDateString();
+                $params['end_date'] = $fecha->toDateString();
+                $params['hourly'] = 'temperature_2m,windspeed_10m,winddirection_10m,windgusts_10m';
+                $url = 'https://api.open-meteo.com/v1/forecast';
+            } else {
+                // 📅 Fecha pasada → archive
+                $params['hourly'] = 'temperature_2m,windspeed_10m,winddirection_10m';
+                $params['start_date'] = $fecha->toDateString();
+                $params['end_date'] = $fecha->copy()->addHour()->toDateString();
+                $url = "https://archive-api.open-meteo.com/v1/archive";
+            }
+        } else {
+            // Sin fecha → datos actuales
             $params['current_weather'] = true;
-            $params['hourly'] = 'windgusts_10m';
+            $params['hourly'] = 'temperature_2m,windspeed_10m,winddirection_10m,windgusts_10m';
             $url = 'https://api.open-meteo.com/v1/forecast';
         }
-        $response = Http::get($url, $params);
 
-        //Chequeo que traiga una respuesta satisfactoria
+        // Llamada HTTP con timeout extendido (por si demora)
+        $response = Http::timeout(20)->get($url, $params);
+
         if (!$response->successful()) {
-            // registro el error
             \Log::error('Error al consultar la API del clima', [
+                'url' => $url,
                 'status' => $response->status(),
                 'body' => $response->body(),
             ]);
@@ -279,19 +455,27 @@ class BanderaController extends Controller
 
         $data = $response->json();
 
-        //Armo respuesta con/sin fecha hora
-        if ($fechaHora && isset($data['hourly'])) {
+        // 🕒 Si viene hourly (archivo o forecast detallado)
+        if (isset($data['hourly']['time'])) {
+            $times = $data['hourly']['time'] ?? [];
+            $temps = $data['hourly']['temperature_2m'] ?? [];
+            $winds = $data['hourly']['windspeed_10m'] ?? [];
+            $dirs  = $data['hourly']['winddirection_10m'] ?? [];
+            $gusts = $data['hourly']['windgusts_10m'] ?? [];
 
-            $times = $data['hourly']['time'];
-            $temps = $data['hourly']['temperature_2m'];
-            $winds = $data['hourly']['windspeed_10m'];
-            $dirs = $data['hourly']['winddirection_10m'];
-            $gusts = $data['hourly']['windgusts_10m'];
+            if (empty($times) || empty($winds)) {
+                // Si no hay datos, devolvemos nulos sin romper
+                return [
+                    'temperatura' => null,
+                    'viento_intensidad' => null,
+                    'viento_direccion' => null,
+                ];
+            }
 
-            // Buscar la hora más cercana
-            $targetTs = strtotime($fechaHora);
+            $targetTs = strtotime($fechaHora ?? now());
             $closestIndex = null;
             $minDiff = PHP_INT_MAX;
+
             foreach ($times as $i => $t) {
                 $diff = abs(strtotime($t) - $targetTs);
                 if ($diff < $minDiff) {
@@ -300,76 +484,60 @@ class BanderaController extends Controller
                 }
             }
 
-            $velocidad = round($winds[$closestIndex]);
-            $rafagas = isset($gusts[$closestIndex]) ? round($gusts[$closestIndex]) : null;
+            if ($closestIndex !== null && isset($winds[$closestIndex])) {
+                $velocidad = round($winds[$closestIndex]);
+                $rafagas = isset($gusts[$closestIndex]) ? round($gusts[$closestIndex]) : null;
 
-            //Salida
-            if ($rafagas) {
-                $viento_intensidad = "{$velocidad}  - {$rafagas} km/h";
-            } else {
-                $viento_intensidad =  "{$velocidad} km/h";
+                $viento_intensidad = $rafagas
+                    ? "{$velocidad} - {$rafagas} km/h"
+                    : "{$velocidad} km/h";
+
+                return [
+                    'temperatura' => isset($temps[$closestIndex]) ? round($temps[$closestIndex]) : null,
+                    'viento_intensidad' => $viento_intensidad,
+                    'viento_direccion' => isset($dirs[$closestIndex])
+                        ? $this->gradosACardinal($dirs[$closestIndex])
+                        : null,
+                ];
             }
+        }
+
+        // 🌤️ Si no viene hourly, usamos current_weather ->Datos actuales
+        if (isset($data['current_weather'])) {
+            $cw = $data['current_weather'];
+
+            $temperatura = isset($cw['temperature']) ? round($cw['temperature']) : null;
+            $velocidad = isset($cw['windspeed']) ? round($cw['windspeed']) : null;
+            $direccion = isset($cw['winddirection']) ? $this->gradosACardinal($cw['winddirection']) : null;
 
             return [
-                'temperatura' => round($temps[$closestIndex]),
-                'viento_intensidad' =>  $viento_intensidad,
-                'viento_direccion' => $this->gradosACardinal($dirs[$closestIndex]),
+                'temperatura' => $temperatura,
+                'viento_intensidad' => $velocidad ? "{$velocidad} km/h" : null,
+                'viento_direccion' => $direccion,
             ];
-
-        } elseif (isset($data['current_weather'])) {
-
-            // 🌡️ Temperatura actual (°C)
-            $temperatura = isset($data['current_weather']['temperature'])
-            ? round($data['current_weather']['temperature'])
-            : null;
-
-            //Viento medio km/h
-            $velocidad = round($data['current_weather']['windspeed']); // km/h
-
-            //Direccion en grados
-            $windDeg = $data['current_weather']['winddirection'];
-            $direccion = $this->gradosACardinal($windDeg);
-
-            // Hora actual del reporte -para encontrar rafagas
-            $currentTime = $data['current_weather']['time'];
-
-            //Ráfaga mas cercana
-            $rafagas = null;
-            if (isset($data['hourly']['time'])) {
-                $times = $data['hourly']['time'];
-                $gusts = $data['hourly']['windgusts_10m'];
-
-                // Convertir a timestamps
-                $currentTs = strtotime($currentTime);
-                $closestIndex = null;
-                $minDiff = PHP_INT_MAX;
-
-                foreach ($times as $i => $t) {
-                    $diff = abs(strtotime($t) - $currentTs);
-                    if ($diff < $minDiff) {
-                        $minDiff = $diff;
-                        $closestIndex = $i;
-                    }
-                }
-
-                if ($closestIndex !== null) {
-                    $rafagas = round($gusts[$closestIndex]);
-                }
-            }
-
-            //Salida
-            if ($rafagas) {
-                $viento_intensidad = "{$velocidad} - {$rafagas} km/h";
-            } else {
-                $viento_intensidad = "{$velocidad} km/h";
-            }
-
-            return(['viento_intensidad' => $viento_intensidad,
-                'viento_direccion' =>  $direccion,
-                'temperatura' =>  $temperatura,]);
         }
-        return null;
+
+        // Si no hay datos válidos
+        return [
+            'temperatura' => null,
+            'viento_intensidad' => null,
+            'viento_direccion' => null,
+        ];
+
+    } catch (\Exception $e) {
+        // Captura cualquier error de conexión, JSON o timeout
+        \Log::error('Excepción al obtener clima', ['error' => $e->getMessage()]);
+        return [
+            'temperatura' => null,
+            'viento_intensidad' => null,
+            'viento_direccion' => null,
+        ];
     }
+
+}
+
+
+
 
     /**
      * Convierte direccion a puntos cardinales
