@@ -15,9 +15,9 @@ document.addEventListener("DOMContentLoaded", () => {
             btn.classList.add("activo");
 
             // Obtener filtros activos
-            const filtroBalneario = document
-                .querySelector('.btn-filtro.activo[data-tipo="balneario"]')
-                .dataset.valor.toLowerCase();
+            // const filtroBalneario = document
+            //     .querySelector('.btn-filtro.activo[data-tipo="balneario"]')
+            //     .dataset.valor.toLowerCase();
             const filtroPuesto = document
                 .querySelector('.btn-filtro.activo[data-tipo="puesto"]')
                 .dataset.valor.toLowerCase();
