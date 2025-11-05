@@ -12,11 +12,9 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
     <!-- Scripts -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/css/style.css'])
     {{-- estilo del template --}}
     {{-- <link rel="stylesheet" href="{{ asset('resources/css/style.css') }}"> --}}
-
-
 </head>
 
 <body class="font-sans antialiased  md:pb-0 pb-14" x-data="{ darkMode: false }" :class="{ 'dark': darkMode }">
@@ -24,20 +22,15 @@
 
     @include('layouts.navigation')
 
-
     @include('layouts.sidebar')
-
 
 
     <!-- Contenido principal -->
 
-
     <!-- Page Heading -->
     @isset($header)
         <header>
-
             {!! $header !!}
-
         </header>
     @endisset
 
@@ -48,9 +41,6 @@
             {{-- {{ $slot }} --}}
         </main>
     </div>
-
-
-
 
     @include('layouts.bottom-navigation')
 

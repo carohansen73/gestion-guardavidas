@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', e => {
 
     function crearBadge(colorClase, sigla, porcentaje) {
         const div = document.createElement('div');
-        div.className = `flex items-center gap-1 bg-gray-100 ${colorClase} rounded-full bg-error-50 py-0.5 px-2 my-1 text-xs font-medium  dark:bg-error-500/15 dark:text-error-500`;
+        div.className = `flex items-center gap-1 ${colorClase} bg-gray-100 rounded-full bg-error-50 py-0.5 px-2 my-1 text-xs font-medium  dark:bg-error-500/15 dark:text-error-500`;
         div.innerHTML = `
             <span class="px-1 text-sm">${sigla}</span>
             ${porcentaje}%

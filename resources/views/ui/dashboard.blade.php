@@ -64,7 +64,6 @@
                             </div>
 
                             <div class="flex flex-col justify-end items-end text-end" id="porcentajeIntervencionesPorPlaya">
-
                             </div>
                         </div>
                     </div>
