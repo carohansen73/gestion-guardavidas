@@ -71,22 +71,23 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/turnos', [CambioDeTurnoController::class, 'indexAdmin'])->name('cambio-de-turno.index');
 
         // Listado general (admin)
-    Route::get('/admin/asistencias', [AsistenciaController::class, 'index'])->name('asistencias.index');
+    Route::get('asistencias', [AsistenciaController::class, 'index'])->name('asistencias.index');
 
     // Historial individual por guardavida
-    Route::get('/admin/asistencias/{id}', [AsistenciaController::class, 'asistenciasPorGuardavida'])->name('asistencias.guardavida');
+    Route::get('asistencias/{id}', [AsistenciaController::class, 'asistenciasPorGuardavida'])->name('asistencias.guardavida');
 
     //para la seccion de "mis asistencias" cerca de "ver perfil"
-    Route::get('/mis-asistencias', [AsistenciaController::class, 'misAsistencias'])
+    Route::get('mis-asistencias', [AsistenciaController::class, 'misAsistencias'])
         ->name('guardavida.misAsistencias');
 
     //para  ir a la seccion de descarga  del excel de asistencias y aplicar filtros(puestos,dias,todos)
     Route::get("guardavidas/excel", [AsistenciaController::class, 'guardavidasPanelExcelAsistencias'])->name('guardavidas.excel');
-    //para exportar excel de asistencias desde el panel de asistencias
-    Route::get("/excel", [AsistenciaController::class, 'descargar']);
-    Route::get('/admin/asistencias/export-dia', [AsistenciaController::class, 'index'])
-       ->name('asistencias.exportDia');
-});
+        //para exportar excel de asistencias desde el panel de asistencias
+        //  Route::get("/excel", [AsistenciaController::class, 'descargar']);
+        Route::get('asistencias/export-dia', [ExportController::class, 'exportAsistenciasPorDia'])
+    ->name('asistencias.exportDia');
+    });
+
 
 // Ruta para obtener el Token Bearer para ser usado en el QR
 // Ademas guarda Id_user para casos sin wifi.
