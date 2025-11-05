@@ -99,40 +99,40 @@ header.header-mobile{
 
 /* PLAYAS */
 .bg-rose-custom{
-   background-color: #ffe4e6; /* bg-rose-100 */
+   /* background-color: #ffe4e6;  */
     color: #be123c;           /* text-rose-600 */
 }
 
 .dark .bg-rose-custom{
-    background-color: #ffe4e6; /* bg-rose-100 */
+    background-color: #ffe4e6;
     color: #be123c;           /* text-rose-600 */
 }
 
 .bg-pink-custom{
-      background-color: #fce7f3; /* bg-pink-100 */
+      /* background-color: #fce7f3;  */
     color: #be185d;            /* text-pink-600 */
 }
 
 .dark .bg-pink-custom{
-      background-color: #fce7f3; /* bg-pink-100 */
+      /* background-color: #fce7f3;  */
     color: #be185d;            /* text-pink-600 */
 }
 
 .bg-violet-custom{
-    background-color: #f5f3ff; /* bg-violet-100 */
+    background-color: #f5f3ff;
     color: #7c3aed;
 }
 
 .dark .bg-violet-custom{
-    background-color: #f5f3ff; /* bg-violet-100 */
+    background-color: #f5f3ff;
     color: #7c3aed;
 }
 .bg-blue-custom{
-    background-color: #dbeafe; /* bg-blue-100 */
+    /* background-color: #dbeafe; bg-blue-100 */
     color: #2563eb;
 }
 
 .dark .bg-blue-custom{
-   background-color: #dbeafe; /* bg-blue-100 */
+   background-color: #dbeafe;
     color: #2563eb;
 }

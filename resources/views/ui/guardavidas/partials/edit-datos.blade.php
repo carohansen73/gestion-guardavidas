@@ -159,7 +159,7 @@
         <!-- Botones -->
         <div class="sm:col-span-8">
             <div class="m-6 mb-6 flex items-center justify-end gap-x-6">
-                <button type="button" class="text-sm font-semibold text-gray-900 dark:text-white">Cancelar</button>
+                <button type="button" class="text-sm font-semibold text-gray-900 dark:text-white" onclick="window.history.back()">Cancelar</button>
                 <button type="submit"
                 class="rounded-md bg-sky-600 px-3 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500">
                 Guardar

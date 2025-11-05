@@ -7,9 +7,12 @@ use App\Models\Guardavida;
 use App\Models\Intervencion;
 use App\Models\Novedad;
 use App\Models\NovedadMaterial;
+use App\Models\Playa;
 use Jenssegers\Agent\Agent;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class HomeController extends Controller
@@ -69,6 +72,8 @@ class HomeController extends Controller
         $novedades = Novedad::orderBy('fecha', 'desc')->take(10)->get();
         $mesActual = Carbon::now()->month;
         $anioActual = Carbon::now()->year;
+        $playas = Playa::all();
+
 
         //Intervenciones
         $totalIntervenciones = Intervencion::count(); // total de intervenciones
@@ -102,8 +107,6 @@ class HomeController extends Controller
             return $item;
         });
 
-
-
         //
         $intervenciones = Intervencion::whereMonth('fecha', $mesActual)
             ->whereYear('fecha', $anioActual)
@@ -119,7 +122,79 @@ class HomeController extends Controller
         })->get();
 
         return view('ui.dashboard',
-        compact( 'novedades', 'intervenciones', 'banderas','novedadesMateriales', 'guardavidas',
+        compact( 'playas', 'novedades', 'intervenciones', 'banderas','novedadesMateriales', 'guardavidas',
         'totalIntervenciones', 'intervencionesPorPlaya', 'totalNovedadesMateriales', 'novedadesMaterialesPorPlaya'));
+    }
+
+
+    public function getData(Request $request)
+    {
+        $playaId = $request->get('playa');
+
+        $intervencionesQuery = Intervencion::query();
+        $novedadesQuery = NovedadMaterial::query();
+        $banderasQuery = Bandera::query();
+
+        // Totales globales (sin filtro)
+        $totalIntervencionesGlobal = Intervencion::count();
+        $totalNovedadesGlobal = NovedadMaterial::count();
+
+        if ($playaId) {
+            $intervencionesQuery->where('playa_id', $playaId);
+            $novedadesQuery->where('playa_id', $playaId);
+            $banderasQuery->where('playa_id', $playaId);
+        }
+
+        /*INTERVENCIONES*/
+        $totalIntervenciones = $intervencionesQuery->count();
+
+        $intervencionesPorPlaya = Intervencion::select('playa_id') //count por playa
+            ->selectRaw('COUNT(*) as total')
+            ->when($playaId, fn($q) => $q->where('playa_id', $playaId))
+            ->groupBy('playa_id')
+            ->with('playa')
+            ->get();
+
+        // Agrego porcentaje
+        $intervencionesPorPlaya->transform(function ($item) use ($totalIntervencionesGlobal) {
+            $item->porcentaje = round(($item->total / $totalIntervencionesGlobal) * 100);
+             $item->sigla = Str::substr($item->playa->nombre, 0, 3);
+            return $item;
+        });
+
+        /*NOVEDADES MAT*/
+        $totalNovedadesMateriales = $novedadesQuery->count();
+
+        $novedadesMaterialesPorPlaya = NovedadMaterial::select('playa_id') //count por playa
+            ->selectRaw('COUNT(*) as total')
+            ->when($playaId, fn($q) => $q->where('playa_id', $playaId))
+            ->groupBy('playa_id')
+            ->with('playa')
+            ->get();
+
+        // Agrego porcentaje
+        $novedadesMaterialesPorPlaya->transform(function ($item) use ($totalNovedadesGlobal) {
+            $item->porcentaje = round(($item->total / $totalNovedadesGlobal) * 100);
+            $item->sigla = Str::substr($item->playa->nombre, 0, 3);
+            return $item;
+        });
+
+
+
+        return response()->json([
+            'totalIntervenciones' => $totalIntervenciones,
+            'intervencionesPorPlaya' => $intervencionesPorPlaya,
+            'totalNovedadesMateriales' => $totalNovedadesMateriales,
+            'novedadesMaterialesPorPlaya' => $novedadesMaterialesPorPlaya,
+            'banderas' => $banderasQuery
+               ->join('bandera_tipos', 'bandera_tipos.id', '=', 'banderas.bandera_id')
+                ->select(
+                    'bandera_tipos.codigo as codigo',
+                    'bandera_tipos.color as color',
+                    DB::raw('count(*) as total')
+                 )
+            ->groupBy('bandera_tipos.codigo', 'bandera_tipos.color')
+            ->get()
+        ]);
     }
 }
