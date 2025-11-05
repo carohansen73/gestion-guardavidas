@@ -104,7 +104,7 @@
                         </a>
                     </li>
                 @endcan
-                @can('ver_asistencias')
+                @can('ver_asistencia')
                     <li>
                         <a href="{{ route('asistencias.index') }}"
                             class="{{ request()->routeIs('asistencias.*') ? 'text-sky-600 bg-sky-100' : 'text-gray-800' }} flex items-center p-2 text-gray-800 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">

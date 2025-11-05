@@ -53,6 +53,13 @@ class RolesYPermisosSeeder extends Seeder
         Permission::create(['name' => 'eliminar_licencia']);
         Permission::create(['name' => 'ver_licencia']);
 
+        Permission::create(['name' => 'agregar_asistencia']);
+        Permission::create(['name' => 'editar_asistencia']);
+        Permission::create(['name' => 'eliminar_asistencia']);
+        Permission::create(['name' => 'ver_asistencia']);
+
+        Permission::create(['name' => 'ver_asistencia_propia']);
+
         Permission::create(['name' => 'abm_roles_y_permisos']);
 
         // Permission::create(['name' => 'fichar_asistencia']);
@@ -67,7 +74,9 @@ class RolesYPermisosSeeder extends Seeder
         'agregar_bandera',
         'editar_bandera',
         'eliminar_bandera',
-        'ver_bandera']);
+        'ver_bandera',
+        'ver_asistencia_propia'
+    ]);
 
         $encargado->givePermissionTo([
             'agregar_bandera',
@@ -99,6 +108,9 @@ class RolesYPermisosSeeder extends Seeder
             'editar_licencia',
             'eliminar_licencia',
             'ver_licencia',
+
+            'ver_asistencia',
+            'ver_asistencia_propia',
         ]);
 
         $admin->givePermissionTo(Permission::all());
