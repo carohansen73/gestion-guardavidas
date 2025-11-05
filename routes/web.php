@@ -84,7 +84,7 @@ Route::middleware('auth')->group(function () {
     Route::get("guardavidas/excel", [AsistenciaController::class, 'guardavidasPanelExcelAsistencias'])->name('guardavidas.excel');
         //para exportar excel de asistencias desde el panel de asistencias
         //  Route::get("/excel", [AsistenciaController::class, 'descargar']);
-        Route::get('/asistencias/export-dia', [ExportController::class, 'exportAsistenciasPorDia'])
+        Route::post('asistencias/export-dia', [ExportController::class, 'exportAsistenciasPorDia'])
     ->name('asistencias.exportDia');
     });
 
@@ -92,7 +92,6 @@ Route::middleware('auth')->group(function () {
 // Ruta para obtener el Token Bearer para ser usado en el QR
 // Ademas guarda Id_user para casos sin wifi.
 Route::post('/loginIdUser', [ApiAuthController::class, 'login'])->name('loginIdUser');
-
 
 
 require __DIR__.'/auth.php';

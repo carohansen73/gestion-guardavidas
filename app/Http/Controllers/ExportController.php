@@ -121,11 +121,28 @@ class ExportController extends Controller
 
     Se genera con nombre asistencias_y_licencias_YYYY-MM-DD_HHMMSS.xlsx.
      */
-
     public function exportAsistenciasPorDia(Request $request)
     {
-        // Guardar sesión antes de comenzar export (evita bloqueo)
+      /*  // Guardar sesión antes de comenzar export (evita bloqueo de session)
         $request->session()->save();
+
+        // Validación simple: si no vienen fechas, usamos hoy
+        $fechaInicio = $request->input('fecha_inicio')
+            ? Carbon::parse($request->input('fecha_inicio'))->startOfDay()
+            : Carbon::today()->startOfDay();
+
+        $fechaFin = $request->input('fecha_fin')
+            ? Carbon::parse($request->input('fecha_fin'))->endOfDay()
+            : Carbon::today()->endOfDay();
+
+        $nombreArchivo = 'asistencias_y_licencias_' . now()->format('Y-m-d_His') . '.xlsx';
+
+        return Excel::download(new AsistenciasExport($fechaInicio, $fechaFin), $nombreArchivo);
+    }*/
+
+
+        // Guardar sesión antes de comenzar export (evita bloqueo)
+       $request->session()->save();
         // Validación
         $request->validate([
             'fecha_inicio' => 'required|date',
@@ -143,51 +160,4 @@ class ExportController extends Controller
     }
 
 
-
-
-
-
-
-
-
-/**metodo viejo antes de la modificacion */
-/*
-     public function exportAsistenciasPorDia(Request $request)
-     {
-         $request->validate([
-             'fecha_inicio' => 'required|date',
-             'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
-        ]);
-
-        $query= Asistencia::query();
-
-
-
-
-         if($request->filled('fecha')){
-            $inicio=$request->input('fecha_inicio');
-            $query->where('fecha', 'LIKE', "%{$inicio}%");
-
-         }
-
-         if($request->filled('fecha')){
-            $fin = $request->input('fecha_fin');
-            $query->where('fecha', 'LIKE', "%{$fin}%");
-         }
-
-         $fecha= timezone_open();
-         $asistencias = $query->get();
-         if($asistencias->isEmpty()){
-            $mensaje = [
-                'titulo' => '¡Error!',
-                'detalle' => 'No se encontraron registros para las fechas seleccionadas.'
-            ];
-            return back()->with('error', $mensaje);
-         }else{
-
-                  return Excel::download(new AsistenciasExport(($asistencias)) ,"asistencias_$fecha.xlsx");
-
-         }
-    }
-         */
 }

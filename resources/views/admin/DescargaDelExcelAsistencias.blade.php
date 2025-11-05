@@ -9,7 +9,8 @@
             <div class="card-body">
 
 
-                <form action="{{ route('asistencias.exportDia') }}" method="GET">
+                <form action="{{ route('asistencias.exportDia') }}" method="POST">
+                    @csrf
                     <div class="row align-items-end">
                         <div class="col-md-4 mb-3">
                             <label for="fecha_inicio" class="form-label">Desde</label>
