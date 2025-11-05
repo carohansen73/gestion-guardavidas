@@ -84,6 +84,13 @@
                     {{ __('Perfil') }}
                 </x-dropdown-link>
 
+                <!--Boton para ver asistencia -->
+                <x-responsive-nav-link :href="route('guardavida.misAsistencias')">
+                    {{ __('Mis Asistencias') }}
+                </x-responsive-nav-link>
+
+
+
                 <!-- Authentication -->
                 @auth
                     <form method="POST" action="{{ route('logout') }}">

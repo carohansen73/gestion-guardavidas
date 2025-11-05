@@ -46,7 +46,17 @@ class Asistencia extends Model
     public static function asistenciaPorPuesto($idPuesto)
     {
         return self::where('puesto_id', $idPuesto)->with('guardavida')->get();
-    }/*
+    }
+
+    public function puesto()
+    {
+        return $this->belongsTo(Puesto::class);
+    }
+
+
+
+
+    /*
     public static function asistenciaPorPlaya(){
 
         $asistenciaPorPlaya = Asistencia::where
@@ -59,5 +69,4 @@ class Asistencia extends Model
         $asistenciaPorTurno = Asistencia::
     }
         */
-
 }

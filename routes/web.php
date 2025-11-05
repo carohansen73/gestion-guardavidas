@@ -83,9 +83,9 @@ Route::middleware('auth')->group(function () {
     //para  ir a la seccion de descarga  del excel de asistencias y aplicar filtros(puestos,dias,todos)
     Route::get("guardavidas/excel", [AsistenciaController::class, 'guardavidasPanelExcelAsistencias'])->name('guardavidas.excel');
     //para exportar excel de asistencias desde el panel de asistencias
-    //Route::get("/excel", [AsistenciaController::class, 'descargar']);
-   // Route::get('/admin/asistencias/export-dia', [AsistenciaController::class, 'index'])
-     //   ->name('asistencias.exportDia');
+    Route::get("/excel", [AsistenciaController::class, 'descargar']);
+    Route::get('/admin/asistencias/export-dia', [AsistenciaController::class, 'index'])
+       ->name('asistencias.exportDia');
 });
 
 // Ruta para obtener el Token Bearer para ser usado en el QR
