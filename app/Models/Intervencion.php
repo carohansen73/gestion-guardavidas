@@ -45,9 +45,8 @@ class Intervencion extends Model
 
     public function bandera()
     {
-        return $this->belongsTo(BanderaTipo::class);
+        return $this->belongsTo(Bandera::class);
     }
-
 
     //many to many
     public function guardavidas()

@@ -128,7 +128,7 @@
                                 <p class="text-sm text-gray-800 dark:text-gray-400 font-medium mt-1 line-clamp-2">
                                     Bandera
                                     <span class="text-sm text-gray-500 dark:text-gray-300">
-                                        {!!$intervencion->bandera->codigo !!}
+                                        {{-- {!!$intervencion->bandera->codigo !!} --}}
                                     </span>
                                 </p>
                                 <p class="text-sm text-gray-800 dark:text-gray-400 font-medium mt-1 line-clamp-2">

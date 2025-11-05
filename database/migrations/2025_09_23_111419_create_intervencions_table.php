@@ -17,8 +17,8 @@ return new class extends Migration
             $table->string('tipo_intervencion');
             $table->integer('victimas');
             $table->integer('codigo');
-            $table->unsignedBigInteger('bandera_id');
-            $table->foreign('bandera_id')->references('id')->on('bandera_tipos')->onDelete('cascade');
+            $table->unsignedBigInteger('bandera_id')->nullable();
+            $table->foreign('bandera_id')->references('id')->on('banderas')->onDelete('cascade');
             $table->boolean('traslado');
             $table->unsignedBigInteger('playa_id');
             $table->foreign('playa_id')->references('id')->on('playas')->onDelete('cascade');

@@ -11,6 +11,8 @@ use App\Models\Fuerza;
 use App\Models\User;
 use App\Http\Requests\StoreIntervencionRequest;
 use App\Http\Requests\UpdateIntervencionRequest;
+use App\Models\Bandera;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -72,10 +74,19 @@ class IntervencionController extends Controller
     {
         $user_id = Auth::id();
 
+        $validated = $request->validated();
+
+        // Buscar la bandera correspondiente
+        $bandera = $this->buscarBanderaDelDiaYTurno(
+                $validated['playa_id'],
+                $validated['fecha']
+        );
+
         //Se crea la intervencion con datos validados + user_id
         $intervencion = Intervencion::create([
-            ...$request->validated(),
+            ...$validated,
             'user_id' => $user_id,
+            'bandera_id' => $bandera?->id,
         ]);
 
         //chequea que lleguen fuerzas y guardavidas y los sincroniza
@@ -130,8 +141,20 @@ class IntervencionController extends Controller
      */
     public function update(UpdateIntervencionRequest $request, Intervencion $intervencion)
     {
+
+        $validated = $request->validated();
+
+        // Buscar la bandera correspondiente (según playa y fecha)
+        $bandera = $this->buscarBanderaDelDiaYTurno(
+            $validated['playa_id'],
+            $validated['fecha']
+        );
+
         //actualizo los datos
-        $intervencion->update($request->validated());
+        $intervencion->update([
+            ...$validated,
+            'bandera_id' => $bandera?->id,
+        ]);
 
         //Sincroniza fuerzas
         if($request->has('fuerzas')){
@@ -175,5 +198,62 @@ class IntervencionController extends Controller
 
           return redirect()->route('intervencion.index')
         ->with('success', 'Intervención eliminada');
+    }
+
+
+    public function buscarBanderaDelDiaYTurno($playaId, $fecha){
+        if ($fecha) {
+            $hora = Carbon::parse($fecha)->format('H');
+
+            // Asignar turno según hora (si cargan fuera de horario queda TT)
+            if ($hora >= 5 && $hora < 13) {
+                $turno = 'M';
+            } else {
+                $turno = 'T';
+            }
+        }
+
+
+        // 1- Busca bandera en el turno, cargada antes
+        $bandera = Bandera::where('playa_id', $playaId)
+            ->whereDate('fecha', Carbon::parse($fecha)->toDateString())
+            ->whereTime('fecha', '<=', Carbon::parse($fecha)->toTimeString())
+            ->where('turno', $turno)
+            ->orderBy('fecha', 'desc')
+            ->first();
+
+        // 2- busca bandera en el turno, cargada despues
+        if (!$bandera) {
+            $bandera = Bandera::where('playa_id', $playaId)
+                ->whereDate('fecha', Carbon::parse($fecha)->toDateString())
+                ->whereTime('fecha', '>', Carbon::parse($fecha)->toTimeString())
+                ->where('turno', $turno)
+                ->orderBy('fecha', 'asc')
+                ->first();
+        }
+
+        // 3- Si no hay bandera en ese turno, busca en el otro turno
+        if (!$bandera) {
+            $otroTurno = $turno === 'M' ? 'T' : 'M';
+
+            $bandera = Bandera::where('playa_id', $playaId)
+                ->whereDate('fecha', Carbon::parse($fecha)->toDateString())
+                ->whereTime('fecha', '<=', Carbon::parse($fecha)->toTimeString())
+                ->where('turno', $otroTurno)
+                ->orderBy('fecha', 'desc')
+                ->first();
+
+            // Si tampoco hay previa, probamos la siguiente del otro turno
+            if (!$bandera) {
+                $bandera = Bandera::where('playa_id', $playaId)
+                    ->whereDate('fecha',  Carbon::parse($fecha)->toDateString())
+                    ->whereTime('fecha', '>', Carbon::parse($fecha)->toTimeString())
+                    ->where('turno', $otroTurno)
+                    ->orderBy('fecha', 'asc')
+                    ->first();
+            }
+        }
+
+        return $bandera;
     }
 }

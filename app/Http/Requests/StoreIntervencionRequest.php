@@ -28,7 +28,7 @@ class StoreIntervencionRequest extends FormRequest
             'tipo_intervencion' => 'required|string|max:255',
             'victimas'          => 'required|integer|digits_between:1,3',
             'codigo'            => 'required|integer|between:1,6',
-            'bandera_id'        => 'required|exists:bandera_tipos,id',
+            'bandera_id'        => 'nullable|exists:banderas,id',
             'traslado'          => 'required|boolean',
             'playa_id'          => 'required|exists:playas,id',
             'puesto_id'         => 'required|exists:puestos,id',

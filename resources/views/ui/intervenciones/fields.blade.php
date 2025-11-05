@@ -342,7 +342,7 @@
         </div>
 
         <!-- Bandera -->
-        <div class="sm:col-span-2">
+        {{-- <div class="sm:col-span-2">
           <label for="bandera_id" class="block text-sm font-medium text-gray-900 dark:text-white">Bandera</label>
           <div class="mt-2">
             <select id="bandera_id" name="bandera_id"
@@ -355,7 +355,7 @@
                 @endforeach
             </select>
           </div>
-        </div>
+        </div> --}}
 
         <!-- Fuerzas -->
         <div class="sm:col-span-2">
