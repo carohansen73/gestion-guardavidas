@@ -117,29 +117,12 @@ class ExportController extends Controller
 
     Los guardavidas sin registros mostrarán "No presente".
 
-    Tendrás columnas completas: Guardavida, DNI, Puesto, Playa, Fecha, Tipo, Horas y Detalle.
+    Tendrás columnas completas: Guardavida, DNI, Puesto, Playa, Fecha, Tipo, Horas y Detalle Licencia.
 
     Se genera con nombre asistencias_y_licencias_YYYY-MM-DD_HHMMSS.xlsx.
      */
     public function exportAsistenciasPorDia(Request $request)
     {
-      /*  // Guardar sesión antes de comenzar export (evita bloqueo de session)
-        $request->session()->save();
-
-        // Validación simple: si no vienen fechas, usamos hoy
-        $fechaInicio = $request->input('fecha_inicio')
-            ? Carbon::parse($request->input('fecha_inicio'))->startOfDay()
-            : Carbon::today()->startOfDay();
-
-        $fechaFin = $request->input('fecha_fin')
-            ? Carbon::parse($request->input('fecha_fin'))->endOfDay()
-            : Carbon::today()->endOfDay();
-
-        $nombreArchivo = 'asistencias_y_licencias_' . now()->format('Y-m-d_His') . '.xlsx';
-
-        return Excel::download(new AsistenciasExport($fechaInicio, $fechaFin), $nombreArchivo);
-    }*/
-
 
         // Guardar sesión antes de comenzar export (evita bloqueo)
        $request->session()->save();
