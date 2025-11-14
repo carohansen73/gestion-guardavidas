@@ -16,8 +16,15 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 
+
 class IntervencionController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->authorizeResource(Intervencion::class, 'intervencion');
+    }
+
     /**
      * Display a listing of the resource.
      */

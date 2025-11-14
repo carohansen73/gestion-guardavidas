@@ -13,17 +13,18 @@ class IntervencionPolicy
      */
     public function viewAny(User $user): bool
     {
-         return true;
+         return $user->can('ver_intervencion');
     }
 
     /**
+     *
      * Determine whether the user can view the model.
      */
     public function view(User $user, Intervencion $intervencion): bool
     {
        //TODO ver roles y permisos!
     //    return $user->role === 'admin' || $user->role === 'guardavida'  || $user->role === 'timonel';
-       return true;
+       return $user->can('ver_intervencion');
     }
 
     /**
@@ -33,7 +34,7 @@ class IntervencionPolicy
     {
         //TODO ver roles y permisos!
         //return $user->role === 'admin' || $user->role === 'guardavida'  || $user->role === 'timonel';
-        return true;
+        return $user->can('agregar_intervencion');
     }
 
     /**
@@ -41,7 +42,7 @@ class IntervencionPolicy
      */
     public function update(User $user, Intervencion $intervencion): bool
     {
-         return true;
+         return $user->can('editar_intervencion');
     }
 
     /**
@@ -52,7 +53,7 @@ class IntervencionPolicy
         // return $user->id === $intervencion->user_id || $user->rol === 'encargado' || $user->rol === 'jefePlaya'
         // || $user->role === 'admin' ;
 
-        return true;
+        return $user->can('eliminar_intervencion');
     }
 
     /**
@@ -69,5 +70,12 @@ class IntervencionPolicy
     public function forceDelete(User $user, Intervencion $intervencion): bool
     {
         return false;
+    }
+
+    public function before(User $user, string $ability)
+    {
+        if ($user->role === 'admin') {
+            return true;
+        }
     }
 }
