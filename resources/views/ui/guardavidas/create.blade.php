@@ -260,11 +260,18 @@
             </div>
 
             <!-- Botones -->
-            <div class="m-6 mb-6 flex items-center justify-end gap-x-6">
-                <button type="button" class="text-sm font-semibold text-gray-900 dark:text-white" onclick="window.history.back()">Cancelar</button>
+            <div class="m-6 mb-6 mt-8 flex flex-col-reverse gap-4 md:flex-row md:items-center md:justify-end md:gap-x-6">
+                <!-- Cancelar -->
+                <button type="button"
+                    class="text-sm font-semibold text-gray-900 dark:text-white"
+                    onclick="window.history.back()">
+                    Cancelar
+                </button>
+
+                <!-- Guardar -->
                 <button type="submit"
-                class="rounded-md bg-sky-600 px-3 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500">
-                Guardar
+                    class="w-full md:w-auto rounded-md bg-sky-600 px-3 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500">
+                    Guardar
                 </button>
             </div>
 
