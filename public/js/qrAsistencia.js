@@ -61,8 +61,14 @@ async function iniciarCamara() {
             }, 2 * 60 * 1000);
         }
     } catch (error) {
-        console.error("No se pudo acceder a la cámara:", error);
-        alertaError( "No se pudo acceder a la cámara.");
+        Swal.fire({
+            title: "Error",
+            text: "No se pudo acceder a la cámara:",
+            icon: "error",
+            confirmButtonColor: "#36be7f",
+        }).then(() => {
+            window.location.href = "/home"; // Redireccion despues de cerrar el alert
+        });
     }
 }
 

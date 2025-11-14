@@ -11,7 +11,9 @@
 
 
  <section class="text-gray-600 dark:text-gray-100 body-font px-4 py-10">
-  <h2 class="text-base/7 font-semibold text-gray-900 dark:text-white">Registrar Intervención</h2>
+ <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Registrar Intervención</h2>
+    <p class="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">Por favor complete los campos a continuación para registrar una intervención.</p>
+
 
     <form action="{{ route('intervencion.store') }}" method="POST" class="">
         @csrf
@@ -22,7 +24,7 @@
 
     </form>
 
-     <div class="py-4  w-full">
+     <div class="py-4 w-full sm:hidden">
         <a href="{{ route('intervencion.index') }}" class="bg-sky-600 rounded flex py-4 px-4 h-full justify-between">
             <div class="flex">
                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"

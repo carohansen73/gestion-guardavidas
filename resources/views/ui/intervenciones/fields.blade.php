@@ -1,4 +1,4 @@
-{{-- <form>
+ {{-- <form>
 
     <div class="space-y-12  ">
         <div class="border-b border-gray-900/10 pb-12 dark:border-white/10  rounded-lg bg-white dark:bg-gray-600  px-4 py-10">
@@ -9,7 +9,7 @@
                 <div class="sm:col-span-4">
                 <label for="username" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Username</label>
                 <div class="mt-2">
-                    <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600 dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-indigo-500">
+                    <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-sky-600 dark:bg-white/5 dark:outline-white/10 dark:focus-within:outline-sky-500">
                     <div class="shrink-0 text-base text-gray-500 select-none sm:text-sm/6 dark:text-gray-400">workcation.com/</div>
                     <input id="fecha" type="date" name="fecha" placeholder="fecha" class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6 dark:bg-transparent dark:text-white dark:placeholder:text-gray-500" />
                     </div>
@@ -19,7 +19,7 @@
                 <div class="col-span-full">
                     <label for="about" class="block text-sm/6 font-medium text-gray-900 dark:text-white">About</label>
                     <div class="mt-2">
-                        <textarea id="about" name="about" rows="3" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"></textarea>
+                        <textarea id="about" name="about" rows="3" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-sky-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-sky-500"></textarea>
                     </div>
                     <p class="mt-3 text-sm/6 text-gray-600 dark:text-gray-400">Write a few sentences about yourself.</p>
                 </div>
@@ -42,7 +42,7 @@
                             <path d="M1.5 6a2.25 2.25 0 0 1 2.25-2.25h16.5A2.25 2.25 0 0 1 22.5 6v12a2.25 2.25 0 0 1-2.25 2.25H3.75A2.25 2.25 0 0 1 1.5 18V6ZM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0 0 21 18v-1.94l-2.69-2.689a1.5 1.5 0 0 0-2.12 0l-.88.879.97.97a.75.75 0 1 1-1.06 1.06l-5.16-5.159a1.5 1.5 0 0 0-2.12 0L3 16.061Zm10.125-7.81a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0Z" clip-rule="evenodd" fill-rule="evenodd" />
                         </svg>
                         <div class="mt-4 flex text-sm/6 text-gray-600 dark:text-gray-400">
-                            <label for="file-upload" class="relative cursor-pointer rounded-md bg-transparent font-semibold text-indigo-600 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:focus-within:outline-indigo-500 dark:hover:text-indigo-300">
+                            <label for="file-upload" class="relative cursor-pointer rounded-md bg-transparent font-semibold text-sky-600 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-sky-600 hover:text-sky-500 dark:text-sky-400 dark:focus-within:outline-sky-500 dark:hover:text-sky-300">
                             <span>Upload a file</span>
                             <input id="file-upload" type="file" name="file-upload" class="sr-only" />
                             </label>
@@ -63,28 +63,28 @@
         <div class="sm:col-span-3">
           <label for="first-name" class="block text-sm/6 font-medium text-gray-900 dark:text-white">First name</label>
           <div class="mt-2">
-            <input id="first-name" type="text" name="first-name" autocomplete="given-name" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500" />
+            <input id="first-name" type="text" name="first-name" autocomplete="given-name" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-sky-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-sky-500" />
           </div>
         </div>
 
         <div class="sm:col-span-3">
           <label for="last-name" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Last name</label>
           <div class="mt-2">
-            <input id="last-name" type="text" name="last-name" autocomplete="family-name" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500" />
+            <input id="last-name" type="text" name="last-name" autocomplete="family-name" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-sky-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-sky-500" />
           </div>
         </div>
 
         <div class="sm:col-span-4">
           <label for="email" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Email address</label>
           <div class="mt-2">
-            <input id="email" type="email" name="email" autocomplete="email" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500" />
+            <input id="email" type="email" name="email" autocomplete="email" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-sky-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-sky-500" />
           </div>
         </div>
 
         <div class="sm:col-span-3">
           <label for="country" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Country</label>
           <div class="mt-2 grid grid-cols-1">
-            <select id="country" name="country" autocomplete="country-name" class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:*:bg-gray-800 dark:focus:outline-indigo-500">
+            <select id="country" name="country" autocomplete="country-name" class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-sky-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:*:bg-gray-800 dark:focus:outline-sky-500">
               <option>United States</option>
               <option>Canada</option>
               <option>Mexico</option>
@@ -98,28 +98,28 @@
         <div class="col-span-full">
           <label for="street-address" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Street address</label>
           <div class="mt-2">
-            <input id="street-address" type="text" name="street-address" autocomplete="street-address" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500" />
+            <input id="street-address" type="text" name="street-address" autocomplete="street-address" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-sky-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-sky-500" />
           </div>
         </div>
 
         <div class="sm:col-span-2 sm:col-start-1">
           <label for="city" class="block text-sm/6 font-medium text-gray-900 dark:text-white">City</label>
           <div class="mt-2">
-            <input id="city" type="text" name="city" autocomplete="address-level2" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500" />
+            <input id="city" type="text" name="city" autocomplete="address-level2" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-sky-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-sky-500" />
           </div>
         </div>
 
         <div class="sm:col-span-2">
           <label for="region" class="block text-sm/6 font-medium text-gray-900 dark:text-white">State / Province</label>
           <div class="mt-2">
-            <input id="region" type="text" name="region" autocomplete="address-level1" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500" />
+            <input id="region" type="text" name="region" autocomplete="address-level1" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-sky-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-sky-500" />
           </div>
         </div>
 
         <div class="sm:col-span-2">
           <label for="postal-code" class="block text-sm/6 font-medium text-gray-900 dark:text-white">ZIP / Postal code</label>
           <div class="mt-2">
-            <input id="postal-code" type="text" name="postal-code" autocomplete="postal-code" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500" />
+            <input id="postal-code" type="text" name="postal-code" autocomplete="postal-code" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-sky-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-sky-500" />
           </div>
         </div>
       </div>
@@ -136,7 +136,7 @@
             <div class="flex gap-3">
               <div class="flex h-6 shrink-0 items-center">
                 <div class="group grid size-4 grid-cols-1">
-                  <input id="comments" type="checkbox" name="comments" checked aria-describedby="comments-description" class="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 dark:border-white/10 dark:bg-white/5 dark:checked:border-indigo-500 dark:checked:bg-indigo-500 dark:indeterminate:border-indigo-500 dark:indeterminate:bg-indigo-500 dark:focus-visible:outline-indigo-500 dark:disabled:border-white/5 dark:disabled:bg-white/10 dark:disabled:checked:bg-white/10 forced-colors:appearance-auto" />
+                  <input id="comments" type="checkbox" name="comments" checked aria-describedby="comments-description" class="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-sky-600 checked:bg-sky-600 indeterminate:border-sky-600 indeterminate:bg-sky-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 dark:border-white/10 dark:bg-white/5 dark:checked:border-sky-500 dark:checked:bg-sky-500 dark:indeterminate:border-sky-500 dark:indeterminate:bg-sky-500 dark:focus-visible:outline-sky-500 dark:disabled:border-white/5 dark:disabled:bg-white/10 dark:disabled:checked:bg-white/10 forced-colors:appearance-auto" />
                   <svg viewBox="0 0 14 14" fill="none" class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-disabled:stroke-gray-950/25 dark:group-has-disabled:stroke-white/25">
                     <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-checked:opacity-100" />
                     <path d="M3 7H11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-indeterminate:opacity-100" />
@@ -151,7 +151,7 @@
             <div class="flex gap-3">
               <div class="flex h-6 shrink-0 items-center">
                 <div class="group grid size-4 grid-cols-1">
-                  <input id="candidates" type="checkbox" name="candidates" aria-describedby="candidates-description" class="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 dark:border-white/10 dark:bg-white/5 dark:checked:border-indigo-500 dark:checked:bg-indigo-500 dark:indeterminate:border-indigo-500 dark:indeterminate:bg-indigo-500 dark:focus-visible:outline-indigo-500 dark:disabled:border-white/5 dark:disabled:bg-white/10 dark:disabled:checked:bg-white/10 forced-colors:appearance-auto" />
+                  <input id="candidates" type="checkbox" name="candidates" aria-describedby="candidates-description" class="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-sky-600 checked:bg-sky-600 indeterminate:border-sky-600 indeterminate:bg-sky-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 dark:border-white/10 dark:bg-white/5 dark:checked:border-sky-500 dark:checked:bg-sky-500 dark:indeterminate:border-sky-500 dark:indeterminate:bg-sky-500 dark:focus-visible:outline-sky-500 dark:disabled:border-white/5 dark:disabled:bg-white/10 dark:disabled:checked:bg-white/10 forced-colors:appearance-auto" />
                   <svg viewBox="0 0 14 14" fill="none" class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-disabled:stroke-gray-950/25 dark:group-has-disabled:stroke-white/25">
                     <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-checked:opacity-100" />
                     <path d="M3 7H11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-indeterminate:opacity-100" />
@@ -166,7 +166,7 @@
             <div class="flex gap-3">
               <div class="flex h-6 shrink-0 items-center">
                 <div class="group grid size-4 grid-cols-1">
-                  <input id="offers" type="checkbox" name="offers" aria-describedby="offers-description" class="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 dark:border-white/10 dark:bg-white/5 dark:checked:border-indigo-500 dark:checked:bg-indigo-500 dark:indeterminate:border-indigo-500 dark:indeterminate:bg-indigo-500 dark:focus-visible:outline-indigo-500 dark:disabled:border-white/5 dark:disabled:bg-white/10 dark:disabled:checked:bg-white/10 forced-colors:appearance-auto" />
+                  <input id="offers" type="checkbox" name="offers" aria-describedby="offers-description" class="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-sky-600 checked:bg-sky-600 indeterminate:border-sky-600 indeterminate:bg-sky-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 dark:border-white/10 dark:bg-white/5 dark:checked:border-sky-500 dark:checked:bg-sky-500 dark:indeterminate:border-sky-500 dark:indeterminate:bg-sky-500 dark:focus-visible:outline-sky-500 dark:disabled:border-white/5 dark:disabled:bg-white/10 dark:disabled:checked:bg-white/10 forced-colors:appearance-auto" />
                   <svg viewBox="0 0 14 14" fill="none" class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-disabled:stroke-gray-950/25 dark:group-has-disabled:stroke-white/25">
                     <path d="M3 8L6 11L11 3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-checked:opacity-100" />
                     <path d="M3 7H11" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-has-indeterminate:opacity-100" />
@@ -186,15 +186,15 @@
           <p class="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">These are delivered via SMS to your mobile phone.</p>
           <div class="mt-6 space-y-6">
             <div class="flex items-center gap-x-3">
-              <input id="push-everything" type="radio" name="push-notifications" checked class="relative size-4 appearance-none rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 dark:border-white/10 dark:bg-white/5 dark:checked:border-indigo-500 dark:checked:bg-indigo-500 dark:focus-visible:outline-indigo-500 dark:disabled:border-white/5 dark:disabled:bg-white/10 dark:disabled:before:bg-white/20 forced-colors:appearance-auto forced-colors:before:hidden" />
+              <input id="push-everything" type="radio" name="push-notifications" checked class="relative size-4 appearance-none rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-sky-600 checked:bg-sky-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 dark:border-white/10 dark:bg-white/5 dark:checked:border-sky-500 dark:checked:bg-sky-500 dark:focus-visible:outline-sky-500 dark:disabled:border-white/5 dark:disabled:bg-white/10 dark:disabled:before:bg-white/20 forced-colors:appearance-auto forced-colors:before:hidden" />
               <label for="push-everything" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Everything</label>
             </div>
             <div class="flex items-center gap-x-3">
-              <input id="push-email" type="radio" name="push-notifications" class="relative size-4 appearance-none rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 dark:border-white/10 dark:bg-white/5 dark:checked:border-indigo-500 dark:checked:bg-indigo-500 dark:focus-visible:outline-indigo-500 dark:disabled:border-white/5 dark:disabled:bg-white/10 dark:disabled:before:bg-white/20 forced-colors:appearance-auto forced-colors:before:hidden" />
+              <input id="push-email" type="radio" name="push-notifications" class="relative size-4 appearance-none rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-sky-600 checked:bg-sky-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 dark:border-white/10 dark:bg-white/5 dark:checked:border-sky-500 dark:checked:bg-sky-500 dark:focus-visible:outline-sky-500 dark:disabled:border-white/5 dark:disabled:bg-white/10 dark:disabled:before:bg-white/20 forced-colors:appearance-auto forced-colors:before:hidden" />
               <label for="push-email" class="block text-sm/6 font-medium text-gray-900 dark:text-white">Same as email</label>
             </div>
             <div class="flex items-center gap-x-3">
-              <input id="push-nothing" type="radio" name="push-notifications" class="relative size-4 appearance-none rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 dark:border-white/10 dark:bg-white/5 dark:checked:border-indigo-500 dark:checked:bg-indigo-500 dark:focus-visible:outline-indigo-500 dark:disabled:border-white/5 dark:disabled:bg-white/10 dark:disabled:before:bg-white/20 forced-colors:appearance-auto forced-colors:before:hidden" />
+              <input id="push-nothing" type="radio" name="push-notifications" class="relative size-4 appearance-none rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-sky-600 checked:bg-sky-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 dark:border-white/10 dark:bg-white/5 dark:checked:border-sky-500 dark:checked:bg-sky-500 dark:focus-visible:outline-sky-500 dark:disabled:border-white/5 dark:disabled:bg-white/10 dark:disabled:before:bg-white/20 forced-colors:appearance-auto forced-colors:before:hidden" />
               <label for="push-nothing" class="block text-sm/6 font-medium text-gray-900 dark:text-white">No push notifications</label>
             </div>
           </div>
@@ -205,9 +205,15 @@
 
   <div class="mt-6 flex items-center justify-end gap-x-6">
     <button type="button" class="text-sm/6 font-semibold text-gray-900 dark:text-white">Cancel</button>
-    <button type="submit" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500 dark:shadow-none dark:focus-visible:outline-indigo-500">Save</button>
+    <button type="submit" class="rounded-md bg-sky-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-sky-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 dark:bg-sky-500 dark:shadow-none dark:focus-visible:outline-sky-500">Save</button>
   </div>
 </form> --}}
+
+{{--
+HASTa ACAAAA --}}
+
+
+
 
 
 {{--
@@ -234,11 +240,11 @@
             <div class=" grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
 
               <!-- Playa -->
-                <div class="sm:col-span-3">
-                    <label for="playa_id" class="block text-sm font-medium text-gray-900 dark:text-white">Playa</label>
+            <div class="sm:col-span-3">
+                <label class="text-sm/6 font-semibold text-gray-900 dark:text-white">Playa</label>
                     <div class="mt-2">
                         <select id="playa_id" name="playa_id"
-                        class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-indigo-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500">
+                        class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-800 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500">
                             @foreach($playas as $playa)
                             <option value="{{ $playa->id }}"
                                 @if( isset($intervencion) && $intervencion->playa_id == $playa->id )
@@ -254,11 +260,11 @@
             </div>
 
         <!-- Puesto -->
-        <div class="sm:col-span-3">
-          <label for="puesto_id" class="block text-sm font-medium text-gray-900 dark:text-white">Puesto</label>
+         <div class="sm:col-span-3">
+          <label class="text-sm/6 font-semibold text-gray-900 dark:text-white">Puesto</label>
           <div class="mt-2">
             <select id="puesto_id" name="puesto_id"
-              class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-indigo-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500">
+              class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-800 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500">
                @foreach($puestos as $puesto)
                 <option value="{{ $puesto->id }}" data-playa="{{ $puesto->playa_id }}"
                     @if( isset($intervencion) && $intervencion->puesto_id == $puesto->id )
@@ -276,21 +282,24 @@
 
         <!-- Fecha y hora -->
         <div class="sm:col-span-2">
-          <label for="fecha" class="block text-sm font-medium text-gray-900 dark:text-white">Fecha y Hora</label>
+          <label class="text-sm/6 font-semibold text-gray-900 dark:text-white">Fecha y hora</label>
           <div class="mt-2">
             <input id="fecha" type="datetime-local" name="fecha"
               class="block w-full max-w-xs rounded-md bg-white px-2 py-1 text-sm text-gray-900
-              shadow-sm outline outline-1 outline-gray-300 focus:outline-indigo-600 dark:bg-gray-700
+              shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 dark:bg-gray-700
               dark:text-white dark:outline-gray-500" value="{{ old('fecha', $intervencion->fecha ?? '') }}" />
           </div>
         </div>
 
         <!-- Tipo de intervención -->
         <div class="sm:col-span-2">
-          <label for="tipo_intervencion" class="block text-sm font-medium text-gray-900 dark:text-white">Tipo de Intervención</label>
+          <label class="text-sm/6 font-semibold text-gray-900 dark:text-white">Tipo de Intervención</label>
+          {{-- <p class="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">Ejemplo: Busqueda/extravío de personas, Asistencia médica, Primeros auxilios, Rescate, etc.</p> --}}
+
+
           <div class="mt-2">
             <input id="tipo_intervencion" type="text" name="tipo_intervencion" placeholder="Ej. rescate"
-              class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-indigo-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
+              class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-800 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
               value="{{ old('tipo_intervencion', $intervencion->tipo_intervencion ?? '') }}" />
             @error('tipo_intervencion')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -299,11 +308,12 @@
         </div>
 
         <!-- Víctimas -->
-        <div class="sm:col-span-2">
-          <label for="victimas" class="block text-sm font-medium text-gray-900 dark:text-white">Víctimas</label>
+         <div class="sm:col-span-2">
+          <label class="text-sm/6 font-semibold text-gray-900 dark:text-white">Víctimas</label>
+          {{-- <p class="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">Ingrese la cantidad de víctimas.</p> --}}
           <div class="mt-2">
             <input id="victimas" type="number" name="victimas" min="0"
-              class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-indigo-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
+              class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-800 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
                value="{{ old('victimas', $intervencion->victimas ?? '') }}"/>
                 @error('victimas')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -314,18 +324,18 @@
 
          <!-- Traslado -->
        <div class="sm:col-span-2">
-            <label class="block text-sm font-medium text-gray-900 dark:text-white">Hubo traslado</label>
+            <label class="text-sm/6 font-semibold text-gray-900 dark:text-white">Hubo traslado</label>
             <div class="mt-2 flex gap-x-4">
                 <label class="flex items-center gap-x-2">
                 <input type="radio" name="traslado" value="1"
                     {{ old('traslado', $intervencion->traslado ?? '') == '1' ? 'checked' : '' }}
-                    class="h-4 w-4 text-indigo-600 focus:ring-indigo-600 border-gray-300 dark:bg-gray-700 dark:border-gray-500" />
+                    class="h-4 w-4 text-sky-600 focus:ring-sky-600 border-gray-300 dark:bg-gray-700 dark:border-gray-500" />
                 <span class="text-sm text-gray-700 dark:text-gray-300">Sí</span>
                 </label>
                 <label class="flex items-center gap-x-2">
                 <input type="radio" name="traslado" value="0"
                     {{ old('traslado', $intervencion->traslado ?? '') == '0' ? 'checked' : '' }}
-                    class="h-4 w-4 text-indigo-600 focus:ring-indigo-600 border-gray-300 dark:bg-gray-700 dark:border-gray-500" />
+                    class="h-4 w-4 text-sky-600 focus:ring-sky-600 border-gray-300 dark:bg-gray-700 dark:border-gray-500" />
                 <span class="text-sm text-gray-700 dark:text-gray-300">No</span>
                 </label>
             </div>
@@ -333,12 +343,13 @@
 
         <!-- Código -->
         <div class="sm:col-span-2">
-          <label for="codigo" class="block text-sm font-medium text-gray-900 dark:text-white">Código</label>
-          <div class="mt-2">
-            <input id="codigo" type="number" name="codigo"
-              class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-indigo-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
-               value="{{ old('codigo', $intervencion->codigo ?? '') }}"/>
-          </div>
+            <label class="text-sm/6 font-semibold text-gray-900 dark:text-white">Código</label>
+            {{-- <p class="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">Ingrese un número entre el 1 y el 6.</p> --}}
+            <div class="mt-2">
+                <input id="codigo" type="number" name="codigo"
+                class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-800 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
+                value="{{ old('codigo', $intervencion->codigo ?? '') }}"/>
+            </div>
         </div>
 
         <!-- Bandera -->
@@ -346,7 +357,7 @@
           <label for="bandera_id" class="block text-sm font-medium text-gray-900 dark:text-white">Bandera</label>
           <div class="mt-2">
             <select id="bandera_id" name="bandera_id"
-              class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 font-medium shadow-sm outline outline-1 outline-gray-300 focus:outline-indigo-600 text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500">
+              class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 font-medium shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500">
                @foreach($banderas as $bandera)
                     <option value="{{ $bandera->id }}"
                         {{ old('bandera_id', $intervencion?->bandera_id ?? '') == $bandera->id ? 'selected' : '' }}>
@@ -359,7 +370,7 @@
 
         <!-- Fuerzas -->
         <div class="sm:col-span-2">
-            <label for="fecha" class="block text-sm font-medium text-gray-900 dark:text-white">Intervinieron otras fuerzas</label>
+            <label for="fecha" class="text-sm/6 font-semibold text-gray-900 dark:text-white">Intervinieron otras fuerzas</label>
             <div class="mt-2">
             <select id="fuerzas" name="fuerzas[]" multiple>
                 @foreach($fuerzas as $fuerza)
@@ -376,7 +387,7 @@
 
         <!-- Lista de guardavidas -->
          <div class="sm:col-span-2">
-            <label for="fecha" class="block text-sm font-medium text-gray-900 dark:text-white">Guardavidas que intervinieron</label>
+            <label for="fecha" class="text-sm/6 font-semibold text-gray-900 dark:text-white">Guardavidas que intervinieron</label>
             <div class="mt-2">
             <select id="guardavidas" name="guardavidas[]" multiple>
                 @foreach($guardavidas as $g)
@@ -393,26 +404,35 @@
 
         <!-- Detalles -->
         <div class="col-span-full">
-          <label for="detalles" class="block text-sm font-medium text-gray-900 dark:text-white">Detalles</label>
-          <div class="mt-2">
-            <textarea id="detalles" name="detalles" rows="4"
-              class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-indigo-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500">
-            {{ old('detalles', $intervencion->detalles ?? '') }}
-        </textarea>
-          </div>
+            <label class="text-sm/6 font-semibold text-gray-900 dark:text-white">Detalles</label>
+            <p class="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">Describa la intervención.</p>
+            <div class="mt-2">
+                <textarea id="detalles" name="detalles" rows="4"
+                class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-800 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500">
+                {{ old('detalles', $intervencion->detalles ?? '') }}
+                </textarea>
+            </div>
         </div>
+
       </div>
     </div>
   </div>
 
-  <!-- Botones -->
-  <div class="m-6 mb-6 flex items-center justify-end gap-x-6">
-    <button type="button" class="text-sm font-semibold text-gray-900 dark:text-white" onclick="window.history.back()">Cancelar</button>
-    <button type="submit"
-      class="rounded-md bg-sky-600 px-3 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500">
-      Guardar
-    </button>
-  </div>
+   <!-- Botones -->
+    <div class="m-6 mb-6 mt-8 flex flex-col-reverse gap-4 md:flex-row md:items-center md:justify-end md:gap-x-6">
+        <!-- Cancelar -->
+        <button type="button"
+            class="text-sm font-semibold text-gray-900 dark:text-white"
+            onclick="window.history.back()">
+            Cancelar
+        </button>
+
+        <!-- Guardar -->
+        <button type="submit"
+            class="w-full md:w-auto rounded-md bg-sky-600 px-3 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500">
+            Guardar
+        </button>
+    </div>
 {{-- </form> --}}
 
 @vite(['resources/js/filterPuestoByPlaya.js'])

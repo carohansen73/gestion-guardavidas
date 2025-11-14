@@ -5,7 +5,9 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 // use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use App\Models\Bandera;
+use App\Models\Intervencion;
 use App\Policies\BanderaPolicy;
+use App\Policies\IntervencionPolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -16,6 +18,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected $policies = [
         Bandera::class => BanderaPolicy::class,
+        Intervencion::class => IntervencionPolicy::class,
     ];
 
     /**

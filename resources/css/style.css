@@ -100,29 +100,30 @@ header.header-mobile{
     color: #be123c;
 }
 
-.dark .bg-rose-custom{
+.dark .color-rose-custom{
     color: #d82c57;
 }
 
-.bg-pink-custom{
+.color-pink-custom{
     color: #be185d;
 }
 
-.dark .bg-pink-custom{
+.dark .color-pink-custom{
     color: #dd367c;
 }
 
-.bg-violet-custom{
+.color-violet-custom{
     color: #7c3aed;
 }
 
-.dark .bg-violet-custom{
+.dark .color-violet-custom{
     color: #9b65f6;
 }
-.bg-blue-custom{
+
+.color-blue-custom{
     color: #2563eb;
 }
 
-.dark .bg-blue-custom{
+.dark .color-blue-custom{
     color: #497ff4;
 }

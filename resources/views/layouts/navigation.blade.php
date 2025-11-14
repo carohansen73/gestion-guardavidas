@@ -4,7 +4,7 @@
     $rol = Auth::user()->getRoleNames()->first();
 @endphp
 
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
+<nav x-data="{ open: false }" class="bg-white border-b border-gray-200 shadow-lg">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -17,14 +17,14 @@
                             @endauth
                             @if ($rol !== 'admin' && $playa)
                                 <svg xmlns="http://www.w3.org/2000/svg"
-                                    class="w-7 h-7 animate-bounce text-gray-600 mx-2" fill="none" viewBox="0 0 24 24"
+                                    class="w-7 h-7 animate-bounce text-orange-600 mx-2" fill="none" viewBox="0 0 24 24"
                                     stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
                                 </svg>
-                                <p class="text-lg text-gray-700 dark:text-gray-200 font-medium">{{ $playa }}</p>
+                                <p class="text-lg text-gray-600 dark:text-gray-200 font-medium">{{ $playa }}</p>
                             @else
                                 <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
                             @endif
@@ -125,12 +125,55 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{ 'block': open, 'hidden': !open }" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
+             <x-responsive-nav-link :href="route('home')" :active="request()->routeIs('home')">
+                {{ __('Inicio') }}
+            </x-responsive-nav-link>
+            @role('admin')
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('intervencion.index')" :active="request()->routeIs('dashboard')">
-                {{ __('Intervenciones') }}
-            </x-responsive-nav-link>
+            @endrole
+            @can('ver_bandera')
+                <x-responsive-nav-link :href="route('bandera.index')" :active="request()->routeIs('bandera.*')">
+                    {{ __('Banderas') }}
+                </x-responsive-nav-link>
+            @endcan
+            @can('ver_intervencion')
+                <x-responsive-nav-link :href="route('intervencion.index')" :active="request()->routeIs('intervencion.*')">
+                    {{ __('Intervenciones') }}
+                </x-responsive-nav-link>
+            @endcan
+            @can('ver_novedad_material')
+                <x-responsive-nav-link :href="route('novedad-de-material.index')" :active="request()->routeIs('novedad-de-material.*')">
+                    {{ __('Novedades materiales') }}
+                </x-responsive-nav-link>
+            @endcan
+        </div>
+
+
+          <div class="pt-4 pb-1 border-t border-gray-200">
+
+
+            @can('ver_guardavida')
+                <x-responsive-nav-link :href="route('guardavida.index')" :active="request()->routeIs('guardavida.*')">
+                    {{ __('Guardavidas') }}
+                </x-responsive-nav-link>
+            @endcan
+            @can('ver_asistencia')
+                <x-responsive-nav-link :href="route('asistencias.index')" :active="request()->routeIs('asistencias.*')">
+                    {{ __('Asistencias') }}
+                </x-responsive-nav-link>
+            @endcan
+            @can('ver_licencia')
+                <x-responsive-nav-link :href="route('licencia.index')" :active="request()->routeIs('licencia.*')">
+                    {{ __('Licencias') }}
+                </x-responsive-nav-link>
+            @endcan
+            @can('ver_cambio_turno')
+                <x-responsive-nav-link :href="route('cambio-de-turno.index')" :active="request()->routeIs('cambio-de-turno.*')">
+                    {{ __('Cambios de turno') }}
+                </x-responsive-nav-link>
+            @endcan
         </div>
 
         <!-- Responsive Settings Options -->
