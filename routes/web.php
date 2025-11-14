@@ -62,15 +62,20 @@ Route::middleware('auth')->group(function () {
     //  NUEVAS RUTAS PARA PERFILES (dentro del middleware)
     Route::get('/profile', [GuardavidaController::class, 'myProfile']) ->name('guardavida.myProfile');
 
-    Route::put('/profile/{guardavida}', [GuardavidaController::class, 'updateProfile'])->name('guardavida.updateProfile');
 
     Route::get('/guardavida/{guardavida}/perfil', [GuardavidaController::class, 'showProfile'])->name('guardavida.profile');
+    Route::put('/profile/{guardavida}', [GuardavidaController::class, 'updateProfile'])->name('guardavida.updateProfile');
 
 
     //listado de cambios de turno
     Route::get('turnos', [CambioDeTurnoController::class, 'indexAdmin'])->name('cambio-de-turno.index');
 
-        // Listado general (admin)
+    //obtener puestos para renderizar con balnearios en la vista del template al momneto de seleccionar o modificar
+   /* Route::get('/puestos-por-playa/{playa_id}', [GuardavidaController::class, 'obtenerPuestos'])
+        ->name('puestos.por.playa');*/
+    Route::get('/puestos-por-playa/{id}', [GuardavidaController::class, 'obtenerPuestos']);
+
+    // Listado general (admin)
     Route::get('asistencias', [AsistenciaController::class, 'index'])->name('asistencias.index');
 
     // Historial individual por guardavida

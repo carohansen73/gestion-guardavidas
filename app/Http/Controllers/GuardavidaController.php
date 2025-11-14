@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Guardavida;
 use App\Http\Requests\StoreGuardavidaRequest;
 use App\Http\Requests\UpdateGuardavidaRequest;
+use App\Models\CambioDeTurno;
 use App\Models\Playa;
 use App\Models\Puesto;
 use App\Models\User;
@@ -277,13 +278,14 @@ class GuardavidaController extends Controller
         // Obtener listas para los selects (solo si es admin)
         $playas = $esAdmin ? Playa::all() : null;
         $puestos = $esAdmin ? Puesto::all() : null;
-
+        $turnos = $esAdmin ? CambioDeTurno::all() : null;
         return view('profile.profile', compact(
             'guardavida',
             'puedeEditar',
             'esAdmin',
             'playas',
-            'puestos'
+            'puestos',
+            'turnos'
         ));
     }
 
@@ -331,17 +333,22 @@ public function updateProfile(Request $request, Guardavida $guardavida)
             'numero' => 'nullable|string|max:10',
             'piso_dpto' => 'nullable|string|max:10',
         ];
-    // Solo admin puede cambiar playa/puesto/función
+    // Solo admin puede cambiar playa/puesto/función/turno
     if ($esAdmin) {
         $rules['playa_id'] = 'nullable|exists:playas,id';
         $rules['puesto_id'] = 'nullable|exists:puestos,id';
+
         // agregar cuando haya tabla de funciones $rules['funcion'] = 'nullable|string';
     }
 
     $validated = $request->validate($rules);
         // Si no es admin, remover campos que no puede editar
         if (!$esAdmin) {
-            unset($validated['playa_id'], $validated['puesto_id']);
+
+
+            unset($validated['playa_id'],
+             $validated['puesto_id']);
+
         }
     if ($guardavida->update($validated)) {
             // También actualizar el usuario asociado si cambió nombre/apellido
@@ -372,4 +379,9 @@ public function updateProfile(Request $request, Guardavida $guardavida)
 
 }
 
+    public function obtenerPuestos($playa_id)
+    {
+        $puestos = Puesto::where('playa_id', $playa_id)->get();
+        return response()->json($puestos);
+    }
 }

@@ -3,7 +3,7 @@
         padding: 0;
         box-sizing: border-box;
     }
-
+    
      :root {
         --primary-color: #1272b1;
         --primary-dark: #38ffeb;
@@ -18,20 +18,20 @@
         --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     }
-
+    
     body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         /*background: linear-gradient(135deg, #66cbea 0%, #4b65a2 100%);*/
         min-height: 100vh;
         color: var(--text-primary);
     }
-
+    
     .container {
         max-width: 1200px;
         margin: 0 auto;
     }
     /* Header */
-
+    
     .header {
         margin-top: 1.5rem;
         display: flex;
@@ -41,7 +41,7 @@
         margin-bottom: 30px;
         flex-wrap: wrap;
     }
-
+    
     .btn-back {
         background: var(--card-bg);
         color: var(--primary-color);
@@ -57,38 +57,38 @@
         box-shadow: var(--shadow);
         transition: all 0.3s ease;
     }
-
+    
     .btn-back:hover {
         transform: translateY(-2px);
         box-shadow: var(--shadow-lg);
     }
-
+    
     .header-title {
         font-size: 28px;
         font-weight: 700;
     }
     /* Profile Card */
-
+    
     .profile-card {
         --tw-shadow: 0 4px 6px -1px rgb(123 123 123 / 82%), 0 2px 4px -2px rgb(123 123 123 / 82%);
         --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
         box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
     }
-
+    
     .profile-card {
         background: var(--card-bg);
         border-radius: 20px;
         overflow: hidden;
         margin-bottom: 20px;
     }
-
+    
     .profile-header {
         background: var(--primary-color);
         padding: 40px 30px;
         text-align: center;
         position: relative;
     }
-
+    
     .profile-avatar {
         width: 120px;
         height: 120px;
@@ -102,20 +102,20 @@
         color: var(--primary-color);
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     }
-
+    
     .profile-name {
         color: white;
         font-size: 32px;
         font-weight: 700;
         margin-bottom: 5px;
     }
-
+    
     .profile-role {
         color: rgba(255, 255, 255, 0.9);
         font-size: 16px;
         font-weight: 500;
     }
-
+    
     .badge {
         display: inline-block;
         padding: 6px 16px;
@@ -124,22 +124,22 @@
         font-weight: 600;
         margin-top: 15px;
     }
-
+    
     .badge-admin {
         background: var(--warning-color);
         color: white;
     }
-
+    
     .badge-active {
         background: var(--secondary-color);
         color: white;
     }
     /* Profile Body */
-
+    
     .profile-body {
         padding: 40px 30px;
     }
-
+    
     .section-title {
         font-size: 20px;
         font-weight: 700;
@@ -149,24 +149,24 @@
         align-items: center;
         gap: 10px;
     }
-
+    
     .section-title i {
         color: var(--primary-color);
     }
-
+    
     .info-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         gap: 25px;
         margin-bottom: 40px;
     }
-
+    
     .info-item {
         display: flex;
         flex-direction: column;
         gap: 8px;
     }
-
+    
     .info-label {
         font-size: 12px;
         font-weight: 600;
@@ -174,7 +174,7 @@
         color: var(--text-secondary);
         letter-spacing: 0.5px;
     }
-
+    
     .info-value {
         font-size: 16px;
         color: var(--text-primary);
@@ -183,12 +183,12 @@
         align-items: center;
         gap: 10px;
     }
-
+    
     .info-value i {
         color: var(--primary-color);
         width: 20px;
     }
-
+    
     .info-value.editable {
         padding: 12px 15px;
         background: #f8fafc;
@@ -196,12 +196,12 @@
         border-radius: 10px;
         transition: all 0.3s ease;
     }
-
+    
     .info-value.editable:focus-within {
         border-color: var(--primary-color);
         background: white;
     }
-
+    
     input.form-control,
     select.form-control {
         width: 100%;
@@ -213,7 +213,7 @@
         font-weight: 500;
     }
     /* Action Buttons */
-
+    
     .action-buttons {
         display: flex;
         gap: 15px;
@@ -222,7 +222,6 @@
         padding-top: 30px;
         border-top: 2px solid var(--border-color);
     }
-
     /* .btn {
         padding: 14px 32px;
         border: none;
@@ -236,39 +235,38 @@
         transition: all 0.3s ease;
         box-shadow: var(--shadow);
     } */
-
     /* .btn:hover {
         transform: translateY(-2px);
         box-shadow: var(--shadow-lg);
     } */
-
+    
     .btn-primary {
         background: var(--primary-color);
         color: white;
     }
-
+    
     .btn-primary:hover {
         background: var(--primary-dark);
     }
-
+    
     .btn-secondary {
         background: var(--text-secondary);
         color: white;
     }
-
+    
     .btn-danger {
         background: var(--danger-color);
         color: white;
     }
     /* Stats Cards */
-
+    
     .stats-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 20px;
         margin-bottom: 40px;
     }
-
+    
     .stat-card {
         --tw-shadow: 0 4px 6px -1px rgb(123 123 123 / 82%), 0 2px 4px -2px rgb(123 123 123 / 82%);
         --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
@@ -277,26 +275,26 @@
         border-radius: 15px;
         border: 2px rgb(201 201 201 / 82%) solid;
     }
-
+    
     .stat-icon {
         font-size: 32px;
         margin-bottom: 10px;
         opacity: 0.9;
     }
-
+    
     .stat-value {
         font-size: 28px;
         font-weight: 700;
         margin-bottom: 5px;
     }
-
+    
     .stat-label {
         font-size: 14px;
         opacity: 0.9;
         font-weight: 500;
     }
     /* Alert Messages */
-
+    
     .alert {
         padding: 16px 20px;
         border-radius: 10px;
@@ -306,7 +304,7 @@
         gap: 12px;
         animation: slideIn 0.3s ease;
     }
-
+    
     @keyframes slideIn {
         from {
             opacity: 0;
@@ -317,24 +315,24 @@
             transform: translateY(0);
         }
     }
-
+    
     .alert-success {
         background: #d1fae5;
         color: #065f46;
         border-left: 4px solid var(--secondary-color);
     }
-
+    
     .alert-error {
         background: #fee2e2;
         color: #991b1b;
         border-left: 4px solid var(--danger-color);
     }
-
+    
     .alert i {
         font-size: 20px;
     }
     /* Loading Spinner */
-
+    
     .spinner {
         display: inline-block;
         width: 20px;
@@ -344,14 +342,14 @@
         border-top-color: white;
         animation: spin 1s ease-in-out infinite;
     }
-
+    
     @keyframes spin {
         to {
             transform: rotate(360deg);
         }
     }
     /* Responsive */
-
+    
     @media (max-width: 768px) {
         .header-title {
             font-size: 22px;
@@ -377,7 +375,7 @@
             grid-template-columns: 1fr;
         }
     }
-
+    
     @media (max-width: 480px) {
         .profile-avatar {
             width: 100px;
@@ -391,7 +389,7 @@
     /*------------------------------------------------------------------------------------*/
     /******************** Estilos del Popap Historial De Licencias ************************/
     /* --- Fondo del modal --- */
-
+    
     .modal-licencias {
         position: fixed;
         top: 0;
@@ -406,7 +404,7 @@
         z-index: 9999;
     }
     /* --- Contenido del modal --- */
-
+    
     .modal-content {
         background: #fff;
         width: 90%;
@@ -420,19 +418,19 @@
         transition: transform 0.4s ease, opacity 0.4s ease;
     }
     /* --- Mostrar animación --- */
-
+    
     .modal-licencias.show .modal-content {
         transform: translateY(0);
         opacity: 1;
     }
     /* --- Título --- */
-
+    
     .modal-content h3 {
         margin-top: 0;
         color: #1273b4;
     }
     /* --- Contenedor scrollable --- */
-
+    
     .lista-container {
         max-height: 220px;
         /* limita altura */
@@ -443,13 +441,13 @@
         padding: 0.5rem;
     }
     /* --- Lista de guardavidas --- */
-
+    
     .lista-licencias {
         list-style: none;
         padding: 0;
         margin: 0;
     }
-
+    
     .lista-licencias li {
         display: flex;
         align-items: center;
@@ -465,7 +463,7 @@
         border-radius: 50%;
     }*/
     /* --- Paginación --- */
-
+    
     .paginacion {
         display: flex;
         justify-content: center;
@@ -473,7 +471,7 @@
         gap: 8px;
         margin-bottom: 1rem;
     }
-
+    
     .pag-btn {
         background-color: #1273b4;
         color: white;
@@ -483,12 +481,12 @@
         height: 28px;
         cursor: pointer;
     }
-
+    
     .pag-btn:hover {
         background-color: #0f5c90;
     }
     /* --- Botón cerrar --- */
-
+    
     #cerrar-modal {
         background-color: #1273b4;
         color: white;
@@ -497,27 +495,31 @@
         padding: 10px 20px;
         cursor: pointer;
     }
-
+    
     #cerrar-modal:hover {
         background-color: #0f5c90;
     }
-
+    
     .licencia-info {
         text-align: left;
         line-height: 1.4;
         color: #333;
     }
-
+    
     .licencia-info strong {
         color: #1273b4;
     }
-
+    
     .licencia-info a {
         color: #1273b4;
         font-size: 0.9rem;
         text-decoration: none;
     }
-
+    
     .licencia-info a:hover {
         text-decoration: underline;
+    }
+    
+    .form-control {
+        color: #333;
     }

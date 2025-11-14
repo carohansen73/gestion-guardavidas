@@ -25,7 +25,7 @@ class Guardavida extends Model
         'user_id',
         'playa_id',
         'puesto_id',
-        'turno',
+        'turno_id',
     ];
     // Agregar accessor para contar asistencias
     protected $appends = ['asistencias_count', 'intervenciones_count','licencias_count'];
@@ -61,6 +61,11 @@ class Guardavida extends Model
     public function licencias()
     {
         return $this->hasMany(Licencia::class, 'guardavida_id');
+    }
+
+    public function turno()
+    {
+        return $this->belongsTo(CambioDeTurno::class, 'turno_id');
     }
 
 

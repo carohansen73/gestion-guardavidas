@@ -67,7 +67,7 @@
                                 <label class="info-label">Puesto asignado</label>
                                 <div class="info-value">
                                     <i class="fas fa-flag"></i>
-                                    {{ $asistencia->puesto->nombre_puesto ?? 'No asignado' }}
+                                    {{ $asistencia->puesto->puesto_id ?? 'No asignado' }}
                                 </div>
                             </div>
 
@@ -76,7 +76,7 @@
                                 <label class="info-label">Playa</label>
                                 <div class="info-value">
                                     <i class="fas fa-umbrella-beach"></i>
-                                    {{ $asistencia->puesto->playa->nombre_playa ?? 'No especificado' }}
+                                    {{ $asistencia->puesto->playa->nombre ?? 'No especificado' }}
                                 </div>
                             </div>
 
@@ -126,7 +126,7 @@
                         <label class="info-label">Balneario</label>
                         <div class="info-value">
                             <i class="fas fa-umbrella-beach"></i>
-                            {{ $guardavida->puesto->playa->nombre_playa ?? 'No asignado' }}
+                            {{ $guardavida->playa_id ?? 'No asignado' }}
                         </div>
                     </div>
 
@@ -134,7 +134,7 @@
                         <label class="info-label">Puesto</label>
                         <div class="info-value">
                             <i class="fas fa-flag"></i>
-                            {{ $guardavida->puesto->nombre_puesto ?? 'No asignado' }}
+                            {{ $guardavida->puesto_id ?? 'No asignado' }}
                         </div>
                     </div>
 
