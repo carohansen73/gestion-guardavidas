@@ -22,7 +22,6 @@ class Puesto extends Model
         'playa_id'
     ];
 
-
     // Un puesto puede estar asignado a varios guardavidas
     public function guardavidas()
     {
@@ -34,9 +33,6 @@ class Puesto extends Model
     {
         return $this->hasMany(Asistencia::class);
     }
-
-
-
 
     public function playa()
     {

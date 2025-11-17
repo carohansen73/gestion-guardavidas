@@ -156,6 +156,25 @@
             </div>
         </div>
 
+            <!-- Turno -->
+            <div class="sm:col-span-2">
+                <label class="block text-sm font-medium text-gray-900 dark:text-white">Turno</label>
+                <div class="mt-2 flex gap-4">
+                    <label class="inline-flex items-center">
+                        <input type="radio" name="turno" value="M"
+                            {{ old('turno', $guardavida->turno ?? '') == 'M' ? 'checked' : '' }}
+                            class="text-sky-600 border-gray-300 focus:ring-indigo-500">
+                        <span class="ml-2">Mañana</span>
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="radio" name="turno" value="T"
+                            {{ old('turno', $guardavida->turno ?? '') == 'T' ? 'checked' : '' }}
+                            class="text-sky-600 border-gray-300 focus:ring-indigo-500">
+                        <span class="ml-2">Tarde</span>
+                    </label>
+                </div>
+            </div>
+
         <!-- Botones -->
         <div class="sm:col-span-8">
             <div class="m-6 mb-6 flex items-center justify-end gap-x-6">

@@ -9,7 +9,7 @@
         @if($bandera)
             <div class="px-4 py-4">
 
-                <div class="bg-gray-200 dark:bg-gray-600 text-gray-500 dark:text-gray-300 rounded-2xl p-6 transform transition focus:scale-105 duration-300">
+                <div class="bg-gradient-to-r from-sky-100 to-purple-100 dark:from-sky-700 dark:to-purple-700 text-gray-900 dark:text-gray-300 rounded-2xl p-6 transform transition focus:scale-105 duration-300 shadow-sm">
                         <!-- Contenido principal: playa izquierda, bandera derecha -->
                     <div class="flex justify-content-between align-center pb-2">
                         <h2 class="text-2xl md:text-3xl font-bold">Bandera del día</h2>

@@ -13,6 +13,7 @@ use App\Http\Controllers\CambioDeTurnoController;
 use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\ExportController;
+use Illuminate\Support\Facades\Artisan;
 
 Route::get('/', function () {
     return view('auth.welcome');
@@ -97,6 +98,17 @@ Route::middleware('auth')->group(function () {
 // Ruta para obtener el Token Bearer para ser usado en el QR
 // Ademas guarda Id_user para casos sin wifi.
 Route::post('/loginIdUser', [ApiAuthController::class, 'login'])->name('loginIdUser');
+
+Route::get('/clear-laravel-cache', function () {
+
+    Artisan::call('cache:clear');
+    Artisan::call('config:clear');
+    Artisan::call('view:clear');
+    Artisan::call('route:clear');
+
+    return 'CACHE LIMPIADA ✔';
+});
+
 
 
 require __DIR__.'/auth.php';
