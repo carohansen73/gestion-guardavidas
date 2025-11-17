@@ -251,7 +251,7 @@
                                     <i class="fas fa-clock"></i>
 
                                     @foreach ($turnos as $turno)
-                                        {{ $guardavida->cambioDeTurnos()->latest()->first()->turno_nuevo ?? 'No asignado' }}
+                                        {{ $guardavida->turno()->latest()->first()->turno_nuevo ?? 'No asignado' }}
                                     @endforeach
 
                                 </div>
