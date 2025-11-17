@@ -9,6 +9,7 @@ use App\Http\Controllers\GuardavidaController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AsistenciaController;
+use App\Http\Controllers\Auth\ForcedPasswordController;
 use App\Http\Controllers\CambioDeTurnoController;
 use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
@@ -20,7 +21,18 @@ Route::get('/', function () {
 })->name('welcome');
 
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'force.password'])->group(function () {
+    /* Fuerzo a que actualice la contraseña la 1era vez que se loguea
+    */
+    Route::get('/force-password', [ForcedPasswordController::class, 'edit'])
+    ->middleware('auth')
+    ->name('password.force');
+
+    Route::post('/force-password', [ForcedPasswordController::class, 'update'])
+        ->middleware('auth')
+        ->name('password.force.update');
+    /**/
+
     Route::get('/home', [HomeController::class, 'index'])->name('home');
      Route::get('/dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
 

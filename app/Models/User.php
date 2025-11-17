@@ -25,6 +25,7 @@ class User extends Authenticatable
         'email',
         'enabled',
         'password',
+        'must_change_password',
     ];
 
     /**
@@ -48,6 +49,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'enabled' => 'boolean',
+            'must_change_password' => 'boolean',
         ];
     }
 
@@ -74,8 +76,8 @@ class User extends Authenticatable
         ->join('puestos', 'guardavidas.puesto_id', '=', 'puestos.id')
         ->where('puestos.id', $idPuesto)
         ->first();
-        
+
         return !empty($datosGuardavidas) ? $datosGuardavidas : null;
-        
+
     }
 }

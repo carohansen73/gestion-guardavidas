@@ -28,6 +28,11 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        //Fuerzo a que actualice la contraseña al loguearse por 1era vez
+        if (Auth::user()->must_change_psw) {
+            return redirect()->route('password.force');
+        }
+
         return redirect()->intended(route('home', absolute: false));
     }
 

@@ -101,6 +101,7 @@ class GuardavidaController extends Controller
                 'lastname' => $validated['apellido'],
                 'email' => $validated['email'],
                 'password' => bcrypt('123456789'),
+                'must_change_password' => true,
             ]);
 
             // 2 Asigno rol
