@@ -50,7 +50,7 @@ class AsistenciasExport implements FromCollection, WithHeadings,WithMapping
                     'dni' => $g->dni,
                     'puesto' => $g->puesto->nombre_puesto ?? '-',
                     'playa' => $g->puesto->playa->nombre_playa ?? '-',
-                    'fecha' =>  $a->fecha_hora ? $a->fecha_hora->format('Y-m-d') :'Sin registros',
+                    'fecha' =>  $g->fecha_hora ? $g->fecha_hora->format('Y-m-d') :'Sin registros',
                     'tipo' => 'No presente',
                     'hora_entrada' => '-',
                     'hora_salida' => '-',
