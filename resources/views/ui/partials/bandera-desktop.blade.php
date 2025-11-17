@@ -14,7 +14,7 @@
     @if($bandera)
     {{-- Info de la Bandera del dia --}}
         <div class="p-2">
-            <div class="bg-gradient-to-r from-sky-100 to-purple-100 dark:from-blue-700 dark:to-teal-700 text-black rounded shadow-sm p-6 transform transition hover:scale-105 duration-300"
+            <div class="bg-gradient-to-r from-sky-100 to-purple-100 dark:from-sky-700 dark:to-purple-700 text-black rounded shadow-sm p-6 transform transition hover:scale-105 duration-300"
             >
                 <div class="flex justify-content-between align-center">
                     <h2 class="text-2xl md:text-3xl font-bold text-black">Bandera del día</h2>

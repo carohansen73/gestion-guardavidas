@@ -40,16 +40,18 @@
                     <div class="pb-12  px-4 py-2">
 
                         <div class=" grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                             <h3 class="sm:col-span-6 text-gray-900 dark:text-white text-lg font-medium ">
-                                Registro de usuario
-                            </h3>
-
+                            <div class="sm:col-span-6">
+                                <h3 class="font-semibold text-gray-900 dark:text-white text-lg pt-4">
+                                    Registro de usuario
+                                </h3>
+                                <p class="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">El correo ingresado será su usuario para acceder al sistema. La contraseña inicial será del 1 al 9 y deberá cambiarla al ingresar por primera vez. Seleccione el rol correspondiente.</p>
+                            </div>
                              <!-- Nombre -->
                             <div class="sm:col-span-3">
                                 <label for="nombre" class="block text-sm font-medium text-gray-900 dark:text-white">Nombre</label>
                                 <div class="mt-2">
                                     <input id="nombre" type="text" name="nombre" placeholder="Nombre"
-                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-indigo-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
+                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
                                     value="{{ old('nombre', $guardavida->nombre ?? '') }}" required/>
                                     @error('nombre')
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -62,7 +64,7 @@
                                 <label for="apellido" class="block text-sm font-medium text-gray-900 dark:text-white">Apellido</label>
                                 <div class="mt-2">
                                     <input id="apellido" type="text" name="apellido" placeholder="Apellido"
-                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-indigo-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
+                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
                                     value="{{ old('apellido', $guardavida->apellido ?? '') }}" required/>
                                     @error('apellido')
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -74,7 +76,7 @@
                                 <label for="email" class="block text-sm font-medium text-gray-900 dark:text-white">Email</label>
                                 <div class="mt-2">
                                     <input id="email" type="email" name="email" placeholder="usuario@gmail.com"
-                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-indigo-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
+                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
                                     value="{{ old('email', $guardavida->user->email ?? '') }}" required/>
                                     @error('email')
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -91,7 +93,7 @@
                                 <label for="Rol" class="block text-sm font-medium text-gray-900 dark:text-white">Rol</label>
                                      <div class="mt-2 relative overflow-hidden">
                                         <select name="rol" id="rol-select"
-                                        class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-indigo-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
+                                        class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
                                         required>
                                             <option class="w-auto" value="">Seleccione</option>
                                             <option value="guardavida" {{ old('rol', $rol ?? '' ) == 'guardavida' ? 'selected' : '' }}>Guardavida</option>
@@ -101,19 +103,25 @@
                                 </div>
                             </div>
                         </div>
+
 {{-- A PARTIR DE ACA, SOLO VISIBLE SI VA A AGREGAR UN GUARDAVIDA  --}}
                         <div id="guardavida-fields" style="display: none;" class=" grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-8 py-4">
 
-                            <h3 class="sm:col-span-8 border-t border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white text-lg font-medium pt-4">
-                                Información personal
-                            </h3>
+                            <div class="sm:col-span-8 border-t border-gray-200 dark:border-gray-700">
+                                <h3 class="font-semibold text-gray-900 dark:text-white text-lg pt-4">
+                                    Información personal
+                                </h3>
+                                <p class="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">
+                                    Complete los datos personales del guardavidas. Asegúrese de que la información sea correcta, ya que será utilizada para su identificación y gestión interna.
+                                </p>
+                            </div>
 
                             <!-- DNI -->
                             <div class="sm:col-span-4">
                                 <label for="dni" class="block text-sm font-medium text-gray-900 dark:text-white">DNI</label>
                                 <div class="mt-2">
                                     <input id="dni" type="number" name="dni" placeholder="Ej: 11111111"
-                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-indigo-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
+                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
                                     value="{{ old('dni', $guardavida->dni ?? '') }}" />
                                     @error('dni')
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -126,7 +134,7 @@
                                 <label for="telefono" class="block text-sm font-medium text-gray-900 dark:text-white">Telefono</label>
                                 <div class="mt-2">
                                     <input id="telefono" type="number" name="telefono" placeholder="2983111111"
-                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-indigo-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
+                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
                                     value="{{ old('telefono', $guardavida->telefono ?? '') }}" />
                                     @error('telefono')
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -139,7 +147,7 @@
                                 <label for="direccion" class="block text-sm font-medium text-gray-900 dark:text-white">Dirección</label>
                                 <div class="mt-2">
                                     <input id="direccion" type="text" name="direccion" placeholder="Ej. calle 11"
-                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-indigo-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
+                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
                                     value="{{ old('direccion', $guardavida->direccion ?? '') }}" />
                                     @error('direccion')
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -153,7 +161,7 @@
                                 <label for="dni" class="block text-sm font-medium text-gray-900 dark:text-white">Número</label>
                                 <div class="mt-2">
                                     <input id="numero" type="number" name="numero" placeholder="Ej: 1250"
-                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-indigo-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
+                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
                                     value="{{ old('numero', $guardavida->numero ?? '') }}" />
                                     @error('numero')
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -166,7 +174,7 @@
                                 <label for="piso_dpto" class="block text-sm font-medium text-gray-900 dark:text-white">Piso - Dpto</label>
                                 <div class="mt-2">
                                     <input id="piso_dpto" type="text" name="piso_dpto" placeholder="Ej. 2-A"
-                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-indigo-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
+                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
                                     value="{{ old('piso_dpto', $guardavida->piso_dpto ?? '') }}" />
                                     @error('piso_dpto')
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -174,16 +182,25 @@
                                 </div>
                             </div>
 
-                            <h3 class="sm:col-span-8 border-t border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white text-lg font-medium pt-4">
-                                Información profesional
-                            </h3>
+
+
+                            <div class="sm:col-span-8 border-t border-gray-200 dark:border-gray-700">
+                                <h3 class="font-semibold text-gray-900 dark:text-white text-lg pt-4">
+                                    Información profesional
+                                </h3>
+
+                                <p class="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">
+                                    Indique correctamente la playa, puesto, función y turno asignados. Estos datos determinan dónde deberá fichar el guardavidas y cómo se gestionarán sus tareas.
+                                </p>
+                            </div>
+
 
                             <!-- Playa -->
                             <div class="sm:col-span-4">
                                 <label for="playa_id" class="block text-sm font-medium text-gray-900 dark:text-white">Playa</label>
                                 <div class="mt-2">
                                     <select id="playa_id" name="playa_id"
-                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-indigo-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500">
+                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500">
                                         @foreach($playas as $playa)
                                         <option value="{{ $playa->id }}"
                                             @if( isset($guardavida) && $guardavida->playa_id == $playa->id )
@@ -204,7 +221,7 @@
                             <label for="puesto_id" class="block text-sm font-medium text-gray-900 dark:text-white">Puesto</label>
                             <div class="mt-2">
                                 <select id="puesto_id" name="puesto_id"
-                                class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-indigo-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500">
+                                class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500">
                                 @foreach($puestos as $puesto)
                                     <option value="{{ $puesto->id }}" data-playa="{{ $puesto->playa_id }}"
                                         @if( isset($guardavida) && $guardavida->puesto_id == $puesto->id )
@@ -225,7 +242,7 @@
                                 <label for="funcion"
                                 class="block text-sm font-medium text-gray-900 dark:text-white">Función</label>
                                <div class="mt-2 relative overflow-hidden">
-                                <select id="funcion" name="funcion" class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-indigo-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500">
+                                <select id="funcion" name="funcion" class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500">
                                     <option value="Guardavida">Guardavida</option>
                                     <option value="Timonel">Timonel</option>
                                     <option value="Encargado">Encargado</option>
@@ -241,13 +258,13 @@
                                     <label class="inline-flex items-center">
                                         <input type="radio" name="turno" value="M"
                                             {{ old('turno', $guardavida->turno ?? '') == 'M' ? 'checked' : '' }}
-                                            class="text-sky-600 border-gray-300 focus:ring-indigo-500">
+                                            class="text-sky-600 border-gray-300 focus:ring-sky-500">
                                         <span class="ml-2">Mañana</span>
                                     </label>
                                     <label class="inline-flex items-center">
                                         <input type="radio" name="turno" value="T"
                                             {{ old('turno', $guardavida->turno ?? '') == 'T' ? 'checked' : '' }}
-                                            class="text-sky-600 border-gray-300 focus:ring-indigo-500">
+                                            class="text-sky-600 border-gray-300 focus:ring-sky-500">
                                         <span class="ml-2">Tarde</span>
                                     </label>
                                 </div>
@@ -270,7 +287,7 @@
 
                 <!-- Guardar -->
                 <button type="submit"
-                    class="w-full md:w-auto rounded-md bg-sky-600 px-3 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500">
+                    class="w-full md:w-auto rounded-md bg-sky-600 px-3 py-2 text-sm font-semibold text-white shadow hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 dark:bg-sky-500">
                     Guardar
                 </button>
             </div>
