@@ -127,3 +127,12 @@ header.header-mobile{
 .dark .color-blue-custom{
     color: #497ff4;
 }
+
+.border-gray-100 {
+    border-color: #f3f4f6;
+}
+
+.border-gray-200 {
+    border-color: #e5e7eb;
+}
+

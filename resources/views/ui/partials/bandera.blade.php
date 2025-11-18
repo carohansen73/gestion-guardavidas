@@ -9,54 +9,54 @@
         @if($bandera)
             <div class="px-4 py-4">
 
-                <div class="bg-gradient-to-r from-sky-100 to-purple-100 dark:from-sky-700 dark:to-purple-700 text-gray-900 dark:text-gray-300 rounded-2xl p-6 transform transition focus:scale-105 duration-300 shadow-sm">
+                <div class="bg-gradient-to-r from-sky-200 to-purple-200 dark:from-sky-700 dark:to-purple-700 text-gray-900 dark:text-gray-300 rounded-2xl p-6 transform transition focus:scale-105 duration-300 shadow-sm">
                         <!-- Contenido principal: playa izquierda, bandera derecha -->
                     <div class="flex justify-content-between align-center pb-2">
-                        <h2 class="text-2xl md:text-3xl font-bold">Bandera del día</h2>
+                        <h2 class="text-2xl md:text-3xl ">Bandera del día</h2>
                         <a href="{{ route('bandera.index') }}">
                             <svg xmlns="http://www.w3.org/2000/svg"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke-width="3"
                                 stroke="currentColor"
-                                class="w-8 h-8 py-2 px-2 bg-gray-800/60 text-white rounded-xl">
+                                class="w-8 h-8 py-2 px-2 bg-white text-sky-900 rounded-full">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
                             </svg>
                         </a>
                     </div>
 
                     <!-- Izquierda: icono + playa -->
-                    <div class="grid grid-cols-3 mt-2">
+                    <div class="grid grid-cols-3 mt-2 bg-sky-100/80 p-1 rounded-lg ">
                         <!-- Columna 1 -->
-                        <div class="flex flex-col items-center rounded-lg">
+                        <div class="flex flex-col items-center border-r border-white my-2">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
-                                class="bandera {{ $bandera->bandera->color }} w-12 h-12 flex-shrink-0 mr-4 animate-ondear">
+                                class="bandera {{ $bandera->bandera->color }} w-12 h-12 flex-shrink-0  animate-ondear">
                             <path fill-rule="evenodd" d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z" clip-rule="evenodd" />
                             </svg>
-                            <p class="text-sm font-medium">{{$bandera->bandera->codigo}}</p>
+                            <p class="text-sm pt-2">{{$bandera->bandera->codigo}}</p>
                         </div>
 
                         <!-- Columna 2 -->
-                        <div class="flex flex-col items-center rounded-lg">
+                        <div class="flex flex-col items-center border-r border-white my-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
-                                class="text-yellow-600 w-12 h-12">
+                                class="text-yellow-500 w-12 h-12">
                             <path d="M12 2.25a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-1.5 0V3a.75.75 0 0 1 .75-.75ZM7.5 12a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM18.894 6.166a.75.75 0 0 0-1.06-1.06l-1.591 1.59a.75.75 0 1 0 1.06 1.061l1.591-1.59ZM21.75 12a.75.75 0 0 1-.75.75h-2.25a.75.75 0 0 1 0-1.5H21a.75.75 0 0 1 .75.75ZM17.834 18.894a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 1 0-1.061 1.06l1.59 1.591ZM12 18a.75.75 0 0 1 .75.75V21a.75.75 0 0 1-1.5 0v-2.25A.75.75 0 0 1 12 18ZM7.758 17.303a.75.75 0 0 0-1.061-1.06l-1.591 1.59a.75.75 0 0 0 1.06 1.061l1.591-1.59ZM6 12a.75.75 0 0 1-.75.75H3a.75.75 0 0 1 0-1.5h2.25A.75.75 0 0 1 6 12ZM6.697 7.757a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 0 0-1.061 1.06l1.59 1.591Z" />
                             </svg>
-                            <p class="text-sm font-medium"> {{ $bandera->temperatura }} º</p>
+                            <p class="text-sm  pt-2"> {{ $bandera->temperatura }} º</p>
                         </div>
 
                         <!-- Columna 3 -->
-                        <div class="flex flex-col items-center rounded-lg">
+                        <div class="flex flex-col items-center rounded-lg my-2 px-1">
                             <svg xmlns="http://www.w3.org/2000/svg"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke-width="1.5"
                                 stroke="currentColor"
-                                class="text-sky-600 w-12 h-12">
+                                class="text-sky-500 w-12 h-12">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M4 12h12a2 2 0 10-2-2m-10 4h8a2 2 0 11-2 2" />
                             </svg>
-                            <p class="text-sm font-medium"> {{ $bandera->viento_intensidad }} {{ $bandera->viento_direccion }}</p>
+                            <p class="text-sm pt-2"> {{ $bandera->viento_intensidad }} {{ $bandera->viento_direccion }}</p>
                         </div>
                     </div>
                 </div>
@@ -75,7 +75,7 @@
 
                         <a href="{{ route('bandera.create') }}">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                                    class="w-8 h-8 py-2 px-2 bg-gray-800/60 text-white rounded-xl">
+                                    class="w-8 h-8 py-2 px-2 bg-gray-800/60 text-white rounded-full">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                                 </svg>
                         </a>

@@ -24,7 +24,7 @@ class Intervencion extends Model
     ];
 
     protected $casts = [
-        'fecha' => 'datetime',  // 👈 convierte automáticamente a Carbon
+        'fecha' => 'datetime',
         'traslado' => 'boolean',
     ];
 

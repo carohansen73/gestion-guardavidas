@@ -18,6 +18,10 @@ class Asistencia extends Model
         'fecha_hora',
     ];
 
+    protected $casts = [
+        'fecha_hora' => 'datetime',
+    ];
+
 
 
     public static function nuevaAsistencia($longitud, $latitud, $precision, $puesto_id, $guardavidas_id, $fecha_hora){
