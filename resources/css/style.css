@@ -136,3 +136,75 @@ header.header-mobile{
     border-color: #e5e7eb;
 }
 
+.title-bold{
+    font-family: "poppins", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+}
+
+.title-regular{
+    font-family: "poppins", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.title-semibold{
+    font-family: "poppins", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+}
+
+h1 {
+
+  position: relative;
+
+  padding-bottom: 15px;
+}
+
+h1::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+   transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: #0ea5e9;
+  border-radius: 2px;
+}
+
+h2.section-title{
+    position: relative;
+    padding-bottom: 10px;
+    /* margin-bottom: 15px; */
+}
+
+h2.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    /* transform: translateX(-50%); */
+    width: 80px;
+    height: 4px;
+    background: #0ea5e9;
+    border-radius: 2px;
+}
+
+h3.section-title{
+    position: relative;
+    padding-bottom: 6px;
+    /* margin-bottom: 15px; */
+}
+
+h3.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    /* transform: translateX(-50%); */
+    width: 60px;
+    height: 3px;
+    background: #0ea5e9;
+    border-radius: 2px;
+}

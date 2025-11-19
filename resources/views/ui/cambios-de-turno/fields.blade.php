@@ -7,8 +7,9 @@
 </button>
 
 <section class="text-gray-600 dark:text-gray-100 body-font px-4 py-10">
-    <h2 class="text-base/7 font-semibold text-gray-900 dark:text-white">Registrar cambio de turno</h2>
+
 @if (Route::currentRouteName() == 'cambio-de-turno.create')
+    <h2 class="mb-3 text-gray-700 text-2xl font-bold tracking-tight text-heading md:text-3xl lg:text-4xl section-title">Registrar cambio de turno</h2>
     <div class="mb-4 rounded-md bg-blue-50 p-3 text-sm text-blue-800 border border-blue-200">
         <p class="text-sm text-gray-500 dark:text-gray-400">Recordá que la <strong class="font-medium text-gray-800 dark:text-white"> Playa, Puesto, Turno y Función </strong>
             se asignan automáticamente de acuerdo al guardavidas seleccionado. <br>
@@ -16,6 +17,7 @@
         </p>
     </div>
 @else
+    <h2 class="mb-3 text-gray-700 text-2xl font-bold tracking-tight text-heading md:text-3xl lg:text-4xl section-title">Editar cambio de turno</h2>
     <div class="mb-4 rounded-md bg-yellow-50 p-3 text-sm text-yellow-800 border border-yellow-200">
         ⚠️ Si cambiás el <strong>guardavidas</strong>, recordá actualizar los campos
         <strong>Playa</strong>, <strong>Puesto</strong>, <strong>Turno</strong> y <strong>Función</strong>

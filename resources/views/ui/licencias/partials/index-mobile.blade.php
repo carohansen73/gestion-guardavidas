@@ -74,7 +74,7 @@
 
                             <p class="text-sm text-gray-800 dark:text-gray-400 font-medium mt-1 line-clamp-2">
                                 Constancia:
-                                <a href="{{ $registro->archivo_url }}" target="_blank" class="text-indigo-600 underline">Ver archivo</a>
+                                <a href="{{ asset('storage/' . $registro->archivo) }}" target="_blank" class="text-indigo-600 underline">Ver archivo</a>
                             </p>
                             @endif
 

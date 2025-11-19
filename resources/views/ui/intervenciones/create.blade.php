@@ -10,9 +10,9 @@
 </button>
 
 
- <section class="text-gray-600 dark:text-gray-100 body-font px-4 py-10">
- <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Registrar Intervención</h2>
-    <p class="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">Por favor complete los campos a continuación para registrar una intervención.</p>
+<section class="text-gray-600 dark:text-gray-100 body-font px-4 py-10">
+<h2 class="mb-3 text-gray-700 text-2xl font-bold tracking-tight text-heading md:text-3xl lg:text-4xl section-title">Registrar Intervención</h2>
+<p class="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">Por favor complete los campos a continuación para registrar una intervención.</p>
 
 
     <form action="{{ route('intervencion.store') }}" method="POST" class="">

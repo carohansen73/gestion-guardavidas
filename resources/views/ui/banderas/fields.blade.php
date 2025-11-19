@@ -8,7 +8,14 @@
 </button>
 
 <section class="text-gray-600 dark:text-gray-100 body-font px-4 py-10">
-    <h2 class="text-base/7 font-semibold text-gray-900 dark:text-white">Registrar Bandera</h2>
+    <h2 class="mb-3 text-gray-700 text-2xl font-bold tracking-tight text-heading md:text-3xl lg:text-4xl section-title">
+        @if(isset($bandera))
+            Editar
+        @else
+            Registrar
+        @endif
+        Bandera
+    </h2>
 
         {{-- <form action="{{ route('bandera.store') }}" method="POST" class="bg-white rounded shadow-md ">
             @csrf --}}

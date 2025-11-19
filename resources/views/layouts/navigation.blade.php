@@ -10,7 +10,7 @@
         <div class="flex justify-between h-16">
             <div class="flex">
                 <!-- Logo -->
-                <div class="shrink-0 flex items-center">
+                <div class="shrink-0 flex items-center sm:hidden">
                     @auth <a href="{{ route('home') }}" class="flex">
                         @else
                             <a href="{{ route('welcome') }}" class="flex">
@@ -24,7 +24,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
                                 </svg>
-                                <p class="text-lg text-gray-600 dark:text-gray-200 font-medium">{{ $playa }}</p>
+                                <p class="text-2xl font-bold tracking-tight text-heading md:text-3xl lg:text-4xl">{{ $playa }}</p>
                             @else
                                 <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
                             @endif
@@ -50,11 +50,11 @@
                 @endif --}}
 
                 <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                {{-- <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                </div>
+                </div> --}}
             </div>
 
             <!-- Settings Dropdown -->

@@ -10,7 +10,7 @@
 
 
 <section class="text-gray-600 dark:text-gray-100 body-font px-4 py-10">
-    <h2 class="text-base/7 font-semibold text-gray-900 dark:text-white">Registrar Guardavida</h2>
+<h2 class="mb-3 text-gray-700 text-2xl font-bold tracking-tight text-heading md:text-3xl lg:text-4xl section-title">Agregar Guardavida</h2>
 
         {{-- <form action="{{ route('bandera.store') }}" method="POST" class="bg-white rounded shadow-md ">
             @csrf --}}
@@ -39,9 +39,10 @@
                 <div class="space-y-12">
                     <div class="pb-12  px-4 py-2">
 
+
                         <div class=" grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                             <div class="sm:col-span-6">
-                                <h3 class="font-semibold text-gray-900 dark:text-white text-lg pt-4">
+                                <h3 class="font-semibold text-gray-900 dark:text-white text-lg pt-2 ">
                                     Registro de usuario
                                 </h3>
                                 <p class="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">El correo ingresado será su usuario para acceder al sistema. La contraseña inicial será del 1 al 9 y deberá cambiarla al ingresar por primera vez. Seleccione el rol correspondiente.</p>

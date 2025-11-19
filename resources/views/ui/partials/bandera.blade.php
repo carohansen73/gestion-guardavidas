@@ -12,7 +12,7 @@
                 <div class="bg-gradient-to-r from-sky-200 to-purple-200 dark:from-sky-700 dark:to-purple-700 text-gray-900 dark:text-gray-300 rounded-2xl p-6 transform transition focus:scale-105 duration-300 shadow-sm">
                         <!-- Contenido principal: playa izquierda, bandera derecha -->
                     <div class="flex justify-content-between align-center pb-2">
-                        <h2 class="text-2xl md:text-3xl ">Bandera del día</h2>
+                        <h2 class="text-2xl font-bold tracking-tight text-heading md:text-3xl lg:text-4xl">Bandera del día</h2>
                         <a href="{{ route('bandera.index') }}">
                             <svg xmlns="http://www.w3.org/2000/svg"
                                 fill="none"
