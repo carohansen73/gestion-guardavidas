@@ -5,8 +5,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Guardavida;
 use App\Models\Asistencia;
+use App\Models\Licencia;
 use App\Models\Playa;
 use App\Models\Puesto;
+use Carbon\Carbon;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Jenssegers\Agent\Agent;
 use Laravel\Sanctum\PersonalAccessToken;
 
 
@@ -69,16 +73,25 @@ class AsistenciaController extends Controller
      */
     public function index()
     {
-
-
         if (!auth()->user()->hasAnyRole(['admin', 'encargado'])) {
             // Si no tiene permiso, devolvemos vista vacía o redirige (eso no me acuerdo como se veia en la interfaz)
             return view('admin.usuarios.asistencias', ['guardavidas' => collect()]);
         }
+
         $guardavidas = Guardavida::with(['puesto.playa'])
             ->paginate(10);
+        $playas = Playa::all();
+        $agent = new Agent();
 
-        return view('admin.usuarios.asistencias', compact('guardavidas'));
+        if($agent->isMobile()){
+            return view('admin.usuarios.asistencias', compact('guardavidas'));
+        }
+        else{
+            return view('admin.usuarios.asistencias-desktop', compact('guardavidas', 'playas'));
+        }
+
+
+
     }
     /**
      * Muestra todas las asistencias de un guardavida en especifico*cuando el admin lo selecciona o cuando el propio usuario
@@ -88,19 +101,15 @@ class AsistenciaController extends Controller
     public function asistenciasPorGuardavida($id)
     {
         $guardavida = Guardavida::with(['puesto.playa', 'asistencias.puesto.playa'])->findOrFail($id);
-         /**si falla aca en anyrole es porque
-         * no me dejaba ejecutar
-         *  la migracion.
-         El composer require spatie/laravel-permission
-         de permissions ya lo instale
-         * */
-        $esAdmin = auth()->user()->hasAnyRole(['admin', 'encargado']); // o el método que uses para validar admin
+
+        $esAdmin = auth()->user()->hasAnyRole(['admin', 'encargado']);
 
         // Solo si es admin, mandamos balnearios y puestos
         $balnearios = $esAdmin ?Playa::all() : null;
         $puestos = $esAdmin ?Puesto::all() : null;
+        $historial = $esAdmin ? $this->getAttendanceHistory($id) : null;
 
-        return view('admin.asistenciaPorPerfil', compact('guardavida', 'esAdmin', 'balnearios', 'puestos'));
+        return view('admin.usuarios.asistencia-show-desktop', compact('guardavida', 'esAdmin', 'balnearios', 'puestos', 'historial'));
     }
 
 
@@ -149,6 +158,105 @@ class AsistenciaController extends Controller
     public function guardavidasPanelExcelAsistencias(){
         return view('admin.DescargaDelExcelAsistencias');
 
+
+    }
+
+    /**
+     * Agrego funcionalidad para crear un historial de asistencias para el guardavida seleccionado
+     */
+    public function getAttendanceHistory( $guardavidaId){
+
+        $guardavida = Guardavida::findOrFail($guardavidaId);
+
+        //Agregar request!
+        // Rango (mes actual por defecto)
+        // $inicio = Carbon::parse($request->input('inicio', Carbon::now()->startOfMonth()));
+        // $fin = Carbon::parse($request->input('fin', Carbon::now()->endOfMonth()));
+        $inicio = Carbon::now()->subDays(30)->startOfDay();
+        $fin = Carbon::now()->endOfDay();
+
+        // Asistencias del rango
+        $asistencias = Asistencia::where('guardavidas_id', $guardavidaId)
+            ->whereBetween('fecha_hora', [$inicio, $fin])
+            ->orderBy('fecha_hora')
+            ->get()
+            ->groupBy(fn($a) => Carbon::parse($a->fecha_hora)->toDateString());
+
+        // Licencias del rango
+        $licencias = Licencia::where('guardavida_id', $guardavidaId)
+            ->where(function($q) use ($inicio, $fin) {
+                $q->whereBetween('fecha_inicio', [$inicio, $fin])
+                ->orWhereBetween('fecha_fin', [$inicio, $fin])
+                ->orWhere(function ($q2) use ($inicio, $fin) {
+                    $q2->where('fecha_inicio', '<=', $inicio)
+                        ->where('fecha_fin', '>=', $fin);
+                });
+            })
+            ->get();
+
+        // Construcción del historial día x día
+        $historial = [];
+
+        for ($fecha = $inicio->copy(); $fecha->lte($fin); $fecha->addDay()) {
+
+            $dateString = $fecha->toDateString();
+
+            // 1. Verificamos si hay licencia ese día
+            $licencia = $licencias->first(function ($l) use ($fecha) {
+                return $fecha->between($l->fecha_inicio, $l->fecha_fin);
+            });
+
+            if ($licencia) {
+                $historial[] = [
+                    'fecha' => $dateString,
+                    'estado' => 'LICENCIA',
+                    'detalle' => $licencia->tipo_licencia,
+                    'ingreso' => null,
+                    'egreso' => null,
+                    'puesto' => $licencia->puesto->nombre ?? '-'
+                ];
+                continue;
+            }
+
+            // 2. Verificamos si hay asistencia ese día
+            $asis = $asistencias->get($dateString);
+
+            if ($asis) {
+                $historial[] = [
+                    'fecha' => $dateString,
+                    'estado' => 'ASISTIÓ',
+                    'ingreso' => $asis->first()->fecha_hora,
+                    'egreso' => $asis->last()->fecha_hora,
+                    'puesto' => $asis->first()->puesto->nombre ?? '-',
+                ];
+                continue;
+            }
+
+            // 3. Si no hay ni licencia ni asistencia → FALTÓ
+            $historial[] = [
+                'fecha' => $dateString,
+                'estado' => 'FALTA',
+                'ingreso' => null,
+                'egreso' => null,
+                'puesto' => '-',
+            ];
+        }
+
+        // 🔵 AGREGO PAGINACIÓN
+        $page = request()->input('page', 1);
+        $perPage = 10;
+
+        $items = array_slice($historial, ($page - 1) * $perPage, $perPage);
+
+        $paginado = new LengthAwarePaginator(
+            $items,
+            count($historial),
+            $perPage,
+            $page,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+
+        return $paginado;
 
     }
 
