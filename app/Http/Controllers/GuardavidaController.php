@@ -265,11 +265,14 @@ class GuardavidaController extends Controller
         $esAdmin = $user->hasRole('admin') || $user->hasRole('encargado');
         $esPropietario = $user->guardavida && $user->guardavida->id === $guardavida->id;
 
+
+
         if (!$esAdmin && !$esPropietario) {
             abort(403, 'No tenés permisos para ver este perfil.');
         }
 
         $puedeEditar = $esAdmin || $esPropietario;
+
     /*
             // Cargar relaciones necesarias
             $guardavida->load(['playa', 'puesto', 'turnos', 'funciones', 'user']);
@@ -329,15 +332,15 @@ public function updateProfile(Request $request, Guardavida $guardavida)
             'nombre' => 'required|string|max:100',
             'apellido' => 'required|string|max:100',
             'dni' => 'required|string|max:20',
-            'telefono' => 'nullable|string|max:20',
-            'direccion' => 'nullable|string|max:255',
-            'numero' => 'nullable|string|max:10',
+            'telefono' => 'required|string|max:20',
+            'direccion' => 'required|string|max:255',
+            'numero' => 'required|string|max:10',
             'piso_dpto' => 'nullable|string|max:10',
         ];
     // Solo admin puede cambiar playa/puesto/función/turno
     if ($esAdmin) {
-        $rules['playa_id'] = 'nullable|exists:playas,id';
-        $rules['puesto_id'] = 'nullable|exists:puestos,id';
+        $rules['playa_id'] = 'required|exists:playas,id';
+        $rules['puesto_id'] = 'required|exists:puestos,id';
 
         // agregar cuando haya tabla de funciones $rules['funcion'] = 'nullable|string';
     }

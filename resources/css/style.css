@@ -208,3 +208,11 @@ h3.section-title::after {
     background: #0ea5e9;
     border-radius: 2px;
 }
+
+.bg-caracoles{
+    background-color: #E0F2FE;
+    background-image: url('/img/caracoles.png');
+      background-repeat: no-repeat, no-repeat;
+    background-size: cover;
+    background-position: center;
+}

@@ -5,11 +5,7 @@ const csrfToken = document
 const form = document.querySelector(".profile-body");
 const guardavidaId = parseInt(form.dataset.guardavidaId); // Esto te da el ID
 
-const spanEditar = window.esAdmin === true; // 'Perfil de Guardavidas' o 'Mi Perfil'
-let puedeEditar = false;
-if (spanEditar === "Perfil de Guardavidas") {
-    puedeEditar = true;
-}
+let puedeEditar =  window.puedeEditar === true;
 
 // Función para mostrar alertas
 function mostrarAlerta(tipo, titulo, mensaje) {
@@ -35,8 +31,10 @@ function mostrarAlerta(tipo, titulo, mensaje) {
     // Auto-ocultar después de 5 segundos
     setTimeout(() => {
         alertContainer.innerHTML = "";
-    }, 5000);
+    }, 10000);
 }
+
+console.log(puedeEditar);
 
 // Manejar envío del formulario
 if (puedeEditar) {
@@ -44,6 +42,20 @@ if (puedeEditar) {
         .querySelector(".profile-body")
         .addEventListener("submit", async function(e) {
             e.preventDefault();
+
+            // VALIDACIÓN: si cambió la playa y NO eligió puesto → detener envío
+            const puestoSelect = document.getElementById("selectPuesto");
+
+           console.log("EXISTE SELECT?", document.getElementById("selectPuesto"));
+
+            if (puestoSelect.dataset.requiereNuevo === "1" && puestoSelect.value === "") {
+                mostrarAlerta(
+                    "error",
+                    "Puesto obligatorio",
+                    "Debe seleccionar un puesto correspondiente a la nueva playa elegida."
+                );
+                return; // ← Bloquea el envío
+            }
 
             const btnGuardar = document.getElementById("btnGuardar");
             const textoOriginal = btnGuardar.innerHTML;
@@ -91,6 +103,8 @@ document.getElementById("selectPlaya").addEventListener("change", function() {
     let puestoSelect = document.getElementById("selectPuesto");
     puestoSelect.innerHTML = '<option value="">Cargando...</option>';
 
+    puestoSelect.dataset.requiereNuevo = "1";
+
     if (!playaId) {
         puestoSelect.innerHTML = '<option value="">Seleccionar puesto</option>';
         return;
@@ -105,7 +119,7 @@ document.getElementById("selectPlaya").addEventListener("change", function() {
             data.forEach((puesto) => {
                 let option = document.createElement("option");
                 option.value = puesto.id;
-                option.textContent = puesto.nombre_puesto;
+                option.textContent = puesto.nombre;
                 puestoSelect.appendChild(option);
             });
         })

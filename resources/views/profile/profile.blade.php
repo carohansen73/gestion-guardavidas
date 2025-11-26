@@ -14,8 +14,11 @@
 <body>
 
     @include('layouts.navigation')
+     @include('layouts.sidebar')
 
-    <div class="container">
+
+    <div class="lg:ml-64 min-h-screen bg-gray-100 dark:bg-gray-800 ">
+        <main class="overflow-x-hidden mb-4 mx-4">
         <!-- Header -->
         <div class="header">
             <h1 class="header-title ">
@@ -37,7 +40,7 @@
                     <i class="fas fa-user"></i>
                 </div>
                 <h2 class="profile-name">{{ $guardavida->nombre }} {{ $guardavida->apellido }}</h2>
-                <p class="profile-role">Guardavidas Profesional</p>
+                <p class="profile-role">{{ $guardavida->funcion }}</p>
                 @if ($esAdmin)
                     <span class="badge badge-admin">
                         <i class="fas fa-crown"></i> Vista Administrativa
@@ -54,86 +57,86 @@
                 @csrf
                 @method('PUT')
                 <!-- Personal Information -->
-                <h3 class="section-title">
+                <h3 class="section-title text-gray-900 dark:text-white">
                     <i class="fas fa-id-card"></i>
                     Información Personal
                 </h3>
 
-                <div class="info-grid">
-                    <div class="info-item">
-                        <label class="info-label">Nombre</label>
+                <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-8 bg-white text-gray-600 rounded shadow-md pb-12 px-6 py-6">
+                    <div class="sm:col-span-4">
+                        <label class="info-label text-gray-800">Nombre</label>
                         @if ($puedeEditar)
-                            <div class="info-value editable">
+                            <div class="info-value text-gray-700 text-gray-700 font-light editable">
                                 <i class="fas fa-user"></i>
-                                <input type="text" name="nombre" class="form-control"
+                                <input type="text" name="nombre" class="form-control p-1"
                                     value="{{ $guardavida->nombre }}" required>
                             </div>
                         @else
-                            <div class="info-value">
+                            <div class="info-value text-gray-700 text-gray-700 font-light">
                                 <i class="fas fa-user"></i>
                                 {{ $guardavida->nombre }}
                             </div>
                         @endif
                     </div>
 
-                    <div class="info-item">
-                        <label class="info-label">Apellido</label>
+                    <div class="sm:col-span-4">
+                        <label class="info-label text-gray-800">Apellido</label>
                         @if ($puedeEditar)
-                            <div class="info-value editable">
+                            <div class="info-value text-gray-700 text-gray-700 editable">
                                 <i class="fas fa-user"></i>
-                                <input type="text" name="apellido" class="form-control"
+                                <input type="text" name="apellido" class="form-control p-1"
                                     value="{{ $guardavida->apellido }}" required>
                             </div>
                         @else
-                            <div class="info-value">
+                            <div class="info-value text-gray-700 text-gray-700">
                                 <i class="fas fa-user"></i>
                                 {{ $guardavida->apellido }}
                             </div>
                         @endif
                     </div>
 
-                    <div class="info-item">
-                        <label class="info-label">DNI</label>
+                    <div class="sm:col-span-8">
+                        <label class="info-label text-gray-800">DNI</label>
                         @if ($puedeEditar)
-                            <div class="info-value editable">
+                            <div class="info-value text-gray-700 text-gray-700 editable">
                                 <i class="fas fa-id-badge"></i>
-                                <input type="text" name="dni" class="form-control"
+                                <input type="text" name="dni" class="form-control p-1"
                                     value="{{ $guardavida->dni }}" required>
                             </div>
                         @else
-                            <div class="info-value">
+                            <div class="info-value text-gray-700 text-gray-700">
                                 <i class="fas fa-id-badge"></i>
                                 {{ $guardavida->dni }}
                             </div>
                         @endif
                     </div>
 
-                    <div class="info-item">
-                        <label class="info-label">Teléfono</label>
+                    <div class="sm:col-span-4">
+                        <label class="info-label text-gray-800">Teléfono</label>
                         @if ($puedeEditar)
-                            <div class="info-value editable">
+                            <div class="info-value text-gray-700 text-gray-700 editable">
                                 <i class="fas fa-phone"></i>
-                                <input type="tel" name="telefono" class="form-control"
+                                <input type="tel" name="telefono" class="form-control p-1"
                                     value="{{ $guardavida->telefono ?? 'No especificado' }}">
                             </div>
                         @else
-                            <div class="info-value">
+                            <div class="info-value text-gray-700 text-gray-700">
                                 <i class="fas fa-phone"></i>
                                 {{ $guardavida->telefono ?? 'No especificado' }}
                             </div>
                         @endif
                     </div>
 
-                    <div class="info-item">
-                        <label class="info-label">Email</label>
+                   <div class="sm:col-span-4">
+                        <label class="info-label text-gray-800">Email</label>
                         @if ($puedeEditar)
-                            <div class="info-value editable">
+                            <div class="info-value text-gray-700 text-gray-700 editable">
                                 <i class="fas fa-envelope"></i>
-                                <input type="email" name="email" class="form-control"
+                                <input type="email" name="email" class="form-control p-1"
                                     value="{{ $guardavida->user->email ?? 'No especificado' }}">
                             </div>
                         @else
-                            <div class="info-value">
+                            <div class="info-value text-gray-700 text-gray-700">
                                 <i class="fas fa-envelope"></i>
                                 {{ $guardavida->user->email ?? 'No especificado' }}
                             </div>
@@ -141,16 +144,16 @@
                     </div>
 
 
-                    <div class="info-item">
-                        <label class="info-label">Dirección</label>
+                    <div class="sm:col-span-4">
+                        <label class="info-label text-gray-800">Dirección</label>
                         @if ($puedeEditar)
-                            <div class="info-value editable">
+                            <div class="info-value text-gray-700 text-gray-700 editable">
                                 <i class="fas fa-map-marker-alt"></i>
-                                <input type="text" name="direccion" class="form-control"
+                                <input type="text" name="direccion" class="form-control p-1"
                                     value="{{ $guardavida->direccion ?? 'No especificado' }}">
                             </div>
                         @else
-                            <div class="info-value">
+                            <div class="info-value text-gray-700 text-gray-700">
                                 <i class="fas fa-map-marker-alt"></i>
                                 {{ $guardavida->direccion ?? 'No especificado' }}
                             </div>
@@ -158,32 +161,32 @@
                     </div>
 
 
-                    <div class="info-item">
-                        <label class="info-label">Número</label>
+                    <div class="sm:col-span-2">
+                        <label class="info-label text-gray-800">Número</label>
                         @if ($puedeEditar)
-                            <div class="info-value editable">
+                            <div class="info-value text-gray-700 text-gray-700 editable">
                                 <i class="fas fa-hashtag"></i>
-                                <input type="text" name="numero" class="form-control"
+                                <input type="text" name="numero" class="form-control p-1"
                                     value="{{ $guardavida->numero ?? 'No especificado' }}">
                             </div>
                         @else
-                            <div class="info-value">
+                            <div class="info-value text-gray-700 text-gray-700">
                                 <i class="fas fa-hashtag"></i>
                                 {{ $guardavida->numero ?? 'No especificado' }}
                             </div>
                         @endif
                     </div>
 
-                    <div class="info-item">
-                        <label class="info-label">Piso/Dpto</label>
+                    <div class="sm:col-span-2">
+                        <label class="info-label text-gray-800">Piso/Dpto</label>
                         @if ($puedeEditar)
-                            <div class="info-value editable">
+                            <div class="info-value text-gray-700 text-gray-700 editable">
                                 <i class="fas fa-building"></i>
-                                <input type="text" name="piso_dpto" class="form-control"
+                                <input type="text" name="piso_dpto" class="form-control p-1"
                                     value="{{ $guardavida->piso_dpto ?? 'No especificado' }}">
                             </div>
                         @else
-                            <div class="info-value">
+                            <div class="info-value text-gray-700 text-gray-700">
                                 <i class="fas fa-building"></i>
                                 {{ $guardavida->piso_dpto ?? 'No especificado' }}
                             </div>
@@ -196,18 +199,21 @@
 
 
                     <!-- Work Information -->
-                    <h3 class="section-title">
-                        <i class="fas fa-briefcase"></i>
-                        Información Laboral
-                    </h3>
 
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <label class="info-label">Playa</label>
+                    <div class="sm:col-span-8 pt-4 mt-3 border-t border-gray-200 dark:border-gray-700 ">
+                        <h3 class="section-title text-gray-900 dark:text-white">
+                            <i class="fas fa-briefcase"></i>
+                            Información Laboral
+                        </h3>
+                    </div>
+
+                     <div class="sm:col-span-4">
+
+                            <label class="info-label text-gray-800">Playa</label>
                             @if ($esAdmin && $playas)
-                                <div class="info-value editable">
+                                <div class="info-value text-gray-700 editable">
                                     <i class="fas fa-umbrella-beach"></i>
-                                    <select id="selectPlaya" name="playa_id" class="form-control">
+                                    <select id="selectPlaya" name="playa_id" class="form-control p-1">
                                         <option value="">Seleccionar balneario</option>
                                         @foreach ($playas as $balneario)
                                             <option value="{{ $balneario->id }}"
@@ -219,66 +225,77 @@
                                     </select>
                                 </div>
                             @else
-                                <div class="info-value">
+                                <div class="info-value text-gray-700">
                                     <i class="fas fa-umbrella-beach"></i>
                                     {{ $guardavida->playa ? $guardavida->playa->nombre : 'No asignado' }}
                                 </div>
                             @endif
                         </div>
 
-                        <div class="info-item">
-                            <label class="info-label">Puesto</label>
+                        <div class="sm:col-span-4">
+                            <label class="info-label text-gray-800">Puesto</label>
                             @if ($esAdmin && $puestos)
-                                <div class="info-value editable">
+                                 <div class="info-value text-gray-700 editable">
                                     <i class="fas fa-flag"></i>
-
-                                    {{ $guardavida->puesto->nombre }}
-
-
+                                   <select id="selectPuesto" name="puesto_id" class="form-control p-1">
+                                        <option value="">Seleccionar puesto</option>
+                                        @foreach ($puestos as $puesto)
+                                            @if ($puesto->playa_id == $guardavida->playa_id)
+                                                <option value="{{ $puesto->id }}"
+                                                    {{ $guardavida->puesto_id == $puesto->id ? 'selected' : '' }}>
+                                                    {{$puesto->nombre }}
+                                                </option>
+                                            @endif
+                                        @endforeach
+                                    </select>
                                 </div>
                             @else
-                                <div class="info-value">
+                                <div class="info-value text-gray-700">
                                     <i class="fas fa-flag"></i>
                                     {{ $guardavida->puesto ? $guardavida->puesto->nombre : 'No asignado' }}
                                 </div>
                             @endif
                         </div>
 
-                        <div class="info-item">
-                            <label class="info-label">Turno actual</label>
+                        <div class="sm:col-span-4">
+                            <label class="info-label text-gray-800">Turno actual</label>
                             @if ($esAdmin)
-                                <div class="info-value editable">
+                                <div class="info-value text-gray-700 editable">
                                     <i class="fas fa-clock"></i>
 
                                     @foreach ($turnos as $turno)
-                                        {{ $guardavida->turno()->latest()->first()->turno_nuevo ?? 'No asignado' }}
+                                        {{ $guardavida->turno ?? 'No asignado' }}
                                     @endforeach
 
                                 </div>
                             @else
-                                <div class="info-value">
+                                <div class="info-value text-gray-700">
                                     <i class="fas fa-clock"></i>
                                     {{ $guardavida->turno ? $guardavida->turno->nombre_turno : 'No asignado' }}
                                 </div>
                             @endif
                         </div>
+
+                        <div class="sm:col-span-4">
+                            <label class="info-label text-gray-800">Función</label>
+                            <div class="info-value text-gray-700">
+                                <i class="fas fa-tasks"></i>
+                                @if ($guardavida->funciones && $guardavida->funciones->isNotEmpty())
+                                    {{ $guardavida->funciones->first()->nombre_funcion }}
+                                @else
+                                    Guardavidas
+                                @endif
+                            </div>
+                        </div>
+
+
                     </div>
 
-                    <div class="info-item">
-                        <label class="info-label">Función</label>
-                        <div class="info-value">
-                            <i class="fas fa-tasks"></i>
-                            @if ($guardavida->funciones && $guardavida->funciones->isNotEmpty())
-                                {{ $guardavida->funciones->first()->nombre_funcion }}
-                            @else
-                                Guardavidas
-                            @endif
-                        </div>
-                    </div>
+
                 </div>
 
                 <!-- Statistics -->
-                <h3 class="section-title">
+                <h3 class="section-title  text-gray-900 dark:text-white">
                     <i class="fas fa-chart-line"></i>
                     Estadísticas
                 </h3>
@@ -304,7 +321,7 @@
                             <i class="fas fa-save"></i>
                             Guardar Cambios
                         </button>
-                        <button type="button" class="btn btn-secondary" onclick="window.history.back()">
+                        <button type="button" class="btn text-white bg-gray-500 hover:bg-gray-400" onclick="window.history.back()">
                             <i class="fas fa-times"></i>
                             Cancelar
                         </button>
@@ -320,7 +337,11 @@
             </form>
         </div>
     </div>
-
+ </div>
+ <script>
+    window.esAdmin = @json($esAdmin);
+    window.puedeEditar = @json($puedeEditar);
+</script>
     <!-- Mostrar mensajes de sesión si existen -->
     @if (session('success'))
         <script>

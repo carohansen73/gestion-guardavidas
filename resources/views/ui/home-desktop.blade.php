@@ -58,7 +58,7 @@
     <!-- 🟦 Columna principal (2/3 del ancho) -->
     <main class="w-full md:w-2/3  space-y-6">
 
-        @include('ui.partials.bandera-desktop')
+        @include('ui.partials.bandera-desktop-copy')
 
 {{-- @if($rol !== 'admin' && $playaUsuario)
     <div class="px-4 py-4">
