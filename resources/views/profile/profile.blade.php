@@ -18,196 +18,214 @@
 
 
     <div class="lg:ml-64 min-h-screen bg-gray-100 dark:bg-gray-800 ">
-        <main class="overflow-x-hidden mb-4 mx-4">
-        <!-- Header -->
-        <div class="header">
-            <h1 class="header-title ">
-                <i class="fas fa-user-shield"></i>
-                <span class="puedeEditar">
-                    {{ $puedeEditar ? 'Perfil de Guardavidas' : 'Mi Perfil' }}
-                </span>
-            </h1>
-        </div>
-
-        <!-- Alert Messages -->
-        <div id="alertContainer"></div>
-
-        <!-- Profile Card -->
-        <div class="profile-card">
-            <!-- Profile Header -->
-            <div class="profile-header">
-                <div class="profile-avatar">
-                    <i class="fas fa-user"></i>
-                </div>
-                <h2 class="profile-name">{{ $guardavida->nombre }} {{ $guardavida->apellido }}</h2>
-                <p class="profile-role">{{ $guardavida->funcion }}</p>
-                @if ($esAdmin)
-                    <span class="badge badge-admin">
-                        <i class="fas fa-crown"></i> Vista Administrativa
+        <main class="overflow-x-hidden pb-5 mx-4">
+            <!-- Header -->
+            {{-- <div class="header">
+                <h1 class="header-title ">
+                    <i class="fas fa-user-shield"></i>
+                    <span class="puedeEditar">
+                        {{ $puedeEditar ? 'Perfil de Guardavidas' : 'Mi Perfil' }}
                     </span>
-                @endif
-                <span class="badge badge-active">
-                    <i class="fas fa-check-circle"></i> Activo
-                </span>
-            </div>
+                </h1>
+            </div> --}}
 
-            <!-- Profile Body -->
-            <form action="{{ route('guardavida.updateProfile', $guardavida->id) }}" method="POST" class="profile-body"
-                data-guardavida-id="{{ $guardavida->id }}">
-                @csrf
-                @method('PUT')
-                <!-- Personal Information -->
-                <h3 class="section-title text-gray-900 dark:text-white">
-                    <i class="fas fa-id-card"></i>
-                    Información Personal
-                </h3>
+            <!-- Alert Messages -->
+            <div id="alertContainer"></div>
 
-                <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-8 bg-white text-gray-600 rounded shadow-md pb-12 px-6 py-6">
+            <!-- Profile Card -->
+            <div class="profile-card bg-white rounded-lg shadow-md my-4">
+
+                    <!-- Profile Header -->
+                <div class="profile-header bg-sky-600 py-4
+                    flex flex-col items-center text-center
+                    md:flex-row md:items-center md:text-left md:justify-start rounded-t-lg">
+
+                    <!-- Avatar -->
+                    <div class="profile-avatar text-6xl md:w-1/4 md:flex md:justify-center">
+                        <i class="fas fa-user"></i>
+                    </div>
+
+                    <!-- Info -->
+                    <div class="flex flex-col mt-3 md:mt-0 md:w-3/4 md:pl-4 md:text-left">
+
+                        <h2 class="profile-name text-white text-xl font-semibold">
+                            {{ $guardavida->nombre }} {{ $guardavida->apellido }}
+                        </h2>
+
+                        <p class="profile-role text-gray-200">
+                            {{ $guardavida->funcion }}
+                        </p>
+
+                        <div class="flex gap-2 justify-center md:justify-start mt-2">
+
+                            @if ($esAdmin)
+                                <span class="badge badge-admin flex items-center gap-1">
+                                    <i class="fas fa-crown"></i> Vista Administrativa
+                                </span>
+                            @endif
+
+                            <span class="badge badge-active flex items-center gap-1">
+                                <i class="fas fa-check-circle"></i> Activo
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Profile Body -->
+                <form action="{{ route('guardavida.updateProfile', $guardavida->id) }}" method="POST" class="profile-body"
+                    data-guardavida-id="{{ $guardavida->id }}">
+                    @csrf
+                    @method('PUT')
+
+                    <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-8 text-gray-600 rounded sm:px-10 md:px-10 pb-12 py-10">
+
+                        <!-- Personal Information -->
+                        <div class="sm:col-span-8">
+                            <h3 class="section-title text-gray-900 dark:text-white">
+                                <i class="fas fa-id-card"></i>
+                                Información Personal
+                            </h3>
+                        </div>
+
+                        <div class="sm:col-span-4">
+                            <label class="info-label text-gray-800">Nombre</label>
+                            @if ($puedeEditar)
+                                <div class="info-value text-gray-700 text-gray-700 font-light editable">
+                                    <i class="fas fa-user"></i>
+                                    <input type="text" name="nombre" class="form-control p-1"
+                                        value="{{ $guardavida->nombre }}" required>
+                                </div>
+                            @else
+                                <div class="info-value text-gray-700 text-gray-700 font-light">
+                                    <i class="fas fa-user"></i>
+                                    {{ $guardavida->nombre }}
+                                </div>
+                            @endif
+                        </div>
+
+                        <div class="sm:col-span-4">
+                            <label class="info-label text-gray-800">Apellido</label>
+                            @if ($puedeEditar)
+                                <div class="info-value text-gray-700 text-gray-700 editable">
+                                    <i class="fas fa-user"></i>
+                                    <input type="text" name="apellido" class="form-control p-1"
+                                        value="{{ $guardavida->apellido }}" required>
+                                </div>
+                            @else
+                                <div class="info-value text-gray-700 text-gray-700">
+                                    <i class="fas fa-user"></i>
+                                    {{ $guardavida->apellido }}
+                                </div>
+                            @endif
+                        </div>
+
+                        <div class="sm:col-span-8">
+                            <label class="info-label text-gray-800">DNI</label>
+                            @if ($puedeEditar)
+                                <div class="info-value text-gray-700 text-gray-700 editable">
+                                    <i class="fas fa-id-badge"></i>
+                                    <input type="text" name="dni" class="form-control p-1"
+                                        value="{{ $guardavida->dni }}" required>
+                                </div>
+                            @else
+                                <div class="info-value text-gray-700 text-gray-700">
+                                    <i class="fas fa-id-badge"></i>
+                                    {{ $guardavida->dni }}
+                                </div>
+                            @endif
+                        </div>
+
+                        <div class="sm:col-span-4">
+                            <label class="info-label text-gray-800">Teléfono</label>
+                            @if ($puedeEditar)
+                                <div class="info-value text-gray-700 text-gray-700 editable">
+                                    <i class="fas fa-phone"></i>
+                                    <input type="tel" name="telefono" class="form-control p-1"
+                                        value="{{ $guardavida->telefono ?? 'No especificado' }}">
+                                </div>
+                            @else
+                                <div class="info-value text-gray-700 text-gray-700">
+                                    <i class="fas fa-phone"></i>
+                                    {{ $guardavida->telefono ?? 'No especificado' }}
+                                </div>
+                            @endif
+                        </div>
+
                     <div class="sm:col-span-4">
-                        <label class="info-label text-gray-800">Nombre</label>
-                        @if ($puedeEditar)
-                            <div class="info-value text-gray-700 text-gray-700 font-light editable">
-                                <i class="fas fa-user"></i>
-                                <input type="text" name="nombre" class="form-control p-1"
-                                    value="{{ $guardavida->nombre }}" required>
-                            </div>
-                        @else
-                            <div class="info-value text-gray-700 text-gray-700 font-light">
-                                <i class="fas fa-user"></i>
-                                {{ $guardavida->nombre }}
-                            </div>
-                        @endif
-                    </div>
+                            <label class="info-label text-gray-800">Email</label>
+                            @if ($puedeEditar)
+                                <div class="info-value text-gray-700 text-gray-700 editable">
+                                    <i class="fas fa-envelope"></i>
+                                    <input type="email" name="email" class="form-control p-1"
+                                        value="{{ $guardavida->user->email ?? 'No especificado' }}">
+                                </div>
+                            @else
+                                <div class="info-value text-gray-700 text-gray-700">
+                                    <i class="fas fa-envelope"></i>
+                                    {{ $guardavida->user->email ?? 'No especificado' }}
+                                </div>
+                            @endif
+                        </div>
 
-                    <div class="sm:col-span-4">
-                        <label class="info-label text-gray-800">Apellido</label>
-                        @if ($puedeEditar)
-                            <div class="info-value text-gray-700 text-gray-700 editable">
-                                <i class="fas fa-user"></i>
-                                <input type="text" name="apellido" class="form-control p-1"
-                                    value="{{ $guardavida->apellido }}" required>
-                            </div>
-                        @else
-                            <div class="info-value text-gray-700 text-gray-700">
-                                <i class="fas fa-user"></i>
-                                {{ $guardavida->apellido }}
-                            </div>
-                        @endif
-                    </div>
+                        <div class="sm:col-span-4">
+                            <label class="info-label text-gray-800">Dirección</label>
+                            @if ($puedeEditar)
+                                <div class="info-value text-gray-700 text-gray-700 editable">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <input type="text" name="direccion" class="form-control p-1"
+                                        value="{{ $guardavida->direccion ?? 'No especificado' }}">
+                                </div>
+                            @else
+                                <div class="info-value text-gray-700 text-gray-700">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    {{ $guardavida->direccion ?? 'No especificado' }}
+                                </div>
+                            @endif
+                        </div>
 
-                    <div class="sm:col-span-8">
-                        <label class="info-label text-gray-800">DNI</label>
-                        @if ($puedeEditar)
-                            <div class="info-value text-gray-700 text-gray-700 editable">
-                                <i class="fas fa-id-badge"></i>
-                                <input type="text" name="dni" class="form-control p-1"
-                                    value="{{ $guardavida->dni }}" required>
-                            </div>
-                        @else
-                            <div class="info-value text-gray-700 text-gray-700">
-                                <i class="fas fa-id-badge"></i>
-                                {{ $guardavida->dni }}
-                            </div>
-                        @endif
-                    </div>
+                        <div class="sm:col-span-2">
+                            <label class="info-label text-gray-800">Número</label>
+                            @if ($puedeEditar)
+                                <div class="info-value text-gray-700 text-gray-700 editable">
+                                    <i class="fas fa-hashtag"></i>
+                                    <input type="text" name="numero" class="form-control p-1"
+                                        value="{{ $guardavida->numero ?? 'No especificado' }}">
+                                </div>
+                            @else
+                                <div class="info-value text-gray-700 text-gray-700">
+                                    <i class="fas fa-hashtag"></i>
+                                    {{ $guardavida->numero ?? 'No especificado' }}
+                                </div>
+                            @endif
+                        </div>
 
-                    <div class="sm:col-span-4">
-                        <label class="info-label text-gray-800">Teléfono</label>
-                        @if ($puedeEditar)
-                            <div class="info-value text-gray-700 text-gray-700 editable">
-                                <i class="fas fa-phone"></i>
-                                <input type="tel" name="telefono" class="form-control p-1"
-                                    value="{{ $guardavida->telefono ?? 'No especificado' }}">
-                            </div>
-                        @else
-                            <div class="info-value text-gray-700 text-gray-700">
-                                <i class="fas fa-phone"></i>
-                                {{ $guardavida->telefono ?? 'No especificado' }}
-                            </div>
-                        @endif
-                    </div>
+                        <div class="sm:col-span-2">
+                            <label class="info-label text-gray-800">Piso/Dpto</label>
+                            @if ($puedeEditar)
+                                <div class="info-value text-gray-700 text-gray-700 editable">
+                                    <i class="fas fa-building"></i>
+                                    <input type="text" name="piso_dpto" class="form-control p-1"
+                                        value="{{ $guardavida->piso_dpto ?? 'No especificado' }}">
+                                </div>
+                            @else
+                                <div class="info-value text-gray-700 text-gray-700">
+                                    <i class="fas fa-building"></i>
+                                    {{ $guardavida->piso_dpto ?? 'No especificado' }}
+                                </div>
+                            @endif
+                        </div>
 
-                   <div class="sm:col-span-4">
-                        <label class="info-label text-gray-800">Email</label>
-                        @if ($puedeEditar)
-                            <div class="info-value text-gray-700 text-gray-700 editable">
-                                <i class="fas fa-envelope"></i>
-                                <input type="email" name="email" class="form-control p-1"
-                                    value="{{ $guardavida->user->email ?? 'No especificado' }}">
-                            </div>
-                        @else
-                            <div class="info-value text-gray-700 text-gray-700">
-                                <i class="fas fa-envelope"></i>
-                                {{ $guardavida->user->email ?? 'No especificado' }}
-                            </div>
-                        @endif
-                    </div>
+                        <!-- Work Information -->
 
+                        <div class="sm:col-span-8 pt-4 mt-3 border-t border-gray-200 dark:border-gray-700 ">
+                            <h3 class="section-title text-gray-900 dark:text-white">
+                                <i class="fas fa-briefcase"></i>
+                                Información Laboral
+                            </h3>
+                        </div>
 
-                    <div class="sm:col-span-4">
-                        <label class="info-label text-gray-800">Dirección</label>
-                        @if ($puedeEditar)
-                            <div class="info-value text-gray-700 text-gray-700 editable">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <input type="text" name="direccion" class="form-control p-1"
-                                    value="{{ $guardavida->direccion ?? 'No especificado' }}">
-                            </div>
-                        @else
-                            <div class="info-value text-gray-700 text-gray-700">
-                                <i class="fas fa-map-marker-alt"></i>
-                                {{ $guardavida->direccion ?? 'No especificado' }}
-                            </div>
-                        @endif
-                    </div>
-
-
-                    <div class="sm:col-span-2">
-                        <label class="info-label text-gray-800">Número</label>
-                        @if ($puedeEditar)
-                            <div class="info-value text-gray-700 text-gray-700 editable">
-                                <i class="fas fa-hashtag"></i>
-                                <input type="text" name="numero" class="form-control p-1"
-                                    value="{{ $guardavida->numero ?? 'No especificado' }}">
-                            </div>
-                        @else
-                            <div class="info-value text-gray-700 text-gray-700">
-                                <i class="fas fa-hashtag"></i>
-                                {{ $guardavida->numero ?? 'No especificado' }}
-                            </div>
-                        @endif
-                    </div>
-
-                    <div class="sm:col-span-2">
-                        <label class="info-label text-gray-800">Piso/Dpto</label>
-                        @if ($puedeEditar)
-                            <div class="info-value text-gray-700 text-gray-700 editable">
-                                <i class="fas fa-building"></i>
-                                <input type="text" name="piso_dpto" class="form-control p-1"
-                                    value="{{ $guardavida->piso_dpto ?? 'No especificado' }}">
-                            </div>
-                        @else
-                            <div class="info-value text-gray-700 text-gray-700">
-                                <i class="fas fa-building"></i>
-                                {{ $guardavida->piso_dpto ?? 'No especificado' }}
-                            </div>
-                        @endif
-                    </div>
-
-
-
-
-
-
-                    <!-- Work Information -->
-
-                    <div class="sm:col-span-8 pt-4 mt-3 border-t border-gray-200 dark:border-gray-700 ">
-                        <h3 class="section-title text-gray-900 dark:text-white">
-                            <i class="fas fa-briefcase"></i>
-                            Información Laboral
-                        </h3>
-                    </div>
-
-                     <div class="sm:col-span-4">
+                        <div class="sm:col-span-4">
 
                             <label class="info-label text-gray-800">Playa</label>
                             @if ($esAdmin && $playas)
@@ -289,53 +307,56 @@
                         </div>
 
 
+                        <!-- Action Buttons -->
+
                     </div>
-
-
-                </div>
-
-                <!-- Statistics -->
-                <h3 class="section-title  text-gray-900 dark:text-white">
-                    <i class="fas fa-chart-line"></i>
-                    Estadísticas
-                </h3>
-
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
-                        <div class="stat-value">{{ $guardavida->asistencias_count ?? 0 }}</div>
-                        <div class="stat-label">Asistencias</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon"><i class="fas fa-life-ring"></i></div>
-                        <div class="stat-value">{{ $guardavida->intervenciones_count ?? 0 }}</div>
-                        <div class="stat-label">Intervenciones</div>
-                    </div>
-
-                </div>
-
-                <!-- Action Buttons -->
-                @if ($esAdmin)
-                    <div class="action-buttons">
-                        <button type="submit" class="btn btn-primary" id="btnGuardar">
-                            <i class="fas fa-save"></i>
+                      @if ($esAdmin)
+                    <div class="action-buttons mb-4">
+                        <button type="submit" class="btn btn-primary me-2 mb-2" id="btnGuardar">
+                            <i class="fas fa-save me-1"></i>
                             Guardar Cambios
                         </button>
-                        <button type="button" class="btn text-white bg-gray-500 hover:bg-gray-400" onclick="window.history.back()">
-                            <i class="fas fa-times"></i>
+                        <button type="button" class="btn text-white bg-gray-500 hover:bg-gray-400 mb-2" onclick="window.history.back()">
+                            <i class="fas fa-times me-1"></i>
                             Cancelar
                         </button>
                     </div>
-                @else
+                    @endif
+                </div>
+
+                <!-- Statistics -->
+                <div class="bg-white rounded-lg shadow-md sm:px-10 md:px-10 pb-12 py-10 px-4">
+                    <h3 class="section-title  text-gray-900 dark:text-white">
+                        <i class="fas fa-chart-line"></i>
+                        Estadísticas
+                    </h3>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+                            <div class="stat-value">{{ $guardavida->asistencias_count ?? 0 }}</div>
+                            <div class="stat-label">Asistencias</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-life-ring"></i></div>
+                            <div class="stat-value">{{ $guardavida->intervenciones_count ?? 0 }}</div>
+                            <div class="stat-label">Intervenciones</div>
+                        </div>
+
+                    </div>
+                </div>
+                <!-- Action Buttons -->
+
                     <div class="action-buttons">
                         <button type="button" class="btn btn-secondary" onclick="window.history.back()">
                             <i class="fas fa-arrow-left"></i>
                             Volver
                         </button>
                     </div>
-                @endif
+
             </form>
-        </div>
+
+        </main>
     </div>
  </div>
  <script>
