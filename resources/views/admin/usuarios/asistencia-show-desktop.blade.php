@@ -34,6 +34,35 @@
 
 <div x-data="{ selectedId: null }">
 
+    <form method="GET" class="flex gap-4 my-2 mx-4 px-4 py-2 bg-gray-50 border border-gray-200 dark:border-gray-700  shadow-sm">
+        <div>
+            <label for="inicio">Desde:</label>
+            <input type="date" name="inicio" id="inicio"
+                value="{{ request('inicio') }}"
+                class="border rounded p-1">
+        </div>
+
+        <div>
+            <label for="fin">Hasta:</label>
+            <input type="date" name="fin" id="fin"
+                value="{{ request('fin') }}"
+                class="border rounded p-1">
+        </div>
+
+        <button class="bg-sky-600 hover:bg-sky-500 text-white px-4 py-1 rounded">
+            Filtrar
+        </button>
+
+        @if(request()->filled('inicio') || request()->filled('fin'))
+            <a href="{{ route('asistencias.guardavida', $guardavida->id) }}"
+            class="bg-gray-400 hover:bg-gray-300 text-white px-4 py-1 rounded">
+                Limpiar
+            </a>
+        @endif
+    </form>
+
+
+
      {{-- Lista para Mobile --}}
     {{-- @include('ui.intervenciones.partials.index-mobile') --}}
 
@@ -67,7 +96,7 @@
 
 
           {{-- PAGINACIÓN --}}
-            <div class="mt-4">
+            <div class="m-4">
                 {{ $historial->links() }}
             </div>
 
@@ -79,7 +108,7 @@
 
                 {{-- VOLVER --}}
                 <div class="text-center mt-4">
-                    <a class="btn btn-secondary" href="{{ url('dashboard') }}">Volver</a>
+                    <a class="btn btn-secondary" onclick="window.history.back()">Volver</a>
                 </div>
 
 

@@ -1,6 +1,4 @@
-<div class="hidden sm:block overflow-x-auto space-y-12">
-    <div class="pb-12 dark:border-white/10 rounded-lg dark:bg-gray-600 px-4 py-2">
-        <table class="min-w-full border border-gray-200 dark:border-gray-700 rounded-lg shadow">
+<x-index-table>
             <thead class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
                 <tr>
                     <th class="px-4 py-2 text-left cursor-pointer" onclick="toggleSort()">Guardavidas</th>
@@ -71,6 +69,4 @@
                 @endforeach
 
             </tbody>
-        </table>
-    </div>
-</div>
+        </x-index-table>

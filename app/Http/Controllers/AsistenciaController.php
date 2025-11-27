@@ -98,7 +98,7 @@ class AsistenciaController extends Controller
      * ingresa a la seccion "mis asistencias o asistencia"
      * (usado en admin/asistenciaPorPerfil.blade.php)
      */
-    public function asistenciasPorGuardavida($id)
+    public function asistenciasPorGuardavida(Request $request, $id)
     {
         $guardavida = Guardavida::with(['puesto.playa', 'asistencias.puesto.playa'])->findOrFail($id);
 
@@ -107,7 +107,7 @@ class AsistenciaController extends Controller
         // Solo si es admin, mandamos balnearios y puestos
         $balnearios = $esAdmin ?Playa::all() : null;
         $puestos = $esAdmin ?Puesto::all() : null;
-        $historial = $esAdmin ? $this->getAttendanceHistory($id) : null;
+        $historial = $esAdmin ? $this->getAttendanceHistory($request, $id) : null;
 
         return view('admin.usuarios.asistencia-show-desktop', compact('guardavida', 'esAdmin', 'balnearios', 'puestos', 'historial'));
     }
@@ -164,16 +164,22 @@ class AsistenciaController extends Controller
     /**
      * Agrego funcionalidad para crear un historial de asistencias para el guardavida seleccionado
      */
-    public function getAttendanceHistory( $guardavidaId){
+    public function getAttendanceHistory($request, $guardavidaId){
 
         $guardavida = Guardavida::findOrFail($guardavidaId);
 
-        //Agregar request!
-        // Rango (mes actual por defecto)
-        // $inicio = Carbon::parse($request->input('inicio', Carbon::now()->startOfMonth()));
-        // $fin = Carbon::parse($request->input('fin', Carbon::now()->endOfMonth()));
-        $inicio = Carbon::now()->subDays(30)->startOfDay();
-        $fin = Carbon::now()->endOfDay();
+        //Toma el filtro de fechas, y si no se selecciono fecha, toma desde hace 30 dias atras.
+        $inicio = $request->filled('inicio')
+            ? Carbon::parse($request->input('inicio'))->startOfDay()
+            : Carbon::now()->subDays(30)->startOfDay();
+
+        $fin = $request->filled('fin')
+            ? Carbon::parse($request->input('fin'))->endOfDay()
+            : Carbon::now()->endOfDay();
+
+        // FECHA DE INICIO FIJA (30 dias atras)
+        // $inicio = Carbon::now()->subDays(30)->startOfDay();
+        // $fin = Carbon::now()->endOfDay();
 
         // Asistencias del rango
         $asistencias = Asistencia::where('guardavidas_id', $guardavidaId)
