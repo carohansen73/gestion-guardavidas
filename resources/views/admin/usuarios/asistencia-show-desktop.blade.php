@@ -83,11 +83,64 @@
                 </svg>
             </button>
         @endif
-
     </div>
 
      {{-- Lista para Mobile --}}
-    {{-- @include('ui.intervenciones.partials.index-mobile') --}}
+     <section class="text-gray-600 dark:text-gray-100 body-font px-4 py-4 sm:hidden">
+        <div id="accordion-collapse" data-accordion="collapse" class="bg-white dark:bg-gray-600">
+            @foreach ($historial as $h)
+                <div class="registro-item-lista rounded ">
+                    <h2 id="accordion-collapse-heading-{{$h['fecha']}}">
+                        <button type="button" class="flex items-center justify-between w-full px-4 py-2 font-medium text-left text-gray-500 border border-b-0 border-gray-200 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 gap-3"
+                            data-accordion-target="#accordion-collapse-body-{{$h['fecha']}}" aria-expanded="true" aria-controls="accordion-collapse-body-1">
+                            {{-- <a href="{{ route('intervencion.show', $intervencion) }}"> --}}
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                                  {{ \Carbon\Carbon::parse($h['fecha'])->format('d/m/Y') }}
+                                </h3>
+                                <span class="text-sm text-gray-500 dark:text-gray-300">
+                                Estado: <strong>{{ $h['estado'] }}</strong>
+                                </span>
+                            </div>
+                            {{-- </a> --}}
+                            <svg data-accordion-icon class="w-3 h-3 rotate-180 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 5 1 1 5"/>
+                            </svg>
+                        </button>
+                    </h2>
+
+                    <div id="accordion-collapse-body-{{$h['fecha']}}" class="hidden" aria-labelledby="accordion-collapse-heading-{{$h['fecha']}}">
+                        <div class="px-4 py-2 border border-b-0 border-gray-200 dark:border-gray-700 dark:bg-gray-900">
+
+                            <p class="text-sm text-gray-700 dark:text-gray-300">
+                                <strong>Ingreso:</strong> {{ $h['ingreso'] ? \Carbon\Carbon::parse($h['ingreso'])->format('H:i') : '-' }}
+                            </p>
+                            <p class="text-sm text-gray-700 dark:text-gray-300">
+                                <strong>Egreso:</strong> {{ $h['egreso'] ? \Carbon\Carbon::parse($h['egreso'])->format('H:i') : '-' }}
+                            </p>
+                            <p class="text-sm text-gray-700 dark:text-gray-300">
+                                <strong>Puesto:</strong> {{ $h['puesto'] }}
+                            </p>
+
+                            <p class="text-sm text-gray-800 dark:text-gray-400 font-medium mt-1 line-clamp-2">
+                                Detalles:
+                                <span class="text-sm text-gray-500 dark:text-gray-300">
+                                    detalleeeesss
+                                </span>
+                            </p>
+
+                        </div><!--px-4-->
+                    </div><!--accordion-->
+
+                </div>
+            @endforeach
+        </div>
+    </section>
+
+
+
+
+
 
     {{-- Tabla para Desktop --}}
    <x-index-table>

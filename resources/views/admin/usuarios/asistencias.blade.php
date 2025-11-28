@@ -9,65 +9,30 @@
 
             <div class="card-body">
 
-                {{-- FILTROS RÁPIDOS --}}
-                <div class="filtros-rapidos mb-4">
-                    <div class="grupo-filtro">
-                        <span>Playa:</span>
-                        <button class="btn btn-outline-primary btn-sm" data-tipo="balneario" data-valor="todos">Todos</button>
-                        <button class="btn btn-outline-primary btn-sm" data-tipo="balneario"
-                            data-valor="claromeco">Claromecó</button>
-                        <button class="btn btn-outline-primary btn-sm" data-tipo="balneario" data-valor="reta">Reta</button>
-                        <button class="btn btn-outline-primary btn-sm" data-tipo="balneario"
-                            data-valor="orense">Orense</button>
-                    </div>
+                {{-- REUTILIZO FILTROS --}}
+                <x-filtros-de-busqueda :playas="$playas" tipo="asistencia-general" />
 
-                    <div class="grupo-filtro">
-                        <br>
-                        <span>Puesto:</span>
-                        <button class="btn btn-outline-primary btn-sm" data-tipo="puesto" data-valor="todos">Todos</button>
-                        @for ($i = 1; $i <= 6; $i++)
-                            <button class="btn btn-outline-primary btn-sm" data-tipo="puesto"
-                                data-valor="{{ $i }}">{{ $i }}</button>
-                        @endfor
-                    </div>
-
-                    <div class="grupo-filtro">
-                        <br>
-                        <span>Turno:</span>
-                        <button class="btn btn-outline-primary btn-sm" data-tipo="turno" data-valor="todos">Todos</button>
-                        <button class="btn btn-outline-primary btn-sm" data-tipo="turno" data-valor="mañana">Mañana</button>
-                        <button class="btn btn-outline-primary btn-sm" data-tipo="turno" data-valor="tarde">Tarde</button>
-                    </div>
-                </div>
-
-                {{-- LISTADO DE GUARDAVIDAS --}}
-                <ul class="lista-guardavidas list-group mt-4">
+                {{-- /LISTADO DE GUARDAVIDAS --}}
+                <div  class="bg-white dark:bg-gray-600 my-2">
                     @foreach ($guardavidas as $g)
-                        <li class="list-group-item d-flex justify-content-between align-items-center mb-2 shadow-sm rounded"
-                            data-balneario="{{ strtolower($g->puesto->playa->nombre ?? '') }}"
-                            data-puesto="{{ strtolower($g->puesto->nombre ?? '') }}">
-                            <div class="info">
-                                <h5 class="mb-1 fw-semibold text-primary">{{ $g->nombre ?? 'Sin nombre' }}</h4>
+                        <ul class="registro-item-lista rounded lista-guardavidas list-group" data-playa="{{ $g->playa->id ?? '' }}">
+                            <li class="list-group-item d-flex justify-content-between align-items-center mb-2 shadow-sm rounded registro-item-lista">
+                                <div class="info">
+                                    <h5 class="mb-1 fw-semibold text-primary">{{ $g->nombre ?? 'Sin nombre' }}</h4>
                                     <p class="mb-0 text-muted small">
                                         {{ $g->updated_at ? $g->updated_at->diffForHumans() : '' }}
-                                        · Puesto {{ $g->puestos->nombre ?? 'sin asignar' }}
+                                        · Puesto {{ $g->puesto->nombre ?? 'sin asignar' }}
                                     </p>
-                            </div>
-                            <div class="acciones">
-                                <a href="{{ route('asistencias.guardavida', $g->id) }}"
-                                    class="btn btn-outline-primary btn-sm">
-                                    Ver Historial
-                                </a>
-                            </div>
-                        </li>
+                                </div>
+                                <div class="acciones">
+                                    <a href="{{ route('asistencias.guardavida', $g->id) }}"
+                                        class="btn btn-outline-primary btn-sm">
+                                        Historial
+                                    </a>
+                                </div>
+                            </li>
+                        </ul>
                     @endforeach
-                </ul>
-
-                {{-- DESCARGAR EXCEL --}}
-                <div class="mt-4 text-end">
-                    <a href="{{ route('guardavidas.excel') }}" class="btn btn-success">
-                        <i class="fa fa-file-excel"></i> Descargar Asistencias
-                    </a>
                 </div>
 
                 {{-- PAGINACIÓN --}}
@@ -85,4 +50,6 @@
             </div>
         </div>
     </div>
+
+    <script src="{{ asset('js/table-intervenciones.js') }}"></script>
 @endsection

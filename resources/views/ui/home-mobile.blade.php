@@ -242,9 +242,9 @@
                     </a>
                 </li>
                 @endcan
-                {{-- @can('ver_guardavida')
+                @can('ver_asistencia')
                 <li class="py-2">
-                    <a href="{{ route('bandera.index') }}"
+                    <a href="{{ route('asistencias.index') }}"
                         class=" inline-flex  font-medium  "
                         disabled>
                         <svg xmlns="http://www.w3.org/2000/svg"
@@ -258,7 +258,7 @@
                         Asistencia
                     </a>
                 </li>
-                @endcan--}}
+                @endcan
                 @can('ver_licencia')
                  <li class="py-2">
                     <a href="{{ route('licencia.index') }}"
