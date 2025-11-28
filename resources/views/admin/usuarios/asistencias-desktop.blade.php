@@ -16,7 +16,7 @@
     <div x-data="{ selectedId: null }">
 {{--
         TODO: acomodar export!!! --}}
-    <x-filtros-de-busqueda :playas="$playas" tipo="asistencias" />
+    <x-filtros-de-busqueda :playas="$playas" tipo="asistencia-general" />
 
     @if (session('success'))
          <div class="bg-green-100 text-green-700 p-3 rounded my-2">
