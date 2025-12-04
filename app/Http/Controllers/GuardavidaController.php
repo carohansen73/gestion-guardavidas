@@ -45,8 +45,6 @@ class GuardavidaController extends Controller
                 })
                 ->get();
 
-
-
         //TODO solo habilitan/deshabilitan usuarios los admin o encargados tmb?
 
         $playas = Playa::all();
@@ -76,8 +74,14 @@ class GuardavidaController extends Controller
      */
     public function create()
     {
-        $playas = Playa::all();
-        $puestos = Puesto::orderBy('nombre')->get();
+        $user = Auth::user();
+        if ($user->hasAnyRole(['guardavida', 'encargado']) ){
+            $playas = Playa::where('id', $user->guardavida->playa_id)->get();
+            $puestos = Puesto::where('playa_id', $user->guardavida->playa_id)->get();
+        } else {
+            $playas = Playa::all();
+            $puestos = Puesto::orderBy('nombre')->get();
+        }
 
         $guardavida = null;
 
@@ -154,7 +158,11 @@ class GuardavidaController extends Controller
         $guardavidaAuth = $user->guardavida;
         $rol = $guardavida->user?->getRoleNames()->first() ?? '';
 
-        $playas = Playa::with('puestos')->get();
+        if ($user->hasAnyRole(['guardavida', 'encargado']) ){
+            $playas = Playa::with('puestos')->where('id', $user->guardavida->playa_id)->get();
+        } else {
+            $playas = Playa::with('puestos')->get();
+        }
 
         return view('ui.guardavidas.edit', compact(
             'guardavidaAuth', 'rol', 'playas', 'guardavida'

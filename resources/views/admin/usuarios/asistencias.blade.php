@@ -44,7 +44,7 @@
 
                 {{-- VOLVER --}}
                 <div class="text-center mt-4">
-                    <a class="btn btn-secondary" href="{{ url('dashboard') }}">Volver</a>
+                    <a class="btn btn-secondary" onclick="window.history.back()">Volver</a>
                 </div>
 
             </div>
