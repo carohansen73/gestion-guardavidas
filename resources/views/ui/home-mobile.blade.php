@@ -6,17 +6,7 @@
     </x-slot>
 @section('content')
 
-
-{{--
-<button @click="darkMode = !darkMode"
-        class="px-4 py-2 bg-gray-200 dark:bg-gray-800 rounded">
-  Cambiar modo
-</button>
-
-<div :class="{'dark': darkMode}">
-   <p class="text-gray-900 dark:text-gray-100">Hola!</p>
-</div> --}}
- @include('ui.partials.bandera')
+@include('ui.partials.bandera')
 
 
 

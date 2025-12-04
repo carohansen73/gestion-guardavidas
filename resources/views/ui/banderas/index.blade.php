@@ -3,14 +3,8 @@
 
 @section('content')
 
-
-<button @click="darkMode = !darkMode"
-        class="px-4 py-2 bg-gray-200 dark:bg-gray-800 rounded">
-  Cambiar modo
-</button>
-
 <div class="text-gray-600 dark:text-gray-100 body-font px-4 ">
-    <div class="flex justify-between align-center mb-sm-4">
+    <div class="flex justify-between align-center my-4">
         <h2 class="text-gray-700 dark:text-white text-2xl font-bold tracking-tight text-heading md:text-3xl lg:text-4xl"> Historial de banderas </h2>
         @can('agregar_bandera')
             <a href="{{ route('bandera.create') }}" class="btn hidden sm:flex align-center bg-sky-500 dark:bg-sky-700 hover:bg-sky-400 dark:hover:bg-sky-600 rounded-full px-3 py-2 shadow-md hover:shadow-lg">

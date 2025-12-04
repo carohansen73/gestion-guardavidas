@@ -1,14 +1,9 @@
 @extends('layouts.app')
 @section('content')
 
-<button @click="darkMode = !darkMode"
-        class="px-4 py-2 bg-gray-200 dark:bg-gray-800 rounded">
-  Cambiar modo
-</button>
-
 <section class="text-gray-600 dark:text-gray-100 body-font px-4 py-10">
     @if (Route::currentRouteName() !== 'licencia.edit')
-        <h2 class="mb-3 text-gray-700 text-2xl font-bold tracking-tight text-heading md:text-3xl lg:text-4xl section-title">Editar licencia</h2>
+        <h2 class="mb-3 text-gray-700 dark:text-white text-2xl font-bold tracking-tight text-heading md:text-3xl lg:text-4xl section-title">Editar licencia</h2>
 
         <div class="mb-4 rounded-md bg-blue-50 p-3 text-sm text-blue-800 border border-blue-200">
             <p class="text-sm text-gray-500 dark:text-gray-400">Recordá que la <strong class="font-medium text-gray-800 dark:text-white"> Playa, Puesto y Turno </strong>

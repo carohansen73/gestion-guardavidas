@@ -51,7 +51,7 @@
     @endisset
 
     <!-- Page Content -->
-    <div class="desktop-ml-64 min-h-screen bg-gray-100 dark:bg-gray-800 transition-all">
+    <div class="desktop-ml-64 min-h-screen bg-gray-100 dark:bg-gray-900 transition-all">
         <main class="overflow-x-hidden">
             @yield('content')
             {{-- {{ $slot }} --}}

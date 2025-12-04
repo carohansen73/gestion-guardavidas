@@ -57,35 +57,18 @@
                 </div> --}}
             </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             <!-- Settings Dropdown -->
             <div class="flex items-center">
-
 
                <x-darkmode-toggle />
                 <div class="hidden sm:flex sm:items-center sm:ms-6">
                     <x-dropdown align="right" width="48">
-
                 </div>
             </div>
 
-
             <x-slot name="trigger">
                 <button
-                    class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
+                    class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-white bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
                     @auth <div>{{ Auth::user()->name }}</div> @endauth
 
                     <div class="ms-1">
@@ -104,9 +87,9 @@
                 </x-dropdown-link>
 
                 <!--Boton para ver asistencia -->
-                <x-responsive-nav-link :href="route('guardavida.misAsistencias')">
+                <x-dropdown-link :href="route('guardavida.misAsistencias')">
                     {{ __('Mis Asistencias') }}
-                </x-responsive-nav-link>
+                </x-dropdown-link>
 
 
                 <!-- Authentication -->

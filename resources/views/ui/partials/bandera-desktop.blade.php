@@ -98,7 +98,7 @@
         <div class="bg-yellow-500/50 border-l-4 border-yellow-500 text-yellow-900 dark:from-blue-700 dark:to-teal-700 text-black rounded shadow-sm p-6 transform transition hover:scale-105 duration-300">
             <div class="flex justify-content-between align-center">
                 <div class="mb-2">
-                    <h2 class="text-2xl md:text-3xl font-bold text-black">Bandera del día</h2>
+                    <h2 class="text-2xl md:text-3xl font-bold text-black dark:text-white">Bandera del día</h2>
                     <p class="text-sm text-gray-800">⚠️ No se ha cargado la bandera para hoy.</p>
                 </div>
 

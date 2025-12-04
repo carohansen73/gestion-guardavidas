@@ -2,12 +2,6 @@
 
 @section('content')
 
-
-<button @click="darkMode = !darkMode"
-        class="px-4 py-2 bg-gray-200 dark:bg-gray-800 rounded">
-  Cambiar modo
-</button>
-
 <div class="text-gray-600 dark:text-gray-100 body-font px-4 ">
     <div class="flex justify-between align-center mb-sm-4">
         <h2 class="text-gray-700 text-xl font-bold tracking-tight text-heading md:text-3xl lg:text-4xl">

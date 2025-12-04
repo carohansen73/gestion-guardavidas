@@ -1,11 +1,6 @@
 @extends('layouts.app')
 @section('content')
 
-<button @click="darkMode = !darkMode"
-        class="px-4 py-2 bg-gray-200 dark:bg-gray-800 rounded">
-  Cambiar modo
-</button>
-
 <section class="text-gray-600 dark:text-gray-100 body-font px-4 py-10  ">
 
     <div class="flex justify-between align-center mb-sm-2">
