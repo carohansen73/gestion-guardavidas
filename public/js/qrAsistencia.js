@@ -18,9 +18,14 @@ let detector;
 let html5Scanner;
 let timeoutId;
 
+// Comprobación de uso de sistema operaivo iOS para usar Html5Qrcode
 function isIOS() {
-    console.log(/iPhone|iPad|iPod/i.test(navigator.userAgent));
-    return /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    let esSistemaIOS =  /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (!esSistemaIOS){
+        let qrFrameBarcodeDetector =  document.querySelector(".qr-frame");
+        qrFrameBarcodeDetector.classList.remove("ocultarDiv");
+    }
+    return esSistemaIOS;
 }
 // -----------------------------------------------------------
 // Iniciar cámara y escaneo automático
@@ -50,12 +55,12 @@ async function iniciarCamara() {
             }, 2 * 60 * 1000);
 
         } else {
-            html5Scanner = new Html5Qrcode("video");
+            html5Scanner = new Html5Qrcode("qr-reader");
             await html5Scanner.start(
                 { facingMode: "environment" },
-                { fps: 10, qrbox: 250 },
+                { fps: 10, qrbox: 600 },
                 (decodedText) => manejarQRLeido(decodedText),
-                (errorMessage) => console.log("Escaneando...", errorMessage)
+                //(errorMessage) => console.log("Escaneando...", errorMessage)
             );
             // Timeout de 2 minutos
             timeoutId = setTimeout(() => {
@@ -72,6 +77,7 @@ async function iniciarCamara() {
         }).then(() => {
             window.location.href = "/home"; // Redireccion despues de cerrar el alert
         });
+        console.error(error);
     }
 }
 
@@ -113,7 +119,7 @@ async function scanFrame() {
 async function manejarQRLeido(valorQR) {
     scanning = false;
     clearTimeout(timeoutId);
-    detenerScanner();
+    await detenerScanner();
     await registrarAsistencia(valorQR);
 }
 
@@ -126,16 +132,16 @@ async function manejarQRLeido(valorQR) {
 // Detiene cualquier scanner activo (BarcodeDetector o Html5Qrcode),
 // detiene la cámara, limpia el timeout y resetea flags.
 
-function detenerScanner() {
+async function detenerScanner() {
     if (detector) {
         scanning = false;
     }
     if (html5Scanner) {
-        html5Scanner
+        await html5Scanner
             .stop().catch((err) =>
                 console.error("Error al detener html5Scanner:", err)
             );
-        html5Scanner.clear();
+        await html5Scanner.clear();
         html5Scanner = null;
     }
     if (video.srcObject) {
@@ -172,6 +178,7 @@ async function registrarAsistencia(valorQR) {
     try {
         if (navigator.onLine) {
             let data = await desencriptarQR(valorQR);
+            console.log(data);
             if (!data){
                 throw new Error("Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente.");
             }
@@ -232,6 +239,7 @@ async function desencriptarQR(valorQR) {
         return data.data;
     }
     catch(err){
+        console.error(err);
         return undefined;
     }
 

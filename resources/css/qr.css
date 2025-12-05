@@ -83,6 +83,7 @@ nav{
     margin: auto;
 }
 
+
 #video{
     border: solid 2px #292929;
 }
@@ -131,5 +132,9 @@ nav{
 
 nav{
     z-index: 20000;
+}
+
+.ocultarDiv{
+    display: none !important;
 }
 
