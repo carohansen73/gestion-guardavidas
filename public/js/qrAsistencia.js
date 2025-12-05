@@ -18,6 +18,10 @@ let detector;
 let html5Scanner;
 let timeoutId;
 
+function isIOS() {
+    console.log(/iPhone|iPad|iPod/i.test(navigator.userAgent));
+    return /iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
 // -----------------------------------------------------------
 // Iniciar cámara y escaneo automático
 // -----------------------------------------------------------
@@ -30,7 +34,7 @@ let timeoutId;
 
 async function iniciarCamara() {
     try {
-        if ("BarcodeDetector" in window) {
+        if ("BarcodeDetector" in window && !isIOS()) {
             detector = new BarcodeDetector({ formats: ["qr_code"] });
             const stream = await navigator.mediaDevices.getUserMedia({
                 video: { facingMode: "environment" },
@@ -46,7 +50,6 @@ async function iniciarCamara() {
             }, 2 * 60 * 1000);
 
         } else {
-            // fallback a html5-qrcode
             html5Scanner = new Html5Qrcode("video");
             await html5Scanner.start(
                 { facingMode: "environment" },
@@ -63,7 +66,7 @@ async function iniciarCamara() {
     } catch (error) {
         Swal.fire({
             title: "Error",
-            text: "No se pudo acceder a la cámara:",
+            text: "No se pudo acceder a la cámara.",
             icon: "error",
             confirmButtonColor: "#36be7f",
         }).then(() => {
