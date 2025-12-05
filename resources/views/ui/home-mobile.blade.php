@@ -123,7 +123,7 @@
            || auth()->user()->can('ver_novedad_material') || auth()->user()->can('ver_licencia')
            || auth()->user()->can('ver_bandera') || auth()->user()->can('ver_cambio_turno') )
 
-            <a class="bg-sky-600 rounded flex px-4 py-3 h-full justify-between">
+            <a class="bg-sky-600 dark:bg-sky-700 rounded flex px-4 py-3 h-full justify-between">
                 <div class="flex">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                     class="text-gray-100 w-6 h-6 flex-shrink-0 mr-4">
@@ -161,7 +161,7 @@
     <div id="drawer-bottom-example" class="fixed bottom-0 left-0 right-0 z-50 w-full p-4 overflow-y-auto transition-transform translate-y-full bg-white dark:bg-gray-800 shadow-md" tabindex="-1"
         aria-labelledby="drawer-bottom-label">
         <h5 id="drawer-bottom-label" class="inline-flex items-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400">
-            <svg class="w-4 h-4 me-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+            <svg class="w-4 h-4 me-2.5 text-orange-600 dark:text-orange-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
             viewBox="0 0 20 20">
             <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
             </svg>Listados
@@ -175,7 +175,7 @@
         </button>
         {{-- Acciones --}}
         <div class="py-4">
-            <ul class="space-y-3 font-medium">
+            <ul class="space-y-3 font-medium dark:text-gray-100">
                 @can('ver_guardavida')
                 <li class="py-2">
                     <a href="{{ route('guardavida.index') }}"
