@@ -7,16 +7,22 @@ import { guardarAsistenciaOffline } from "./baseDeDatosNavegador.js";
 // contenedorAnimacionCarga: overlay con animación mientras se procesa
 // animacionCarga: elemento animado de carga
 
-
-const video = document.getElementById("video");
-const contenedorAnimacionCarga = document.getElementById("contenedorCarga");
-const animacionCarga = document.getElementById("carga");
-
-
 let scanning = false;
 let detector;
 let html5Scanner;
 let timeoutId;
+// Mover estas líneas DESPUÉS de declarar los elementos
+const video = document.getElementById("video");
+const contenedorAnimacionCarga = document.getElementById("contenedorCarga");
+const animacionCarga = document.getElementById("carga");
+
+document.querySelector(".contenedorQR").style.display = "block";
+contenedorAnimacionCarga.style.display = "none";
+
+//al iniciar el navegador pregunta si es iphone
+function esIphone() {
+    return /iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
 
 // -----------------------------------------------------------
 // Iniciar cámara y escaneo automático
@@ -27,10 +33,16 @@ let timeoutId;
 // Inicializa la cámara trasera del dispositivo.
 // Decide si usar BarcodeDetector nativo o Html5Qrcode (fallback).
 // Controla timeout de 2 minutos y errores de permisos.
+// Solo Android inicia automáticamente
+if (!esIphone()) {
+    iniciarCamara();
+}
 
 async function iniciarCamara() {
     try {
-        if ("BarcodeDetector" in window) {
+        // iPhone siempre debe usar html5-qrcode
+        //agrego para que pregunte si es android o no
+        if ("BarcodeDetector" in window && !esIphone()) {
             detector = new BarcodeDetector({ formats: ["qr_code"] });
             const stream = await navigator.mediaDevices.getUserMedia({
                 video: { facingMode: "environment" },
@@ -42,22 +54,29 @@ async function iniciarCamara() {
             requestAnimationFrame(scanFrame);
             timeoutId = setTimeout(() => {
                 detenerScanner();
-                alertaError("El tiempo de escaneo expiró. Intenta nuevamente.", "warning");
+                alertaError(
+                    "El tiempo de escaneo expiró. Intenta nuevamente.",
+                    "warning"
+                );
             }, 2 * 60 * 1000);
-
         } else {
             // fallback a html5-qrcode
-            html5Scanner = new Html5Qrcode("video");
-            await html5Scanner.start(
-                { facingMode: "environment" },
-                { fps: 10, qrbox: 250 },
+            //  html5Scanner = new Html5Qrcode("video");
+            html5Scanner = new Html5Qrcode("qr-reader");
+            document.getElementById("video").style.display = "none";
+            document.getElementById("qr-reader").style.display = "block";
+
+            await html5Scanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 },
                 (decodedText) => manejarQRLeido(decodedText),
                 (errorMessage) => console.log("Escaneando...", errorMessage)
             );
             // Timeout de 2 minutos
             timeoutId = setTimeout(() => {
                 detenerScanner();
-                alertaError("El tiempo de escaneo expiró. Intenta nuevamente.", "warning");
+                alertaError(
+                    "El tiempo de escaneo expiró. Intenta nuevamente.",
+                    "warning"
+                );
             }, 2 * 60 * 1000);
         }
     } catch (error) {
@@ -80,7 +99,6 @@ async function iniciarCamara() {
 // -----------------------------------------------------------
 // Función recursiva que analiza cada frame usando BarcodeDetector
 // para detectar QR. Si encuentra uno, llama a manejarQRLeido.
-
 
 async function scanFrame() {
     if (!scanning) return;
@@ -106,7 +124,6 @@ async function scanFrame() {
 // Función que se ejecuta cuando se detecta un QR.
 // Detiene la cámara/scanner y llama a registrarAsistencia.
 
-
 async function manejarQRLeido(valorQR) {
     scanning = false;
     clearTimeout(timeoutId);
@@ -129,7 +146,8 @@ function detenerScanner() {
     }
     if (html5Scanner) {
         html5Scanner
-            .stop().catch((err) =>
+            .stop()
+            .catch((err) =>
                 console.error("Error al detener html5Scanner:", err)
             );
         html5Scanner.clear();
@@ -144,7 +162,6 @@ function detenerScanner() {
         timeoutId = null;
     }
 }
-
 
 // -----------------------------------------------------------
 // Registrar asistencia (online/offline)
@@ -169,27 +186,36 @@ async function registrarAsistencia(valorQR) {
     try {
         if (navigator.onLine) {
             let data = await desencriptarQR(valorQR);
-            if (!data){
-                throw new Error("Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente.");
+            if (!data) {
+                throw new Error(
+                    "Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente."
+                );
             }
             let idPlaya = data.playa_id;
             let idPuesto = data.puesto_id;
             let latitudPuesto = data.puesto_lat;
             let longitudPuesto = data.puesto_lng;
 
-            let resultado = await cargarDistancia(latitudPuesto, longitudPuesto);
+            let resultado = await cargarDistancia(
+                latitudPuesto,
+                longitudPuesto
+            );
             if (resultado == null || isNaN(resultado.distancia)) {
-                throw new Error('Distancia inválida');
+                throw new Error("Distancia inválida");
             }
             console.log(resultado);
-            if (resultado.distancia > 200){
-                throw new Error('No se puede registrar la asistencia: el QR esta siendo escaneado a más de 200 metros de distancia.');
+            if (resultado.distancia > 200) {
+                throw new Error(
+                    "No se puede registrar la asistencia: el QR esta siendo escaneado a más de 200 metros de distancia."
+                );
             }
 
             let puestoCorrecto = await perteneceQRAlPuesto(user_id, idPuesto);
 
-            if (!puestoCorrecto || puestoCorrecto.success == false){
-                throw new Error('No se puede registrar la asistencia: el QR esta siendo escaneado en el puesto incorrecto.');
+            if (!puestoCorrecto || puestoCorrecto.success == false) {
+                throw new Error(
+                    "No se puede registrar la asistencia: el QR esta siendo escaneado en el puesto incorrecto."
+                );
             }
 
             let datos = {
@@ -202,11 +228,16 @@ async function registrarAsistencia(valorQR) {
                 fecha_hora: fechaHoraArgentinaDatetime(),
             };
             cargarDatos(datos);
-
         } else {
             // Offline
             const resultado = await obtenerUbicacion();
-            await guardarDatosOffline(user_id, valorQR, resultado.coords.latitude, resultado.coords.longitude, resultado.coords.accuracy);
+            await guardarDatosOffline(
+                user_id,
+                valorQR,
+                resultado.coords.latitude,
+                resultado.coords.longitude,
+                resultado.coords.accuracy
+            );
         }
     } catch (err) {
         contenedorAnimacionCarga.style.display = "none";
@@ -216,24 +247,21 @@ async function registrarAsistencia(valorQR) {
 }
 
 async function desencriptarQR(valorQR) {
-    try{
+    try {
         const res = await fetch("api/desencriptar-qr", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                'Authorization': `Bearer ${localStorage.getItem("token")}`
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
             body: JSON.stringify({ encrypted: valorQR }),
         });
         const data = await res.json();
         return data.data;
-    }
-    catch(err){
+    } catch (err) {
         return undefined;
     }
-
 }
-
 
 // -----------------------------------------------------------
 // fechaHoraArgentinaDatetime()
@@ -266,7 +294,7 @@ async function perteneceQRAlPuesto(user_id, idPuesto) {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                'Authorization': `Bearer ${localStorage.getItem("token")}`
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
             body: JSON.stringify({ user_id: user_id, puesto_id: idPuesto }),
         });
@@ -276,7 +304,9 @@ async function perteneceQRAlPuesto(user_id, idPuesto) {
     } catch (error) {
         contenedorAnimacionCarga.style.display = "none";
         animacionCarga.classList.remove("animacion");
-        alertaError("Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente.");
+        alertaError(
+            "Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente."
+        );
         return null;
     }
 }
@@ -292,7 +322,13 @@ async function perteneceQRAlPuesto(user_id, idPuesto) {
 // Guarda localmente los datos de asistencia cuando no hay internet.
 // Posteriormente se sincronizan automáticamente (implementación aparte).
 
-async function guardarDatosOffline(user_id, valorQR, userLat, userLng, userPrecision) {
+async function guardarDatosOffline(
+    user_id,
+    valorQR,
+    userLat,
+    userLng,
+    userPrecision
+) {
     if (!navigator.onLine) {
         try {
             let guardado = await guardarAsistenciaOffline({
@@ -316,7 +352,9 @@ async function guardarDatosOffline(user_id, valorQR, userLat, userLng, userPreci
                     window.location.href = "/dashboard";
                 });
             } else {
-                throw new Error('No se pudo guarda la asistencia, intente nuevamente');
+                throw new Error(
+                    "No se pudo guardar la asistencia, intente nuevamente"
+                );
             }
         } catch (error) {
             alertaError(error);
@@ -326,7 +364,6 @@ async function guardarDatosOffline(user_id, valorQR, userLat, userLng, userPreci
     }
 }
 
-
 // -----------------------------------------------------------
 // cargarDatos(datos)
 // datos: JSON => datos a guardar en la base de datos de asistencia
@@ -334,14 +371,13 @@ async function guardarDatosOffline(user_id, valorQR, userLat, userLng, userPreci
 // Envía al backend los datos de asistencia verificados
 // y muestra confirmación al usuario mediante Swal.
 
-
 async function cargarDatos(datos) {
     try {
         let response = await fetch("api/cargarAsistencia", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                'Authorization': `Bearer ${localStorage.getItem("token")}`
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
             body: JSON.stringify({
                 playa_id: datos.idPlaya,
@@ -367,7 +403,9 @@ async function cargarDatos(datos) {
                 window.location.href = "/dashboard"; // Redireccion despues de cerrar el Swal
             });
         } else {
-            throw new Error("Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente.");
+            throw new Error(
+                "Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente."
+            );
         }
     } catch (err) {
         contenedorAnimacionCarga.style.display = "none";
@@ -375,8 +413,6 @@ async function cargarDatos(datos) {
         alertaError(err);
     }
 }
-
-
 
 // -----------------------------------------------------------
 // cargarDistancia(latitudPuesto, longitudPuesto)
@@ -386,14 +422,18 @@ async function cargarDatos(datos) {
 // Obtiene la ubicación del usuario y calcula la distancia
 // en metros entre usuario y puesto usando fórmula Haversine (calcularDistancia).
 
-
 async function cargarDistancia(latitudPuesto, longitudPuesto) {
     try {
         let position = await obtenerUbicacion();
         let userLat = position.coords.latitude;
         let userLng = position.coords.longitude;
         let userPrecision = position.coords.accuracy; // en metros
-        let resultadoDistancia = await calcularDistancia(userLat, userLng, latitudPuesto, longitudPuesto);
+        let resultadoDistancia = await calcularDistancia(
+            userLat,
+            userLng,
+            latitudPuesto,
+            longitudPuesto
+        );
 
         return {
             distancia: resultadoDistancia,
@@ -425,11 +465,11 @@ async function obtenerId() {
 // Retorna la ubicación GPS actual del usuario usando Promises.
 
 function obtenerUbicacion() {
-    const opciones ={
+    const opciones = {
         enableHighAccuracy: true,
         timeout: 10000,
-        maximumAge : 0
-    }
+        maximumAge: 0,
+    };
     return new Promise((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(resolve, reject, opciones);
     });
@@ -483,8 +523,35 @@ async function calcularDistancia(lat1, lon1, lat2, lon2) {
 
 // -----------------------------------------------------------
 // Iniciar escaneo automáticamente
+//comento esta linea porque en iphone bloquea los permisos y falla antes que el usuario haga click en el evento dentro del sitio, son permisos bloqueados de webkit y safari (chrome en iphones hereda de safari las librerias) para iphones
+/**
+ * LO QUE iPHONE EXIGE PARA PERMITIR LA CÁMARA
+
+iPhone (Safari/WebKit) obliga a cumplir estas condiciones:
+
+1 Debe ser un gesto del usuario (user gesture) (y esto viene desde otra vista , en android lo detecta en iphone le cuesta hacerlo y falla)
+
+La cámara solamente puede abrirse después de:
+✔ un click
+✔ un touchstart
+
+ En este caso:
+¿Qué cambia y por qué ahora sí funciona en iPhone?
+# iPhone jamás intentará usar BarcodeDetector
+
+Chrome, Safari y Firefox para iOS usan WebKit → WebKit “dice” que soporta BarcodeDetector, pero no permite abrir cámara desde getUserMedia + BarcodeDetector → error.
+
+# Evita conflictos entre <video> y html5-qrcode
+
+Antes, aunque el fallback entraba, el <video> ya estaba creado o inicializado → WebKit bloqueaba la cámara al segundo intento.
+
+# Es 100% compatible con Android
+
+Android seguirá usando el detector nativo (más rápido).
+iPhone usará html5-qrcode (más compatible).
+ */
 // -----------------------------------------------------------
-window.addEventListener("DOMContentLoaded", iniciarCamara);
+//window.addEventListener("DOMContentLoaded", iniciarCamara); esto ya no porque fallaba en iphone
 
 /****************************************************************************************************************/
 /*** Formato QR esperado:
