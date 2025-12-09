@@ -37,9 +37,10 @@ function isIOS() {
 // Decide si usar BarcodeDetector nativo o Html5Qrcode (fallback).
 // Controla timeout de 2 minutos y errores de permisos.
 
-async function iniciarCamara() {
+async function iniciarCamara(){
     try {
-        if ("BarcodeDetector" in window && !isIOS()) {
+        /*let isIOSTrue = isIOS();
+        if ("BarcodeDetector" in window && !isIOSTrue) {
             detector = new BarcodeDetector({ formats: ["qr_code"] });
             const stream = await navigator.mediaDevices.getUserMedia({
                 video: { facingMode: "environment" },
@@ -54,11 +55,11 @@ async function iniciarCamara() {
                 alertaError("El tiempo de escaneo expiró. Intenta nuevamente.", "warning");
             }, 2 * 60 * 1000);
 
-        } else {
+        } else {*/
             html5Scanner = new Html5Qrcode("qr-reader");
             await html5Scanner.start(
                 { facingMode: "environment" },
-                { fps: 10, qrbox: 600 },
+                { fps: 10, qrbox: 250 },
                 (decodedText) => manejarQRLeido(decodedText),
                 //(errorMessage) => console.log("Escaneando...", errorMessage)
             );
@@ -67,7 +68,7 @@ async function iniciarCamara() {
                 detenerScanner();
                 alertaError("El tiempo de escaneo expiró. Intenta nuevamente.", "warning");
             }, 2 * 60 * 1000);
-        }
+        /*}*/
     } catch (error) {
         Swal.fire({
             title: "Error",
@@ -77,7 +78,6 @@ async function iniciarCamara() {
         }).then(() => {
             window.location.href = "/home"; // Redireccion despues de cerrar el alert
         });
-        console.error(error);
     }
 }
 
