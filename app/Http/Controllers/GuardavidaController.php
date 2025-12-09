@@ -43,7 +43,7 @@ class GuardavidaController extends Controller
                 ->whereHas('user', function ($query) {
                     $query->where('enabled', true);
                 })
-                ->get();
+                ->paginate(20);
 
         //TODO solo habilitan/deshabilitan usuarios los admin o encargados tmb?
 

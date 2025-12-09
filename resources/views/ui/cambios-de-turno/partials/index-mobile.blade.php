@@ -120,6 +120,10 @@
                 </div>
             @endforeach
         </div>
+        <div class="mt-4">
+            {{ $registros->links() }}
+        </div>
+
     </section>
 
     @can('agregar_cambio_turno')

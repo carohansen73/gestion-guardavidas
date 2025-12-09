@@ -129,6 +129,11 @@
             @endforeach
         </div>
 
+        <div class="mt-4">
+            {{ $guardavidasHabilitados->links() }}
+        </div>
+
+
     </section>
     @can('agregar_guardavida')
         <a href="{{ route('guardavida.create') }}" class="btn fixed z-40 flex align-content-center bg-sky-500 dark:bg-sky-500 bottom-24 right-8 rounded-full px-3 py-3 shadow">

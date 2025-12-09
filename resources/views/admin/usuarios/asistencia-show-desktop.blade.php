@@ -137,7 +137,7 @@
 
 
     {{-- Tabla para Desktop --}}
-   <x-index-table>
+   <x-index-table :registros="$historial">
         <thead class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
             <tr>
                 {{-- <th class="px-4 py-2 text-left cursor-pointer" onclick="toggleSort()">Fecha</th> --}}
@@ -163,12 +163,6 @@
         </tbody>
     </x-index-table>
 {{-- End tabla --}}
-
-
-          {{-- PAGINACIÓN --}}
-            <div class="m-4">
-                {{ $historial->links() }}
-            </div>
 
                 {{-- @if (method_exists($guardavidas, 'links'))
                     <div class="paginacion mt-4">
