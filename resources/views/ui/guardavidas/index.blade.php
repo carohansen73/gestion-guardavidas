@@ -41,6 +41,7 @@
     {{-- Tabla para Desktop --}}
     @include('ui.guardavidas.partials.index-desktop')
 
+
     <!-- drawer component -->
     {{-- <div id="drawer-bottom-example" class="fixed bottom-0 left-0 right-0 z-50 w-full p-4 overflow-y-auto transition-transform translate-y-full bg-white dark:bg-gray-800 " tabindex="-1"
         aria-labelledby="drawer-bottom-label">

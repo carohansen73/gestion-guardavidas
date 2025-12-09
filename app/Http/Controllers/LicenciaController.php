@@ -21,7 +21,7 @@ class LicenciaController extends Controller
 
         $licencias = Licencia::with(['guardavida', 'playa', 'puesto'])
         ->latest()
-        ->get();
+        ->paginate(20);
 
         $playas = Playa::all();
 

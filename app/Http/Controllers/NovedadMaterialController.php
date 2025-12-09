@@ -22,7 +22,7 @@ class NovedadMaterialController extends Controller
 
         $novedades = NovedadMaterial::with(['material', 'playa'])
         ->latest()
-        ->get();
+        ->paginate(20);
 
         $playas = Playa::all();
 
