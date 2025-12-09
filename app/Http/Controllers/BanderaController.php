@@ -51,11 +51,16 @@ class BanderaController extends Controller
         $user = Auth::user();
         $guardavidaAuth = $user->guardavida;
 
+        //Los guardavidas solo agregan registros en la playa a la que pertenecen
+        if ($user->hasAnyRole(['guardavida', 'encargado']) && $guardavidaAuth){
+            $playas = Playa::where('id', $guardavidaAuth->playa_id)->get();
+            $puestos = Puesto::where('playa_id', $guardavidaAuth->playa_id)->get();
+        } else {
+            $playas = Playa::all();
+            $puestos = Puesto::orderBy('nombre')->get();
+        }
 
         $banderas = BanderaTipo::all();
-        $playas = Playa::all();
-        $puestos = Puesto::orderBy('nombre')->get();
-
         $bandera = null;
 
         return view('ui.banderas.fields', compact(
@@ -106,10 +111,16 @@ class BanderaController extends Controller
     {
         $user = Auth::user();
         $guardavidaAuth = $user->guardavida;
-
         $banderas = BanderaTipo::all();
-        $playas = Playa::all();
-        $puestos = Puesto::orderBy('nombre')->get();
+
+         //Los guardavidas solo agregan registros en la playa a la que pertenecen
+        if ($user->hasAnyRole(['guardavida', 'encargado']) && $guardavidaAuth){
+            $playas = Playa::where('id', $guardavidaAuth->playa_id)->get();
+            $puestos = Puesto::where('playa_id', $guardavidaAuth->playa_id)->get();
+        } else {
+            $playas = Playa::all();
+            $puestos = Puesto::orderBy('nombre')->get();
+        }
 
         return view('ui.banderas.fields', compact(
             'guardavidaAuth', 'banderas', 'playas', 'puestos', 'bandera'

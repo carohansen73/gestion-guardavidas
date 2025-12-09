@@ -60,14 +60,20 @@ class IntervencionController extends Controller
     {
         $user = Auth::user();
         $guardavidaAuth = $user->guardavida;
-
-        $guardavidas = Guardavida::orderBy('nombre')->get();
         $banderas = BanderaTipo::all();
-        $playas = Playa::all();
-        $puestos = Puesto::orderBy('nombre')->get();
         $fuerzas = Fuerza::all();
-
         $intervencion = null;
+
+        //Los guardavidas solo agregan registros en la playa a la que pertenecen
+        if ($user->hasAnyRole(['guardavida', 'encargado']) && $guardavidaAuth){
+            $playas = Playa::where('id', $guardavidaAuth->playa_id)->get();
+            $puestos = Puesto::where('playa_id', $guardavidaAuth->playa_id)->get();
+            $guardavidas = Guardavida::where('playa_id', $guardavidaAuth->playa_id)->orderBy('nombre')->get();
+        } else {
+            $playas = Playa::all();
+            $puestos = Puesto::orderBy('nombre')->get();
+            $guardavidas = Guardavida::orderBy('nombre')->get();
+        }
 
         return view('ui.intervenciones.create', compact(
             'guardavidas', 'banderas', 'playas', 'puestos', 'fuerzas', 'guardavidaAuth', 'intervencion'
@@ -110,7 +116,6 @@ class IntervencionController extends Controller
 
         return redirect()->route('intervencion.index')
                      ->with('success', 'Intervención creada');
-
     }
 
     /**
@@ -130,13 +135,19 @@ class IntervencionController extends Controller
     {
         $user = Auth::user();
         $guardavidaAuth = $user->guardavida;
-
-        $guardavidas = Guardavida::orderBy('nombre')->get();
         $banderas = BanderaTipo::all();
-        $playas = Playa::all();
-        $puestos = Puesto::orderBy('nombre')->get();
         $fuerzas = Fuerza::all();
 
+        //Los guardavidas solo agregan registros en la playa a la que pertenecen
+        if ($user->hasAnyRole(['guardavida', 'encargado']) && $guardavidaAuth){
+            $playas = Playa::where('id', $guardavidaAuth->playa_id)->get();
+            $puestos = Puesto::where('playa_id', $guardavidaAuth->playa_id)->get();
+            $guardavidas = Guardavida::where('playa_id', $guardavidaAuth->playa_id)->orderBy('nombre')->get();
+        } else {
+            $playas = Playa::all();
+            $puestos = Puesto::orderBy('nombre')->get();
+            $guardavidas = Guardavida::orderBy('nombre')->get();
+        }
 
         return view('ui.intervenciones.edit', compact(
             'guardavidas', 'banderas', 'playas', 'puestos', 'fuerzas', 'guardavidaAuth', 'intervencion'

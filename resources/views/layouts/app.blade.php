@@ -14,9 +14,23 @@
     <link rel="stylesheet" href="https://use.typekit.net/wjn2blc.css">
 
     <!-- Scripts -->
-    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/css/style.css'])
+    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/css/style.css',  'resources/js/darkMode.js'])
     {{-- estilo del template --}}
     {{-- <link rel="stylesheet" href="{{ asset('resources/css/style.css') }}"> --}}
+
+    <script>
+    // Evita el FOUC (Flash Of Unstyled Content)
+    (function() {
+        const theme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (theme === 'dark' || (!theme && prefersDark)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    })();
+</script>
 </head>
 
 <body class="font-sans antialiased  md:pb-0 pb-14" x-data="{ darkMode: false }" :class="{ 'dark': darkMode }">
@@ -37,8 +51,8 @@
     @endisset
 
     <!-- Page Content -->
-    <div class="lg:ml-64 min-h-screen bg-gray-100 dark:bg-gray-800">
-        <main class="overflow-x-hidden mb-4">
+    <div class="desktop-ml-64 min-h-screen bg-gray-100 dark:bg-gray-900 transition-all">
+        <main class="overflow-x-hidden">
             @yield('content')
             {{-- {{ $slot }} --}}
         </main>

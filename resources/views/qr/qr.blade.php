@@ -46,9 +46,12 @@
             <div id="qr-reader" style="display:none;"></div>
 
         </div>
+        <div id="qr-reader"
+            style="width: 300px; height: 450px; position: absolute; top:50%; left:50%; transform:translate(-50%, -50%) ">
+        </div>
     </div>
 
-    {{-- TEXTO INFERIOR --}}
+
     <div
         class="fixed bottom-0 left-0 right-0 z-40 bg-gray-100 lg:hidden buttom-navigation border-t border-gray-200 shadow rounded-t-lg">
         <div class="flex justify-around items-center px-2 border-t-[3px] border-[#4d4d4d] rounded-[10px]">

@@ -12,6 +12,7 @@ export default defineConfig({
                 "resources/css/qr.css",
                 "resources/js/filterPuestoByPlaya.js",
                 "resources/js/dashboard-charts.js",
+                'resources/js/darkMode.js'
             ],
             refresh: true,
         }),

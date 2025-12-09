@@ -3,15 +3,8 @@
 
 @section('content')
 
-
-<button @click="darkMode = !darkMode"
-        class="px-4 py-2 bg-gray-200 dark:bg-gray-800 rounded">
-  Cambiar modo
-</button>
-
-
 <section class="text-gray-600 dark:text-gray-100 body-font px-4 py-10">
-<h2 class="mb-3 text-gray-700 text-2xl font-bold tracking-tight text-heading md:text-3xl lg:text-4xl section-title">Registrar Intervención</h2>
+<h2 class="mb-3 text-gray-700 dark:text-white text-2xl font-bold tracking-tight text-heading md:text-3xl lg:text-4xl section-title">Registrar Intervención</h2>
 <p class="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">Por favor complete los campos a continuación para registrar una intervención.</p>
 
 

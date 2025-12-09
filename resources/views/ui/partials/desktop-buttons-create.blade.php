@@ -24,14 +24,14 @@
              @can('agregar_bandera')
                 <div class="p-2 w-auto">
                     <a href="{{ route('bandera.create') }}">
-                        <div class="flex items-center bg-white px-2 pe-4 py-3 rounded-lg shadow-md hover:shadow-xl cursor-pointer dark:bg-gray-600 transition ease-in duration-300">
+                        <div class="flex items-center bg-white px-2 pe-4 py-2 rounded-lg shadow-md hover:shadow-xl cursor-pointer dark:bg-gray-600 transition ease-in duration-300">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                            class="bg-sky-600/20 text-sky-600 w-9 h-9 py-2 px-2 inline-block rounded-xl mx-2">
+                            class="bg-sky-600/20 text-sky-600 dark:bg-sky-800 dark:text-sky-400 w-9 h-9 py-2 px-2 inline-block rounded-xl mx-2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                         </svg>
                         <div class="text-start mx-2">
                             <p class="text-sm text-gray-400">Agregar</p>
-                            <p class="text-gray-800">Bandera</p>
+                            <p class="text-gray-800 dark:text-white">Bandera</p>
                         </div>
 
                     </div>
@@ -41,14 +41,14 @@
             @can('agregar_intervencion')
                 <div class="p-2 w-auto">
                     <a href="{{ route('intervencion.create') }}">
-                        <div class="flex items-center bg-white px-2 pe-3 py-3 rounded-lg shadow-md hover:shadow-xl cursor-pointer dark:bg-gray-600 transition ease-in duration-300">
+                        <div class="flex items-center bg-white px-2 pe-3 py-2 rounded-lg shadow-md hover:shadow-xl cursor-pointer dark:bg-gray-600 transition ease-in duration-300">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                            class="bg-orange-600/20 text-orange-600 w-9 h-9 py-2 px-2 inline-block rounded-xl mx-2">
+                            class="bg-orange-600/20 text-orange-600 dark:bg-orange-800 dark:text-orange-400 w-9 h-9 py-2 px-2 inline-block rounded-xl mx-2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                         </svg>
                         <div class="text-start mx-2">
                             <p class="text-sm text-gray-400">Agregar</p>
-                            <p class="text-gray-800">Intervencion</p>
+                            <p class="text-gray-800 dark:text-white">Intervencion</p>
                         </div>
 
                     </div>
@@ -57,15 +57,15 @@
             @endcan
             @can('agregar_novedad_material')
                 <div class="p-2 w-auto">
-                    <a href="{{ route('novedad-de-material.create') }}">
-                        <div class="flex justify-center items-center bg-white px-2 pe-3 py-3 rounded-lg shadow-md hover:shadow-xl cursor-pointer dark:bg-gray-600 transition ease-in duration-300">
+                    <a href="{{ route('novedad-de-material.create') }}" class="flex justify-center items-center bg-white px-2 pe-3 py-2 rounded-lg shadow-md hover:shadow-xl cursor-pointer dark:bg-gray-600 transition ease-in duration-300">
+                        <div class="flex justify-center items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                               class="bg-purple-500/30 text-purple-600 w-9 h-9 py-2 px-2 inline-block rounded-xl mx-2">
+                               class="bg-purple-500/30 text-purple-600 dark:bg-purple-800 dark:text-purple-400 w-9 h-9 py-2 px-2 inline-block rounded-xl mx-2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                             </svg>
                             <div class="text-start mx-2">
                                 <p class="text-sm text-gray-400">Agregar</p>
-                                <p class="text-gray-800">Novedad de Material</p>
+                                <p class="text-gray-800 dark:text-white">Novedad de Material</p>
                             </div>
 
                         </div>

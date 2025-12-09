@@ -3,20 +3,15 @@
 @section('content')
 
 
-<button @click="darkMode = !darkMode"
-        class="px-4 py-2 bg-gray-200 dark:bg-gray-800 rounded">
-  Cambiar modo
-</button>
-
 <div class="text-gray-600 dark:text-gray-100 body-font px-4 ">
-    <div class="flex justify-between align-center mb-sm-4">
-        <h2 class="text-gray-700 text-2xl font-bold tracking-tight text-heading md:text-3xl lg:text-4xl"> Asistencias </h2>
+    <div class="flex justify-between align-center my-4">
+        <h2 class="text-gray-700 dark:text-white text-2xl font-bold tracking-tight text-heading md:text-3xl lg:text-4xl"> Asistencias </h2>
     </div>
 
     <div x-data="{ selectedId: null }">
 {{--
         TODO: acomodar export!!! --}}
-    <x-filtros-de-busqueda :playas="$playas" tipo="asistencias" />
+    <x-filtros-de-busqueda :playas="$playas" tipo="asistencia-general" />
 
     @if (session('success'))
          <div class="bg-green-100 text-green-700 p-3 rounded my-2">
@@ -54,7 +49,7 @@
                     data-playa="{{ $g->playa->id ?? '' }}">
                     {{-- <td class="px-4 py-2">{{ $intervencion->fecha->format('d/m/Y') }}</td> --}}
                     <td class="px-4 py-2">
-                        <a href="{{ route('asistencias.guardavida', $g->id) }}" class="text-sky-600 hover:text-sky-400">
+                        <a href="{{ route('asistencias.guardavida', $g->id) }}" class="text-sky-600 hover:text-sky-400 dark:text-sky-400 dark:hover:text-sky-200">
                                 {{ $g->apellido }} {{ $g->nombre }}
                         </a>
                     </td>
@@ -77,7 +72,7 @@
 
                 {{-- VOLVER --}}
                 <div class="text-center mt-4">
-                    <a class="btn btn-secondary" href="{{ url('dashboard') }}">Volver</a>
+                    <a class="btn btn-secondary" onclick="window.history.back()">Volver</a>
                 </div>
 
 

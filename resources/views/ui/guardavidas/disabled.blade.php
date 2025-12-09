@@ -3,12 +3,6 @@
 
 @section('content')
 
-
-<button @click="darkMode = !darkMode"
-        class="px-4 py-2 bg-gray-200 dark:bg-gray-800 rounded">
-  Cambiar modo
-</button>
-
 <div class="text-gray-600 dark:text-gray-100 body-font px-4 ">
     <div class="flex justify-between align-center mb-sm-4">
         <h1 class="text-lg font-semibold text-gray-900 dark:text-white mt-3 "> Guardavidas bloqueados </h1>

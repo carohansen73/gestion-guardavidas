@@ -6,17 +6,7 @@
     </x-slot>
 @section('content')
 
-
-{{--
-<button @click="darkMode = !darkMode"
-        class="px-4 py-2 bg-gray-200 dark:bg-gray-800 rounded">
-  Cambiar modo
-</button>
-
-<div :class="{'dark': darkMode}">
-   <p class="text-gray-900 dark:text-gray-100">Hola!</p>
-</div> --}}
- @include('ui.partials.bandera')
+@include('ui.partials.bandera')
 
 
 
@@ -133,7 +123,7 @@
            || auth()->user()->can('ver_novedad_material') || auth()->user()->can('ver_licencia')
            || auth()->user()->can('ver_bandera') || auth()->user()->can('ver_cambio_turno') )
 
-            <a class="bg-sky-600 rounded flex px-4 py-3 h-full justify-between">
+            <a class="bg-sky-600 dark:bg-sky-700 rounded flex px-4 py-3 h-full justify-between">
                 <div class="flex">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                     class="text-gray-100 w-6 h-6 flex-shrink-0 mr-4">
@@ -171,7 +161,7 @@
     <div id="drawer-bottom-example" class="fixed bottom-0 left-0 right-0 z-50 w-full p-4 overflow-y-auto transition-transform translate-y-full bg-white dark:bg-gray-800 shadow-md" tabindex="-1"
         aria-labelledby="drawer-bottom-label">
         <h5 id="drawer-bottom-label" class="inline-flex items-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400">
-            <svg class="w-4 h-4 me-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+            <svg class="w-4 h-4 me-2.5 text-orange-600 dark:text-orange-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
             viewBox="0 0 20 20">
             <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
             </svg>Listados
@@ -185,7 +175,7 @@
         </button>
         {{-- Acciones --}}
         <div class="py-4">
-            <ul class="space-y-3 font-medium">
+            <ul class="space-y-3 font-medium dark:text-gray-100">
                 @can('ver_guardavida')
                 <li class="py-2">
                     <a href="{{ route('guardavida.index') }}"
@@ -242,23 +232,20 @@
                     </a>
                 </li>
                 @endcan
-                {{-- @can('ver_guardavida')
+                @can('ver_asistencia')
                 <li class="py-2">
-                    <a href="{{ route('bandera.index') }}"
+                    <a href="{{ route('asistencias.index') }}"
                         class=" inline-flex  font-medium  "
                         disabled>
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            class="w-5 h-5 me-2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                         class="w-5 h-5 me-2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                         </svg>
+
                         Asistencia
                     </a>
                 </li>
-                @endcan--}}
+                @endcan
                 @can('ver_licencia')
                  <li class="py-2">
                     <a href="{{ route('licencia.index') }}"

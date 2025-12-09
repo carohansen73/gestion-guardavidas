@@ -289,7 +289,7 @@
                             @else
                                 <div class="info-value text-gray-700">
                                     <i class="fas fa-clock"></i>
-                                    {{ $guardavida->turno ? $guardavida->turno->nombre_turno : 'No asignado' }}
+                                    {{ $guardavida->turno ? $guardavida->turno : 'No asignado' }}
                                 </div>
                             @endif
                         </div>

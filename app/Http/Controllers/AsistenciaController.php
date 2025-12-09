@@ -84,7 +84,7 @@ class AsistenciaController extends Controller
         $agent = new Agent();
 
         if($agent->isMobile()){
-            return view('admin.usuarios.asistencias', compact('guardavidas'));
+            return view('admin.usuarios.asistencias', compact('guardavidas', 'playas'));
         }
         else{
             return view('admin.usuarios.asistencias-desktop', compact('guardavidas', 'playas'));

@@ -6,7 +6,7 @@
                     <th class="px-4 py-2 text-left">Rol</th>
                     <th class="px-4 py-2 text-left">Playa - puesto</th>
                     <th class="px-4 py-2 text-left">Edit</th>
-                    <th class="px-4 py-2 text-left">Estado</th>
+                    <th class="px-4 py-2 text-left">Activo</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200 dark:divide-gray-600">
@@ -16,17 +16,17 @@
                         data-playa="{{ $registro->playa->id ?? '' }}">
 
                         <td class="px-4 py-2">
-                            <a href="{{ route('guardavida.show', $registro) }}" class="{{ !$registro->user->enabled ? 'text-gray-600 hover:text-gray-600 dark:text-gray-300' : 'text-sky-600 hover:text-sky-400' }}">
+                            <a href="{{ route('guardavida.show', $registro) }}" class="{{ !$registro->user->enabled ? 'text-gray-600 hover:text-gray-400 dark:text-gray-200 dark:hover:text-gray-100' : 'text-sky-600 hover:text-sky-500 dark:text-sky-300 hover:dark:text-sky-200' }}">
                                 {{ $registro->apellido }} {{ $registro->nombre }}
                             </a>
                         </td>
                         @php
                             $color = match($registro->funcion) {
-                                'Encargado' => 'text-red-600',
-                                'Jefe_de_playa' => 'text-orange-600',
-                                'Guardavida' => 'text-sky-600',
-                                'Timonel' => 'text-teal-600',
-                                default => 'text-gray-600'
+                                'Encargado' => 'text-red-600 dark:text-red-400',
+                                'Jefe_de_playa' => 'text-orange-600 dark:text-orange-400',
+                                'Guardavida' => 'text-sky-600 dark:text-sky-400',
+                                'Timonel' => 'text-teal-600 dark:text-teal-400',
+                                default => 'text-gray-600 dark:text-gray-400'
                             };
                         @endphp
                         <td class="px-4 py-2 {{ $color }}">{{ str_replace('_', ' ', $registro->funcion) }}</td>
@@ -41,7 +41,7 @@
                                     <a href="{{ route('guardavida.edit', $registro) }}"
                                         class="text-yellow-600 hover:underline">
                                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                                            class="text-sky-500 dark:text-sky-700 w-7 h-7  rounded p-1">
+                                            class="text-sky-500 dark:text-sky-400 w-7 h-7  rounded p-1">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
                                         </svg>
                                     </a>

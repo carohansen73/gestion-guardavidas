@@ -40,9 +40,13 @@ class NovedadMaterialController extends Controller
         $user = Auth::user();
         $guardavidaAuth = $user->guardavida;
 
-        $playas = Playa::all();
-        $materiales = Material::all();
+        if ($user->hasAnyRole(['guardavida', 'encargado']) && $guardavidaAuth){
+            $playas = Playa::where('id', $guardavidaAuth->playa_id)->get();
+        } else {
+            $playas = Playa::all();
+        }
 
+        $materiales = Material::all();
         //Enums
         $tipoNovedad = TipoNovedad::values();
 
@@ -101,8 +105,12 @@ class NovedadMaterialController extends Controller
         $user = Auth::user();
         $guardavidaAuth = $user->guardavida;
 
+        if ($user->hasAnyRole(['guardavida', 'encargado']) && $guardavidaAuth){
+            $playas = Playa::where('id', $guardavidaAuth->playa_id)->get();
+        } else {
+            $playas = Playa::all();
+        }
 
-        $playas = Playa::all();
         $materiales = Material::all();
         $tipoNovedad = TipoNovedad::values();
 
