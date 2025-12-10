@@ -4,8 +4,8 @@
 @section('content')
 
 <div class="text-gray-600 dark:text-gray-100 body-font px-4 ">
-    <div class="flex justify-between align-center mb-sm-4">
-        <h1 class="text-lg font-semibold text-gray-900 dark:text-white mt-3 "> Guardavidas bloqueados </h1>
+    <div class="flex justify-between align-center my-4">
+         <h2 class="text-gray-700 dark:text-white text-2xl font-bold tracking-tight text-heading md:text-3xl lg:text-4xl"> Guardavidas bloqueados </h2>
 
         <a href="{{ route('guardavida.create') }}" class="btn hidden sm:flex align-center bg-sky-500 dark:bg-sky-700 hover:bg-sky-400 dark:hover:bg-sky-600 rounded-full px-3 py-2 shadow">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"

@@ -28,7 +28,7 @@
             </a>
             @else
              <a href="{{ route('guardavida.index')}}"
-            class="playa-tag px-3 py-1 bg-sky-500 text-gray-100 rounded hover:bg-gray-300 hover:shadow-lg dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-gray-200">
+            class="@if (request()->routeIs('guardavidas.disabled'))  bg-gray-600 text-white  @endif playa-tag px-3 py-1 text-gray-100 rounded hover:bg-gray-600 hover:shadow-lg dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-gray-200">
                Habilitados
             </a>
             @endif

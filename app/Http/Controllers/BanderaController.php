@@ -27,11 +27,11 @@ class BanderaController extends Controller
             $registros = Bandera::where('playa_id', $user->guardavida->playa_id)
             ->with(['bandera', 'playa'])
             ->latest()
-            ->paginate(20);
+            ->get();
         }  elseif ($user->hasAnyRole(['admin', 'encargado', 'jefeDePlaya'])) {
              $registros = Bandera::with(['bandera', 'playa'])
             ->latest()
-            ->paginate(20);
+            ->get();
         } else {
             abort (403, 'No tienes permisos para ver este historial de banderas');
         }

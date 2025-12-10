@@ -36,11 +36,11 @@ class IntervencionController extends Controller
             $intervenciones = Intervencion::where('playa_id', $user->guardavida->playa_id)
             ->with(['guardavidas', 'fuerzas', 'puesto', 'playa'])
             ->latest()
-            ->paginate(20);
+            ->get();
         }  elseif ($user->hasAnyRole(['admin', 'encargado'])) {
             $intervenciones = Intervencion::with(['guardavidas', 'fuerzas', 'puesto', 'playa'])
             ->latest()
-            ->paginate(20);
+            ->get();
         } else {
             abort (403, 'No tienes permisos para ver estas intervenciones');
         }

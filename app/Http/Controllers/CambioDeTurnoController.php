@@ -20,7 +20,7 @@ class CambioDeTurnoController extends Controller
 
         $cambiosDeTurno = CambioDeTurno::with(['guardavida', 'playa', 'puesto'])
         ->latest()
-        ->paginate(20);
+        ->get();
 
         $playas = Playa::all();
 

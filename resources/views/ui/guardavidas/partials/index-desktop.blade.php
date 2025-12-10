@@ -1,4 +1,4 @@
-<x-index-table :registros="$registros">
+<x-index-table-links :registros="$registros">
             <thead class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
                 <tr>
                     <th class="px-4 py-2 text-left cursor-pointer" onclick="toggleSort()">Guardavidas</th>
@@ -69,4 +69,4 @@
                 @endforeach
 
             </tbody>
-        </x-index-table>
+        </x-index-table-links>

@@ -20,39 +20,80 @@ class GuardavidaController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
+        $playas = Playa::all();
         //Encargados solo de su playa? ->los de  claro/Dunamar pueden verse?
         //if ($user->hasRole('admin')) {
 
-        $guardavidas = Guardavida::
-            select('guardavidas.*')
-            ->join('playas', 'playas.id', '=', 'guardavidas.playa_id')
-            ->join('puestos', 'puestos.id', '=', 'guardavidas.puesto_id')
-            ->join('users', 'users.id', '=', 'guardavidas.user_id')
-            ->orderByDesc('users.enabled')
-            ->orderBy('playas.nombre')
-            ->orderBy('puestos.nombre')
-            ->orderBy('guardavidas.apellido')
-            ->orderBy('guardavidas.nombre')
-            ->with(['playa', 'puesto', 'user'])
-            ->paginate(20);
+        // Paso los filtros de busqueda al back porque en el front se rompe con el paginado
+        $guardavidas = $this->getlifeguardsLeaked($request);
 
-            $guardavidasHabilitados = Guardavida::with('user', 'playa', 'puesto')
-                ->whereHas('user', function ($query) {
-                    $query->where('enabled', true);
-                })
-                ->paginate(20);
-
-        //TODO solo habilitan/deshabilitan usuarios los admin o encargados tmb?
-
-        $playas = Playa::all();
+        // Para mobile - solo muestro habilitados
+        $guardavidasHabilitados = $this->getlifeguardsLeaked($request, true);
 
         return view('ui.guardavidas.index')
         ->with('registros', $guardavidas)
         ->with('playas', $playas)
         ->with('guardavidasHabilitados', $guardavidasHabilitados);
+    }
+
+    public function getlifeguardsLeaked($request, $enabledOnly = false){
+        // Posibles filtros
+        $search    = $request->input('search');
+        $playaId   = $request->input('playa_id');
+        $sortOrder = $request->input('sort', 'asc'); // asc o desc
+
+        $query = Guardavida::select('guardavidas.*')
+            ->join('playas', 'playas.id', '=', 'guardavidas.playa_id')
+            ->join('puestos', 'puestos.id', '=', 'guardavidas.puesto_id')
+            ->join('users', 'users.id', '=', 'guardavidas.user_id')
+            ->with(['playa', 'puesto', 'user']);
+
+        // FILTRO SOLO PARA HABILITADOS
+        if ($enabledOnly) {
+            $query->whereHas('user', function ($q) {
+                $q->where('enabled', true);
+            });
+        }
+
+        /* ----------------------
+        FILTRO POR PLAYA
+        ----------------------- */
+        if ($playaId && $playaId !== "all") {
+            $query->where('guardavidas.playa_id', $playaId);
+        }
+
+        /* ----------------------
+        BÚSQUEDA GENERAL
+        ----------------------- */
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('guardavidas.nombre', 'LIKE', "%$search%")
+                ->orWhere('guardavidas.apellido', 'LIKE', "%$search%")
+                ->orWhere('users.email', 'LIKE', "%$search%")
+                ->orWhere('puestos.nombre', 'LIKE', "%$search%")
+                ->orWhere('playas.nombre', 'LIKE', "%$search%");
+            });
+        }
+
+        /* ----------------------
+        ORDEN
+        ----------------------- */
+        $query->orderBy('guardavidas.apellido', $sortOrder)
+            ->orderBy('guardavidas.nombre', $sortOrder);
+
+        /* ----------------------
+        PAGINACIÓN
+        ----------------------- */
+        $registros = $query->paginate(20)->appends([
+            'search'   => $search,
+            'playa_id' => $playaId,
+            'sort'     => $sortOrder
+        ]);
+
+        return $registros;
     }
 
     public function getAllDisabled(){
@@ -158,11 +199,7 @@ class GuardavidaController extends Controller
         $guardavidaAuth = $user->guardavida;
         $rol = $guardavida->user?->getRoleNames()->first() ?? '';
 
-        if ($user->hasAnyRole(['guardavida', 'encargado']) ){
-            $playas = Playa::with('puestos')->where('id', $user->guardavida->playa_id)->get();
-        } else {
-            $playas = Playa::with('puestos')->get();
-        }
+        $playas = Playa::with('puestos')->get();
 
         return view('ui.guardavidas.edit', compact(
             'guardavidaAuth', 'rol', 'playas', 'guardavida'
