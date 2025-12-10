@@ -19,7 +19,7 @@
     @include('layouts.navigation')
 
     {{-- ANIMACIÓN DE CARGA --}}
-    <div id="contenedorCarga" style="display:none">
+    <div id="contenedorCarga">
         <div class="position">
             <div id="carga"></div>
             <p class="text-xl font-medium text-gray-800 py-2 px-4 flex-grow text-center">
@@ -28,26 +28,22 @@
         </div>
     </div>
 
-    {{-- BOTÓN SOLO PARA IPHONE (OBLIGATORIO POR REGLA DE SAFARI) --}}
-    <div id="btnIphoneScan" style="display:none" class="text-center mt-4">
-        <button id="btnScan" class="bg-green-600 text-white px-4 py-2 rounded-lg shadow font-semibold">
-            Activar Cámara
-        </button>
-    </div>
 
     {{-- CONTENEDOR DEL ESCÁNER --}}
-    <div class="contenedorQR" style="display:none">
+    <div class="contenedorQR">
         <div class="qr-frame">
 
             <!-- CÁMARA NATIVA (BarcodeDetector) -->
             <video id="video" autoplay playsinline muted></video>
 
-            <!-- FALLBACK html5-qrcode (solo iPhone) -->
-            <div id="qr-reader" style="display:none;"></div>
-
         </div>
-        <div id="qr-reader"
-            style="width: 300px; height: 450px; position: absolute; top:50%; left:50%; transform:translate(-50%, -50%) ">
+        <div style="
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        ">
+            <div id="qr-reader" style="width: 300px; height: 450px;"></div>
         </div>
     </div>
 

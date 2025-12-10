@@ -17,22 +17,14 @@ const contenedorAnimacionCarga = document.getElementById("contenedorCarga");
 const animacionCarga = document.getElementById("carga");
 
 document.querySelector(".contenedorQR").style.display = "block";
-contenedorAnimacionCarga.style.display = "none";
+
 
 //al iniciar el navegador pregunta si es iphone
 function esIphone() {
     return /iPhone|iPad|iPod/i.test(navigator.userAgent);
 }
 
-// Comprobación de uso de sistema operaivo iOS para usar Html5Qrcode
-function isIOS() {
-    let esSistemaIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-    if (!esSistemaIOS) {
-        let qrFrameBarcodeDetector = document.querySelector(".qr-frame");
-        qrFrameBarcodeDetector.classList.remove("ocultarDiv");
-    }
-    return esSistemaIOS;
-}
+
 // -----------------------------------------------------------
 // Iniciar cámara y escaneo automático
 // -----------------------------------------------------------
@@ -43,15 +35,15 @@ function isIOS() {
 // Decide si usar BarcodeDetector nativo o Html5Qrcode (fallback).
 // Controla timeout de 2 minutos y errores de permisos.
 // Solo Android inicia automáticamente
-if (!esIphone()) {
+/*if (!esIphone()) {
     iniciarCamara();
-}
+}*/
 
 async function iniciarCamara() {
     try {
         // iPhone siempre debe usar html5-qrcode
         //agrego para que pregunte si es android o no
-        if ("BarcodeDetector" in window && !esIphone()) {
+        /*if ("BarcodeDetector" in window && !esIphone()) {
             detector = new BarcodeDetector({ formats: ["qr_code"] });
             const stream = await navigator.mediaDevices.getUserMedia({
                 video: { facingMode: "environment" },
@@ -68,10 +60,10 @@ async function iniciarCamara() {
                     "warning"
                 );
             }, 2 * 60 * 1000);
-        } else {
+        } else {*/
             // fallback a html5-qrcode
-            html5Scanner = new Html5Qrcode("video");
-            await html5Scanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 },
+            html5Scanner = new Html5Qrcode("qr-reader");
+            await html5Scanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 600 },
                 (decodedText) => manejarQRLeido(decodedText)
                 //(errorMessage) => console.log("Escaneando...", errorMessage)
             );
@@ -84,7 +76,7 @@ async function iniciarCamara() {
                 );
             }, 2 * 60 * 1000);
             /*}*/
-        }
+        /*}*/
     } catch (error) {
         Swal.fire({
             title: "Error",
@@ -150,8 +142,7 @@ async function detenerScanner() {
         scanning = false;
     }
     if (html5Scanner) {
-        html5Scanner
-            .stop()
+        await html5Scanner.stop()
             .catch((err) =>
                 console.error("Error al detener html5Scanner:", err)
             );
@@ -525,6 +516,8 @@ async function calcularDistancia(lat1, lon1, lat2, lon2) {
 
     return R * c; // en metros
 }
+
+window.addEventListener("DOMContentLoaded", iniciarCamara);
 
 // -----------------------------------------------------------
 // Iniciar escaneo automáticamente
