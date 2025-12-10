@@ -61,14 +61,6 @@
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- Mostrar botón solo en iPhone -->
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-                document.getElementById("btnIphoneScan").style.display = "block";
-            }
-        });
-    </script>
 
     {{-- MÓDULOS --}}
     <script type="module" src="{{ asset('js/baseDeDatosNavegador.js') }}"></script>
