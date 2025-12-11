@@ -42,6 +42,9 @@
     @endphp
 @endauth
 
+@if(session('show_guardavida_setup'))
+    @include('ui.partials.modal-setup')
+@endif
 
 <div class="flex flex-col md:flex-row gap-6 px-6 py-6">
 

@@ -285,17 +285,46 @@ class GuardavidaController extends Controller
         //
     }
 
+    /**
+     * Esta funcion exige que el guardavidas, al loguearse por primera vez,
+     *  si es que no tiene turno asignado (por lo que el puesto tmp esta corroborado),
+     * Exige que el usuario actualize esta información.
+     *
+     * @param Request $request
+     * @return void
+     */
+    public function setup(Request $request){
+        //Valida puesto y turno para su actualización
+        $request->validate([
+            'puesto_id' => 'required|exists:puestos,id',
+            'turno'     => 'required|in:M,T',
+        ]);
+
+        $user = Auth::user();
+        if($user && $user->guardavida){
+            $guardavida = $user->guardavida;
+
+            // Actualiza puesto y turno
+            $guardavida->update([
+                'puesto_id' => $request->puesto_id,
+                'turno'     => $request->turno,
+            ]);
+
+            // Limpia el popup (para no volver a mostrar)
+            session()->forget('show_guardavida_setup');
+
+            return redirect()->route('home')
+                ->with('success', 'Puesto y turno configurados correctamente.');
+        }
+
+
+    }
+
     public function getAll(){
         $guardavidas = Guardavida::select('id', 'nombre', 'apellido')->get();
 
         return response()->json($guardavidas);
     }
-
-
-
-
-
-
 
 
     /**

@@ -22,12 +22,14 @@ class HomeController extends Controller
         $agent = new Agent();
         $isMobile = $agent->isMobile();
 
-        //bandera segun user->playa
+        // bandera segun user->playa
         $user = Auth::user();
-
         $bandera = $this->buscarBanderaActual($user);
 
-        // var_dump($bandera);die;
+        // Exije que actualice puesto y turn al loguearse la 1era vez
+        if ($user->guardavida && is_null($user->guardavida->turno)) {
+            session(['show_guardavida_setup' => true]);
+        }
 
         if( $agent->isMobile()) {
             return view('ui.home-mobile', compact( 'isMobile', 'bandera'));

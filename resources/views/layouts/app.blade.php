@@ -33,7 +33,7 @@
 </script>
 </head>
 
-<body class="font-sans antialiased  md:pb-0 pb-14" x-data="{ darkMode: false }" :class="{ 'dark': darkMode }">
+<body class="font-sans antialiased pb-0 " x-data="{ darkMode: false }" :class="{ 'dark': darkMode }">
 
 
     @include('layouts.navigation')
@@ -51,7 +51,7 @@
     @endisset
 
     <!-- Page Content -->
-    <div class="desktop-ml-64 min-h-screen bg-gray-100 dark:bg-gray-900 transition-all">
+    <div class="desktop-ml-64 min-h-screen bg-gray-100 dark:bg-gray-900 transition-all pb-14">
         <main class="overflow-x-hidden">
             @yield('content')
             {{-- {{ $slot }} --}}

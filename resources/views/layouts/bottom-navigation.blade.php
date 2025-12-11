@@ -25,11 +25,11 @@
 
 <nav>
 
-    <div class="fixed bottom-0 left-0 right-0 z-40 bg-white lg:hidden buttom-navigation border-t border-gray-200 shadow rounded-t-lg">
+    <div class="fixed bottom-0 left-0 right-0 z-40 bg-white lg:hidden buttom-navigation border-t border-gray-200 dark:border-gray-500 shadow rounded-t-lg">
         <div class="flex justify-around items-center  px-2">
             <!-- Íconos de la navbar -->
             @can('agregar_intervencion')
-            <a aria-current="page" class="flex flex-1 flex-col items-center justify-center text-xs font-medium py-1 px-4 text-gray-500 flex-grow text-center"
+            <a aria-current="page" class="flex flex-1 flex-col items-center justify-center text-xs font-medium py-1 px-4 text-gray-500 dark:text-gray-200 flex-grow text-center"
                 href="{{ route('intervencion.create') }}">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                     class="w-9 h-9">
@@ -39,7 +39,7 @@
                 <p> Intervención </p>
             </a>
             @else
-                <a aria-current="page" class="flex flex-1 flex-col items-center justify-center text-xs font-medium py-1 px-4 text-gray-500 flex-grow text-center"
+                <a aria-current="page" class="flex flex-1 flex-col items-center justify-center text-xs font-medium py-1 px-4 text-gray-500 dark:text-gray-200 flex-grow text-center"
                 href="{{ route('guardavida.myProfile') }}">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                     class="w-7 h-7">
@@ -52,11 +52,11 @@
             @endcan
 
             <!-- Botón flotante en el centro -->
-            <a href="{{route('home')}}" class="relative flex flex-1 flex-col items-center justify-center text-xs font-medium  text-gray-700 py-2 px-4 flex-grow text-center">
-                <div class="absolute bottom-0 p-2 rounded-full border-4 border-sky-200 bg-gray-100 shadow-lg">
+            <a href="{{route('home')}}" class="relative flex flex-1 flex-col items-center justify-center text-xs font-medium text-gray-700 py-2 px-4 flex-grow text-center">
+                <div class="absolute bottom-0 p-2 rounded-full border-4 border-sky-200 bg-gray-100 dark:bg-gray-800 dark:border-sky-800 shadow-lg">
 
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                        class="w-8 h-8  text-sky-600">
+                        class="w-8 h-8  text-sky-600 dark:text-sky-400">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
                     </svg>
 
@@ -65,7 +65,7 @@
             </a>
 
 
-    <a class="flex flex-1 flex-col items-center justify-center text-xs font-medium text-gray-500 py-1 px-4 flex-grow text-center"  href=" {{ route('activeCamera') }}">
+    <a class="flex flex-1 flex-col items-center justify-center text-xs font-medium text-gray-500 dark:text-gray-200 py-1 px-4 flex-grow text-center"  href=" {{ route('activeCamera') }}">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
         class="w-7 h-7">
         <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 3.75 9.375v-4.5ZM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 0 1-1.125-1.125v-4.5ZM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 13.5 9.375v-4.5Z" />

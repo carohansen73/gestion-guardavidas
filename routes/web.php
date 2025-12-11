@@ -22,8 +22,7 @@ Route::get('/', function () {
 
 
 Route::middleware(['auth', 'force.password'])->group(function () {
-    /* Fuerzo a que actualice la contraseña la 1era vez que se loguea
-    */
+    /* Fuerzo a que actualice la contraseña la 1era vez que se loguea*/
     Route::get('/force-password', [ForcedPasswordController::class, 'edit'])
     ->middleware('auth')
     ->name('password.force');
@@ -31,10 +30,14 @@ Route::middleware(['auth', 'force.password'])->group(function () {
     Route::post('/force-password', [ForcedPasswordController::class, 'update'])
         ->middleware('auth')
         ->name('password.force.update');
+
+      // Ruta que actualiza los datos del guardavida (turno, puesto, etc.)
+    Route::post('/guardavida/setup', [GuardavidaController::class, 'setup'])
+         ->name('guardavida.setup.store');
     /**/
 
     Route::get('/home', [HomeController::class, 'index'])->name('home');
-     Route::get('/dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
+    Route::get('/dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
 
     Route::get('/activeCamera', [QrController::class, 'activeCamera'])->name('activeCamera');
 
