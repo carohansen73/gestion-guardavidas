@@ -12,6 +12,8 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
     <link rel="stylesheet" href="https://use.typekit.net/wjn2blc.css">
+    {{-- Icons --}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/css/style.css',  'resources/js/darkMode.js'])
@@ -35,11 +37,8 @@
 
 <body class="font-sans antialiased pb-0 " x-data="{ darkMode: false }" :class="{ 'dark': darkMode }">
 
-
     @include('layouts.navigation')
-
     @include('layouts.sidebar')
-
 
     <!-- Contenido principal -->
 
@@ -65,7 +64,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/mensajesSW.js') }}"></script>
     <script src="{{ asset('resources/js/script.js') }}"></script>
-
     {{-- <script src="https://unpkg.com/flowbite@2.5.1/dist/flowbite.min.js"></script> --}}
 </body>
 

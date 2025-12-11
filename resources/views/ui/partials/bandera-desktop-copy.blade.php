@@ -12,10 +12,10 @@
 
 @if($rol !== 'admin' && $playaUsuario)
     @if($bandera)
-    @php
-        $fecha = \Carbon\Carbon::parse($bandera->fecha)->locale('es');
-    @endphp
-    {{-- Info de la Bandera del dia --}}
+        @php
+            $fecha = \Carbon\Carbon::parse($bandera->fecha)->locale('es');
+        @endphp
+        {{-- Info de la Bandera del dia --}}
         <div class="p-2">
             <div class="bg-gradient-to-r from-sky-200 to-purple-200 dark:from-sky-700 dark:to-purple-700 text-black rounded shadow-sm p-6 transform transition hover:scale-105 duration-300 bg-caracoles dark:bg-caracoles"
             >
@@ -133,4 +133,83 @@
     </div>
     @endif
 
+@else
+{{-- Es admin --}}
+
+
+@if($bandera && count($bandera) > 0)
+
+<div
+    x-data="carousel({ total: {{ count($bandera) }} })"
+    class="relative w-full overflow-hidden"
+>
+
+    <!-- Slides -->
+    <div class="flex transition-transform duration-500"
+         :style="`transform: translateX(-${current * 100}%);`">
+
+        @foreach($bandera as $b)
+            <div class="w-full flex-shrink-0 px-2">
+                @include('components.card-bandera-desktop', ['bandera' => $b])
+            </div>
+        @endforeach
+
+    </div>
+
+    <!-- Botón izquierda -->
+    <button @click="prev"
+        class="absolute left-2 top-1/2 -translate-y-1/2 bg-gray-700/40 text-white p-2 rounded-full">
+        ‹
+    </button>
+
+    <!-- Botón derecha -->
+    <button @click="next"
+        class="absolute right-2 top-1/2 -translate-y-1/2 bg-gray-700/40 text-white p-2 rounded-full">
+        ›
+    </button>
+
+    <!-- Indicadores -->
+    <div class="flex justify-center mt-2 space-x-2">
+        <template x-for="i in total">
+            <div
+                class="w-2 h-2 rounded-full transition"
+                :class="current === i - 1
+                    ? 'bg-sky-500'
+                    : 'bg-gray-400 dark:bg-gray-600'">
+            </div>
+        </template>
+    </div>
+
+</div>
+
 @endif
+
+
+
+@endif
+
+
+
+<script>
+document.addEventListener('alpine:init', () => {
+
+    Alpine.data('carousel', ({ total }) => ({
+        current: 0,
+        total,
+
+        next() {
+            this.current = (this.current + 1) % this.total;
+        },
+
+        prev() {
+            this.current = (this.current - 1 + this.total) % this.total;
+        },
+
+        autoplayInterval: null,
+
+        init() {
+            this.autoplayInterval = setInterval(() => this.next(), 5000);
+        }
+    }));
+});
+</script>

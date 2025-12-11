@@ -51,52 +51,23 @@
     <!-- 🟦 Columna principal (2/3 del ancho) -->
     <main class="w-full md:w-2/3  space-y-6">
 
-        @include('ui.partials.bandera-desktop-copy')
-
-{{-- @if($rol !== 'admin' && $playaUsuario)
-    <div class="px-4 py-4">
-        <div class="bg-gradient-to-r from-gray-100 to-{{$bandera->color}}-400 dark:from-gray-500 dark:to-{{$bandera->color}}-500 text-sky-900 dark:text-gray-200 rounded-2xl shadow-lg p-6 transform transition hover:scale-105 duration-300">
-            <div class="flex md:flex-row md:items-center justify-between gap-1">
-                <div class="flex items-center gap-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
-                        class="bandera
-                    text-{{$bandera->color}}-500 dark:text-{{$bandera->color}}-300
-                        w-12 h-12 flex-shrink-0 mr-4 animate-ondear">
-                        <path fill-rule="evenodd" d="M3 2.25a.75.75 0 0 1 .75.75v.54l1.838-.46a9.75 9.75 0 0 1 6.725.738l.108.054A8.25 8.25 0 0 0 18 4.524l3.11-.732a.75.75 0 0 1 .917.81 47.784 47.784 0 0 0 .005 10.337.75.75 0 0 1-.574.812l-3.114.733a9.75 9.75 0 0 1-6.594-.77l-.108-.054a8.25 8.25 0 0 0-5.69-.625l-2.202.55V21a.75.75 0 0 1-1.5 0V3A.75.75 0 0 1 3 2.25Z" clip-rule="evenodd" />
-                    </svg>
-                    <div>
-                        <h2 class="text-2xl md:text-3xl font-bold mb-2">Bandera del día</h2>
-                        <p class="text-sm font-medium"> Mar {{ $bandera->codigo }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-@endif --}}
+        {{-- Incluye Banderaa del día o coleccion de banderas si es admin --}}
+        @include('ui.partials.bandera-desktop')
 
 
-@if($isMobile)
+        @if($isMobile)
+            @include('ui.partials.mobile-buttons-create')
+        @else
+            @include('ui.partials.desktop-buttons-create')
+        @endif
 
-    @include('ui.partials.mobile-buttons-create')
-
-@else
-
-     @include('ui.partials.desktop-buttons-create')
-
-@endif
-
-@if($isMobile)
-
+        @if($isMobile)
+        @else
+            @include('ui.partials.desktop-cards')
+        @endif
 
 
-@else
-
-     @include('ui.partials.desktop-cards')
-
-@endif
-
-
-</main>
+    </main>
 <!-- 🟨 Aside lateral (1/3 del ancho) -->
     <aside class="hidden md:block w-full md:w-1/3 ">
 
