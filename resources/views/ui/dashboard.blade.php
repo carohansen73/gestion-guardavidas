@@ -8,42 +8,18 @@
 
 @section('content')
 
-{{-- <button @click="darkMode = !darkMode"
-        class="px-4 py-2 bg-gray-200 dark:bg-gray-800 rounded">
-  Cambiar modo
-</button>
-
-<div :class="{'dark': darkMode}">
-   <p class="text-gray-900 dark:text-gray-100">Dashboard</p>
-</div> --}}
-
-
-
 <div class="flex flex-col md:flex-row gap-6 px-6 py-6">
 
     <!-- 🟦 Columna principal (2/3 del ancho) -->
     <main class="w-full md:w-2/3  space-y-6">
-        {{-- hasta aca tenia --}}
 
-           {{-- <div class="flex flex-wrap gap-2 align-content-center">
-            <button
-                class="playa-tag px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-gray-200" --}}
-
-
-<h2 class=" text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
-    Mostrando datos de <span class="tituloPlayaSeleccionada text-sky-600">Todas las playas</span>
-</h2>
-
+        <h2 class=" text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
+            Mostrando datos de <span class="tituloPlayaSeleccionada text-sky-600">Todas las playas</span>
+        </h2>
 
         <div class="grid grid-cols-12 gap-4 ">
             <div class="col-span-12 space-y-6 ">
-
-
-
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6">
-
-
-
 
                     <!-- Metric Intervenciones Start  -->
                     <div class="rounded-2xl border border-gray-200 bg-white p-4 py-4 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
@@ -69,7 +45,6 @@
                     </div>
                     <!-- Metric Intervenciones End -->
 
-
                     <!-- Metric Novedades de materiales Start  -->
                     <div class="rounded-2xl border border-gray-200 bg-white p-4 py-4 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
                         <div class="flex justify-between">
@@ -87,114 +62,101 @@
                                     {{ $totalNovedadesMateriales }}
                                 </span>
                             </div>
-
                             <div class="flex flex-col justify-end items-end text-end"  id="porcentajeNovedadesPorPlaya">
-
                             </div>
                         </div>
                     </div>
                     <!-- Metric Novedades de materiales End -->
-
                 </div>
-
-
-
-
             </div>
         </div>
 
-{{--
-Graficos con filtros por playa
-DESDE ACA
---}}
+        {{--
+        Graficos con filtros por playa
+        DESDE ACA
+        1º Banderas mas izadas
+        --}}
 
+        <div class="md:w-2/3 bg-white p-4 rounded shadow">
+            <h3 class="text-lg font-semibold mb-2">Banderas más izadas</h3>
+            <canvas id="graficoBanderas" height="120"></canvas>
+        </div>
 
-
-
-<div class="md:w-2/3 bg-white p-4 rounded shadow">
-    <h3 class="text-lg font-semibold mb-2">Banderas más izadas</h3>
-    <canvas id="graficoBanderas" height="120"></canvas>
-</div>
-
-
-{{--
-HASTA ACA
- --}}
-
+        {{--
+        HASTA ACA
+        --}}
     </main>
     <!--  End Columna principal (2/3 del ancho) -->
+
 
     <!-- 🟨 Aside lateral (1/3 del ancho) -->
     <aside class="hidden md:block w-full md:w-1/3 ">
 
+         <!-- Filtro playas -->
         <div class="mb-2 flex flex-wrap gap-2 items-center">
-
-    <!-- Botón "Todas" -->
-    <button
-        class="btn-filtro bg-sky-100 text-blue-800 hover:bg-sky-200 px-2 py-1 rounded text-xs font-medium"
-        data-playa=""
-        data-nombre="Todas">
-        Todas
-    </button>
-
-    <!-- Botones por cada playa -->
-    @foreach($playas as $playa)
-        <button
-            class="btn-filtro bg-gray-200 text-gray-800 hover:bg-gray-300 px-2 py-1 rounded text-xs font-medium"
-            data-playa="{{ $playa->id }}"
-            data-nombre="{{ $playa->nombre }}">
-            {{ $playa->nombre }}
-        </button>
-    @endforeach
-</div>
+            <button
+                class="btn-filtro bg-sky-100 text-blue-800 hover:bg-sky-200 px-2 py-1 rounded text-xs font-medium"
+                data-playa=""
+                data-nombre="Todas">
+                Todas
+            </button>
+            <!-- Botones por cada playa -->
+            @foreach($playas as $playa)
+                <button
+                    class="btn-filtro bg-gray-200 text-gray-800 hover:bg-gray-300 px-2 py-1 rounded text-xs font-medium"
+                    data-playa="{{ $playa->id }}"
+                    data-nombre="{{ $playa->nombre }}">
+                    {{ $playa->nombre }}
+                </button>
+            @endforeach
+        </div>
 
 
         <div class="container bg-white dark:bg-gray-600 w-full px-3 py-3 rounded my-4">
             <h3 class="flex items-center mb-4 text-xl font-semibold text-gray-900 dark:text-white">
-                    Ultimas Novedades
-                </h3>
+                Ultimas Novedades
+            </h3>
 
-        <ol class="relative border-s border-gray-200 dark:border-gray-700 mx-2 my-2">
-        @foreach ($novedades as $index => $novedad)
-                @php
-            // $colores = [
-            //     'orange' => 'bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-300',
-            //     'teal' => 'bg-teal-100 dark:bg-teal-900 text-teal-800 dark:text-teal-300',
-            //     'sky' => 'bg-sky-100 dark:bg-sky-900 text-sky-800 dark:text-sky-300',
-            // ];
-            // $colorClase = $colores[$novedad->color] ?? 'bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-300';
-            @endphp
+            <ol class="relative border-s border-gray-200 dark:border-gray-700 mx-2 my-2">
+                @foreach ($novedades as $index => $novedad)
+                    @php
+                    // $colores = [
+                    //     'orange' => 'bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-300',
+                    //     'teal' => 'bg-teal-100 dark:bg-teal-900 text-teal-800 dark:text-teal-300',
+                    //     'sky' => 'bg-sky-100 dark:bg-sky-900 text-sky-800 dark:text-sky-300',
+                    // ];
+                    // $colorClase = $colores[$novedad->color] ?? 'bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-300';
+                    @endphp
 
-            <li class="mb-6 ms-6">
-                <span class=" {!! $novedad->color !!}
-                     absolute flex items-center justify-center w-6 h-6  rounded-full -start-3 ring-8 ring-white dark:ring-gray-900">
-                     {!! $novedad->icono !!}
-                </span>
-                <h3 class="flex items-center mb-1  font-semibold text-gray-900 dark:text-white">
-                     {{$novedad->titulo}}
-                     @if ($loop->first)
-                    <span class="bg-sky-100 text-sky-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300 ms-3">
-                        Latest
-                    </span>
-                    @endif
-                </h3>
-                <time class="block mb-2 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">
-                   {{$novedad->fecha}}
-                </time>
-                <p class="mb-4 text-base font-normal text-gray-500 dark:text-gray-400 ">
-                    {{$novedad->playa->nombre}}
-                </p>
+                    <li class="mb-6 ms-6">
+                        <span class=" {!! $novedad->color !!}
+                            absolute flex items-center justify-center w-6 h-6  rounded-full -start-3 ring-8 ring-white dark:ring-gray-900">
+                            {!! $novedad->icono !!}
+                        </span>
+                        <h3 class="flex items-center mb-1  font-semibold text-gray-900 dark:text-white">
+                            {{$novedad->titulo}}
+                            @if ($loop->first)
+                            <span class="bg-sky-100 text-sky-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300 ms-3">
+                                Latest
+                            </span>
+                            @endif
+                        </h3>
+                        <time class="block mb-2 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">
+                        {{$novedad->fecha}}
+                        </time>
+                        <p class="mb-4 text-base font-normal text-gray-500 dark:text-gray-400 ">
+                            {{$novedad->playa->nombre}}
+                        </p>
 
-                {{-- <a href="#" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:outline-none focus:ring-gray-100 focus:text-blue-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700"><svg class="w-3.5 h-3.5 me-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M14.707 7.793a1 1 0 0 0-1.414 0L11 10.086V1.5a1 1 0 0 0-2 0v8.586L6.707 7.793a1 1 0 1 0-1.414 1.414l4 4a1 1 0 0 0 1.416 0l4-4a1 1 0 0 0-.002-1.414Z"/>
-                    <path d="M18 12h-2.55l-2.975 2.975a3.5 3.5 0 0 1-4.95 0L4.55 12H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2Zm-3 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"/>
-                </svg> Download ZIP</a> --}}
-            </li>
-        @endforeach
-        </ol>
+                        {{-- <a href="#" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:outline-none focus:ring-gray-100 focus:text-blue-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700">
+                            <svg class="w-3.5 h-3.5 me-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M14.707 7.793a1 1 0 0 0-1.414 0L11 10.086V1.5a1 1 0 0 0-2 0v8.586L6.707 7.793a1 1 0 1 0-1.414 1.414l4 4a1 1 0 0 0 1.416 0l4-4a1 1 0 0 0-.002-1.414Z"/>
+                            <path d="M18 12h-2.55l-2.975 2.975a3.5 3.5 0 0 1-4.95 0L4.55 12H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2Zm-3 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"/>
+                        </svg> Download ZIP</a> --}}
+                    </li>
+                @endforeach
+            </ol>
         </div>
-
-
     </aside>
 
 
