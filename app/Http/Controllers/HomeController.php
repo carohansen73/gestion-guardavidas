@@ -26,16 +26,25 @@ class HomeController extends Controller
         $user = Auth::user();
         $bandera = $this->buscarBanderaActual($user);
 
-        // Exije que actualice puesto y turn al loguearse la 1era vez
+        $totales = [
+                'intervenciones' => Intervencion::count(),
+                'banderas' => Bandera::count(),
+                'novedades' => NovedadMaterial::count(),
+                'guardavidas' => Guardavida::whereHas('user', function ($u) {
+                    $u->where('enabled', 1);
+                })->count(),
+            ];
+
+        // Exije que actualice puesto y turno al loguearse la 1era vez
         if ($user->guardavida && is_null($user->guardavida->turno)) {
             session(['show_guardavida_setup' => true]);
         }
 
         if( $agent->isMobile()) {
-            return view('ui.home-mobile', compact( 'isMobile', 'bandera'));
+            return view('ui.home-mobile', compact( 'isMobile', 'bandera', 'totales'));
         } else{
                 $novedades = Novedad::orderBy('fecha', 'desc')->take(10)->get();
-               return view('ui.home-desktop', compact( 'isMobile', 'bandera', 'novedades'));
+               return view('ui.home-desktop', compact( 'isMobile', 'bandera', 'novedades', 'totales'));
         }
     }
 
