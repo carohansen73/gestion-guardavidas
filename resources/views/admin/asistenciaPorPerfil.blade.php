@@ -1,36 +1,28 @@
-<!DOCTYPE html>
-<html lang="es">
+@extends('layouts.app')
+{{-- @extends('layouts.navbar') --}}
+@push('styles')
+@vite(['resources/css/perfilGuardavidas.css'])
+@endpush
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perfil Guardavidas</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
-    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/css/style.css', 'resources/css/perfilGuardavidas.css'])
-
+@push('head-scripts')
     <script src="{{ asset('js/historialLicencias.js') }}"></script>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-</head>
+@endpush
 
-<body>
-     @include('layouts.navigation')
-     @include('layouts.sidebar')
+@section('content')
 
+    {{-- <div class="lg:ml-64 min-h-screen bg-gray-100 dark:bg-gray-800 "> --}}
+        <section class="pb-5 mx-4">
 
-    <div class="lg:ml-64 min-h-screen bg-gray-100 dark:bg-gray-800 ">
-        <main class="overflow-x-hidden pb-5 mx-4">
-
-        <!-- Header -->
-        <div class="header">
-            <button onclick="window.history.back()" class="btn-back">
-                <i class="fas fa-arrow-left"></i>
-                Volver
-            </button>
-            <h1 class="header-title">
-                <i class="fas fa-user-shield"></i>
-                {{ $esAdmin ? 'Perfil asistencia del Personal' : 'Mis asistencias' }}
-            </h1>
-        </div>
+            <!-- Header -->
+            <div class="relative flex items-center h-16 mt-4">
+                <button onclick="window.history.back()" class="btn-back z-10 flex items-center gap-2 bg-white dark:bg-gray-200 text-sky-600">
+                    <i class="fas fa-arrow-left"></i>
+                    Volver
+                </button>
+                <h1  class="header-title absolute left-1/2 -translate-x-1/2 text-center w-full pointer-events-none text-gray-900 dark:text-white">
+                    {{ $esAdmin ? 'Perfil asistencia del Personal' : 'Mis asistencias' }}
+                </h1>
+            </div>
 
         <!-- Alert Messages -->
         <div id="alertContainer"></div>
@@ -69,7 +61,7 @@
                             @endif
 
                             <span class="badge badge-active flex items-center gap-1">
-                                <i class="fas fa-check-circle"></i> Activo
+                                <i class="fas fa-check-circle me-1"></i> Activo
                             </span>
                         </div>
                     </div>
@@ -77,27 +69,19 @@
                 <!-- Profile Header end-->
 
 
-
-
-
-
             <!-- Profile Body -->
-
             <form id="profileForm" class="profile-body">
                 @csrf
                 @method('PUT')
 
                 <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6 text-gray-600 rounded sm:px-10 md:px-10 pb-12 py-10">
 
-
-
-
                     <!-- Personal Information -->
                     <div class="sm:col-span-6">
-                        <h3 class="section-title">
+                        <h2 class="title text-gray-700 dark:text-gray-50">
                             <i class="fas fa-id-card"></i>
                             Registro de asistencias
-                        </h3>
+                        </h2>
                     </div>
 
                     <!--  Listado de asistencias -->
@@ -105,8 +89,8 @@
                         <div class="info-grid">
                             @foreach ($guardavida->asistencias as $asistencia)
                                 <div class="info-item">
-                                    <label class="info-label">Puesto asignado</label>
-                                    <div class="info-value">
+                                    <label class="info-label text-gray-600 dark:text-gray-100">Puesto asignado</label>
+                                    <div class="info-value text-gray-600 dark:text-gray-200">
                                         <i class="fas fa-flag"></i>
                                         {{ $asistencia->puesto->puesto_id ?? 'No asignado' }}
                                     </div>
@@ -114,32 +98,32 @@
 
 
                                 <div class="info-item">
-                                    <label class="info-label">Playa</label>
-                                    <div class="info-value">
+                                    <label class="info-label text-gray-600 dark:text-gray-100">Playa</label>
+                                    <div class="info-value text-gray-600 dark:text-gray-200">
                                         <i class="fas fa-umbrella-beach"></i>
                                         {{ $asistencia->puesto->playa->nombre ?? 'No especificado' }}
                                     </div>
                                 </div>
 
                                 <div class="info-item">
-                                    <label class="info-label">Fecha</label>
-                                    <div class="info-value">
+                                    <label class="info-label text-gray-600 dark:text-gray-100">Fecha</label>
+                                    <div class="info-value text-gray-600 dark:text-gray-200">
                                         <i class="fas fa-calendar"></i>
                                         {{ $asistencia->fecha ?? 'No se registra asistencia en esta fecha' }}
                                     </div>
                                 </div>
 
                                 <div class="info-item">
-                                    <label class="info-label">Hora de entrada</label>
-                                    <div class="info-value">
+                                    <label class="info-label text-gray-600 dark:text-gray-100">Hora de entrada</label>
+                                    <div class="info-value text-gray-600 dark:text-gray-200">
                                         <i class="fas fa-clock"></i>
                                         {{ $asistencia->hora_entrada ?? 'No especificado' }}
                                     </div>
                                 </div>
 
                                 <div class="info-item">
-                                    <label class="info-label">Hora de salida</label>
-                                    <div class="info-value">
+                                    <label class="info-label text-gray-600 dark:text-gray-100">Hora de salida</label>
+                                    <div class="info-value text-gray-600 dark:text-gray-200">
                                         <i class="fas fa-clock"></i>
                                         {{ $asistencia->hora_salida ?? 'No especificado' }}
                                     </div>
@@ -149,7 +133,7 @@
                             @endforeach
                         </div>
                     @else
-                        <p class="no-data">No hay asistencias registradas.</p>
+                        <p class="no-data text-gray-600 dark:text-gray-200">No hay asistencias registradas.</p>
                     @endif
 
 
@@ -158,58 +142,60 @@
 
                     <!-- Work Information -->
                     <div class="sm:col-span-6">
-                        <h3 class="section-title">
+                        <h3 class="title text-gray-700 dark:text-gray-50">
                             <i class="fas fa-briefcase"></i>
                             Información Laboral
                         </h3>
                     </div>
 
                     <div class="sm:col-span-2">
-                        <label class="info-label">Playa</label>
-                        <div class="info-value">
+                        <label class="info-label text-gray-600 dark:text-gray-100">Playa</label>
+                        <div class="info-value text-gray-600 dark:text-gray-200">
                             <i class="fas fa-umbrella-beach me-1"></i>
                             {{ $guardavida->playa->nombre ?? 'No asignado' }}
                         </div>
                     </div>
 
                     <div class="sm:col-span-2">
-                        <label class="info-label">Puesto</label>
-                        <div class="info-value">
+                        <label class="info-label text-gray-600 dark:text-gray-100">Puesto</label>
+                        <div class="info-value text-gray-600 dark:text-gray-200">
                             <i class="fas fa-flag"></i>
                             {{ $guardavida->puesto->nombre ?? 'No asignado' }}
                         </div>
                     </div>
 
                     <div class="sm:col-span-2">
-                        <label class="info-label">Función</label>
-                        <div class="info-value">
+                        <label class="info-label text-gray-600 dark:text-gray-100">Función</label>
+                        <div class="info-value text-gray-600 dark:text-gray-200">
                             <i class="fas fa-tasks"></i>
                             {{ $guardavida->funcion ?? 'Guardavidas' }}
                         </div>
                     </div>
 
 
+                    <hr class="separator mb-5">
+
                 <div class="sm:col-span-6">
-                    <h3 class="section-title">
+                    <h3 class="title text-gray-700 dark:text-gray-50">
                         <i class="fas fa-chart-line"></i> Estadísticas
                     </h3>
                 </div>
 
                 <div class="sm:col-span-2">
-                    <div class="stat-card ">
-                        <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+                    <div class="stat-card text-gray-600 dark:text-gray-200">
+                        <div class="stat-icon text-end"><i class="fas fa-calendar-check"></i></div>
                         <div class="stat-value">{{ $guardavida->asistencias_count }}</div>
                         <div class="stat-label">Asistencias</div>
                     </div>
                 </div>
-                    <div class="stat-card sm:col-span-2">
-                        <div class="stat-icon"><i class="fas fa-life-ring"></i></div>
+                    <div class="stat-card text-gray-600 dark:text-gray-200 sm:col-span-2">
+                        <div class="stat-icon text-end"><i class="fas fa-life-ring"></i></div>
                         <div class="stat-value">{{ $guardavida->intervenciones_count }}</div>
                         <div class="stat-label">Intervenciones</div>
                     </div>
 
-                     <div class="stat-card sm:col-span-2">
-                        <div class="stat-icon"><i class="fas fa-life-ring"></i></div>
+                     <div class="stat-card text-gray-600 dark:text-gray-200 sm:col-span-2">
+                        <div class="stat-icon text-end"><i class="fas fa-life-ring"></i></div>
                         <div class="stat-value">{{ $guardavida->licencias_count }}</div>
                         <div class="stat-label">Licencias
 
@@ -290,8 +276,6 @@
             mostrarAlerta('error', '{{ session('error.titulo') }}', '{{ session('error.detalle') }}');
         </script>
     @endif
+    </section>
 
-
-</body>
-
-</html>
+@endsection

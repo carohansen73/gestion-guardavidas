@@ -15,24 +15,31 @@
     {{-- Icons --}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
 
-    <!-- Scripts -->
+    <!-- CSS y JS Generales -->
     @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/css/style.css',  'resources/js/darkMode.js'])
+
+    <!-- CSS específico por vista -->
+    @stack('styles')
+
+    {{-- JS específico por vista --}}
+    @stack('head-scripts')
+
     {{-- estilo del template --}}
     {{-- <link rel="stylesheet" href="{{ asset('resources/css/style.css') }}"> --}}
 
     <script>
-    // Evita el FOUC (Flash Of Unstyled Content)
-    (function() {
-        const theme = localStorage.getItem('theme');
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        // Evita el FOUC (Flash Of Unstyled Content)
+        (function() {
+            const theme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-        if (theme === 'dark' || (!theme && prefersDark)) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-    })();
-</script>
+            if (theme === 'dark' || (!theme && prefersDark)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
 </head>
 
 <body class="font-sans antialiased pb-0 " x-data="{ darkMode: false }" :class="{ 'dark': darkMode }">
