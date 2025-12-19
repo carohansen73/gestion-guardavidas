@@ -68,4 +68,8 @@ class Puesto extends Model
         });
     }
 
+    public static function getNombre($id){
+        return Puesto::where('id', $id)->value('nombre');
+    }
+
 }

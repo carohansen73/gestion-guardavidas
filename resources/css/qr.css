@@ -70,10 +70,12 @@ nav{
 
 .contenedorQR{
     display: flex;
+    justify-content: center;
     height: 100vh;
 }
 
-.qr-frame, #video{
+/*
+.qr-frame{
     position: absolute;
     width: 300px;
     height: 400px;
@@ -83,12 +85,7 @@ nav{
     margin: auto;
 }
 
-
-#video{
-    border: solid 2px #292929;
-}
-
-.qr-frame::before, .qr-frame::after, .qr-frame span::before, .qr-frame span::after{
+.qr-bordes::before, .qr-bordes::after, .qr-bordes span::before, .qr-bordes span::after{
     content: "";
     position: absolute;
     width: 25px;
@@ -97,38 +94,38 @@ nav{
     z-index: 10000;
 }
 
-.qr-frame::before{
+.qr-bordes::before{
     top: 0;
     left: 0;
     border-right: none;
     border-bottom: none;
 }
 
-.qr-frame::after{
+.qr-bordes::after{
     top: 0;
     right: 0;
     border-left: none;
     border-bottom: none;
 }
 
-.qr-frame span{
+.qr-bordes span{
     position: absolute;
     inset: 0;
 }
 
-.qr-frame span::before{
+.qr-bordes span::before{
     bottom: 0;
     left: 0;
     border-right: none;
     border-top: none;
 }
 
-.qr-frame span::after{
+.qr-bordes span::after{
     bottom: 0;
     right: 0;
     border-left: none;
     border-top: none;
-}
+}*/
 
 nav{
     z-index: 20000;
@@ -138,3 +135,6 @@ nav{
     display: none !important;
 }
 
+.alturaQR{
+    height: 100vh;
+}

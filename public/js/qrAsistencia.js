@@ -19,12 +19,6 @@ const animacionCarga = document.getElementById("carga");
 document.querySelector(".contenedorQR").style.display = "block";
 
 
-//al iniciar el navegador pregunta si es iphone
-function esIphone() {
-    return /iPhone|iPad|iPod/i.test(navigator.userAgent);
-}
-
-
 // -----------------------------------------------------------
 // Iniciar cámara y escaneo automático
 // -----------------------------------------------------------
@@ -32,35 +26,12 @@ function esIphone() {
 // iniciarCamara()
 // -----------------------------------------------------------
 // Inicializa la cámara trasera del dispositivo.
-// Decide si usar BarcodeDetector nativo o Html5Qrcode (fallback).
+// Usa Html5Qrcode (fallback).
 // Controla timeout de 2 minutos y errores de permisos.
-// Solo Android inicia automáticamente
-/*if (!esIphone()) {
-    iniciarCamara();
-}*/
+
 
 async function iniciarCamara() {
     try {
-        // iPhone siempre debe usar html5-qrcode
-        //agrego para que pregunte si es android o no
-        /*if ("BarcodeDetector" in window && !esIphone()) {
-            detector = new BarcodeDetector({ formats: ["qr_code"] });
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: "environment" },
-            });
-            video.srcObject = stream;
-            video.setAttribute("playsinline", true);
-            video.play();
-            scanning = true;
-            requestAnimationFrame(scanFrame);
-            timeoutId = setTimeout(() => {
-                detenerScanner();
-                alertaError(
-                    "El tiempo de escaneo expiró. Intenta nuevamente.",
-                    "warning"
-                );
-            }, 2 * 60 * 1000);
-        } else {*/
             // fallback a html5-qrcode
             html5Scanner = new Html5Qrcode("qr-reader");
             await html5Scanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 600 },
@@ -75,12 +46,10 @@ async function iniciarCamara() {
                     "warning"
                 );
             }, 2 * 60 * 1000);
-            /*}*/
-        /*}*/
     } catch (error) {
         Swal.fire({
             title: "Error",
-            text: "No se pudo acceder a la cámara.",
+            text: "No se logro acceder a la cámara. Intenta nuevamente.",
             icon: "error",
             confirmButtonColor: "#36be7f",
         }).then(() => {
@@ -88,28 +57,7 @@ async function iniciarCamara() {
         });
     }
 }
-// -----------------------------------------------------------
-// Escaneo de frames con BarcodeDetector
-// -----------------------------------------------------------
-// -----------------------------------------------------------
-// scanFrame()
-// -----------------------------------------------------------
-// Función recursiva que analiza cada frame usando BarcodeDetector
-// para detectar QR. Si encuentra uno, llama a manejarQRLeido.
 
-async function scanFrame() {
-    if (!scanning) return;
-    try {
-        const barcodes = await detector.detect(video);
-        if (barcodes.length > 0) {
-            const valorQR = barcodes[0].rawValue;
-            manejarQRLeido(valorQR);
-        }
-    } catch (error) {
-        console.error("Error en detección:", error);
-    }
-    if (scanning) requestAnimationFrame(scanFrame);
-}
 
 // -----------------------------------------------------------
 // Manejar QR leído
@@ -149,10 +97,23 @@ async function detenerScanner() {
         await html5Scanner.clear();
         html5Scanner = null;
     }
-    if (video.srcObject) {
+    if (video && video.srcObject) {
+            const tracks = video.srcObject.getTracks?.();
+
+            if (tracks && tracks.length > 0) {
+                tracks.forEach(track => {
+                    if (track.readyState === "live") {
+                        track.stop();
+                    }
+                });
+            }
+
+            video.srcObject = null;
+        }
+    /*if (video.srcObject) {
         video.srcObject.getTracks().forEach((track) => track.stop());
         video.srcObject = null;
-    }
+    }*/
     if (timeoutId) {
         clearTimeout(timeoutId);
         timeoutId = null;
@@ -192,27 +153,36 @@ async function registrarAsistencia(valorQR) {
             let latitudPuesto = data.puesto_lat;
             let longitudPuesto = data.puesto_lng;
 
+            let esFueraDeZona = await obtenerFueraDeZona(user_id, idPlaya);
+
             let resultado = await cargarDistancia(
                 latitudPuesto,
                 longitudPuesto
             );
+
             if (resultado == null || isNaN(resultado.distancia)) {
-                throw new Error("Distancia inválida");
+                throw new Error("La distancia no se logro calcular porque la aplicación no tiene permiso para acceder a tu ubicación. Intenta nuevamente.");
             }
-            console.log(resultado);
-            if (resultado.distancia > 200) {
-                throw new Error(
-                    "No se puede registrar la asistencia: el QR esta siendo escaneado a más de 200 metros de distancia."
-                );
-            }
+            
+            
 
             let puestoCorrecto = await perteneceQRAlPuesto(user_id, idPuesto);
-
+            
             if (!puestoCorrecto || puestoCorrecto.success == false) {
                 throw new Error(
-                    "No se puede registrar la asistencia: el QR esta siendo escaneado en el puesto incorrecto."
+                    "No se logro registrar la asistencia: el QR se está escaneando en un puesto diferente al asignado."
                 );
             }
+
+            
+            if (!esFueraDeZona.success){
+                if (resultado.distancia > 200) {
+                    throw new Error(
+                        "No se logro registrar la asistencia: el QR esta siendo escaneado a más de 200 metros de distancia."
+                    );
+                }
+            }
+            
 
             let datos = {
                 idPlaya: idPlaya,
@@ -300,9 +270,6 @@ async function perteneceQRAlPuesto(user_id, idPuesto) {
     } catch (error) {
         contenedorAnimacionCarga.style.display = "none";
         animacionCarga.classList.remove("animacion");
-        alertaError(
-            "Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente."
-        );
         return null;
     }
 }
@@ -349,7 +316,7 @@ async function guardarDatosOffline(
                 });
             } else {
                 throw new Error(
-                    "No se pudo guardar la asistencia, intente nuevamente"
+                    "Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente."
                 );
             }
         } catch (error) {
@@ -440,7 +407,7 @@ async function cargarDistancia(latitudPuesto, longitudPuesto) {
     } catch (err) {
         contenedorAnimacionCarga.style.display = "none";
         animacionCarga.classList.remove("animacion");
-        alertaError("Error obteniendo su ubicación.");
+        alertaError("Ha sucedido un error obteniendo su ubicación. Intenta nuevamente.");
     }
 }
 
@@ -455,6 +422,29 @@ async function obtenerId() {
     return user_id;
 }
 
+async function obtenerFueraDeZona(user_id, idPlaya){
+    idPlaya = Number(idPlaya);
+    try {
+        const res = await fetch("api/obtenerFueraDeZona", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+            body: JSON.stringify({ user_id: user_id, playa_id: idPlaya}),
+        });
+
+        const data = await res.json();
+        return data;
+    } catch (error) {
+        contenedorAnimacionCarga.style.display = "none";
+        animacionCarga.classList.remove("animacion");
+        alertaError(
+            "Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente."
+        );
+        return null;
+    }
+}
 // -----------------------------------------------------------
 // obtenerUbicacion()
 // -----------------------------------------------------------
