@@ -462,44 +462,4 @@ public function updateProfile(Request $request, Guardavida $guardavida)
         $puestos = Puesto::where('playa_id', $playa_id)->get();
         return response()->json($puestos);
     }
-
-    public function obtenerFueraDeZona(Request $request){
-
-        $validated = $request->validate([
-            'user_id' => 'required',
-            'playa_id' => 'required',
-        ]);
-        $idUser = $validated['user_id'];
-        $idPlaya = $validated['playa_id'];
-
-
-        $guardavida = Guardavida::obtenerGuardavidas($idUser, $idPlaya);
-
-        if (is_null($guardavida)) {
-            return response()->json([
-                'success' => false,
-            ]);
-        }
-
-        $nombrePuesto = Puesto::getNombre($guardavida->puesto_id);
-
-        if (is_null($nombrePuesto)) {
-            return response()->json([
-                'success' => false,
-            ]);
-        }
-
-        $puesto = mb_strtolower(trim($nombrePuesto), 'UTF-8');
-
-        if(str_replace(['á','é','í','ó','ú','ñ'], ['a','e','i','o','u','n'], $puesto) === 'movil'){
-            return response()->json([
-                'success' => true,
-            ]);
-        }
-        else{
-            return response()->json([
-                'success' => false,
-            ]);
-        }
-    }
 }

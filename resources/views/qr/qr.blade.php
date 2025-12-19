@@ -31,10 +31,19 @@
 
     {{-- CONTENEDOR DEL ESCÁNER --}}
     <div class="contenedorQR">
-        <div class="flex justify-center items-center alturaQR">
-            <div id="qr-reader" class="w-[300px] h-[450px]">
-            </div>
+        <div class="qr-frame">
 
+            <!-- CÁMARA NATIVA (BarcodeDetector) -->
+            <video id="video" autoplay playsinline muted></video>
+
+        </div>
+        <div style="
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        ">
+            <div id="qr-reader" style="width: 300px; height: 450px;"></div>
         </div>
     </div>
 
