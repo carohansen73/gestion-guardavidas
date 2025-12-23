@@ -18,12 +18,10 @@ const animacionCarga = document.getElementById("carga");
 
 document.querySelector(".contenedorQR").style.display = "block";
 
-
 //al iniciar el navegador pregunta si es iphone
 function esIphone() {
     return /iPhone|iPad|iPod/i.test(navigator.userAgent);
 }
-
 
 // -----------------------------------------------------------
 // Iniciar cámara y escaneo automático
@@ -61,21 +59,21 @@ async function iniciarCamara() {
                 );
             }, 2 * 60 * 1000);
         } else {*/
-            // fallback a html5-qrcode
-            html5Scanner = new Html5Qrcode("qr-reader");
-            await html5Scanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 600 },
-                (decodedText) => manejarQRLeido(decodedText)
-                //(errorMessage) => console.log("Escaneando...", errorMessage)
+        // fallback a html5-qrcode
+        html5Scanner = new Html5Qrcode("qr-reader");
+        await html5Scanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 600 },
+            (decodedText) => manejarQRLeido(decodedText)
+            //(errorMessage) => console.log("Escaneando...", errorMessage)
+        );
+        // Timeout de 2 minutos
+        timeoutId = setTimeout(() => {
+            detenerScanner();
+            alertaError(
+                "El tiempo de escaneo expiró. Intenta nuevamente.",
+                "warning"
             );
-            // Timeout de 2 minutos
-            timeoutId = setTimeout(() => {
-                detenerScanner();
-                alertaError(
-                    "El tiempo de escaneo expiró. Intenta nuevamente.",
-                    "warning"
-                );
-            }, 2 * 60 * 1000);
-            /*}*/
+        }, 2 * 60 * 1000);
+        /*}*/
         /*}*/
     } catch (error) {
         Swal.fire({
@@ -142,7 +140,8 @@ async function detenerScanner() {
         scanning = false;
     }
     if (html5Scanner) {
-        await html5Scanner.stop()
+        await html5Scanner
+            .stop()
             .catch((err) =>
                 console.error("Error al detener html5Scanner:", err)
             );
@@ -180,7 +179,17 @@ async function registrarAsistencia(valorQR) {
     animacionCarga.classList.add("animacion");
     const user_id = await obtenerId();
     try {
-        if (navigator.onLine) {
+        async function hayConexionReal() {
+            if (!navigator.onLine) return false;
+            try {
+                await fetch("/ping", { method: "HEAD", cache: "no-store" });
+                return true;
+            } catch {
+                return false;
+            }
+        }
+        //evita falso positivo
+        if (await hayConexionReal()) {
             let data = await desencriptarQR(valorQR);
             if (!data) {
                 throw new Error(
