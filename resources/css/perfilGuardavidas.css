@@ -64,7 +64,7 @@
     }
 
     .header-title {
-        font-size: 28px;
+        font-size: 24px;
         font-weight: 700;
     }
     /* Profile Card */
@@ -162,19 +162,6 @@
         width: 20px;
     }
 
-    .info-value.editable {
-        padding: 4px 8px;
-        background: #f8fafc;
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        transition: all 0.3s ease;
-    }
-
-    .info-value.editable:focus-within {
-        border-color: var(--primary-color);
-        background: white;
-    }
-
     input.form-control,
     select.form-control {
         width: 100%;
@@ -215,14 +202,14 @@
     /* Stats Cards */
 
 
-    .stat-card {
+    /* .stat-card {
         --tw-shadow: 0 4px 6px -1px rgb(123 123 123 / 82%), 0 2px 4px -2px rgb(123 123 123 / 82%);
         --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
         box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
         padding: 25px;
         border-radius: 8px;
         border: 1px rgb(201 201 201 / 82%) solid;
-    }
+    } */
 
     .stat-icon {
         font-size: 32px;

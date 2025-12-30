@@ -3,8 +3,8 @@
 @section('content')
 
 <div class="text-gray-600 dark:text-gray-100 body-font px-4 ">
-    <div class="flex justify-between align-center mb-sm-4">
-        <h2 class="text-gray-700 text-xl font-bold tracking-tight text-heading md:text-3xl lg:text-4xl">
+    <div class="flex justify-between align-center mb-sm-4 my-3">
+        <h2 class="text-gray-700 dark:text-white text-xl font-bold tracking-tight text-heading md:text-3xl lg:text-4xl">
             Historial de Asistencias de
             <span class="text-lg text-sky-600">
             {!! $guardavida->nombre !!}   {!! $guardavida->apellido !!}
@@ -162,6 +162,11 @@
             @endforeach
         </tbody>
     </x-index-table>
+               @if (method_exists($historial, 'links'))
+                    <div class="paginacion mt-4 px-4">
+                        {{ $historial->links() }}
+                    </div>
+                @endif
 {{-- End tabla --}}
 
                 {{-- @if (method_exists($guardavidas, 'links'))

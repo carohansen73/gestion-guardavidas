@@ -32,7 +32,7 @@
             <div class="profile-card bg-white rounded-lg shadow-md my-4">
 
                   <!-- Profile Header -->
-                <div class="profile-header bg-sky-600 py-4
+                <div class="profile-header bg-sky-600 dark:bg-sky-800 py-4
                     flex flex-col items-center text-center
                     md:flex-row md:items-center md:text-left md:justify-start rounded-t-lg">
 
@@ -87,6 +87,8 @@
                     <!--  Listado de asistencias -->
                     @if ($guardavida->asistencias->isNotEmpty())
                         <div class="info-grid">
+                            {{-- Puedo poner un calendario mes actual (carrusel otros meses)
+                            q marque con tilde cuando asistió, con X cuando no --}}
                             @foreach ($guardavida->asistencias as $asistencia)
                                 <div class="info-item">
                                     <label class="info-label text-gray-600 dark:text-gray-100">Puesto asignado</label>
@@ -133,7 +135,9 @@
                             @endforeach
                         </div>
                     @else
-                        <p class="no-data text-gray-600 dark:text-gray-200">No hay asistencias registradas.</p>
+                        <div class="sm:col-span-6">
+                            <p class="text-gray-600 dark:text-gray-200">No hay asistencias registradas.</p>
+                        </div>
                     @endif
 
 
