@@ -1,0 +1,20 @@
+{
+  "name": "Fichaje Guardavidas",
+  "short_name": "Fichaje",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d47a1",
+  "theme_color": "#0d47a1",
+  "icons": [
+    {
+      "src": "/img/offline/lifebuoy-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/img/offline/lifebuoy-192.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

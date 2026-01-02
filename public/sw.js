@@ -1,14 +1,70 @@
 import { agregarBaseDeDatosErrores, eliminarDatosIndexed } from "./js/baseDeDatosNavegador.js";
 
-self.addEventListener('install', event => {
-    console.log("instalando SW");
-    self.skipWaiting(); // fuerza que se active inmediatamente
+
+const CACHE_NAME = "static-v3";
+
+const URLS_TO_CACHE = [
+   "/",
+  "/manifest.json",
+  "/js/pantallaOffline.js",
+  "/js/qrAsistencia.js"
+];
+
+
+self.addEventListener("install", event => {
+  console.log('SW: install');
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(URLS_TO_CACHE))
+      .then(() => self.skipWaiting())
+      .catch(err => {
+        console.error('SW install failed:', err);
+      })
+  );
 });
 
 self.addEventListener('activate', event => {
     console.log("Activado SW");
-    event.waitUntil(clients.claim()); // la página queda controlada de inmediato
+    event.waitUntil(self.clients.claim()); // la página queda controlada de inmediato
 });
+
+// FETCH: responde aunque no haya internet
+self.addEventListener('fetch', event => {
+  const { request } = event;
+
+  if (request.method !== 'GET') return;
+
+  if (request.url.includes('/api/')) return;
+
+  if (request.url.includes('/ping')) {
+    event.respondWith(fetch(request));
+    return;
+  }
+
+  if (
+    request.mode === 'navigate' ||
+    request.url.includes('/login') ||
+    request.url.includes('/home')
+  ) {
+    event.respondWith(fetch(request));
+    return;
+  }
+
+  // ✅ solo assets estáticos
+  event.respondWith(
+    caches.match(request).then(cached => {
+      if (cached) return cached;
+
+      return fetch(request).then(response => {
+        return caches.open(CACHE_NAME).then(cache => {
+          cache.put(request, response.clone());
+          return response;
+        });
+      });
+    })
+  );
+});
+
 
 self.addEventListener('sync', event => {
   console.log('Evento de sincronización recibido:', event.tag);

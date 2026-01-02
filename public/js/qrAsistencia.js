@@ -18,6 +18,9 @@ const animacionCarga = document.getElementById("carga");
 
 document.querySelector(".contenedorQR").style.display = "block";
 
+let offline_user = localStorage.getItem("offline_user");
+const user = JSON.parse(offline_user);
+
 
 // -----------------------------------------------------------
 // Iniciar cámara y escaneo automático
@@ -164,8 +167,6 @@ async function registrarAsistencia(valorQR) {
                 throw new Error("La distancia no se logro calcular porque la aplicación no tiene permiso para acceder a tu ubicación. Intenta nuevamente.");
             }
             
-            
-
             let puestoCorrecto = await perteneceQRAlPuesto(user_id, idPuesto);
             
             if (!puestoCorrecto || puestoCorrecto.success == false) {
@@ -218,7 +219,7 @@ async function desencriptarQR(valorQR) {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${user.token}`,
             },
             body: JSON.stringify({ encrypted: valorQR }),
         });
@@ -260,7 +261,7 @@ async function perteneceQRAlPuesto(user_id, idPuesto) {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${user.token}`,
             },
             body: JSON.stringify({ user_id: user_id, puesto_id: idPuesto }),
         });
@@ -301,7 +302,7 @@ async function guardarDatosOffline(
                 precision: userPrecision,
                 user_id: user_id,
                 fecha_hora: fechaHoraArgentinaDatetime(),
-                token_bearer: localStorage.getItem("token"),
+                token_bearer: user.token,
             });
             contenedorAnimacionCarga.style.display = "none";
             animacionCarga.classList.remove("animacion");
@@ -340,7 +341,7 @@ async function cargarDatos(datos) {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${user.token}`,
             },
             body: JSON.stringify({
                 playa_id: datos.idPlaya,
@@ -417,8 +418,9 @@ async function cargarDistancia(latitudPuesto, longitudPuesto) {
 // Retorna el user_id almacenado en localStorage (ID del guardavidas)
 
 async function obtenerId() {
-    let local_user_id = localStorage.getItem("user_id");
-    let user_id = parseInt(local_user_id);
+    let offline_user = localStorage.getItem("offline_user");
+    const user = JSON.parse(offline_user);
+    let user_id = parseInt(user.id);
     return user_id;
 }
 
@@ -429,7 +431,7 @@ async function obtenerFueraDeZona(user_id, idPlaya){
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                Authorization: `Bearer ${user.token}`,
             },
             body: JSON.stringify({ user_id: user_id, playa_id: idPlaya}),
         });

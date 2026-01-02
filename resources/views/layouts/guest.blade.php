@@ -6,6 +6,8 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{ config('app.name', 'Laravel') }}</title>
+        <link rel="manifest" href="/manifest.json">
+        <meta name="theme-color" content="#0d47a1">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">

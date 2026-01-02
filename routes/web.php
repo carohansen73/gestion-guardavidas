@@ -20,6 +20,9 @@ Route::get('/', function () {
     return view('auth.welcome');
 })->name('welcome');
 
+Route::get('/ping', function () {
+    return response('', 204);
+});
 
 Route::middleware(['auth', 'force.password'])->group(function () {
     /* Fuerzo a que actualice la contraseña la 1era vez que se loguea*/

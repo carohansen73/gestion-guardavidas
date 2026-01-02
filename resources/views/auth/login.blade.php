@@ -1,9 +1,10 @@
 <x-guest-layout>
     <!-- Session Status -->
+
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
-    <form method="POST" action="{{ route('login') }}">
+    <form method="POST" action="{{ route('login') }}" id="formOnline">
         @csrf
 
         <!-- Email Address -->
@@ -48,8 +49,19 @@
 
     <div id="error" class="mt-3 text-sm font-semibold text-red-600"></div>
 
+    <div id="contenedorOffline">
+        <input type="text" id="nombre" placeholder="Nombre del guardavidas">
+
+        <button id="btnWhatsapp" >
+            Enviar registro por WhatsApp
+        </button>
+
+        <p id="estado"></p>
+    </div>
+
 </x-guest-layout>
 <script>
     const BASE_URL = "{{ url('/') }}";
 </script>
  <script src="{{ asset('js/loginIdUserOffline.js') }}"></script>
+ <script src="{{ asset('js/pantallaOffline.js') }}"></script>

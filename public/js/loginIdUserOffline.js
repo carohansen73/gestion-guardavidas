@@ -11,32 +11,35 @@ boton.addEventListener('click', (e) =>{
 async function loginOffline() {
     const email = document.querySelector('#email').value;
     const password = document.querySelector('#password').value;
+        try {
+            const res = await fetch(`${BASE_URL}/loginIdUser`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ email, password })
+            });
 
-    try {
-        const res = await fetch(`${BASE_URL}/loginIdUser`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            body: JSON.stringify({ email, password })
-        });
+            const data = await res.json();
+            console.log(data);
 
-        const data = await res.json();
-        console.log(data);
+            if (data.success) {
+                localStorage.setItem('offline_user', JSON.stringify({
+                    id: data.user.id,
+                    token: data.token,
+                    email: email,
+                }))
+                window.location.href = `${BASE_URL}/home`;
+            } else {
+                // Mostrar el mensaje del backend
+                errorDiv.textContent = data.message || 'Error al iniciar sesión';
+            }
 
-        if (data.success) {
-            localStorage.setItem('user_id', data.user.id);
-            localStorage.setItem('token', data.token);
-            window.location.href = `${BASE_URL}/home`;
-        } else {
-            // Mostrar el mensaje del backend
-            errorDiv.textContent = data.message || 'Error al iniciar sesión';
+        } catch (err) {
+            console.error('Error al hacer login:', err);
+            errorDiv.textContent = 'Error de conexión con el servidor.';
         }
-
-    } catch (err) {
-        console.error('Error al hacer login:', err);
-        errorDiv.textContent = 'Error de conexión con el servidor.';
-    }
 }
+
 
