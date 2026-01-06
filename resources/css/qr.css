@@ -14,7 +14,7 @@
     -webkit-transition: all 1s ease;
     -o-transition: all 1s ease;
     transition: all 1s ease;
-    z-index: 10000;
+    z-index: 1000000;
 }
 
 #carga{
@@ -136,5 +136,9 @@ nav{
 
 .ocultarDiv{
     display: none !important;
+}
+
+.alturaQR{
+    height: 100vh;
 }
 

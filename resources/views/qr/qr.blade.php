@@ -28,14 +28,15 @@
         </div>
     </div>
 
+    {{-- OPCIONES DE PUESTOS PARA CAMBIO DE FICHAJE --}}
     <div>
         <form action="#" method="get">
-            <label for="puestoSeleccionadoFichar" class="font-medium text-gray-700 py-2 px-4 flex-grow text-center mt-[5rem]">En caso de no fichar donde se le ha asignado, debe seleccionar donde va a registrar la asistencia: </label>
+            <label for="puestoSeleccionadoFichar" class="font-medium text-gray-700 py-2 px-4 flex-grow text-center mt-[5rem]">En caso de no fichar en el puesto asignado, debe seleccionar donde va a registrar la asistencia: </label>
             <div class="flex justify-center mb-[1rem]">
                 <select name="puestoSeleccionadoFichar" id="puestoSeleccionadoFichar">
                 <option value="default">Seleccionar</option>
                 @foreach ($puestos as $puesto)
-                    <option value="{{$puesto->id}}" data-id="{{$puesto->playa->id}}" data-lat="{{$puesto->latitud}}" data-lon="{{$puesto->longitud}}">{{$puesto->nombre}}</option>
+                    <option value="{{$puesto->id}}" data-id="{{$puesto->playa->id}}" data-lat="{{$puesto->latitud}}" data-lon="{{$puesto->longitud}}">{{$puesto->nombre}} - {{$puesto->playa->nombre}}</option>
                 @endforeach
             </select>
             </div>
@@ -44,12 +45,8 @@
 
     {{-- CONTENEDOR DEL ESCÁNER --}}
     <div class="contenedorQR">
-        <div style="
-            display: flex;
-            justify-content: center;
-            height: 100vh;
-        ">
-            <div id="qr-reader" style="width: 300px; height: 450px;"></div>
+        <div class="flex justify-center items-center alturaQR">
+            <div id="qr-reader" class="w-[300px] h-[450px]"></div>
         </div>
     </div>
 

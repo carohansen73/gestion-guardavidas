@@ -68,4 +68,9 @@ class Puesto extends Model
         });
     }
 
+
+    public static function getMovil(){
+        return Puesto::where('nombre', 'movil')->get();
+    }
+
 }

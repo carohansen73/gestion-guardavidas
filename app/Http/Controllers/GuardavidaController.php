@@ -462,4 +462,33 @@ public function updateProfile(Request $request, Guardavida $guardavida)
         $puestos = Puesto::where('playa_id', $playa_id)->get();
         return response()->json($puestos);
     }
+
+    public function obtenerFueraDeZona(Request $request){
+        $validated = $request->validate([
+            'puesto_id' => 'required',
+        ]);
+
+        $idPuesto = $validated['puesto_id'];
+
+
+        $puestosMovil = Puesto::getMovil();
+
+        if (is_null($puestosMovil)) {
+            return response()->json([
+                'success' => false,
+            ]);
+        }
+
+        foreach ($puestosMovil as $movil) {
+            if($movil->id == $idPuesto){
+                return response()->json([
+                'success' => true,
+            ]);
+            }
+        }
+
+        return response()->json([
+            'success' => false,
+        ]);
+    }
 }
