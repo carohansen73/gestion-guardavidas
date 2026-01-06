@@ -28,18 +28,24 @@
         </div>
     </div>
 
+    <div>
+        <form action="#" method="get">
+            <label for="puestoSeleccionadoFichar" class="font-medium text-gray-700 py-2 px-4 flex-grow text-center mt-[5rem]">En caso de no fichar donde se le ha asignado, debe seleccionar donde va a registrar la asistencia: </label>
+            <div class="flex justify-center mb-[1rem]">
+                <select name="puestoSeleccionadoFichar" id="puestoSeleccionadoFichar">
+                <option value="default">Seleccionar</option>
+                @foreach ($puestos as $puesto)
+                    <option value="{{$puesto->id}}" data-id="{{$puesto->playa->id}}" data-lat="{{$puesto->latitud}}" data-lon="{{$puesto->longitud}}">{{$puesto->nombre}}</option>
+                @endforeach
+            </select>
+            </div>
+        </form>
+    </div>
 
     {{-- CONTENEDOR DEL ESCÁNER --}}
     <div class="contenedorQR">
-        <div class="qr-frame">
-
-            <!-- CÁMARA NATIVA (BarcodeDetector) -->
-            <video id="video" autoplay playsinline muted></video>
-
-        </div>
         <div style="
             display: flex;
-            align-items: center;
             justify-content: center;
             height: 100vh;
         ">

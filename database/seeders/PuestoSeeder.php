@@ -24,7 +24,7 @@ class PuestoSeeder extends Seeder
             /* ['nombre' => 'Bagre (Timoneles)', 'latitud' => -38.8640, 'longitud' => -60.0550,  'qr_encriptado' => '', 'playa_id' => '1'],
             ['nombre' => 'Base Claromeco', 'latitud' => -38.8650, 'longitud' => -60.0555,  'qr_encriptado' => '', 'playa_id' => '1'],
             ['nombre' => 'Otro', 'latitud' => -38.8660, 'longitud' => -60.0560,  'qr_encriptado' => '', 'playa_id' => '1'], */
-            ['nombre' => 'Fuera zona de baño', 'latitud' => -38.8670, 'longitud' => -60.0565, 'qr_encriptado' => '', 'playa_id' => '1'],
+            ['nombre' => 'movil', 'latitud' => -38.8670, 'longitud' => -60.0565, 'qr_encriptado' => '', 'playa_id' => '1'],
 
             // Dunamar
             ['nombre' => 'Kuyem', 'latitud' => -38.861782, 'longitud' => -60.086318, 'qr_encriptado' => '', 'playa_id' => '2'],
@@ -32,7 +32,7 @@ class PuestoSeeder extends Seeder
             ['nombre' => 'Base Dunamar', 'latitud' => -38.85724, 'longitud' => -60.0869, 'qr_encriptado' => '', 'playa_id' => '2'],
             ['nombre' => 'Puesto Foca', 'latitud' => -38.85860, 'longitud' => -60.0885, 'qr_encriptado' => '', 'playa_id' => '2'],
             ['nombre' => 'Otro', 'latitud' => -38.85900, 'longitud' => -60.0890, 'qr_encriptado' => '', 'playa_id' => '2'], */
-            ['nombre' => 'Fuera zona de baño', 'latitud' => -38.86000, 'longitud' => -60.0900, 'qr_encriptado' => '', 'playa_id' => '2'],
+            ['nombre' => 'movil', 'latitud' => -38.86000, 'longitud' => -60.0900, 'qr_encriptado' => '', 'playa_id' => '2'],
 
             // Orense
             ['nombre' => 'Califa','latitud' => -38.806690, 'longitud' => -59.729438, 'qr_encriptado' => '', 'playa_id' => '3'],
@@ -40,7 +40,7 @@ class PuestoSeeder extends Seeder
             ['nombre' => 'Virazon', 'latitud' => -38.808155, 'longitud' => -59.732990, 'qr_encriptado' => '', 'playa_id' => '3'],
             /*['nombre' => 'Piedras Blancas','latitud' => -38.8085241, 'longitud' => -59.7348246, 'qr_encriptado' =>'', 'playa_id' => '3'],
             ['nombre' => 'Otro', 'latitud' => -38.83400, 'longitud' => -59.94900, 'qr_encriptado' => '', 'playa_id' => '3'], */
-            ['nombre' => 'Fuera zona de baño', 'latitud' => -38.83450, 'longitud' => -59.94950, 'qr_encriptado' => '', 'playa_id' => '3'],
+            ['nombre' => 'movil', 'latitud' => -38.83450, 'longitud' => -59.94950, 'qr_encriptado' => '', 'playa_id' => '3'],
 
             //Reta
             ['nombre' => 'Tequila', 'latitud' => -38.900833, 'longitud' => -60.334167, 'qr_encriptado' => '', 'playa_id' => 4],
@@ -54,7 +54,7 @@ class PuestoSeeder extends Seeder
             ['nombre' => 'Victor 4', 'latitud' => -38.9005, 'longitud' => -60.3390, 'qr_encriptado' => '', 'playa_id' => 4],
             ['nombre' => 'Quincho', 'latitud' => -38.9010, 'longitud' => -60.3393, 'qr_encriptado' => '', 'playa_id' => 4],
             ['nombre' => 'Otro', 'latitud' => -38.9020, 'longitud' => -60.3400, 'qr_encriptado' => '', 'playa_id' => 4], */
-            ['nombre' => 'Fuera zona de baño', 'latitud' => -38.9025, 'longitud' => -60.3405, 'qr_encriptado' => '', 'playa_id' => 4],
+            ['nombre' => 'movil', 'latitud' => -38.9025, 'longitud' => -60.3405, 'qr_encriptado' => '', 'playa_id' => 4],
 
             //Tres Arroyos
             ['nombre' => 'Municipalidad', 'latitud' => -38.3767662, 'longitud' => -60.2759348, 'qr_encriptado' => '', 'playa_id' => 5],

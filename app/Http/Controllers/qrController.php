@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
-
+use App\Models\Puesto;
 
 class QrController extends Controller
 {
@@ -29,6 +29,7 @@ class QrController extends Controller
     }
 
     public function activeCamera(){
-        return view('qr.qr');
+        $puestos = Puesto::with('playa')->get();
+        return view('qr.qr' , compact('puestos'));
     }
 }
