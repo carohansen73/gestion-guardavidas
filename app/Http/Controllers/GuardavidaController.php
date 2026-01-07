@@ -465,12 +465,10 @@ public function updateProfile(Request $request, Guardavida $guardavida)
 
     public function obtenerFueraDeZona(Request $request){
         $validated = $request->validate([
-            'puesto_id' => 'required',
+            'puesto_id' => 'required|integer|exists:puestos,id',
         ]);
 
         $idPuesto = $validated['puesto_id'];
-
-
         $puestosMovil = Puesto::getMovil();
 
         if (is_null($puestosMovil)) {

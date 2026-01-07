@@ -3,26 +3,24 @@ import { guardarAsistenciaOffline } from "./baseDeDatosNavegador.js";
 // -----------------------------------------------------------
 // Constantes y elementos HTML
 // -----------------------------------------------------------
-// video: elemento <video> donde se mostrará la cámara
 // contenedorAnimacionCarga: overlay con animación mientras se procesa
 // animacionCarga: elemento animado de carga
+// puestoSeleccionado: Puesto seleccionado para poder guardar la asistencia en esa ubicación.
 
 let scanning = false;
-let detector;
 let html5Scanner;
 let timeoutId;
 
 
-const video = document.getElementById("video");
 const contenedorAnimacionCarga = document.getElementById("contenedorCarga");
 const animacionCarga = document.getElementById("carga");
 let puestoSeleccionado = document.getElementById("puestoSeleccionadoFichar");
 
 document.querySelector(".contenedorQR").style.display = "block";
 
+// Toma valores del local storage id, bearer token
 let offline_user = localStorage.getItem("offline_user");
 const user = JSON.parse(offline_user);
-
 
 // -----------------------------------------------------------
 // Iniciar cámara y escaneo automático
@@ -35,23 +33,23 @@ const user = JSON.parse(offline_user);
 // Controla timeout de 2 minutos y errores de permisos.
 // Solo Android inicia automáticamente
 
-
 async function iniciarCamara() {
     try {
-            // fallback a html5-qrcode
-            html5Scanner = new Html5Qrcode("qr-reader");
-            await html5Scanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 600 },
-                (decodedText) => manejarQRLeido(decodedText)
-                //(errorMessage) => console.log("Escaneando...", errorMessage)
+        // fallback a html5-qrcode
+        html5Scanner = new Html5Qrcode("qr-reader");
+        await html5Scanner.start(
+            { facingMode: "environment" },
+            { fps: 10, qrbox: 600 },
+            (decodedText) => manejarQRLeido(decodedText)
+        );
+        // Timeout de 2 minutos
+        timeoutId = setTimeout(() => {
+            detenerScanner();
+            alertaError(
+                "El tiempo de escaneo expiró. Intenta nuevamente.",
+                "warning"
             );
-            // Timeout de 2 minutos
-            timeoutId = setTimeout(() => {
-                detenerScanner();
-                alertaError(
-                    "El tiempo de escaneo expiró. Intenta nuevamente.",
-                    "warning"
-                );
-            }, 2 * 60 * 1000);
+        }, 2 * 60 * 1000);
     } catch (error) {
         Swal.fire({
             title: "Error",
@@ -63,7 +61,6 @@ async function iniciarCamara() {
         });
     }
 }
-
 
 // -----------------------------------------------------------
 // Manejar QR leído
@@ -88,7 +85,7 @@ async function manejarQRLeido(valorQR) {
 // -----------------------------------------------------------
 // detenerScanner()
 // -----------------------------------------------------------
-// Detiene cualquier scanner activo (BarcodeDetector o Html5Qrcode),
+// Detiene cualquier scanner activo de Html5Qrcode,
 // detiene la cámara, limpia el timeout y resetea flags.
 
 async function detenerScanner() {
@@ -102,11 +99,6 @@ async function detenerScanner() {
             console.error("Error al detener html5Scanner:", err);
         }
         html5Scanner = null;
-    }
-
-    if (video.srcObject) {
-        video.srcObject.getTracks().forEach(track => track.stop());
-        video.srcObject = null;
     }
 
     if (timeoutId) {
@@ -144,34 +136,37 @@ async function registrarAsistencia(valorQR) {
                 );
             }
 
-            let idPlaya, idPuesto, latitudPuesto, longitudPuesto; 
+            let idPlaya, idPuesto, latitudPuesto, longitudPuesto;
 
-            if(puestoSeleccionado.value !== "default"){
-
-                const optionSeleccionada = puestoSeleccionado.options[puestoSeleccionado.selectedIndex];
+            if (puestoSeleccionado.value !== "default") {
+                const optionSeleccionada =
+                    puestoSeleccionado.options[
+                        puestoSeleccionado.selectedIndex
+                    ];
 
                 idPlaya = parseInt(optionSeleccionada.dataset.id);
                 idPuesto = parseInt(optionSeleccionada.value);
 
                 //data. referencia a los datos que vienen del QR , idPlaya y idPuesto son los valores al seleccionar el puesto donde fichar
-                if (idPlaya != data.playa_id || idPuesto != data.puesto_id){
+                // se encarga de que, si seleccionó donde se va a registrar la asistencia, escanee el QR correspondiente
+                if (idPlaya != data.playa_id || idPuesto != data.puesto_id) {
                     throw new Error(
-                    "Debe escanear el QR del puesto correspondiente donde registrará la asistencia."
+                        "Debe escanear el QR del puesto correspondiente donde registrará la asistencia."
                     );
                 }
-
                 latitudPuesto = parseFloat(optionSeleccionada.dataset.lat);
                 longitudPuesto = parseFloat(optionSeleccionada.dataset.lon);
-            }
-
-            else{
+            } else {
                 idPlaya = data.playa_id;
                 idPuesto = data.puesto_id;
                 latitudPuesto = data.puesto_lat;
                 longitudPuesto = data.puesto_lng;
 
                 // En caso de no cambiar el lugar de fichaje, se fija si esta escaneando el QR correcto
-                let puestoCorrecto = await perteneceQRAlPuesto(user_id, idPuesto);
+                let puestoCorrecto = await perteneceQRAlPuesto(
+                    user_id,
+                    idPuesto
+                );
                 if (!puestoCorrecto || puestoCorrecto.success == false) {
                     throw new Error(
                         "No se puede registrar la asistencia: el QR esta siendo escaneado en el puesto incorrecto."
@@ -179,26 +174,27 @@ async function registrarAsistencia(valorQR) {
                 }
             }
 
-            let resultado = await cargarDistancia( latitudPuesto, longitudPuesto);
+            let resultado = await cargarDistancia(
+                latitudPuesto,
+                longitudPuesto
+            );
 
             if (resultado == null || isNaN(resultado.distancia)) {
-                throw new Error("Distancia inválida");
+                throw new Error("La ubicación está desactivada o no fue autorizada. Activala para poder registrar la asistencia.");
             }
 
-            //Determina si el idPuesto (ya sea el valor del que es seleccionado donde fichar o donde se le tiene asignado sin modificar es un puesto
-            //que corresponde a un movil)
+            //Determina si el idPuesto (ya sea el seleccionado o el asignado) esta registrado como movil
             let esFueraDeZona = await obtenerFueraDeZona(idPuesto);
-            
-            //if(!esFueraDeZona.success){
-                // VER ZONA FUERA DE BAÑO
+
+            if (!esFueraDeZona.success) {
                 if (resultado.distancia > 200) {
                     throw new Error(
                         "No se puede registrar la asistencia: el QR esta siendo escaneado a más de 200 metros de distancia."
                     );
                 }
-            //}
-            
+            }
 
+            // userLat, userLng, userPrecision en los casos que son fuera de zona de baño se guarda la ubicación pero no se controla
             let datos = {
                 idPlaya: idPlaya,
                 userLat: resultado.userLat,
@@ -353,7 +349,6 @@ async function guardarDatosOffline(
 // y muestra confirmación al usuario mediante Swal.
 
 async function cargarDatos(datos) {
-    console.log(datos);
     try {
         let response = await fetch("api/cargarAsistencia", {
             method: "POST",
@@ -386,7 +381,7 @@ async function cargarDatos(datos) {
             });
         } else {
             throw new Error(
-                "Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente. CARGAR DATOS"
+                "Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente."
             );
         }
     } catch (err) {
@@ -440,7 +435,24 @@ async function obtenerId() {
     return user_id;
 }
 
-async function obtenerFueraDeZona(idPuesto){
+// -----------------------------------------------------------
+// Obtener estado "movil"
+// -----------------------------------------------------------
+// -----------------------------------------------------------
+// obtenerFueraDeZona(idPuesto)
+// idPuesto: number => id del puesto seleccionado/asignado del guardavidas para registrar la asistencia
+// -----------------------------------------------------------
+// Consulta al backend si el puesto indicado está marcado
+// como móvil (fuera de zona de baño).
+//
+// Retorna:
+// - true  → el puesto es móvil
+// - false → el puesto no es móvil
+//
+// En caso de error:
+// - Muestra alerta de error
+
+async function obtenerFueraDeZona(idPuesto) {
     idPuesto = Number(idPuesto);
     try {
         const res = await fetch("api/obtenerFueraDeZona", {
@@ -449,7 +461,7 @@ async function obtenerFueraDeZona(idPuesto){
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${user.token}`,
             },
-            body: JSON.stringify({puesto_id: idPuesto}),
+            body: JSON.stringify({ puesto_id: idPuesto }),
         });
 
         const data = await res.json();
@@ -458,11 +470,12 @@ async function obtenerFueraDeZona(idPuesto){
         contenedorAnimacionCarga.style.display = "none";
         animacionCarga.classList.remove("animacion");
         alertaError(
-            "Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente."
+            "Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente. FUERA DE ZONA"
         );
-        return null;
+        //return null;
     }
 }
+
 // -----------------------------------------------------------
 // obtenerUbicacion()
 // -----------------------------------------------------------
@@ -526,4 +539,3 @@ async function calcularDistancia(lat1, lon1, lat2, lon2) {
 }
 
 window.addEventListener("DOMContentLoaded", iniciarCamara);
-

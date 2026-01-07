@@ -49,10 +49,10 @@
 
     <div id="error" class="mt-3 text-sm font-semibold text-red-600"></div>
 
-    <div id="contenedorOffline">
+    <div id="contenedorOffline" style="display: none;">
         <input type="text" id="nombre" placeholder="Nombre del guardavidas">
 
-        <button id="btnWhatsapp" >
+        <button id="btnWhatsapp" style="display: none;">
             Enviar registro por WhatsApp
         </button>
 

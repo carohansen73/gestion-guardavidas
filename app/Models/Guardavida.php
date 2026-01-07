@@ -78,11 +78,10 @@ class Guardavida extends Model
         return $this->licencias()->count();
     }
 
-    public static function obtenerGuardavidas($idUser, $idPlaya)
+    public static function obtenerGuardavidas($idUser)
     {
         return self::with(['puesto.playa'])
             ->where('user_id', $idUser)
-            ->whereHas('puesto.playa', fn($q) => $q->where('id', $idPlaya))
             ->first();
     }
 

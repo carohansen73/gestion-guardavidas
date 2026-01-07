@@ -12,7 +12,7 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
     <!-- Styles & Scripts -->
-    @vite(['resources/css/app.css', 'resources/css/style.css', 'resources/css/qr.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/css/style.css', 'resources/css/qr.css', 'resources/js/app.js' , 'public/js/qrAsistencia.js'])
 </head>
 
 <body>
@@ -45,9 +45,8 @@
 
     {{-- CONTENEDOR DEL ESCÁNER --}}
     <div class="contenedorQR">
-        <div class="flex justify-center items-center alturaQR">
-            <div id="qr-reader" class="w-[300px] h-[450px]"></div>
-        </div>
+        <div class="flex justify-center h-[100vh]">
+            <div id="qr-reader" style="width: 300px; height: 450px;"></div>
     </div>
 
 
@@ -67,7 +66,7 @@
 
     {{-- MÓDULOS --}}
     <script type="module" src="{{ asset('js/baseDeDatosNavegador.js') }}"></script>
-    <script type="module" src="{{ asset('js/qrAsistencia.js') }}"></script>
+
 
 </body>
 

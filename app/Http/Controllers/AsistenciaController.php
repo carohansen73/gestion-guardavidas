@@ -42,10 +42,11 @@ class AsistenciaController extends Controller
             'precision' => 'required|numeric|min:0',
             'fecha_hora' => 'required|date_format:Y-m-d H:i:s'
         ]);
+        
         $idUser = $validated['user_id'];
-        $idPlaya = $validated['playa_id'];
 
-        $guardavidas = Guardavida::obtenerGuardavidas($idUser, $idPlaya);
+
+        $guardavidas = Guardavida::obtenerGuardavidas($idUser);
         if (is_null($guardavidas)) {
             return response()->json([
                 'success' => false,
