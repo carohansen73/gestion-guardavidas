@@ -199,16 +199,13 @@ class IntervencionController extends Controller
      */
     public function destroy(Intervencion $intervencion)
     {
+        // El permiso ya lo valida authorizeResource() del constructor contra
+        // IntervencionPolicy::delete() (permiso eliminar_intervencion). Antes
+        // había acá un chequeo manual con $user->rol, un atributo que no
+        // existe en el modelo User (usa Spatie) — esa condición nunca era
+        // verdadera, así que en la práctica solo el autor original podía
+        // borrar su propia intervención, ni admin ni encargado podían.
 
-         $user = Auth::user();
-
-        //solo lo puede eliminar el suaurio que lo creó o el encargado, jefe de playa o admin
-        //TODO cuanod haga el control por Policy
-        //$this->authorize('delete', $intervencion);
-        if ($intervencion->user_id !== $user->id && $user->rol !== 'encargado' && $user->rol !== 'jefe' && $user->rol !== 'admin') {
-            return redirect()->route('intervencion.index')
-            ->with('error', 'No tienes permiso para eliminar esta intervención.');
-        }
         // Limpia las relaciones de tablas relacionales
         $intervencion->fuerzas()->detach();
         $intervencion->guardavidas()->detach();
