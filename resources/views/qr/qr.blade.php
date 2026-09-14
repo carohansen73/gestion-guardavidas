@@ -30,6 +30,7 @@
 
     {{-- OPCIONES DE PUESTOS PARA CAMBIO DE FICHAJE --}}
     <div>
+        @if(isset($puestos) && $puestos->count())
         <form action="#" method="get">
             <label for="puestoSeleccionadoFichar" class="font-medium text-gray-700 py-2 px-4 flex-grow text-center mt-[5rem]">En caso de no fichar en el puesto asignado, debe seleccionar donde va a registrar la asistencia: </label>
             <div class="flex justify-center mb-[1rem]">
@@ -41,6 +42,7 @@
             </select>
             </div>
         </form>
+        @endif
     </div>
 
     {{-- CONTENEDOR DEL ESCÁNER --}}

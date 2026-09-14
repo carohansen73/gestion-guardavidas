@@ -20,8 +20,8 @@ return new class extends Migration
             $table->unsignedBigInteger('bandera_id')->nullable();
             $table->foreign('bandera_id')->references('id')->on('banderas')->onDelete('cascade');
             $table->boolean('traslado');
-            $table->unsignedBigInteger('playa_id');
-            $table->foreign('playa_id')->references('id')->on('playas')->onDelete('cascade');
+
+            
             $table->unsignedBigInteger('puesto_id');
             $table->foreign('puesto_id')->references('id')->on('puestos')->onDelete('cascade');
             $table->longText('detalles')->nullable();
