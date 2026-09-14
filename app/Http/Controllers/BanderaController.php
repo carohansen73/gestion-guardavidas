@@ -18,22 +18,35 @@ use Illuminate\Support\Facades\Log;
 class BanderaController extends Controller
 {
     /**
+     * authorizeResource()  agrega automaticamente los permisos de la policy
+     * a cada método del controller.
+     *
+     * Según el método, laravel verifica si el usuario tiene permisos en
+     * app/Policies/BanderaPolicy.php. si no tiene permisos devuelve 403
+     */
+    public function __construct()
+    {
+        $this->authorizeResource(Bandera::class, 'bandera');
+    }
+
+    /**
      * Display a listing of the resource. -> Historial
      */
     public function index()
     {
-         $user = Auth::user();
+        $user = Auth::user();
+
+        // El acceso ya está autorizado (ver_bandera) por authorizeResource();
+        // acá solo decido el alcance de los datos según el rol.
         if ($user->hasRole('guardavida')) {
             $registros = Bandera::where('playa_id', $user->guardavida->playa_id)
             ->with(['bandera', 'playa'])
             ->latest()
             ->get();
-        }  elseif ($user->hasAnyRole(['admin', 'encargado', 'jefeDePlaya'])) {
-             $registros = Bandera::with(['bandera', 'playa'])
+        } else {
+            $registros = Bandera::with(['bandera', 'playa'])
             ->latest()
             ->get();
-        } else {
-            abort (403, 'No tienes permisos para ver este historial de banderas');
         }
 
         $playas = Playa::all();
@@ -159,20 +172,10 @@ class BanderaController extends Controller
      */
     public function destroy(Bandera $bandera)
     {
-        $user = Auth::user();
-
-        //solo lo puede eliminar el usuaurio que lo creó o el encargado, jefe de playa o admin
-        //TODO cuanod haga el control por Policy
-        //$this->authorize('delete', $bandera);
-        if ($bandera->user_id === $user->id || $user->hasAnyRole(['encargado', 'admin']) ) {
-            $bandera->delete();
-
-            return redirect()->route('bandera.index')
-            ->with('success', 'Registro de bandera eliminado');
-        }
+        $bandera->delete();
 
         return redirect()->route('bandera.index')
-        ->with('error', 'No tienes permiso para eliminar este registro de bandera.');
+        ->with('success', 'Registro de bandera eliminado');
     }
 
     /**

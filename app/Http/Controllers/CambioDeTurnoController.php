@@ -12,6 +12,18 @@ use Illuminate\Http\Request;
 class CambioDeTurnoController extends Controller
 {
     /**
+     * authorizeResource()  agrega automaticamente los permisos de la policy
+     * a cada método del controller.
+     *
+     * Según el método, laravel verifica si el usuario tiene permisos en
+     * app/Policies/CambioDeTurnoPolicy.php. si no tiene permisos devuelve 403
+     */
+    public function __construct()
+    {
+        $this->authorizeResource(CambioDeTurno::class, 'cambio_de_turno');
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index()
@@ -32,15 +44,17 @@ class CambioDeTurnoController extends Controller
 
     /**
      * Panel admin independiente (/admin/turnos)
-
-      Filtros funcionales
-
-      Paginación
-
-      En el blade estilos básicos que se adaptan a las pantallas
+     *
+     * Filtros funcionales
+     *
+     * Paginación
+     *
+     * En el blade estilos básicos que se adaptan a las pantallas
      */
     public function indexAdmin(Request $request)
     {
+        $this->authorize('viewAny', CambioDeTurno::class);
+
         $query = CambioDeTurno::with(['guardavida', 'playa', 'puesto'])
             ->orderBy('fecha', 'desc');
 
@@ -57,9 +71,6 @@ class CambioDeTurnoController extends Controller
 
         return view('admin.usuarios.listadoTurnos', compact('registros', 'playas'));
     }
-
-
-
 
 
 

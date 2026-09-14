@@ -13,7 +13,7 @@ class LicenciaPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->can('ver_licencia');
     }
 
     /**
@@ -21,7 +21,7 @@ class LicenciaPolicy
      */
     public function view(User $user, Licencia $licencia): bool
     {
-        return false;
+        return $user->can('ver_licencia');
     }
 
     /**
@@ -29,7 +29,7 @@ class LicenciaPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->can('agregar_licencia');
     }
 
     /**
@@ -37,7 +37,7 @@ class LicenciaPolicy
      */
     public function update(User $user, Licencia $licencia): bool
     {
-        return false;
+        return $user->can('editar_licencia');
     }
 
     /**
@@ -45,7 +45,7 @@ class LicenciaPolicy
      */
     public function delete(User $user, Licencia $licencia): bool
     {
-        return false;
+        return $user->can('eliminar_licencia');
     }
 
     /**

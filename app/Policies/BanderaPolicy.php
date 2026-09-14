@@ -13,14 +13,23 @@ class BanderaPolicy
      */
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can('ver_bandera');
     }
 
     /**
-     * Determine whether the user can view the model.
+     * Un guardavida solo ve banderas de su propia playa.
+     * encargado y admin ven cualquiera.
      */
     public function view(User $user, Bandera $bandera): bool
     {
+        if (!$user->can('ver_bandera')) {
+            return false;
+        }
+
+        if ($user->hasRole('guardavida')) {
+            return $user->guardavida?->playa_id === $bandera->playa_id;
+        }
+
         return true;
     }
 
@@ -29,8 +38,7 @@ class BanderaPolicy
      */
     public function create(User $user): bool
     {
-        // return true;
-        return $user->hasRole('guardavida');
+        return $user->can('agregar_bandera');
     }
 
     /**
@@ -38,8 +46,7 @@ class BanderaPolicy
      */
     public function update(User $user, Bandera $bandera): bool
     {
-        // return true;
-         return $user->id === $bandera->user_id || $user->hasRole('Admin');
+        return $user->id === $bandera->user_id || $user->hasAnyRole(['encargado', 'admin']);
     }
 
     /**
@@ -47,7 +54,7 @@ class BanderaPolicy
      */
     public function delete(User $user, Bandera $bandera): bool
     {
-        return true;
+        return $user->id === $bandera->user_id || $user->hasAnyRole(['encargado', 'admin']);
     }
 
     /**

@@ -13,6 +13,17 @@ use Illuminate\Support\Facades\DB;
 
 class NovedadMaterialController extends Controller
 {
+
+/**
+ * authorizeResource() aplica automáticamente los permisos de la Policy
+ * a cada método del controller. Laravel verifica el permiso antes de
+ * ejecutar cada acción y devuelve un 403 si el usuario no está autorizado.
+ */
+    public function __construct()
+    {
+        $this->authorizeResource(NovedadMaterial::class, 'novedad_de_material');
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -146,16 +157,6 @@ class NovedadMaterialController extends Controller
      */
     public function destroy(NovedadMaterial $novedadDeMaterial)
     {
-        $user = Auth::user();
-
-        //solo lo puede eliminar el encargado o admin
-        //TODO cuanod haga el control por Policy
-        //$this->authorize('delete', $novedadDeMaterial);
-        if (!$user->hasAnyRole(['encargado', 'admin']) ) {
-            return redirect()->route('novedad-de-material.index')
-            ->with('error', 'No tienes permiso para eliminar esta novedad.');
-        }
-
         $novedadDeMaterial->delete();
 
         return redirect()->route('novedad-de-material.index')

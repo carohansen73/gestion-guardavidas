@@ -13,7 +13,7 @@ class NovedadMaterialPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->can('ver_novedad_material');
     }
 
     /**
@@ -21,7 +21,7 @@ class NovedadMaterialPolicy
      */
     public function view(User $user, NovedadMaterial $novedadMaterial): bool
     {
-        return false;
+        return $user->can('ver_novedad_material');
     }
 
     /**
@@ -29,7 +29,7 @@ class NovedadMaterialPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->can('agregar_novedad_material');
     }
 
     /**
@@ -37,7 +37,7 @@ class NovedadMaterialPolicy
      */
     public function update(User $user, NovedadMaterial $novedadMaterial): bool
     {
-        return false;
+        return $user->can('editar_novedad_material');
     }
 
     /**
@@ -45,7 +45,7 @@ class NovedadMaterialPolicy
      */
     public function delete(User $user, NovedadMaterial $novedadMaterial): bool
     {
-        return false;
+        return $user->can('eliminar_novedad_material');
     }
 
     /**

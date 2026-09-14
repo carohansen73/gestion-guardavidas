@@ -12,6 +12,18 @@ use Illuminate\Support\Facades\Storage;
 
 class LicenciaController extends Controller
 {
+     /**
+     * authorizeResource()  agrega automaticamente los permisos de la policy
+     * a cada método del controller.
+     *
+     * Según el método, laravel verifica si el usuario tiene permisos en
+     * app/Policies/LicenciaPolicy.php. si no tiene permisos devuelve 403
+     */
+    public function __construct()
+    {
+        $this->authorizeResource(Licencia::class, 'licencia');
+    }
+
     /**
      * Display a listing of the resource.
      */

@@ -13,7 +13,7 @@ class CambioDeTurnoPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->can('ver_cambio_turno');
     }
 
     /**
@@ -21,7 +21,7 @@ class CambioDeTurnoPolicy
      */
     public function view(User $user, CambioDeTurno $cambioDeTurno): bool
     {
-        return false;
+        return $user->can('ver_cambio_turno');
     }
 
     /**
@@ -29,7 +29,7 @@ class CambioDeTurnoPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->can('agregar_cambio_turno');
     }
 
     /**
@@ -37,7 +37,7 @@ class CambioDeTurnoPolicy
      */
     public function update(User $user, CambioDeTurno $cambioDeTurno): bool
     {
-        return false;
+        return $user->can('editar_cambio_turno');
     }
 
     /**
@@ -45,7 +45,7 @@ class CambioDeTurnoPolicy
      */
     public function delete(User $user, CambioDeTurno $cambioDeTurno): bool
     {
-        return false;
+        return $user->can('eliminar_cambio_turno');
     }
 
     /**
