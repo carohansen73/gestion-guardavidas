@@ -206,6 +206,20 @@
                         </a>
                     </li>
                 @endcan
+                @can('abm_roles_y_permisos')
+                    <li>
+                        <a href="{{ route('permisos.index') }}"
+                            class="{{ request()->routeIs('permisos.*') ? 'text-sky-600 bg-sky-100 dark:bg-gray-600' : 'text-gray-800' }} flex items-center p-2 text-gray-800 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"
+                                class="shrink-0 w-5 h-5 scale-[1.15] -translate-x-[3px] text-sky-600 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white">
+                                <path fill-rule="evenodd"
+                                    d="M12 1.5a5.25 5.25 0 0 0-5.25 5.25v3a3 3 0 0 0-3 3v6.75a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3v-6.75a3 3 0 0 0-3-3v-3c0-2.9-2.35-5.25-5.25-5.25Zm3.75 8.25v-3a3.75 3.75 0 1 0-7.5 0v3h7.5Z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            <span class="flex-1 ms-3 whitespace-nowrap">Permisos</span>
+                        </a>
+                    </li>
+                @endcan
             </ul>
             {{-- <ul class="pt-4 mt-4 space-y-2 font-medium border-t border-gray-200 dark:border-gray-700">
                 <li>

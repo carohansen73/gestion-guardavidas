@@ -14,6 +14,7 @@ use App\Http\Controllers\CambioDeTurnoController;
 use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\ExportController;
+use App\Http\Controllers\PermissionController;
 use Illuminate\Support\Facades\Artisan;
 
 Route::get('/', function () {
@@ -110,6 +111,14 @@ Route::middleware(['auth', 'force.password'])->group(function () {
         //  Route::get("/excel", [AsistenciaController::class, 'descargar']);
         Route::post('asistencias/export-dia', [ExportController::class, 'exportAsistenciasPorDia'])
     ->name('asistencias.exportDia');
+
+    // Gestión de permisos por rol. Gateado por el permiso abm_roles_y_permisos,
+    // que hoy solo tiene el rol superadmin (ver RolesYPermisosSeeder) — un admin
+    // normal no lo tiene y por lo tanto no puede acceder a estas rutas.
+    Route::middleware('can:abm_roles_y_permisos')->group(function () {
+        Route::get('/permisos', [PermissionController::class, 'index'])->name('permisos.index');
+        Route::put('/permisos', [PermissionController::class, 'update'])->name('permisos.update');
+    });
     });
 
 

@@ -247,6 +247,15 @@ class GuardavidaController extends Controller
         $nuevoRol = $validated['role'];
         $usuarioLogueado = auth()->user();
 
+        // El rol superadmin nunca se toca desde esta pantalla (ni para
+        // asignarlo ni para modificar a quien ya lo tiene) — se administra
+        // siempre a mano por SQL. syncRoles() reemplaza TODOS los roles del
+        // usuario, así que si no bloqueamos esto acá, editar el rol de un
+        // superadmin por esta vía le borraría el tag superadmin sin querer.
+        if ($nuevoRol === 'superadmin' || $user->hasRole('superadmin')) {
+            abort(403, 'El rol superadmin se administra manualmente, no desde esta pantalla.');
+        }
+
         //admin actualiza cualquier rol
         if($usuarioLogueado->hasRole('admin')){
             //Actualiza rol

@@ -20,6 +20,13 @@ class RolesYPermisosSeeder extends Seeder
         $guardavida = Role::firstOrCreate(['name' => 'guardavida']);
         $encargado = Role::firstOrCreate(['name' => 'encargado']);
         $admin = Role::firstOrCreate(['name' => 'admin']);
+        // superadmin: rol adicional (no reemplaza a admin). Un usuario superadmin
+        // tiene AMBOS roles asignados (admin + superadmin), así que todo chequeo
+        // hasRole('admin')/hasAnyRole([...,'admin']) que ya existe en el código
+        // sigue funcionando sin tocarlo. Lo único exclusivo de superadmin es el
+        // permiso abm_roles_y_permisos (ver más abajo), que gatea la pantalla de
+        // administración de permisos.
+        $superadmin = Role::firstOrCreate(['name' => 'superadmin']);
 
 
         // --- Permisos ---
@@ -113,6 +120,12 @@ class RolesYPermisosSeeder extends Seeder
             'ver_asistencia_propia',
         ]);
 
-        $admin->givePermissionTo(Permission::all());
+        // admin tiene todos los permisos MENOS abm_roles_y_permisos: la gestión
+        // de permisos queda exclusiva de superadmin (ver comentario arriba).
+        $admin->givePermissionTo(
+            Permission::all()->reject(fn (Permission $permiso) => $permiso->name === 'abm_roles_y_permisos')
+        );
+
+        $superadmin->givePermissionTo(Permission::all());
     }
 }
