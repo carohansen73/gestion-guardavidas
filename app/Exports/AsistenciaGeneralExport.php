@@ -51,8 +51,9 @@ class AsistenciaGeneralExport implements FromCollection, WithHeadings, WithTitle
                     $h['estado'],
                     // $h['detalle'] ?? '',
                     $h['ingreso'],
-                    $h['egreso'],
+                    $h['egreso'] ?: ($h['estado'] === 'ASISTIÓ' ? 'Sin registrar' : ''),
                     $h['puesto'],
+                    ($h['fuera_de_rango'] ?? false) ? 'Revisar ubicación' : '',
                 ];
             }
         }
@@ -62,7 +63,7 @@ class AsistenciaGeneralExport implements FromCollection, WithHeadings, WithTitle
 
     public function headings(): array
     {
-        return ['Guardavida', 'Fecha', 'Estado', 'Ingreso', 'Egreso', 'Puesto'];
+        return ['Guardavida', 'Fecha', 'Estado', 'Ingreso', 'Egreso', 'Puesto', 'Revisar'];
     }
 
     public function title(): string

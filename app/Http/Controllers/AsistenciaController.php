@@ -5,9 +5,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Guardavida;
 use App\Models\Asistencia;
-use App\Models\Licencia;
 use App\Models\Playa;
 use App\Models\Puesto;
+use App\Services\HistorialAsistenciaService;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Jenssegers\Agent\Agent;
@@ -59,11 +59,61 @@ class AsistenciaController extends Controller
         $precision = $validated['precision'];
         $idPuesto = $validated['puesto_id'];
         $guardavidas_id = $guardavidas->id;
-        $asistencia = Asistencia::nuevaAsistencia($lng, $lat, $precision, $idPuesto, $guardavidas_id, $fecha_hora);
+
+        $puesto = Puesto::findOrFail($idPuesto);
+        $estadoValidacion = $this->validarDistanciaAlPuesto($puesto, $lat, $lng, $precision);
+
+        $asistencia = Asistencia::nuevaAsistencia($lng, $lat, $precision, $idPuesto, $guardavidas_id, $fecha_hora, $estadoValidacion);
         return response()->json([
             'success' => true,
             'data' => $asistencia
         ], 200);
+    }
+
+    /**
+     * Determina si un fichaje quedó dentro del radio esperado del puesto
+     * (200m), sin bloquear el registro: solo lo marca para revisión.
+     *
+     * Le da el beneficio de la duda al margen de error propio del GPS
+     * (`$precisionMetros`, lo que el dispositivo reporta como incertidumbre
+     * de su propia ubicación) — un GPS con poca señal o el toggle de
+     * "Ubicación exacta" desactivado en iOS puede devolver una posición con
+     * cientos/miles de metros de margen de error; en esos casos no tiene
+     * sentido usar la distancia calculada como si fuera exacta.
+     *
+     * Los puestos "móviles" (fuera de zona de baño) no tienen radio fijo,
+     * así que siempre quedan como válidos.
+     */
+    private function validarDistanciaAlPuesto(Puesto $puesto, float $lat, float $lng, float $precisionMetros): string
+    {
+        $esMovil = Puesto::getMovil()->contains('id', $puesto->id);
+        if ($esMovil) {
+            return 'valido';
+        }
+
+        $distancia = $this->calcularDistanciaMetros($lat, $lng, (float) $puesto->latitud, (float) $puesto->longitud);
+
+        $distanciaConTolerancia = $distancia - $precisionMetros;
+
+        return $distanciaConTolerancia > 200 ? 'fuera_de_rango' : 'valido';
+    }
+
+    /**
+     * Fórmula de Haversine — distancia en metros entre dos coordenadas.
+     */
+    private function calcularDistanciaMetros(float $lat1, float $lon1, float $lat2, float $lon2): float
+    {
+        $radioTierra = 6371000; // metros
+        $radLat1 = deg2rad($lat1);
+        $radLat2 = deg2rad($lat2);
+        $deltaLat = deg2rad($lat2 - $lat1);
+        $deltaLon = deg2rad($lon2 - $lon1);
+
+        $a = sin($deltaLat / 2) ** 2
+            + cos($radLat1) * cos($radLat2) * sin($deltaLon / 2) ** 2;
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        return $radioTierra * $c;
     }
 
 
@@ -156,18 +206,13 @@ class AsistenciaController extends Controller
 
 
 
-    public function guardavidasPanelExcelAsistencias(){
-        return view('admin.DescargaDelExcelAsistencias');
-
-
-    }
-
     /**
-     * Agrego funcionalidad para crear un historial de asistencias para el guardavida seleccionado
+     * Historial de asistencias día por día para el guardavida seleccionado.
+     * La construcción del historial (ASISTIÓ/FALTA/LICENCIA, fuera_de_rango)
+     * vive en HistorialAsistenciaService — la misma lógica que usan los
+     * excels de asistencia, para que pantalla y Excel nunca se desincronicen.
      */
     public function getAttendanceHistory($request, $guardavidaId){
-
-        $guardavida = Guardavida::findOrFail($guardavidaId);
 
         //Toma el filtro de fechas, y si no se selecciono fecha, toma desde hace 30 dias atras.
         $inicio = $request->filled('inicio')
@@ -178,93 +223,21 @@ class AsistenciaController extends Controller
             ? Carbon::parse($request->input('fin'))->endOfDay()
             : Carbon::now()->endOfDay();
 
-        // FECHA DE INICIO FIJA (30 dias atras)
-        // $inicio = Carbon::now()->subDays(30)->startOfDay();
-        // $fin = Carbon::now()->endOfDay();
+        $historial = (new HistorialAsistenciaService())->generar($guardavidaId, $inicio, $fin);
 
-        // Asistencias del rango
-        $asistencias = Asistencia::where('guardavidas_id', $guardavidaId)
-            ->whereBetween('fecha_hora', [$inicio, $fin])
-            ->orderBy('fecha_hora')
-            ->get()
-            ->groupBy(fn($a) => Carbon::parse($a->fecha_hora)->toDateString());
-
-        // Licencias del rango
-        $licencias = Licencia::where('guardavida_id', $guardavidaId)
-            ->where(function($q) use ($inicio, $fin) {
-                $q->whereBetween('fecha_inicio', [$inicio, $fin])
-                ->orWhereBetween('fecha_fin', [$inicio, $fin])
-                ->orWhere(function ($q2) use ($inicio, $fin) {
-                    $q2->where('fecha_inicio', '<=', $inicio)
-                        ->where('fecha_fin', '>=', $fin);
-                });
-            })
-            ->get();
-
-        // Construcción del historial día x día
-        $historial = [];
-
-        for ($fecha = $inicio->copy(); $fecha->lte($fin); $fecha->addDay()) {
-
-            $dateString = $fecha->toDateString();
-
-            // 1. Verificamos si hay licencia ese día
-            $licencia = $licencias->first(function ($l) use ($fecha) {
-                return $fecha->between($l->fecha_inicio, $l->fecha_fin);
-            });
-
-            if ($licencia) {
-                $historial[] = [
-                    'fecha' => $dateString,
-                    'estado' => 'LICENCIA',
-                    'detalle' => $licencia->tipo_licencia,
-                    'ingreso' => null,
-                    'egreso' => null,
-                    'puesto' => $licencia->puesto->nombre ?? '-'
-                ];
-                continue;
-            }
-
-            // 2. Verificamos si hay asistencia ese día
-            $asis = $asistencias->get($dateString);
-
-            if ($asis) {
-                $historial[] = [
-                    'fecha' => $dateString,
-                    'estado' => 'ASISTIÓ',
-                    'ingreso' => $asis->first()->fecha_hora,
-                    'egreso' => $asis->last()->fecha_hora,
-                    'puesto' => $asis->first()->puesto->nombre ?? '-',
-                ];
-                continue;
-            }
-
-            // 3. Si no hay ni licencia ni asistencia → FALTÓ
-            $historial[] = [
-                'fecha' => $dateString,
-                'estado' => 'FALTA',
-                'ingreso' => null,
-                'egreso' => null,
-                'puesto' => '-',
-            ];
-        }
-
-        // 🔵 AGREGO PAGINACIÓN
+        // Paginación (el historial se arma completo en memoria, día por día)
         $page = request()->input('page', 1);
         $perPage = 10;
 
         $items = array_slice($historial, ($page - 1) * $perPage, $perPage);
 
-        $paginado = new LengthAwarePaginator(
+        return new LengthAwarePaginator(
             $items,
             count($historial),
             $perPage,
             $page,
             ['path' => request()->url(), 'query' => request()->query()]
         );
-
-        return $paginado;
-
     }
 
 

@@ -20,8 +20,21 @@ if ('serviceWorker' in navigator && !window._swRegistrado) {
                 await swReg.sync.register('sincronizar-asistencias');
                 console.log('Sincronización registrada correctamente');
             } else {
-                console.warn('SyncManager no soportado en este navegador');
+                console.warn('SyncManager no soportado en este navegador (ej. Safari/iOS) - se usa el respaldo de abajo');
             }
+
+            // Respaldo para navegadores sin SyncManager (principalmente iOS):
+            // le pedimos al Service Worker que sincronice apenas se abre la
+            // app con conexión, y de nuevo si la conexión vuelve mientras la
+            // app sigue abierta. No reemplaza a SyncManager en los
+            // navegadores que sí lo soportan, se suma como red adicional.
+            const pedirSincronizacion = () => {
+                if (navigator.onLine && swReg.active) {
+                    swReg.active.postMessage('sincronizar-asistencias');
+                }
+            };
+            pedirSincronizacion();
+            window.addEventListener('online', pedirSincronizacion);
         })
         .catch(err => console.error('Error al registrar SW o Sync:', err));
 }

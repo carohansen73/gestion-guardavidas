@@ -46,7 +46,8 @@ class HistorialAsistenciaService{
                     'detalle' => $licencia->tipo_licencia,
                     'ingreso' => null,
                     'egreso' => null,
-                    'puesto' => $licencia->puesto->nombre ?? '-'
+                    'puesto' => $licencia->puesto->nombre ?? '-',
+                    'fuera_de_rango' => false,
                 ];
                 continue;
             }
@@ -55,12 +56,19 @@ class HistorialAsistenciaService{
             $asistencia = $asistencias->get($dateString);
 
             if ($asistencia) {
+                // Si hubo un solo fichaje ese día, no hay salida registrada
+                // de verdad — mostrar la misma hora como "egreso" sugiere que
+                // trabajó 0 minutos, cuando en realidad no sabemos a qué hora
+                // se fue (pasa en más de la mitad de los días reales).
+                $huboEgresoDistinto = $asistencia->count() > 1;
+
                 $historial[] = [
                     'fecha' => $dateString,
                     'estado' => 'ASISTIÓ',
                     'ingreso' => $asistencia->first()->fecha_hora,
-                    'egreso' => $asistencia->last()->fecha_hora,
+                    'egreso' => $huboEgresoDistinto ? $asistencia->last()->fecha_hora : null,
                     'puesto' => $asistencia->first()->puesto->nombre ?? '-',
+                    'fuera_de_rango' => $asistencia->contains(fn ($a) => $a->estado_validacion === 'fuera_de_rango'),
                 ];
                 continue;
             }
@@ -72,6 +80,7 @@ class HistorialAsistenciaService{
                 'ingreso' => null,
                 'egreso' => null,
                 'puesto' => '-',
+                'fuera_de_rango' => false,
             ];
         }
 

@@ -70,8 +70,17 @@ self.addEventListener('sync', event => {
   console.log('Evento de sincronización recibido:', event.tag);
   if (event.tag === 'sincronizar-asistencias') {
     event.waitUntil(
-      sincronizarAsistencias(), 
+      sincronizarAsistencias(),
     );
+  }
+})
+
+// Respaldo para navegadores sin Background Sync (Safari/iOS no lo soporta).
+// La página (app.js) manda este mensaje al abrir o al reconectarse, y acá
+// disparamos la misma sincronización que usaría el evento 'sync' en Android.
+self.addEventListener('message', event => {
+  if (event.data === 'sincronizar-asistencias') {
+    event.waitUntil(sincronizarAsistencias());
   }
 })
 
@@ -102,8 +111,6 @@ async function cargarAsistenciaReconexion(asistencia) {
             }
             let idPlaya = data.playa_id;
             let idPuesto = data.puesto_id;
-            let latitudPuesto = data.puesto_lat;
-            let longitudPuesto = data.puesto_lng;
 
             let datos = {
               idPlaya: idPlaya,
@@ -115,11 +122,13 @@ async function cargarAsistenciaReconexion(asistencia) {
               fecha_hora: asistencia.fecha_hora,
             };
 
-            let resultado = await calcularDistancia(asistencia.lat, asistencia.lng, latitudPuesto, longitudPuesto);
-            if (resultado > 200){
-                agregarBaseDeDatosErrores(asistencia.id, datos);
-                throw new Error(`No se pudo registrar la asistencia: el QR fue escaneado a más de 200 metros de distancia el día: ${asistencia.fecha_hora}.`);
-            }
+            // La distancia ya NO se valida acá ni bloquea el reintento: la
+            // valida el servidor (con tolerancia por el margen de error del
+            // GPS) y guarda el fichaje igual, marcado para revisión si hace
+            // falta. Antes esto descartaba el registro para siempre
+            // (agregarBaseDeDatosErrores lo saca de la cola sin reintentar)
+            // ante cualquier lectura de GPS imprecisa — pérdida de datos real,
+            // no solo un bloqueo molesto.
 
             let puestoCorrecto = await perteneceQRAlPuesto(asistencia.user_id, idPuesto, asistencia.token_bearer);
             if (!puestoCorrecto || puestoCorrecto.success == false){
@@ -197,21 +206,6 @@ async function perteneceQRAlPuesto(user_id, idPuesto, token_bearer) {
         await notificarClientes('error', `Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente.`);
         return null;
     }
-}
-
-async function calcularDistancia(lat1, lon1, lat2, lon2) {
-    const R = 6371e3; // radio de la tierra en metros
-    const toRad = (x) => (x * Math.PI) / 180;
-    const φ1 = toRad(lat1);
-    const φ2 = toRad(lat2);
-    const Δφ = toRad(lat2 - lat1);
-    const Δλ = toRad(lon2 - lon1);
-    //calculo de longitud y latitud y si concuerda con los metros de distancia permitidos
-    const a =
-        Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-        Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c; // en metros
 }
 
 

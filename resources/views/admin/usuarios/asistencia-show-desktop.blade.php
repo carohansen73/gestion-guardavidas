@@ -94,6 +94,11 @@
                                 </h3>
                                 <span class="text-sm text-gray-500 dark:text-gray-300">
                                 Estado: <strong>{{ $h['estado'] }}</strong>
+                                @if ($h['fuera_de_rango'] ?? false)
+                                    <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800" title="El fichaje quedó a más de 200m del puesto (según GPS) - revisar">
+                                        ⚠ Revisar ubicación
+                                    </span>
+                                @endif
                                 </span>
                             </div>
                             {{-- </a> --}}
@@ -110,7 +115,14 @@
                                 <strong>Ingreso:</strong> {{ $h['ingreso'] ? \Carbon\Carbon::parse($h['ingreso'])->format('H:i') : '-' }}
                             </p>
                             <p class="text-sm text-gray-700 dark:text-gray-300">
-                                <strong>Egreso:</strong> {{ $h['egreso'] ? \Carbon\Carbon::parse($h['egreso'])->format('H:i') : '-' }}
+                                <strong>Egreso:</strong>
+                                @if ($h['egreso'])
+                                    {{ \Carbon\Carbon::parse($h['egreso'])->format('H:i') }}
+                                @elseif ($h['estado'] === 'ASISTIÓ')
+                                    <span class="text-amber-600 dark:text-amber-400">Sin registrar</span>
+                                @else
+                                    -
+                                @endif
                             </p>
                             <p class="text-sm text-gray-700 dark:text-gray-300">
                                 <strong>Puesto:</strong> {{ $h['puesto'] }}
@@ -154,9 +166,24 @@
                     >
                     {{-- <td class="px-4 py-2">{{ $intervencion->fecha->format('d/m/Y') }}</td> --}}
                     <td class="px-4 py-2">{{ $h['fecha'] }}</td>
-                    <td class="px-4 py-2">{{ $h['estado'] }}</td>
+                    <td class="px-4 py-2">
+                        {{ $h['estado'] }}
+                        @if ($h['fuera_de_rango'] ?? false)
+                            <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800" title="El fichaje quedó a más de 200m del puesto (según GPS) - revisar">
+                                ⚠ Revisar ubicación
+                            </span>
+                        @endif
+                    </td>
                     <td class="px-4 py-2">{{ $h['ingreso'] }}</td>
-                    <td class="px-4 py-2">{{ $h['egreso'] }}</td>
+                    <td class="px-4 py-2">
+                        @if ($h['egreso'])
+                            {{ $h['egreso'] }}
+                        @elseif ($h['estado'] === 'ASISTIÓ')
+                            <span class="text-amber-600 dark:text-amber-400">Sin registrar</span>
+                        @else
+                            -
+                        @endif
+                    </td>
                      <td class="px-4 py-2">{{ $h['puesto'] }}</td>
                 </tr>
             @endforeach

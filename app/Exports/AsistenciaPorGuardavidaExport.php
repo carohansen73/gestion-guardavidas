@@ -39,15 +39,16 @@ class AsistenciaPorGuardavidaExport implements FromCollection, WithHeadings, Wit
                 $h['estado'],
                 // $h['detalle'] ?? '',
                 $h['ingreso'],
-                $h['egreso'],
+                $h['egreso'] ?: ($h['estado'] === 'ASISTIÓ' ? 'Sin registrar' : ''),
                 $h['puesto'],
+                ($h['fuera_de_rango'] ?? false) ? 'Revisar ubicación' : '',
             ];
         });
     }
 
     public function headings(): array
     {
-        return ['Fecha', 'Estado', 'Ingreso', 'Egreso', 'Puesto'];
+        return ['Fecha', 'Estado', 'Ingreso', 'Egreso', 'Puesto', 'Revisar'];
     }
 
     public function title(): string

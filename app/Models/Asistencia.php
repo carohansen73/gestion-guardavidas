@@ -24,7 +24,7 @@ class Asistencia extends Model
 
 
 
-    public static function nuevaAsistencia($longitud, $latitud, $precision, $puesto_id, $guardavidas_id, $fecha_hora){
+    public static function nuevaAsistencia($longitud, $latitud, $precision, $puesto_id, $guardavidas_id, $fecha_hora, $estado_validacion = 'valido'){
         // createOrFirst: intenta crear, y si choca contra el índice único
         // (mismo guardavida + puesto + fecha_hora, típico de un reintento de
         // sincronización offline) devuelve el registro que ya existía en vez
@@ -41,6 +41,7 @@ class Asistencia extends Model
                 'longitud' => $longitud,
                 'latitud' => $latitud,
                 'precision' => $precision,
+                'estado_validacion' => $estado_validacion,
             ]
         );
     }

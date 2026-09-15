@@ -183,18 +183,14 @@ async function registrarAsistencia(valorQR) {
                 throw new Error("La ubicación está desactivada o no fue autorizada. Activala para poder registrar la asistencia.");
             }
 
-            //Determina si el idPuesto (ya sea el seleccionado o el asignado) esta registrado como movil
-            let esFueraDeZona = await obtenerFueraDeZona(idPuesto);
+            // La distancia al puesto ya NO se valida acá: la valida el
+            // servidor (que también considera el margen de error del GPS y
+            // si el puesto es "fuera de zona de baño"). Un fichaje lejos del
+            // puesto ya no se bloquea, se guarda igual marcado para revisión
+            // — antes un GPS impreciso (típico con "Ubicación exacta"
+            // desactivada en iOS) podía rechazar fichajes reales.
 
-            if (!esFueraDeZona.success) {
-                if (resultado.distancia > 200) {
-                    throw new Error(
-                        "No se puede registrar la asistencia: el QR esta siendo escaneado a más de 200 metros de distancia."
-                    );
-                }
-            }
-
-            // userLat, userLng, userPrecision en los casos que son fuera de zona de baño se guarda la ubicación pero no se controla
+            // userLat, userLng, userPrecision se guardan siempre; el servidor decide si quedan marcados para revisión
             let datos = {
                 idPlaya: idPlaya,
                 userLat: resultado.userLat,
@@ -433,47 +429,6 @@ async function cargarDistancia(latitudPuesto, longitudPuesto) {
 async function obtenerId() {
     let user_id = parseInt(user.id);
     return user_id;
-}
-
-// -----------------------------------------------------------
-// Obtener estado "movil"
-// -----------------------------------------------------------
-// -----------------------------------------------------------
-// obtenerFueraDeZona(idPuesto)
-// idPuesto: number => id del puesto seleccionado/asignado del guardavidas para registrar la asistencia
-// -----------------------------------------------------------
-// Consulta al backend si el puesto indicado está marcado
-// como móvil (fuera de zona de baño).
-//
-// Retorna:
-// - true  → el puesto es móvil
-// - false → el puesto no es móvil
-//
-// En caso de error:
-// - Muestra alerta de error
-
-async function obtenerFueraDeZona(idPuesto) {
-    idPuesto = Number(idPuesto);
-    try {
-        const res = await fetch("api/obtenerFueraDeZona", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${user.token}`,
-            },
-            body: JSON.stringify({ puesto_id: idPuesto }),
-        });
-
-        const data = await res.json();
-        return data;
-    } catch (error) {
-        contenedorAnimacionCarga.style.display = "none";
-        animacionCarga.classList.remove("animacion");
-        alertaError(
-            "Ocurrió un error inesperado al registrar la asistencia. Por favor, intentá nuevamente. FUERA DE ZONA"
-        );
-        //return null;
-    }
 }
 
 // -----------------------------------------------------------

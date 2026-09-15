@@ -105,13 +105,6 @@ Route::middleware(['auth', 'force.password'])->group(function () {
     Route::get('/mis-asistencias', [AsistenciaController::class, 'misAsistencias'])
         ->name('guardavida.misAsistencias');
 
-    //para  ir a la seccion de descarga  del excel de asistencias y aplicar filtros(puestos,dias,todos)
-    Route::get("guardavidas/excel", [AsistenciaController::class, 'guardavidasPanelExcelAsistencias'])->name('guardavidas.excel');
-        //para exportar excel de asistencias desde el panel de asistencias
-        //  Route::get("/excel", [AsistenciaController::class, 'descargar']);
-        Route::post('asistencias/export-dia', [ExportController::class, 'exportAsistenciasPorDia'])
-    ->name('asistencias.exportDia');
-
     // Gestión de permisos por rol. Gateado por el permiso abm_roles_y_permisos,
     // que hoy solo tiene el rol superadmin (ver RolesYPermisosSeeder) — un admin
     // normal no lo tiene y por lo tanto no puede acceder a estas rutas.
