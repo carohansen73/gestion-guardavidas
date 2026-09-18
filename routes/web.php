@@ -1,21 +1,23 @@
 <?php
-use App\Http\Controllers\QrController;
+
 use App\Exports\GuardavidasExport;
-use App\Exports\IntervencionesExport;
-use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\AsistenciaController;
 use App\Http\Controllers\Auth\ApiAuthController;
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Auth\ForcedPasswordController;
+use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\CambioDeTurnoController;
+use App\Http\Controllers\ExportController;
+use App\Http\Controllers\FrancoExcepcionController;
+use App\Http\Controllers\FrancoIntercambioController;
 use App\Http\Controllers\GuardavidaController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\QrController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\AsistenciaController;
-use App\Http\Controllers\Auth\ForcedPasswordController;
-use App\Http\Controllers\CambioDeTurnoController;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Http\Controllers\ExportController;
-use App\Http\Controllers\PermissionController;
-use Illuminate\Support\Facades\Artisan;
 
 Route::get('/', function () {
     return view('auth.welcome');
@@ -26,18 +28,18 @@ Route::get('/ping', function () {
 });
 
 Route::middleware(['auth', 'force.password'])->group(function () {
-    /* Fuerzo a que actualice la contraseña la 1era vez que se loguea*/
+    /* Fuerzo a que actualice la contraseña la 1era vez que se loguea */
     Route::get('/force-password', [ForcedPasswordController::class, 'edit'])
-    ->middleware('auth')
-    ->name('password.force');
+        ->middleware('auth')
+        ->name('password.force');
 
     Route::post('/force-password', [ForcedPasswordController::class, 'update'])
         ->middleware('auth')
         ->name('password.force.update');
 
-      // Ruta que actualiza los datos del guardavida (turno, puesto, etc.)
+    // Ruta que actualiza los datos del guardavida (turno, puesto, etc.)
     Route::post('/guardavida/setup', [GuardavidaController::class, 'setup'])
-         ->name('guardavida.setup.store');
+        ->name('guardavida.setup.store');
     /**/
 
     Route::get('/home', [HomeController::class, 'index'])->name('home');
@@ -57,14 +59,14 @@ Route::middleware(['auth', 'force.password'])->group(function () {
     Route::resource('licencia', App\Http\Controllers\LicenciaController::class)->parameters(['licencia' => 'licencia']);
     Route::resource('cambio-de-turno', App\Http\Controllers\CambioDeTurnoController::class);
 
-    //Excel
+    // Excel
     Route::get('/guardavidas/export', function () {
         return Excel::download(new GuardavidasExport, 'guardavidas.xlsx');
     })->name('guardavidas.export');
     Route::get('/export/playas', [ExportController::class, 'exportPorPlaya'])
         ->name('export.playas');
 
-    /*Nuevas rutas*/
+    /* Nuevas rutas */
     Route::get('/my-profile', [GuardavidaController::class, 'myProfile'])->name('guardavida.myProfile');
     Route::put('/my-profile/{guardavida}', [GuardavidaController::class, 'updateProfile'])->name('guardavida.updateProfile');
     Route::get('/guardavida/{guardavida}/perfil', [GuardavidaController::class, 'showProfile'])->name('guardavida.profile');
@@ -73,26 +75,23 @@ Route::middleware(['auth', 'force.password'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     // Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-
-    //pasar a moddleware admin
-    //Route::middleware(['auth', 'can:admin'])
+    // pasar a moddleware admin
+    // Route::middleware(['auth', 'can:admin'])
     Route::put('/update-user/{user}', [RegisteredUserController::class, 'updateUserByAdmin'])->name('user.update');
     Route::put('/update-rol/{user}', [GuardavidaController::class, 'updateUserRol'])->name('rol.update');
 
     //  NUEVAS RUTAS PARA PERFILES (dentro del middleware)
-    Route::get('/profile', [GuardavidaController::class, 'myProfile']) ->name('guardavida.myProfile');
-
+    Route::get('/profile', [GuardavidaController::class, 'myProfile'])->name('guardavida.myProfile');
 
     Route::get('/guardavida/{guardavida}/perfil', [GuardavidaController::class, 'showProfile'])->name('guardavida.profile');
     Route::put('/profile/{guardavida}', [GuardavidaController::class, 'updateProfile'])->name('guardavida.updateProfile');
 
-
-    //listado de cambios de turno
+    // listado de cambios de turno
     Route::get('turnos', [CambioDeTurnoController::class, 'indexAdmin'])->name('cambio-de-turno.index');
 
-    //obtener puestos para renderizar con balnearios en la vista del template al momneto de seleccionar o modificar
-   /* Route::get('/puestos-por-playa/{playa_id}', [GuardavidaController::class, 'obtenerPuestos'])
-        ->name('puestos.por.playa');*/
+    // obtener puestos para renderizar con balnearios en la vista del template al momneto de seleccionar o modificar
+    /* Route::get('/puestos-por-playa/{playa_id}', [GuardavidaController::class, 'obtenerPuestos'])
+         ->name('puestos.por.playa');*/
     Route::get('/puestos-por-playa/{id}', [GuardavidaController::class, 'obtenerPuestos']);
 
     // Listado general (admin)
@@ -101,7 +100,21 @@ Route::middleware(['auth', 'force.password'])->group(function () {
     // Historial individual por guardavida
     Route::get('asistencias/{id}', [AsistenciaController::class, 'asistenciasPorGuardavida'])->name('asistencias.guardavida');
 
-    //para la seccion de "mis asistencias" cerca de "ver perfil"
+    // Cambios puntuales de franco cargados directo por encargado/admin (caso
+    // excepcional/corrección) — el día franco fijo lo configura el propio
+    // guardavida desde su perfil (guardavida.updateProfile).
+    Route::post('guardavida/{guardavida}/franco-excepcion', [FrancoExcepcionController::class, 'store'])->name('franco-excepcion.store');
+    Route::delete('franco-excepcion/{francoExcepcion}', [FrancoExcepcionController::class, 'destroy'])->name('franco-excepcion.destroy');
+
+    // Intercambio de franco entre guardavidas (self-service, requiere que el
+    // compañero acepte). Es puntual: no modifica el dia_franco fijo de nadie.
+    Route::get('/mis-cambios-de-franco', [FrancoIntercambioController::class, 'index'])->name('franco-intercambio.index');
+    Route::post('/franco-intercambio', [FrancoIntercambioController::class, 'store'])->name('franco-intercambio.store');
+    Route::post('/franco-intercambio/{francoIntercambio}/aceptar', [FrancoIntercambioController::class, 'aceptar'])->name('franco-intercambio.aceptar');
+    Route::post('/franco-intercambio/{francoIntercambio}/rechazar', [FrancoIntercambioController::class, 'rechazar'])->name('franco-intercambio.rechazar');
+    Route::delete('/franco-intercambio/{francoIntercambio}', [FrancoIntercambioController::class, 'cancelar'])->name('franco-intercambio.cancelar');
+
+    // para la seccion de "mis asistencias" cerca de "ver perfil"
     Route::get('/mis-asistencias', [AsistenciaController::class, 'misAsistencias'])
         ->name('guardavida.misAsistencias');
 
@@ -112,8 +125,7 @@ Route::middleware(['auth', 'force.password'])->group(function () {
         Route::get('/permisos', [PermissionController::class, 'index'])->name('permisos.index');
         Route::put('/permisos', [PermissionController::class, 'update'])->name('permisos.update');
     });
-    });
-
+});
 
 // Ruta para obtener el Token Bearer para ser usado en el QR
 // Ademas guarda Id_user para casos sin wifi.
@@ -129,7 +141,4 @@ Route::get('/clear-laravel-cache', function () {
     return 'CACHE LIMPIADA ✔';
 });
 
-
-
 require __DIR__.'/auth.php';
-

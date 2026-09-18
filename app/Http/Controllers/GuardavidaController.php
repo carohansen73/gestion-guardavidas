@@ -2,18 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Guardavida;
 use App\Http\Requests\StoreGuardavidaRequest;
 use App\Http\Requests\UpdateGuardavidaRequest;
 use App\Models\CambioDeTurno;
+use App\Models\Guardavida;
 use App\Models\Playa;
 use App\Models\Puesto;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-
-use Illuminate\Http\Request;
-
 
 class GuardavidaController extends Controller
 {
@@ -24,8 +22,8 @@ class GuardavidaController extends Controller
     {
         $user = Auth::user();
         $playas = Playa::all();
-        //Encargados solo de su playa? ->los de  claro/Dunamar pueden verse?
-        //if ($user->hasRole('admin')) {
+        // Encargados solo de su playa? ->los de  claro/Dunamar pueden verse?
+        // if ($user->hasRole('admin')) {
 
         // Paso los filtros de busqueda al back porque en el front se rompe con el paginado
         $guardavidas = $this->getlifeguardsLeaked($request);
@@ -34,15 +32,16 @@ class GuardavidaController extends Controller
         $guardavidasHabilitados = $this->getlifeguardsLeaked($request, true);
 
         return view('ui.guardavidas.index')
-        ->with('registros', $guardavidas)
-        ->with('playas', $playas)
-        ->with('guardavidasHabilitados', $guardavidasHabilitados);
+            ->with('registros', $guardavidas)
+            ->with('playas', $playas)
+            ->with('guardavidasHabilitados', $guardavidasHabilitados);
     }
 
-    public function getlifeguardsLeaked($request, $enabledOnly = false){
+    public function getlifeguardsLeaked($request, $enabledOnly = false)
+    {
         // Posibles filtros
-        $search    = $request->input('search');
-        $playaId   = $request->input('playa_id');
+        $search = $request->input('search');
+        $playaId = $request->input('playa_id');
         $sortOrder = $request->input('sort', 'asc'); // asc o desc
 
         $query = Guardavida::select('guardavidas.*')
@@ -61,7 +60,7 @@ class GuardavidaController extends Controller
         /* ----------------------
         FILTRO POR PLAYA
         ----------------------- */
-        if ($playaId && $playaId !== "all") {
+        if ($playaId && $playaId !== 'all') {
             $query->where('guardavidas.playa_id', $playaId);
         }
 
@@ -71,10 +70,10 @@ class GuardavidaController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('guardavidas.nombre', 'LIKE', "%$search%")
-                ->orWhere('guardavidas.apellido', 'LIKE', "%$search%")
-                ->orWhere('users.email', 'LIKE', "%$search%")
-                ->orWhere('puestos.nombre', 'LIKE', "%$search%")
-                ->orWhere('playas.nombre', 'LIKE', "%$search%");
+                    ->orWhere('guardavidas.apellido', 'LIKE', "%$search%")
+                    ->orWhere('users.email', 'LIKE', "%$search%")
+                    ->orWhere('puestos.nombre', 'LIKE', "%$search%")
+                    ->orWhere('playas.nombre', 'LIKE', "%$search%");
             });
         }
 
@@ -88,15 +87,16 @@ class GuardavidaController extends Controller
         PAGINACIÓN
         ----------------------- */
         $registros = $query->paginate(20)->appends([
-            'search'   => $search,
+            'search' => $search,
             'playa_id' => $playaId,
-            'sort'     => $sortOrder
+            'sort' => $sortOrder,
         ]);
 
         return $registros;
     }
 
-    public function getAllDisabled(){
+    public function getAllDisabled()
+    {
         $guardavidasDeshabilitados = Guardavida::with('user', 'playa', 'puesto')
             ->whereHas('user', function ($query) {
                 $query->where('enabled', false);
@@ -106,8 +106,8 @@ class GuardavidaController extends Controller
         $playas = Playa::all();
 
         return view('ui.guardavidas.disabled')
-        ->with('guardavidasDeshabilitados', $guardavidasDeshabilitados)
-        ->with('playas', $playas);
+            ->with('guardavidasDeshabilitados', $guardavidasDeshabilitados)
+            ->with('playas', $playas);
     }
 
     /**
@@ -116,7 +116,7 @@ class GuardavidaController extends Controller
     public function create()
     {
         $user = Auth::user();
-        if ($user->hasAnyRole(['guardavida', 'encargado']) ){
+        if ($user->hasAnyRole(['guardavida', 'encargado'])) {
             $playas = Playa::where('id', $user->guardavida->playa_id)->get();
             $puestos = Puesto::where('playa_id', $user->guardavida->playa_id)->get();
         } else {
@@ -136,7 +136,7 @@ class GuardavidaController extends Controller
      */
     public function store(StoreGuardavidaRequest $request)
     {
-        //Validación de datos
+        // Validación de datos
         $validated = $request->validated();
 
         DB::transaction(function () use ($validated) {
@@ -150,7 +150,7 @@ class GuardavidaController extends Controller
             ]);
 
             // 2 Asigno rol
-            if (auth()->user()->hasRole('encargado') && $validated['rol'] === "admin") {
+            if (auth()->user()->hasRole('encargado') && $validated['rol'] === 'admin') {
                 abort(403, 'No tenés permisos para crear un usuario con el rol administrador.');
             }
             $user->assignRole($validated['rol']);
@@ -158,26 +158,26 @@ class GuardavidaController extends Controller
             // 3 Si es guardavida o encargado → creo registro en tabla guardavidas
             if (in_array($validated['rol'], ['guardavida', 'encargado'])) {
                 Guardavida::create([
-                    'nombre'    => $validated['nombre'],
-                    'apellido'  => $validated['apellido'],
-                    'dni'       => $validated['dni'],
-                    'telefono'  => $validated['telefono'],
+                    'nombre' => $validated['nombre'],
+                    'apellido' => $validated['apellido'],
+                    'dni' => $validated['dni'],
+                    'telefono' => $validated['telefono'],
                     'direccion' => $validated['direccion'],
-                    'numero'    => $validated['numero'],
+                    'numero' => $validated['numero'],
                     'piso_dpto' => $validated['piso_dpto'],
-                    'playa_id'  => $validated['playa_id'],
+                    'playa_id' => $validated['playa_id'],
                     'puesto_id' => $validated['puesto_id'],
-                    'funcion'   => $validated['funcion'],
-                    'turno'   => $validated['turno'],
-                    'user_id'   => $user->id,
+                    'funcion' => $validated['funcion'],
+                    'turno' => $validated['turno'],
+                    'user_id' => $user->id,
                     // 'legajo' => $validated['legajo'] ?? null,
                 ]);
             }
         });
 
         return redirect()
-        ->route('guardavida.index')
-        ->with('success', 'Guardavida creado correctamente.');
+            ->route('guardavida.index')
+            ->with('success', 'Guardavida creado correctamente.');
     }
 
     /**
@@ -186,7 +186,7 @@ class GuardavidaController extends Controller
     public function show(Guardavida $guardavida)
     {
         return view('ui.guardavidas.show-fields', compact(
-           'guardavida'
+            'guardavida'
         ));
     }
 
@@ -211,19 +211,19 @@ class GuardavidaController extends Controller
      */
     public function update(UpdateGuardavidaRequest $request, Guardavida $guardavida)
     {
-        //Validación de datos
+        // Validación de datos
         $validated = $request->validated();
 
-        //POR SI DEJO MODIFICAR NOMBRE-APELLIDO EN GUARDAVIDA TMB LO TNGO Q ACTUALIZAR EN USER
-        //POR AHORA SOLO LO EDITA DE USER
-        //DB::transaction(function () use ($validated, $guardavida) {
-            //$user = $guardavida->user;
-            //Actualiza usuario - saque nombre y apellido y lo deje unicamente en perfil
-            // $user->update([
-            //     'name'      => $validated['nombre'],
-            //     'lastname'  => $validated['apellido'],
-            // ]);
-        //});
+        // POR SI DEJO MODIFICAR NOMBRE-APELLIDO EN GUARDAVIDA TMB LO TNGO Q ACTUALIZAR EN USER
+        // POR AHORA SOLO LO EDITA DE USER
+        // DB::transaction(function () use ($validated, $guardavida) {
+        // $user = $guardavida->user;
+        // Actualiza usuario - saque nombre y apellido y lo deje unicamente en perfil
+        // $user->update([
+        //     'name'      => $validated['nombre'],
+        //     'lastname'  => $validated['apellido'],
+        // ]);
+        // });
 
         if ($guardavida->update($validated)) {
             return redirect()->route('guardavida.edit', $guardavida->id)
@@ -232,7 +232,6 @@ class GuardavidaController extends Controller
 
         return back()->withErrors('No se pudo actualizar el guardavida. Intente nuevamente.');
     }
-
 
     /**
      * Update rol de usuario
@@ -256,14 +255,15 @@ class GuardavidaController extends Controller
             abort(403, 'El rol superadmin se administra manualmente, no desde esta pantalla.');
         }
 
-        //admin actualiza cualquier rol
-        if($usuarioLogueado->hasRole('admin')){
-            //Actualiza rol
+        // admin actualiza cualquier rol
+        if ($usuarioLogueado->hasRole('admin')) {
+            // Actualiza rol
             $user->syncRoles([$nuevoRol]);
+
             return back()->with('success', 'Rol actualizado correctamente.');
         }
 
-        //Encargado actualiza guardavida/encargado
+        // Encargado actualiza guardavida/encargado
         if ($usuarioLogueado->hasRole('encargado')) {
 
             // no puede asignar o modificar admin
@@ -274,17 +274,16 @@ class GuardavidaController extends Controller
             // Solo puede actualizar entre roles permitidos
             if (in_array($nuevoRol, ['guardavida', 'encargado'])) {
                 $user->syncRoles([$nuevoRol]);
+
                 return back()->with('success', 'Rol actualizado correctamente.');
             }
 
             abort(403, 'No tenés permisos para asignar este rol.');
         }
 
-        //por si otro rol quiere modificar
+        // por si otro rol quiere modificar
         abort(403, 'No tenés permisos para asignar este rol.');
     }
-
-
 
     /**
      * Por el momento, solo deshabilita al usuario
@@ -299,24 +298,24 @@ class GuardavidaController extends Controller
      *  si es que no tiene turno asignado (por lo que el puesto tmp esta corroborado),
      * Exige que el usuario actualize esta información.
      *
-     * @param Request $request
      * @return void
      */
-    public function setup(Request $request){
-        //Valida puesto y turno para su actualización
+    public function setup(Request $request)
+    {
+        // Valida puesto y turno para su actualización
         $request->validate([
             'puesto_id' => 'required|exists:puestos,id',
-            'turno'     => 'required|in:M,T',
+            'turno' => 'required|in:M,T',
         ]);
 
         $user = Auth::user();
-        if($user && $user->guardavida){
+        if ($user && $user->guardavida) {
             $guardavida = $user->guardavida;
 
             // Actualiza puesto y turno
             $guardavida->update([
                 'puesto_id' => $request->puesto_id,
-                'turno'     => $request->turno,
+                'turno' => $request->turno,
             ]);
 
             // Limpia el popup (para no volver a mostrar)
@@ -326,15 +325,14 @@ class GuardavidaController extends Controller
                 ->with('success', 'Puesto y turno configurados correctamente.');
         }
 
-
     }
 
-    public function getAll(){
+    public function getAll()
+    {
         $guardavidas = Guardavida::select('id', 'nombre', 'apellido')->get();
 
         return response()->json($guardavidas);
     }
-
 
     /**
      * Ver perfil de un guardavidas específico
@@ -348,24 +346,23 @@ class GuardavidaController extends Controller
         $esAdmin = $user->hasRole('admin') || $user->hasRole('encargado');
         $esPropietario = $user->guardavida && $user->guardavida->id === $guardavida->id;
 
-
-
-        if (!$esAdmin && !$esPropietario) {
+        if (! $esAdmin && ! $esPropietario) {
             abort(403, 'No tenés permisos para ver este perfil.');
         }
 
         $puedeEditar = $esAdmin || $esPropietario;
 
-    /*
-            // Cargar relaciones necesarias
-            $guardavida->load(['playa', 'puesto', 'turnos', 'funciones', 'user']);
-    */
-            // Cargar relaciones necesarias
-            $guardavida->load(['playa', 'puesto','user']);
+        /*
+                // Cargar relaciones necesarias
+                $guardavida->load(['playa', 'puesto', 'turnos', 'funciones', 'user']);
+        */
+        // Cargar relaciones necesarias
+        $guardavida->load(['playa', 'puesto', 'user']);
         // Obtener listas para los selects (solo si es admin)
         $playas = $esAdmin ? Playa::all() : null;
         $puestos = $esAdmin ? Puesto::all() : null;
         $turnos = $esAdmin ? CambioDeTurno::all() : null;
+
         return view('profile.profile', compact(
             'guardavida',
             'puedeEditar',
@@ -376,7 +373,6 @@ class GuardavidaController extends Controller
         ));
     }
 
-
     /**
      * Mi perfil (guardavida logueado)
      */
@@ -384,7 +380,7 @@ class GuardavidaController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user->guardavida) {
+        if (! $user->guardavida) {
             return redirect()->route('home')
                 ->with('error', 'No tenés un perfil de guardavida asignado.');
         }
@@ -393,21 +389,20 @@ class GuardavidaController extends Controller
         return $this->showProfile($user->guardavida);
     }
 
-
     /**
- * Actualizar perfil del guardavidas logueado
- */
-public function updateProfile(Request $request, Guardavida $guardavida)
-{
-    $user = Auth::user();
+     * Actualizar perfil del guardavidas logueado
+     */
+    public function updateProfile(Request $request, Guardavida $guardavida)
+    {
+        $user = Auth::user();
 
-    // Verificar permisos                     //ajustar nombre si no coincide con el permiso
-    $esAdmin = $user->hasRole('admin') || $user->hasRole('encargado');
-    $esPropietario = $user->guardavida && $user->guardavida->id === $guardavida->id;
+        // Verificar permisos                     //ajustar nombre si no coincide con el permiso
+        $esAdmin = $user->hasRole('admin') || $user->hasRole('encargado');
+        $esPropietario = $user->guardavida && $user->guardavida->id === $guardavida->id;
 
-    if (!$esAdmin && !$esPropietario) {
-        abort(403, 'No tenés permisos para editar este perfil.');
-    }
+        if (! $esAdmin && ! $esPropietario) {
+            abort(403, 'No tenés permisos para editar este perfil.');
+        }
 
         // Validación
         // Validación base (lo que puede editar cualquier usuario)
@@ -419,25 +414,27 @@ public function updateProfile(Request $request, Guardavida $guardavida)
             'direccion' => 'required|string|max:255',
             'numero' => 'required|string|max:10',
             'piso_dpto' => 'nullable|string|max:10',
+            // Día franco fijo semanal (0=domingo..6=sábado): lo configura el
+            // propio guardavida, no requiere permisos de admin/encargado.
+            'dia_franco' => 'nullable|integer|between:0,6',
         ];
-    // Solo admin puede cambiar playa/puesto/función/turno
-    if ($esAdmin) {
-        $rules['playa_id'] = 'required|exists:playas,id';
-        $rules['puesto_id'] = 'required|exists:puestos,id';
+        // Solo admin puede cambiar playa/puesto/función/turno
+        if ($esAdmin) {
+            $rules['playa_id'] = 'required|exists:playas,id';
+            $rules['puesto_id'] = 'required|exists:puestos,id';
 
-        // agregar cuando haya tabla de funciones $rules['funcion'] = 'nullable|string';
-    }
+            // agregar cuando haya tabla de funciones $rules['funcion'] = 'nullable|string';
+        }
 
-    $validated = $request->validate($rules);
+        $validated = $request->validate($rules);
         // Si no es admin, remover campos que no puede editar
-        if (!$esAdmin) {
-
+        if (! $esAdmin) {
 
             unset($validated['playa_id'],
-             $validated['puesto_id']);
+                $validated['puesto_id']);
 
         }
-    if ($guardavida->update($validated)) {
+        if ($guardavida->update($validated)) {
             // También actualizar el usuario asociado si cambió nombre/apellido
             if ($guardavida->user) {
                 $guardavida->user->update([
@@ -452,27 +449,29 @@ public function updateProfile(Request $request, Guardavida $guardavida)
                 return response()->json([
                     'success' => true,
                     'titulo' => 'Éxito',
-                    'detalle' => 'Perfil actualizado correctamente.'
+                    'detalle' => 'Perfil actualizado correctamente.',
                 ]);
             }
 
             return back()->with('success', [
                 'titulo' => 'Éxito',
-                'detalle' => 'Perfil actualizado correctamente.'
+                'detalle' => 'Perfil actualizado correctamente.',
             ]);
         }
 
-    return back()->withErrors('No se pudo actualizar el perfil.');
+        return back()->withErrors('No se pudo actualizar el perfil.');
 
-}
+    }
 
     public function obtenerPuestos($playa_id)
     {
         $puestos = Puesto::where('playa_id', $playa_id)->get();
+
         return response()->json($puestos);
     }
 
-    public function obtenerFueraDeZona(Request $request){
+    public function obtenerFueraDeZona(Request $request)
+    {
         $validated = $request->validate([
             'puesto_id' => 'required|integer|exists:puestos,id',
         ]);
@@ -487,10 +486,10 @@ public function updateProfile(Request $request, Guardavida $guardavida)
         }
 
         foreach ($puestosMovil as $movil) {
-            if($movil->id == $idPuesto){
+            if ($movil->id == $idPuesto) {
                 return response()->json([
-                'success' => true,
-            ]);
+                    'success' => true,
+                ]);
             }
         }
 

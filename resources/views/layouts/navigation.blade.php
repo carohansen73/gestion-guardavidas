@@ -2,6 +2,7 @@
 
     $playa = Auth::user()->guardavida?->playa?->nombre;
     $rol = Auth::user()->getRoleNames()->first();
+    $notificacionesFrancoSinLeer = Auth::user()->unreadNotifications->count();
 @endphp
 
 <nav x-data="{ open: false }" class="bg-white border-b border-gray-200 shadow-lg desktop-ml-64">
@@ -89,6 +90,15 @@
                 <!--Boton para ver asistencia -->
                 <x-dropdown-link :href="route('guardavida.misAsistencias')">
                     {{ __('Mis Asistencias') }}
+                </x-dropdown-link>
+
+                <x-dropdown-link :href="route('franco-intercambio.index')">
+                    {{ __('Cambios de Franco') }}
+                    @if ($notificacionesFrancoSinLeer > 0)
+                        <span class="ml-1 inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-xs font-bold bg-red-500 text-white">
+                            {{ $notificacionesFrancoSinLeer }}
+                        </span>
+                    @endif
                 </x-dropdown-link>
 
 
@@ -192,6 +202,14 @@
                 <!--Boton para ver asistencia -->
                 <x-responsive-nav-link :href="route('guardavida.misAsistencias')">
                     {{ __('Mis Asistencias') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('franco-intercambio.index')">
+                    {{ __('Cambios de Franco') }}
+                    @if ($notificacionesFrancoSinLeer > 0)
+                        <span class="ml-1 inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-xs font-bold bg-red-500 text-white">
+                            {{ $notificacionesFrancoSinLeer }}
+                        </span>
+                    @endif
                 </x-responsive-nav-link>
                 <!-- Authentication -->
                 <form method="POST" action="{{ route('logout') }}">

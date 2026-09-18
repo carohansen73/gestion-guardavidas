@@ -238,6 +238,24 @@
                         </div>
 
                         <div class="sm:col-span-4">
+                            <label class="info-label text-gray-800 dark:text-gray-100"> <i class="fas fa-bed me-1 text-sky-600"></i>Día franco</label>
+                            <div class="text-gray-700 dark:text-gray-200">
+                                <select id="dia_franco" name="dia_franco"
+                                    class="block w-full rounded-md border bg-gray-100 px-3 py-1.5 text-gray-600 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500 mt-1">
+                                    <option value="">Sin configurar</option>
+                                    @foreach (['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'] as $i => $nombreDia)
+                                        <option value="{{ $i }}" {{ old('dia_franco', $guardavida->dia_franco) == $i ? 'selected' : '' }}>
+                                            {{ $nombreDia }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    Es el día libre fijo de todas las semanas. Si una semana puntual se te cambia, avisale a tu encargado para que lo cargue.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="sm:col-span-4">
                             <label class="info-label text-gray-800 dark:text-gray-100"> <i class="fas fa-tasks me-1 text-sky-600"></i>Función</label>
                             <div class="text-gray-700 dark:text-gray-200">
                                 <select id="funcion" name="funcion"

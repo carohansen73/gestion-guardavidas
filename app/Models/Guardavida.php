@@ -7,10 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Guardavida extends Model
 {
-
     use HasFactory;
 
     protected $perPage = 10;
+
     protected $table = 'guardavidas'; // tu tabla real
 
     protected $fillable = [
@@ -26,12 +26,13 @@ class Guardavida extends Model
         'playa_id',
         'puesto_id',
         'turno',
+        'dia_franco',
     ];
+
     // Agregar accessor para contar asistencias
-    protected $appends = ['asistencias_count', 'intervenciones_count','licencias_count'];
+    protected $appends = ['asistencias_count', 'intervenciones_count', 'licencias_count'];
 
-
-    ////------------------------------------------ Relaciones -------------------------------------------------------
+    // //------------------------------------------ Relaciones -------------------------------------------------------
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -46,7 +47,6 @@ class Guardavida extends Model
     {
         return $this->belongsTo(Puesto::class);
     }
-
 
     public function asistencias()
     {
@@ -63,6 +63,34 @@ class Guardavida extends Model
         return $this->hasMany(Licencia::class, 'guardavida_id');
     }
 
+    public function francoExcepciones()
+    {
+        return $this->hasMany(FrancoExcepcion::class);
+    }
+
+    public function intercambiosFrancoSolicitados()
+    {
+        return $this->hasMany(FrancoIntercambio::class, 'guardavida_solicitante_id');
+    }
+
+    public function intercambiosFrancoRecibidos()
+    {
+        return $this->hasMany(FrancoIntercambio::class, 'guardavida_destinatario_id');
+    }
+
+    /** Nombre del día franco fijo, o null si no lo configuró. */
+    public function getDiaFrancoNombreAttribute(): ?string
+    {
+        if ($this->dia_franco === null) {
+            return null;
+        }
+
+        return [
+            0 => 'Domingo', 1 => 'Lunes', 2 => 'Martes', 3 => 'Miércoles',
+            4 => 'Jueves', 5 => 'Viernes', 6 => 'Sábado',
+        ][$this->dia_franco] ?? null;
+    }
+
     // ******************** Contadores ******************************************
     public function getAsistenciasCountAttribute()
     {
@@ -74,7 +102,8 @@ class Guardavida extends Model
         return $this->intervenciones()->count();
     }
 
-    public function getLicenciasCountAttribute(){
+    public function getLicenciasCountAttribute()
+    {
         return $this->licencias()->count();
     }
 
@@ -85,12 +114,10 @@ class Guardavida extends Model
             ->first();
     }
 
-
     public static function showGuardavidaId($id)
     {
         $guardavida = Guardavida::where('id', $id)->first();
+
         return $guardavida ?? null;
     }
-
-
 }

@@ -28,6 +28,67 @@
 
 <div x-data="{ selectedId: null }">
 
+    <div class="flex justify-between items-center my-2 mx-4 px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-sm">
+        <div class="text-sm text-gray-700 dark:text-gray-200">
+            <i class="fas fa-bed me-1 text-sky-600"></i>
+            <strong>Día franco fijo:</strong> {{ $guardavida->dia_franco_nombre ?? 'No configurado' }}
+        </div>
+
+        @if ($esAdmin)
+            <button type="button" class="px-3 py-1 bg-sky-600 hover:bg-sky-500 text-white rounded text-sm"
+                onclick="document.getElementById('francoExcepcionModal').classList.remove('hidden')">
+                <i class="fas fa-calendar-plus me-1"></i> Cargar cambio de franco
+            </button>
+        @endif
+    </div>
+
+    @if ($esAdmin && $francoExcepciones && $francoExcepciones->count())
+        <div class="mx-4 my-2 px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-sm">
+            <p class="text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Cambios de franco cargados</p>
+            <ul class="text-sm divide-y divide-gray-200 dark:divide-gray-600">
+                @foreach ($francoExcepciones as $exc)
+                    <li class="py-1 flex justify-between items-center">
+                        <span>
+                            {{ $exc->fecha->format('d/m/Y') }} —
+                            {{ $exc->tipo === 'agregado' ? 'pasa a ser franco' : 'deja de ser franco' }}
+                            @if ($exc->motivo)
+                                <span class="text-gray-500 dark:text-gray-400">({{ $exc->motivo }})</span>
+                            @endif
+                        </span>
+                        <form action="{{ route('franco-excepcion.destroy', $exc->id) }}" method="POST" onsubmit="return confirm('¿Eliminar este cambio de franco?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-red-500 hover:text-red-400 text-xs">Eliminar</button>
+                        </form>
+                    </li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    @if ($esAdmin && $francoIntercambios && $francoIntercambios->count())
+        <div class="mx-4 my-2 px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-sm">
+            <p class="text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Intercambios de franco entre compañeros</p>
+            <ul class="text-sm divide-y divide-gray-200 dark:divide-gray-600">
+                @foreach ($francoIntercambios as $i)
+                    @php($esSolicitante = $i->guardavida_solicitante_id === $guardavida->id)
+                    <li class="py-1">
+                        @if ($esSolicitante)
+                            Le pidió a <strong>{{ $i->destinatario->apellido }} {{ $i->destinatario->nombre }}</strong>
+                        @else
+                            <strong>{{ $i->solicitante->apellido }} {{ $i->solicitante->nombre }}</strong> le pidió
+                        @endif
+                        cambiar el {{ $i->fecha_propia->format('d/m/Y') }} por el {{ $i->fecha_deseada->format('d/m/Y') }} —
+                        <span class="text-xs uppercase font-medium
+                            {{ $i->estado === 'pendiente' ? 'text-amber-600' : ($i->estado === 'aceptado' ? 'text-emerald-600' : 'text-gray-500') }}">
+                            {{ $i->estado }}
+                        </span>
+                    </li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <div  class="flex justify-between my-2 mx-4 px-4 py-2 bg-gray-50 border border-gray-200 dark:border-gray-700  shadow-sm">
         <form method="GET" class="flex gap-4">
             <div>
@@ -214,6 +275,48 @@
 
 
 
+
+@if ($esAdmin)
+<div id="francoExcepcionModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-96 p-6 animate-fade-in">
+        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
+            Cargar cambio de franco
+        </h2>
+
+        <form action="{{ route('franco-excepcion.store', $guardavida->id) }}" method="POST">
+            @csrf
+
+            <div class="mb-3">
+                <label class="text-gray-700 dark:text-gray-300 text-sm">Fecha:</label>
+                <input type="date" name="fecha" required class="border p-1 w-full rounded">
+            </div>
+
+            <div class="mb-3">
+                <label class="text-gray-700 dark:text-gray-300 text-sm">Tipo de cambio:</label>
+                <select name="tipo" required class="border p-1 w-full rounded">
+                    <option value="agregado">Ese día pasa a ser franco</option>
+                    <option value="cancelado">Ese día deja de ser franco (debe trabajar)</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="text-gray-700 dark:text-gray-300 text-sm">Motivo (opcional):</label>
+                <input type="text" name="motivo" maxlength="255" class="border p-1 w-full rounded" placeholder="Ej: se cambió con Fulano">
+            </div>
+
+            <div class="flex justify-end gap-2 mt-4">
+                <button type="button" class="px-3 py-1 bg-gray-400 text-white rounded"
+                    onclick="document.getElementById('francoExcepcionModal').classList.add('hidden')">
+                    Cancelar
+                </button>
+                <button type="submit" class="px-3 py-1 bg-sky-600 text-white rounded">
+                    Guardar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+@endif
 
 <div id="asistenciaGuardavidaModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-96 p-6 animate-fade-in">

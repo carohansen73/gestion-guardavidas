@@ -1,34 +1,36 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use App\Models\Guardavida;
+
 use App\Models\Asistencia;
+use App\Models\Guardavida;
 use App\Models\Playa;
 use App\Models\Puesto;
 use App\Services\HistorialAsistenciaService;
+use App\Services\ResumenAsistenciaService;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth;
 use Jenssegers\Agent\Agent;
 use Laravel\Sanctum\PersonalAccessToken;
 
-
 class AsistenciaController extends Controller
 {
-    public function cargarAsistencia(Request $request){
+    public function cargarAsistencia(Request $request)
+    {
         $user = Auth::check() ? Auth::user() : null;
 
-        if (!$user && $request->bearerToken()) {
+        if (! $user && $request->bearerToken()) {
             $accessToken = PersonalAccessToken::findToken($request->bearerToken());
             if ($accessToken) {
                 $user = $accessToken->tokenable; // Usuario asociado al token
             }
         }
 
-        if (!$user) {
+        if (! $user) {
             return response()->json([
-                'success' =>false,
+                'success' => false,
                 'data' => 'Debe loguearse para guardar la asistencia',
             ], 401);
         }
@@ -40,17 +42,16 @@ class AsistenciaController extends Controller
             'lat' => 'required|numeric|between:-90,90',
             'lng' => 'required|numeric|between: -180,180',
             'precision' => 'required|numeric|min:0',
-            'fecha_hora' => 'required|date_format:Y-m-d H:i:s'
+            'fecha_hora' => 'required|date_format:Y-m-d H:i:s',
         ]);
-        
-        $idUser = $validated['user_id'];
 
+        $idUser = $validated['user_id'];
 
         $guardavidas = Guardavida::obtenerGuardavidas($idUser);
         if (is_null($guardavidas)) {
             return response()->json([
                 'success' => false,
-                'data' => 'No se pudo registrar la asistencia'
+                'data' => 'No se pudo registrar la asistencia',
             ], 400);
         }
         $fecha_hora = $validated['fecha_hora'];
@@ -64,9 +65,10 @@ class AsistenciaController extends Controller
         $estadoValidacion = $this->validarDistanciaAlPuesto($puesto, $lat, $lng, $precision);
 
         $asistencia = Asistencia::nuevaAsistencia($lng, $lat, $precision, $idPuesto, $guardavidas_id, $fecha_hora, $estadoValidacion);
+
         return response()->json([
             'success' => true,
-            'data' => $asistencia
+            'data' => $asistencia,
         ], 200);
     }
 
@@ -116,34 +118,43 @@ class AsistenciaController extends Controller
         return $radioTierra * $c;
     }
 
-
-
     /**
      * Listado general de asistencias (vista admin)
      * Muestra todas las asistencias de todos los guardavidas.
      */
-    public function index()
+    public function index(Request $request)
     {
-        if (!auth()->user()->hasAnyRole(['admin', 'encargado'])) {
+        if (! auth()->user()->hasAnyRole(['admin', 'encargado'])) {
             // Si no tiene permiso, devolvemos vista vacía o redirige (eso no me acuerdo como se veia en la interfaz)
             return view('admin.usuarios.asistencias', ['guardavidas' => collect()]);
         }
 
+        // Panel de presentismo: por defecto, mes en curso.
+        $inicio = $request->filled('inicio')
+            ? Carbon::parse($request->input('inicio'))->startOfDay()
+            : Carbon::now()->startOfMonth();
+
+        $fin = $request->filled('fin')
+            ? Carbon::parse($request->input('fin'))->endOfDay()
+            : Carbon::now()->endOfDay();
+
         $guardavidas = Guardavida::with(['puesto.playa'])
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();
+
+        $resumen = (new ResumenAsistenciaService)->generar(collect($guardavidas->items()), $inicio, $fin);
+
         $playas = Playa::all();
-        $agent = new Agent();
+        $agent = new Agent;
 
-        if($agent->isMobile()){
-            return view('admin.usuarios.asistencias', compact('guardavidas', 'playas'));
+        if ($agent->isMobile()) {
+            return view('admin.usuarios.asistencias', compact('guardavidas', 'playas', 'resumen', 'inicio', 'fin'));
+        } else {
+            return view('admin.usuarios.asistencias-desktop', compact('guardavidas', 'playas', 'resumen', 'inicio', 'fin'));
         }
-        else{
-            return view('admin.usuarios.asistencias-desktop', compact('guardavidas', 'playas'));
-        }
-
-
 
     }
+
     /**
      * Muestra todas las asistencias de un guardavida en especifico*cuando el admin lo selecciona o cuando el propio usuario
      * ingresa a la seccion "mis asistencias o asistencia"
@@ -156,23 +167,30 @@ class AsistenciaController extends Controller
         $esAdmin = auth()->user()->hasAnyRole(['admin', 'encargado']);
 
         // Solo si es admin, mandamos balnearios y puestos
-        $balnearios = $esAdmin ?Playa::all() : null;
-        $puestos = $esAdmin ?Puesto::all() : null;
+        $balnearios = $esAdmin ? Playa::all() : null;
+        $puestos = $esAdmin ? Puesto::all() : null;
         $historial = $esAdmin ? $this->getAttendanceHistory($request, $id) : null;
+        $francoExcepciones = $esAdmin
+            ? $guardavida->francoExcepciones()->orderByDesc('fecha')->limit(15)->get()
+            : null;
+        $francoIntercambios = null;
+        if ($esAdmin) {
+            $comoSolicitante = $guardavida->intercambiosFrancoSolicitados()->with('destinatario')->get();
+            $comoDestinatario = $guardavida->intercambiosFrancoRecibidos()->with('solicitante')->get();
+            $francoIntercambios = $comoSolicitante->concat($comoDestinatario)->sortByDesc('created_at')->take(15)->values();
+        }
 
-        return view('admin.usuarios.asistencia-show-desktop', compact('guardavida', 'esAdmin', 'balnearios', 'puestos', 'historial'));
+        return view('admin.usuarios.asistencia-show-desktop', compact('guardavida', 'esAdmin', 'balnearios', 'puestos', 'historial', 'francoExcepciones', 'francoIntercambios'));
     }
-
 
     /**
      * metodo para que muestre en la seccion "mis asistencias" las asistencias del usuario logueado (solo las ve no puede descargar ni nada
      * como administradores)
      */
-
     public function misAsistencias()
     {
         $guardavida = auth()->user()->guardavida;
-        if (!$guardavida) {
+        if (! $guardavida) {
             abort(403, 'No tiene un perfil de guardavida asignado.');
         }
 
@@ -181,12 +199,10 @@ class AsistenciaController extends Controller
 
         // Pasamos $esAdmin = false para que el Blade detecte que no es vista administrativa
         $esAdmin = false;
+
         // No necesitamos filtros ni balnearios/puestos para este caso
-        return view('admin.asistenciaPorPerfil', compact('guardavida','esAdmin'));
+        return view('admin.asistenciaPorPerfil', compact('guardavida', 'esAdmin'));
     }
-
-
-
 
     /**
      * Muestra todas las asistencias de un puesto específico
@@ -204,17 +220,16 @@ class AsistenciaController extends Controller
         return view('admin.usuarios.asistencias', compact('guardavidas'));
     }
 
-
-
     /**
      * Historial de asistencias día por día para el guardavida seleccionado.
      * La construcción del historial (ASISTIÓ/FALTA/LICENCIA, fuera_de_rango)
      * vive en HistorialAsistenciaService — la misma lógica que usan los
      * excels de asistencia, para que pantalla y Excel nunca se desincronicen.
      */
-    public function getAttendanceHistory($request, $guardavidaId){
+    public function getAttendanceHistory($request, $guardavidaId)
+    {
 
-        //Toma el filtro de fechas, y si no se selecciono fecha, toma desde hace 30 dias atras.
+        // Toma el filtro de fechas, y si no se selecciono fecha, toma desde hace 30 dias atras.
         $inicio = $request->filled('inicio')
             ? Carbon::parse($request->input('inicio'))->startOfDay()
             : Carbon::now()->subDays(30)->startOfDay();
@@ -223,7 +238,7 @@ class AsistenciaController extends Controller
             ? Carbon::parse($request->input('fin'))->endOfDay()
             : Carbon::now()->endOfDay();
 
-        $historial = (new HistorialAsistenciaService())->generar($guardavidaId, $inicio, $fin);
+        $historial = (new HistorialAsistenciaService)->generar($guardavidaId, $inicio, $fin);
 
         // Paginación (el historial se arma completo en memoria, día por día)
         $page = request()->input('page', 1);
@@ -239,7 +254,4 @@ class AsistenciaController extends Controller
             ['path' => request()->url(), 'query' => request()->query()]
         );
     }
-
-
-
 }
