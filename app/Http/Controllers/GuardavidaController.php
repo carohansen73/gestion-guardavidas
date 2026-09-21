@@ -327,6 +327,35 @@ class GuardavidaController extends Controller
 
     }
 
+    /**
+     * Configura el esquema de franco fijo del guardavida logueado (uno o
+     * varios días por semana — la mayoría tiene 1, el personal que reutiliza
+     * este sistema desde otras áreas del municipio puede tener más, ej.
+     * aeródromo con sábado y domingo). Endpoint chico y separado de
+     * updateProfile() a propósito: ese exige nombre/apellido/dni/etc. como
+     * requeridos, y acá solo queremos poder setear el franco desde el popup
+     * de "Cambios de Franco" sin depender de que el resto del perfil esté
+     * completo. Además esto no es un simple update: da de baja el esquema
+     * anterior y da de alta uno nuevo, para no perder el historial (ver
+     * Guardavida::establecerDiasFranco()).
+     */
+    public function actualizarDiaFranco(Request $request)
+    {
+        $guardavida = Auth::user()->guardavida;
+        if (! $guardavida) {
+            abort(403, 'No tenés un perfil de guardavida asignado.');
+        }
+
+        $validated = $request->validate([
+            'dias_franco' => 'required|array|min:1',
+            'dias_franco.*' => 'integer|between:0,6',
+        ]);
+
+        $guardavida->establecerDiasFranco($validated['dias_franco'], Auth::id());
+
+        return back()->with('success', 'Configuraste tu franco.');
+    }
+
     public function getAll()
     {
         $guardavidas = Guardavida::select('id', 'nombre', 'apellido')->get();
@@ -414,9 +443,6 @@ class GuardavidaController extends Controller
             'direccion' => 'required|string|max:255',
             'numero' => 'required|string|max:10',
             'piso_dpto' => 'nullable|string|max:10',
-            // Día franco fijo semanal (0=domingo..6=sábado): lo configura el
-            // propio guardavida, no requiere permisos de admin/encargado.
-            'dia_franco' => 'nullable|integer|between:0,6',
         ];
         // Solo admin puede cambiar playa/puesto/función/turno
         if ($esAdmin) {

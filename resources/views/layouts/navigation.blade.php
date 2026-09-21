@@ -69,7 +69,12 @@
 
             <x-slot name="trigger">
                 <button
-                    class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-white bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
+                    class="relative inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-white bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
+                    @if ($notificacionesFrancoSinLeer > 0)
+                        <span class="absolute top-0.5 right-0.5 block h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-gray-800"
+                            title="Tenés notificaciones sin leer"></span>
+                    @endif
+
                     @auth <div>{{ Auth::user()->name }}</div> @endauth
 
                     <div class="ms-1">
@@ -121,7 +126,11 @@
         <!-- Hamburger -->
         <div class="-me-2 flex items-center sm:hidden">
             <button @click="open = ! open"
-                class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
+                class="relative inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
+                @if ($notificacionesFrancoSinLeer > 0)
+                    <span class="absolute top-1 right-1 block h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-gray-800"
+                        title="Tenés notificaciones sin leer"></span>
+                @endif
                 <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                     <path :class="{ 'hidden': open, 'inline-flex': !open }" class="inline-flex" stroke-linecap="round"
                         stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />

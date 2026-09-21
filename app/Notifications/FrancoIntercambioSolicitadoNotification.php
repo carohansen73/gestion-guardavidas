@@ -2,21 +2,18 @@
 
 namespace App\Notifications;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 /**
- * Se envía al compañero (destinatario) cuando alguien le pide cambiar el
- * franco. Se manda en cola (mail vía queue:listen) para no bloquear el
- * guardado del pedido — si el mail falla, el pedido igual queda cargado y
- * visible en el sistema.
+ * Aviso EN EL SISTEMA (canal database) de que alguien le pide cambiar el
+ * franco al destinatario. A propósito NO implementa ShouldQueue: se guarda
+ * al toque, en el mismo request en que se crea el pedido, para que el
+ * puntito rojo aparezca ya mismo sin depender de que se procese ninguna
+ * cola. El mail (que sí puede tardar o fallar) va aparte, en
+ * FrancoIntercambioSolicitadoMailNotification.
  */
-class FrancoIntercambioSolicitadoNotification extends Notification implements ShouldQueue
+class FrancoIntercambioSolicitadoNotification extends Notification
 {
-    use Queueable;
-
     public function __construct(
         public int $intercambioId,
         public string $nombreSolicitante,
@@ -30,24 +27,7 @@ class FrancoIntercambioSolicitadoNotification extends Notification implements Sh
      */
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
-    }
-
-    public function toMail(object $notifiable): MailMessage
-    {
-        $mail = (new MailMessage)
-            ->subject('Te pidieron cambiar el franco')
-            ->greeting('¡Hola!')
-            ->line("{$this->nombreSolicitante} te pidió cambiar el franco.")
-            ->line("Te ofrece el {$this->fechaPropia} a cambio de tomar el {$this->fechaDeseada}.");
-
-        if ($this->mensaje) {
-            $mail->line("Mensaje: \"{$this->mensaje}\"");
-        }
-
-        return $mail
-            ->action('Ver pedido', route('franco-intercambio.index'))
-            ->line('Podés aceptar o rechazar el pedido desde el sistema.');
+        return ['database'];
     }
 
     /**

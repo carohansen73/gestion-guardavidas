@@ -86,7 +86,7 @@
                     </td>
                     <td class="px-4 py-2">{{ $g->puesto->nombre ?? '-' }}</td>
                     <td class="px-4 py-2">{{ $g->playa->nombre ?? '-' }}</td>
-                    <td class="px-4 py-2">{{ $g->dia_franco_nombre ?? '-' }}</td>
+                    <td class="px-4 py-2">{{ $g->dias_franco_nombres ?? '-' }}</td>
                     <td class="px-4 py-2 text-right">{{ $r['asistencias'] ?? '-' }}</td>
                     <td class="px-4 py-2 text-right">{{ $r['francos'] ?? '-' }}</td>
                     <td class="px-4 py-2 text-right {{ ($r['faltas'] ?? 0) > 0 ? 'text-red-600 dark:text-red-400 font-medium' : '' }}">{{ $r['faltas'] ?? '-' }}</td>

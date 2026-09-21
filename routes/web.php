@@ -42,6 +42,10 @@ Route::middleware(['auth', 'force.password'])->group(function () {
         ->name('guardavida.setup.store');
     /**/
 
+    // El guardavida logueado configura su día franco fijo (usado desde el
+    // popup en "Cambios de Franco" cuando todavía no lo cargó).
+    Route::patch('/mi-dia-franco', [GuardavidaController::class, 'actualizarDiaFranco'])->name('guardavida.actualizarDiaFranco');
+
     Route::get('/home', [HomeController::class, 'index'])->name('home');
     Route::get('/dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
 
@@ -107,7 +111,7 @@ Route::middleware(['auth', 'force.password'])->group(function () {
     Route::delete('franco-excepcion/{francoExcepcion}', [FrancoExcepcionController::class, 'destroy'])->name('franco-excepcion.destroy');
 
     // Intercambio de franco entre guardavidas (self-service, requiere que el
-    // compañero acepte). Es puntual: no modifica el dia_franco fijo de nadie.
+    // compañero acepte). Es puntual: no modifica el esquema de franco fijo de nadie.
     Route::get('/mis-cambios-de-franco', [FrancoIntercambioController::class, 'index'])->name('franco-intercambio.index');
     Route::post('/franco-intercambio', [FrancoIntercambioController::class, 'store'])->name('franco-intercambio.store');
     Route::post('/franco-intercambio/{francoIntercambio}/aceptar', [FrancoIntercambioController::class, 'aceptar'])->name('franco-intercambio.aceptar');

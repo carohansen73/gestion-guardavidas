@@ -2,19 +2,16 @@
 
 namespace App\Notifications;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 /**
- * Se envía al solicitante cuando el compañero acepta o rechaza su pedido de
- * cambio de franco. En cola, igual que la de solicitud.
+ * Aviso EN EL SISTEMA (canal database) de que el compañero aceptó o rechazó
+ * el pedido. Igual que la de solicitud: sin ShouldQueue a propósito, para
+ * que se guarde de inmediato. El mail va en
+ * FrancoIntercambioRespondidoMailNotification.
  */
-class FrancoIntercambioRespondidoNotification extends Notification implements ShouldQueue
+class FrancoIntercambioRespondidoNotification extends Notification
 {
-    use Queueable;
-
     public function __construct(
         public int $intercambioId,
         public string $nombreDestinatario,
@@ -28,18 +25,7 @@ class FrancoIntercambioRespondidoNotification extends Notification implements Sh
      */
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
-    }
-
-    public function toMail(object $notifiable): MailMessage
-    {
-        $verbo = $this->estado === 'aceptado' ? 'aceptó' : 'rechazó';
-
-        return (new MailMessage)
-            ->subject("Tu pedido de cambio de franco fue {$this->estado}")
-            ->greeting('¡Hola!')
-            ->line("{$this->nombreDestinatario} {$verbo} tu pedido de cambiar el {$this->fechaPropia} por el {$this->fechaDeseada}.")
-            ->action('Ver detalle', route('franco-intercambio.index'));
+        return ['database'];
     }
 
     /**

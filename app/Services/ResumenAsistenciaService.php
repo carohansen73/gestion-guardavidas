@@ -14,11 +14,21 @@ use Illuminate\Support\Collection;
  * (presentismo): días asistidos, faltas, licencias, francos y fichajes
  * fuera de rango en un período.
  *
- * Todo guardavida tiene derecho a 1 franco por semana, aunque no haya
- * configurado día fijo ni se haya cargado ningún cambio puntual: si una
- * semana no tiene franco explícito, el primer día sin asistencia/licencia
- * de esa semana se cuenta como franco (no como falta) — recién el segundo
- * día sin explicar en la misma semana es falta.
+ * El esquema de franco (uno o varios días fijos por semana) se evalúa día
+ * por día contra Guardavida::diasFrancoVigentesEn(), o sea contra el
+ * esquema que regía EN ESA FECHA según guardavida_franco_historial — si
+ * alguien cambió de franco en medio del rango consultado, no se le aplica
+ * retroactivamente el esquema actual a fechas viejas.
+ *
+ * Además, si una semana no tiene ningún día de franco explicado por el
+ * esquema vigente ni por un cambio puntual (FrancoExcepcion) — típicamente
+ * porque todavía no configuró nada — igual se le reconoce 1 franco por
+ * semana por defecto: el primer día sin asistencia/licencia de esa semana
+ * se cuenta como franco (no como falta), y recién el segundo día sin
+ * explicar en la misma semana es falta. Esto es solo la red de seguridad
+ * para el caso "sin configurar"; alguien con esquema de 2+ días (ej.
+ * aeródromo, franco sábado y domingo) ya tiene sus francos cubiertos por el
+ * esquema explícito y no necesita esta inferencia.
  *
  * A propósito NO reutiliza HistorialAsistenciaService (ese arma el
  * historial día por día con relaciones cargadas, pensado para el detalle
@@ -38,6 +48,13 @@ class ResumenAsistenciaService
         if ($ids->isEmpty()) {
             return [];
         }
+
+        // Se carga una sola vez para todos, así diasFrancoVigentesEn() no
+        // dispara una consulta por cada día del rango. load() es propio de
+        // la Collection de Eloquent, no de la Collection genérica — por eso
+        // se envuelve acá, para que este método funcione sin importar qué
+        // tipo de Collection le haya pasado el caller.
+        \Illuminate\Database\Eloquent\Collection::make($guardavidas)->load('francoHistorial');
 
         // Días distintos con fichaje por guardavida, y si alguno de esos
         // fichajes quedó marcado fuera de rango.
@@ -126,8 +143,11 @@ class ResumenAsistenciaService
                     continue;
                 }
 
-                $esDiaFrancoFijo = $guardavida->dia_franco !== null
-                    && (int) Carbon::parse($fechaStr)->dayOfWeek === (int) $guardavida->dia_franco;
+                // Esquema vigente EN ESA FECHA puntual, no el actual — si
+                // cambió de franco en el medio del rango consultado, cada
+                // día se evalúa contra lo que regía en ese momento.
+                $diasFrancoVigentes = $guardavida->diasFrancoVigentesEn($fechaStr);
+                $esDiaFrancoFijo = in_array((int) Carbon::parse($fechaStr)->dayOfWeek, $diasFrancoVigentes, true);
 
                 $clasificacion[$fechaStr] = $esDiaFrancoFijo ? 'franco' : 'pendiente';
             }

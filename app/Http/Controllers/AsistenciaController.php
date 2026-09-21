@@ -142,7 +142,7 @@ class AsistenciaController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        $resumen = (new ResumenAsistenciaService)->generar(collect($guardavidas->items()), $inicio, $fin);
+        $resumen = (new ResumenAsistenciaService)->generar($guardavidas->getCollection(), $inicio, $fin);
 
         $playas = Playa::all();
         $agent = new Agent;

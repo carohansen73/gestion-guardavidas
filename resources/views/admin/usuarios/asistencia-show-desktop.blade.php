@@ -31,7 +31,7 @@
     <div class="flex justify-between items-center my-2 mx-4 px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-sm">
         <div class="text-sm text-gray-700 dark:text-gray-200">
             <i class="fas fa-bed me-1 text-sky-600"></i>
-            <strong>Día franco fijo:</strong> {{ $guardavida->dia_franco_nombre ?? 'No configurado' }}
+            <strong>Franco fijo:</strong> {{ $guardavida->dias_franco_nombres ?? 'No configurado' }}
         </div>
 
         @if ($esAdmin)
@@ -41,6 +41,20 @@
             </button>
         @endif
     </div>
+
+    @if ($esAdmin && $guardavida->francoHistorial->count() > 1)
+        <div class="mx-4 my-2 px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-sm">
+            <p class="text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Historial de franco</p>
+            <ul class="text-sm divide-y divide-gray-200 dark:divide-gray-600">
+                @foreach ($guardavida->francoHistorial as $h)
+                    <li class="py-1">
+                        {{ $h->vigente_desde->format('d/m/Y') }} — {{ $h->vigente_hasta ? $h->vigente_hasta->format('d/m/Y') : 'hoy' }}:
+                        franco los <strong>{{ $h->dias_nombres }}</strong>
+                    </li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
     @if ($esAdmin && $francoExcepciones && $francoExcepciones->count())
         <div class="mx-4 my-2 px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-sm">

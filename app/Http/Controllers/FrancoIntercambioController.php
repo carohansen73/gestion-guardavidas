@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\FrancoExcepcion;
 use App\Models\FrancoIntercambio;
 use App\Models\Guardavida;
+use App\Notifications\FrancoIntercambioRespondidoMailNotification;
 use App\Notifications\FrancoIntercambioRespondidoNotification;
+use App\Notifications\FrancoIntercambioSolicitadoMailNotification;
 use App\Notifications\FrancoIntercambioSolicitadoNotification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -35,8 +37,14 @@ class FrancoIntercambioController extends Controller
             ->orderByDesc('created_at')
             ->get();
 
-        // Al entrar a esta pantalla se dan por vistas las notificaciones de franco.
-        auth()->user()->unreadNotifications->markAsRead();
+        // Las de "te respondieron" son solo informativas, se dan por vistas
+        // al entrar acá. Las de "te pidieron un cambio" NO se marcan solas —
+        // siguen encendidas hasta que esa solicitud puntual se acepta,
+        // rechaza o cancela (ver marcarSolicitudComoLeida()).
+        auth()->user()->unreadNotifications()
+            ->where('type', FrancoIntercambioRespondidoNotification::class)
+            ->get()
+            ->markAsRead();
 
         // Compañeros de la misma playa para elegir a quién pedirle el cambio.
         $companeros = Guardavida::where('playa_id', $guardavida->playa_id)
@@ -59,15 +67,31 @@ class FrancoIntercambioController extends Controller
             abort(403, 'No tenés un perfil de guardavida asignado.');
         }
 
+        $diasFrancoGuardavida = $guardavida->diasFrancoActuales();
+
+        if ($diasFrancoGuardavida === []) {
+            return back()->withErrors('Antes de pedir un cambio, configurá tu franco fijo.');
+        }
+
         $validated = $request->validate([
             'guardavida_destinatario_id' => 'required|exists:guardavidas,id',
             'fecha_propia' => 'required|date|after_or_equal:today',
             'fecha_deseada' => 'required|date|after_or_equal:today|different:fecha_propia',
             'mensaje' => 'nullable|string|max:255',
+        ], [
+            'fecha_propia.after_or_equal' => 'La fecha que ofrecés tiene que ser de hoy en adelante.',
+            'fecha_deseada.after_or_equal' => 'La fecha que querés tomar tiene que ser de hoy en adelante.',
+            'fecha_deseada.different' => 'La fecha que querés tomar no puede ser la misma que la que ofrecés.',
         ]);
 
         if ((int) $validated['guardavida_destinatario_id'] === $guardavida->id) {
-            return back()->withErrors('No podés pedirte un cambio de franco a vos mismo.');
+            return back()->withErrors('No podés pedirte un cambio de franco a vos mismo.')->withInput();
+        }
+
+        if (! in_array((int) Carbon::parse($validated['fecha_propia'])->dayOfWeek, $diasFrancoGuardavida, true)) {
+            return back()
+                ->withErrors('El día que ofrecés tiene que ser tu franco fijo (los '.Guardavida::nombresDeDias($diasFrancoGuardavida).').')
+                ->withInput();
         }
 
         $intercambio = FrancoIntercambio::create([
@@ -81,11 +105,24 @@ class FrancoIntercambioController extends Controller
 
         $destinatario = Guardavida::find($validated['guardavida_destinatario_id']);
         if ($destinatario?->user) {
+            $fechaPropiaFmt = Carbon::parse($validated['fecha_propia'])->format('d/m/Y');
+            $fechaDeseadaFmt = Carbon::parse($validated['fecha_deseada'])->format('d/m/Y');
+            $nombreSolicitante = "{$guardavida->nombre} {$guardavida->apellido}";
+
+            // Aviso en el sistema: inmediato, no depende de la cola.
             $destinatario->user->notify(new FrancoIntercambioSolicitadoNotification(
                 $intercambio->id,
-                "{$guardavida->nombre} {$guardavida->apellido}",
-                Carbon::parse($validated['fecha_propia'])->format('d/m/Y'),
-                Carbon::parse($validated['fecha_deseada'])->format('d/m/Y'),
+                $nombreSolicitante,
+                $fechaPropiaFmt,
+                $fechaDeseadaFmt,
+                $validated['mensaje'] ?? null,
+            ));
+
+            // Mail: en cola, puede tardar o fallar sin afectar lo anterior.
+            $destinatario->user->notify(new FrancoIntercambioSolicitadoMailNotification(
+                $nombreSolicitante,
+                $fechaPropiaFmt,
+                $fechaDeseadaFmt,
                 $validated['mensaje'] ?? null,
             ));
         }
@@ -95,7 +132,7 @@ class FrancoIntercambioController extends Controller
 
     /**
      * El destinatario acepta: recién acá se cargan las excepciones de franco
-     * de los dos, para esa fecha puntual (no toca el dia_franco fijo de nadie).
+     * de los dos, para esa fecha puntual (no toca el esquema de franco fijo de nadie).
      */
     public function aceptar(FrancoIntercambio $francoIntercambio)
     {
@@ -103,6 +140,17 @@ class FrancoIntercambioController extends Controller
 
         if ($francoIntercambio->estado !== 'pendiente') {
             return back()->withErrors('Esta solicitud ya fue respondida.');
+        }
+
+        $destinatario = $francoIntercambio->destinatario;
+        $diasFrancoDestinatario = $destinatario->diasFrancoActuales();
+
+        if ($diasFrancoDestinatario === []) {
+            return back()->withErrors('Antes de aceptar, configurá tu franco fijo.');
+        }
+
+        if (! in_array((int) $francoIntercambio->fecha_deseada->dayOfWeek, $diasFrancoDestinatario, true)) {
+            return back()->withErrors('El día que te piden ceder no es tu franco (tu franco es los '.Guardavida::nombresDeDias($diasFrancoDestinatario).').');
         }
 
         DB::transaction(function () use ($francoIntercambio) {
@@ -133,6 +181,7 @@ class FrancoIntercambioController extends Controller
         });
 
         $this->notificarRespuesta($francoIntercambio, 'aceptado');
+        $this->marcarSolicitudComoLeida($francoIntercambio);
 
         return back()->with('success', 'Aceptaste el cambio de franco.');
     }
@@ -148,8 +197,27 @@ class FrancoIntercambioController extends Controller
         $francoIntercambio->update(['estado' => 'rechazado', 'respondido_at' => now()]);
 
         $this->notificarRespuesta($francoIntercambio, 'rechazado');
+        $this->marcarSolicitudComoLeida($francoIntercambio);
 
         return back()->with('success', 'Rechazaste el cambio de franco.');
+    }
+
+    /**
+     * Apaga el aviso de "te pidieron un cambio" para esta solicitud puntual
+     * — recién cuando se acepta, rechaza o cancela, no antes.
+     */
+    private function marcarSolicitudComoLeida(FrancoIntercambio $francoIntercambio): void
+    {
+        $destinatario = $francoIntercambio->destinatario;
+        if (! $destinatario?->user) {
+            return;
+        }
+
+        $destinatario->user->unreadNotifications()
+            ->where('type', FrancoIntercambioSolicitadoNotification::class)
+            ->get()
+            ->filter(fn ($n) => (int) ($n->data['intercambio_id'] ?? null) === $francoIntercambio->id)
+            ->each->markAsRead();
     }
 
     private function notificarRespuesta(FrancoIntercambio $francoIntercambio, string $estado): void
@@ -158,12 +226,25 @@ class FrancoIntercambioController extends Controller
         $destinatario = $francoIntercambio->destinatario;
 
         if ($solicitante?->user) {
+            $nombreDestinatario = "{$destinatario->nombre} {$destinatario->apellido}";
+            $fechaPropiaFmt = $francoIntercambio->fecha_propia->format('d/m/Y');
+            $fechaDeseadaFmt = $francoIntercambio->fecha_deseada->format('d/m/Y');
+
+            // Aviso en el sistema: inmediato, no depende de la cola.
             $solicitante->user->notify(new FrancoIntercambioRespondidoNotification(
                 $francoIntercambio->id,
-                "{$destinatario->nombre} {$destinatario->apellido}",
+                $nombreDestinatario,
                 $estado,
-                $francoIntercambio->fecha_propia->format('d/m/Y'),
-                $francoIntercambio->fecha_deseada->format('d/m/Y'),
+                $fechaPropiaFmt,
+                $fechaDeseadaFmt,
+            ));
+
+            // Mail: en cola, puede tardar o fallar sin afectar lo anterior.
+            $solicitante->user->notify(new FrancoIntercambioRespondidoMailNotification(
+                $nombreDestinatario,
+                $estado,
+                $fechaPropiaFmt,
+                $fechaDeseadaFmt,
             ));
         }
     }
@@ -183,6 +264,8 @@ class FrancoIntercambioController extends Controller
         }
 
         $francoIntercambio->update(['estado' => 'cancelado', 'respondido_at' => now()]);
+
+        $this->marcarSolicitudComoLeida($francoIntercambio);
 
         return back()->with('success', 'Cancelaste tu pedido de cambio de franco.');
     }
