@@ -25,6 +25,10 @@
     @include('ui.partials.modal-setup')
 @endif
 
+@if(session('show_franco_setup'))
+    @include('ui.partials.aviso-franco-pendiente')
+@endif
+
 
 {{-- <div class="space-y-2 sm:hidden"> --}}
     <section class="text-gray-600 dark:text-gray-100 body-font px-4 py-4 mb-10">

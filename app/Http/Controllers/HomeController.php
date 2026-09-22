@@ -40,6 +40,13 @@ class HomeController extends Controller
             session(['show_guardavida_setup' => true]);
         }
 
+        // Exige (con un aviso, no bloqueante) que configure su día de franco
+        // fijo si todavía no lo tiene. Se limpia en
+        // GuardavidaController::actualizarDiaFranco() al configurarlo.
+        if ($user->guardavida && $user->guardavida->diasFrancoActuales() === []) {
+            session(['show_franco_setup' => true]);
+        }
+
         if( $agent->isMobile()) {
             return view('ui.home-mobile', compact( 'isMobile', 'bandera', 'totales'));
         } else{

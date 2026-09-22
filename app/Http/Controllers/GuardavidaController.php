@@ -353,6 +353,10 @@ class GuardavidaController extends Controller
 
         $guardavida->establecerDiasFranco($validated['dias_franco'], Auth::id());
 
+        // Limpia el aviso de "franco sin configurar" del login (ver
+        // HomeController::index()), para no volver a mostrarlo.
+        session()->forget('show_franco_setup');
+
         return back()->with('success', 'Configuraste tu franco.');
     }
 

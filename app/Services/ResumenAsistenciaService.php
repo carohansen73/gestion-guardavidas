@@ -20,15 +20,12 @@ use Illuminate\Support\Collection;
  * alguien cambió de franco en medio del rango consultado, no se le aplica
  * retroactivamente el esquema actual a fechas viejas.
  *
- * Además, si una semana no tiene ningún día de franco explicado por el
- * esquema vigente ni por un cambio puntual (FrancoExcepcion) — típicamente
- * porque todavía no configuró nada — igual se le reconoce 1 franco por
- * semana por defecto: el primer día sin asistencia/licencia de esa semana
- * se cuenta como franco (no como falta), y recién el segundo día sin
- * explicar en la misma semana es falta. Esto es solo la red de seguridad
- * para el caso "sin configurar"; alguien con esquema de 2+ días (ej.
- * aeródromo, franco sábado y domingo) ya tiene sus francos cubiertos por el
- * esquema explícito y no necesita esta inferencia.
+ * Ya no se infiere ningún franco: si el guardavida no tiene un esquema
+ * configurado (ni un cambio puntual vía FrancoExcepcion), sus días sin
+ * fichaje se cuentan directamente como falta. La configuración del franco
+ * fijo es obligatoria — se le exige con un aviso al iniciar sesión (ver
+ * HomeController::index()) — así que no hace falta "adivinar" cuál sería su
+ * día libre.
  *
  * A propósito NO reutiliza HistorialAsistenciaService (ese arma el
  * historial día por día con relaciones cargadas, pensado para el detalle
@@ -104,18 +101,13 @@ class ResumenAsistenciaService
             $excepciones = $excepcionesPorGuardavida->get($guardavida->id, collect())
                 ->keyBy(fn ($e) => $e->fecha->toDateString());
 
-            // Primera pasada: clasificación "dura" día por día. 'pendiente'
-            // son los días sin asistencia/licencia/franco explicado — ahí es
-            // donde entra en juego el franco semanal de abajo.
+            // Clasificación día por día. Si no hay asistencia/licencia/franco
+            // explicado para una fecha, es falta directamente — no hay
+            // segunda pasada que le adivine un franco semanal.
             $clasificacion = [];
             $fueraDeRangoPorFecha = [];
-            $semanaDe = [];
 
             foreach ($fechas as $fechaStr) {
-                // Semana de lunes a domingo — no nos importa a qué semana de
-                // franco real corresponde, solo agrupar para el descuento.
-                $semanaDe[$fechaStr] = Carbon::parse($fechaStr)->startOfWeek(Carbon::MONDAY)->toDateString();
-
                 if ($diasAsistencia->has($fechaStr)) {
                     $clasificacion[$fechaStr] = 'asistencia';
                     $fueraDeRangoPorFecha[$fechaStr] = (int) $diasAsistencia[$fechaStr]->fuera_de_rango === 1;
@@ -149,39 +141,10 @@ class ResumenAsistenciaService
                 $diasFrancoVigentes = $guardavida->diasFrancoVigentesEn($fechaStr);
                 $esDiaFrancoFijo = in_array((int) Carbon::parse($fechaStr)->dayOfWeek, $diasFrancoVigentes, true);
 
-                $clasificacion[$fechaStr] = $esDiaFrancoFijo ? 'franco' : 'pendiente';
+                $clasificacion[$fechaStr] = $esDiaFrancoFijo ? 'franco' : 'falta';
             }
 
-            // Segunda pasada: todos los guardavidas tienen derecho a 1 franco
-            // semanal, sepamos o no qué día es. Si esa semana ya tiene un
-            // franco explícito (día fijo configurado o cambio puntual
-            // cargado), no se toca nada. Si no, el primer día "pendiente" de
-            // la semana se toma como ese franco semanal, y el resto de los
-            // pendientes de esa misma semana sí quedan como falta.
-            $pendientesPorSemana = [];
-            $francosExplicitosPorSemana = [];
-            foreach ($clasificacion as $fechaStr => $estado) {
-                $semana = $semanaDe[$fechaStr];
-                if ($estado === 'pendiente') {
-                    $pendientesPorSemana[$semana][] = $fechaStr;
-                } elseif ($estado === 'franco') {
-                    $francosExplicitosPorSemana[$semana] = ($francosExplicitosPorSemana[$semana] ?? 0) + 1;
-                }
-            }
-
-            foreach ($pendientesPorSemana as $semana => $fechasPendientes) {
-                sort($fechasPendientes);
-
-                if (($francosExplicitosPorSemana[$semana] ?? 0) === 0) {
-                    $clasificacion[array_shift($fechasPendientes)] = 'franco';
-                }
-
-                foreach ($fechasPendientes as $fechaStr) {
-                    $clasificacion[$fechaStr] = 'falta';
-                }
-            }
-
-            // Tercera pasada: conteo final.
+            // Conteo final.
             $asistencias = 0;
             $faltas = 0;
             $licencias = 0;

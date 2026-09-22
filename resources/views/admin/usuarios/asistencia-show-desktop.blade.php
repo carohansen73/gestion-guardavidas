@@ -23,6 +23,11 @@
             {{ session('error') }}
         </div>
     @endif
+    @if ($errors->any())
+        <div class="bg-red-100 text-red-700 p-3 rounded my-2">
+            {{ $errors->first() }}
+        </div>
+    @endif
 
 </div>
 
@@ -292,26 +297,50 @@
 
 @if ($esAdmin)
 <div id="francoExcepcionModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-96 p-6 animate-fade-in">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-96 p-6 animate-fade-in" x-data="{ accion: 'mover' }">
         <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
             Cargar cambio de franco
         </h2>
+
+        <div class="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 text-amber-800 dark:text-amber-200 text-xs p-2 rounded mb-3">
+            Si esto es parte de un intercambio con un compañero, acordate que este formulario solo actualiza a
+            <strong>{{ $guardavida->nombre }} {{ $guardavida->apellido }}</strong>. Andá también al perfil de la
+            otra persona y cargale el cambio que le corresponde — o, mejor, pedile que lo resuelvan juntos desde
+            "Cambios de Franco", así queda todo hecho en un solo paso.
+        </div>
 
         <form action="{{ route('franco-excepcion.store', $guardavida->id) }}" method="POST">
             @csrf
 
             <div class="mb-3">
-                <label class="text-gray-700 dark:text-gray-300 text-sm">Fecha:</label>
-                <input type="date" name="fecha" required class="border p-1 w-full rounded">
-            </div>
-
-            <div class="mb-3">
-                <label class="text-gray-700 dark:text-gray-300 text-sm">Tipo de cambio:</label>
-                <select name="tipo" required class="border p-1 w-full rounded">
-                    <option value="agregado">Ese día pasa a ser franco</option>
-                    <option value="cancelado">Ese día deja de ser franco (debe trabajar)</option>
+                <label class="text-gray-700 dark:text-gray-300 text-sm">¿Qué querés hacer?</label>
+                <select name="accion" x-model="accion" required class="border p-1 w-full rounded">
+                    <option value="mover">Correr el franco a otro día</option>
+                    <option value="cancelar">Cancelar un franco, sin reemplazo (ej. vino a trabajar)</option>
                 </select>
             </div>
+
+            <template x-if="accion === 'mover'">
+                <div>
+                    <div class="mb-3">
+                        <label class="text-gray-700 dark:text-gray-300 text-sm">
+                            Día que deja de ser franco (tiene que ser su franco fijo: {{ $guardavida->dias_franco_nombres ?? 'sin configurar' }}):
+                        </label>
+                        <input type="date" name="fecha_origen" required class="border p-1 w-full rounded">
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-gray-700 dark:text-gray-300 text-sm">Día que pasa a ser franco:</label>
+                        <input type="date" name="fecha_destino" required class="border p-1 w-full rounded">
+                    </div>
+                </div>
+            </template>
+
+            <template x-if="accion === 'cancelar'">
+                <div class="mb-3">
+                    <label class="text-gray-700 dark:text-gray-300 text-sm">Día que deja de ser franco:</label>
+                    <input type="date" name="fecha" required class="border p-1 w-full rounded">
+                </div>
+            </template>
 
             <div class="mb-3">
                 <label class="text-gray-700 dark:text-gray-300 text-sm">Motivo (opcional):</label>

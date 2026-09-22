@@ -46,6 +46,10 @@
     @include('ui.partials.modal-setup')
 @endif
 
+@if(session('show_franco_setup'))
+    @include('ui.partials.aviso-franco-pendiente')
+@endif
+
 <div class="flex flex-col md:flex-row gap-6 px-6 py-6">
 
     <!-- 🟦 Columna principal (2/3 del ancho) -->

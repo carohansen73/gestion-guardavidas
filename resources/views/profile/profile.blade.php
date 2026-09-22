@@ -278,14 +278,23 @@
                     <a href="{{ route('franco-intercambio.index') }}" class="text-sky-600 hover:underline">pedíselo a un compañero</a> desde "Cambios de Franco".
                 </p>
 
-                <form action="{{ route('guardavida.actualizarDiaFranco') }}" method="POST" class="flex flex-col gap-3">
-                    @csrf
-                    @method('PATCH')
-
+                {{--
+                    OJO: esto NO puede ser un <form> acá — ya estamos dentro del
+                    <form> grande de "Profile Body" (abre en la línea ~65), y los
+                    navegadores no soportan <form> anidados: si esto fuera un
+                    <form> propio, el navegador ignora su action/method y termina
+                    mandando todo por el formulario externo (bug real que pasó:
+                    terminaba haciendo PATCH a la ruta de "mi-profile", que solo
+                    acepta PUT). Se resuelve con el atributo form="..." de HTML5,
+                    que asocia estos inputs/el botón a un <form> declarado aparte
+                    (ver el final del archivo, después de cerrar el form grande),
+                    sin importar dónde estén anidados en el HTML.
+                --}}
+                <div class="flex flex-col gap-3">
                     <div class="flex flex-wrap gap-4">
                         @foreach (['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'] as $i => $nombreDia)
                             <label class="inline-flex items-center gap-1.5 text-sm text-gray-700 dark:text-gray-200">
-                                <input type="checkbox" name="dias_franco[]" value="{{ $i }}"
+                                <input type="checkbox" name="dias_franco[]" value="{{ $i }}" form="francoForm"
                                     {{ in_array($i, old('dias_franco', $guardavida->diasFrancoActuales())) ? 'checked' : '' }}
                                     class="rounded border-gray-300 text-sky-600 focus:ring-sky-500">
                                 {{ $nombreDia }}
@@ -294,12 +303,12 @@
                     </div>
 
                     <div class="mt-4 action-buttons">
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" form="francoForm" class="btn btn-primary">
                             <i class="fas fa-save me-1"></i>
                             Guardar franco
                         </button>
                     </div>
-                </form>
+                </div>
             </div>
 
                 <!-- Statistics -->
@@ -331,6 +340,12 @@
                         </button>
                     </div>
 
+            </form>
+
+            {{-- Form "invisible" del franco (ver comentario más arriba, cerca de "Guardar franco") --}}
+            <form id="francoForm" action="{{ route('guardavida.actualizarDiaFranco') }}" method="POST" class="hidden">
+                @csrf
+                @method('PATCH')
             </form>
 
 
