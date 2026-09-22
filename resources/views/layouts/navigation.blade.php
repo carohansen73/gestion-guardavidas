@@ -1,7 +1,10 @@
+@use('App\Enums\RolUsuario')
+
 @php
 
     $playa = Auth::user()->guardavida?->playa?->nombre;
     $rol = Auth::user()->getRoleNames()->first();
+    $rolPrincipal = RolUsuario::principal(Auth::user());
     $notificacionesFrancoSinLeer = Auth::user()->unreadNotifications->count();
 @endphp
 
@@ -75,7 +78,10 @@
                             title="Tenés notificaciones sin leer"></span>
                     @endif
 
-                    @auth <div>{{ Auth::user()->name }}</div> @endauth
+                    @auth
+                        <x-role-badge :rol="$rolPrincipal" :label="false" size="w-5 h-5" />
+                        <div class="ms-1.5">{{ Auth::user()->name }}</div>
+                    @endauth
 
                     <div class="ms-1">
                         <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -88,6 +94,11 @@
             </x-slot>
 
             <x-slot name="content">
+                <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
+                    <div class="font-medium text-sm text-gray-800 dark:text-gray-50 truncate">{{ Auth::user()->email }}</div>
+                    <x-role-badge :rol="$rolPrincipal" size="w-3.5 h-3.5" class="mt-1" />
+                </div>
+
                 <x-dropdown-link :href="route('guardavida.myProfile')">
                     {{ __('Perfil') }}
                 </x-dropdown-link>
@@ -200,8 +211,9 @@
         <div class="pt-4 pb-1 border-t border-gray-200">
             @auth
                 <div class="px-4">
-                    <div class="font-medium text-base text-gray-800 dark:text-gray-50">{{ Auth::user()->name }}</div>
+                    <div class="font-medium text-base text-gray-800 dark:text-gray-50">{{ Auth::user()->name }} {{ Auth::user()->lastname }}</div>
                     <div class="font-medium text-sm text-gray-500 dark:text-gray-100">{{ Auth::user()->email }}</div>
+                    <x-role-badge :rol="$rolPrincipal" size="w-3.5 h-3.5" class="mt-2" />
                 </div>
             @endauth
             <div class="mt-3 space-y-1">
