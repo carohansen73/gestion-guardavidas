@@ -2,8 +2,11 @@
 const csrfToken = document
     .querySelector('meta[name="csrf-token"]')
     .getAttribute("content");
+// En el perfil de un admin/encargado sin ficha de guardavida asociada, este
+// form no existe (solo se muestra la card de "Datos de Usuario"), así que
+// todo lo que depende de él se guarda condicionado a que exista.
 const form = document.querySelector(".profile-body");
-const guardavidaId = parseInt(form.dataset.guardavidaId); // Esto te da el ID
+const guardavidaId = form ? parseInt(form.dataset.guardavidaId) : null; // Esto te da el ID
 
 let puedeEditar =  window.puedeEditar === true;
 
@@ -37,10 +40,8 @@ function mostrarAlerta(tipo, titulo, mensaje) {
 console.log(puedeEditar);
 
 // Manejar envío del formulario
-if (puedeEditar) {
-    document
-        .querySelector(".profile-body")
-        .addEventListener("submit", async function(e) {
+if (puedeEditar && form) {
+    form.addEventListener("submit", async function(e) {
             e.preventDefault();
 
             // VALIDACIÓN: si cambió la playa y NO eligió puesto → detener envío
@@ -98,34 +99,37 @@ if (puedeEditar) {
         });
 }
 
-document.getElementById("selectPlaya").addEventListener("change", function() {
-    let playaId = this.value;
-    let puestoSelect = document.getElementById("selectPuesto");
-    puestoSelect.innerHTML = '<option value="">Cargando...</option>';
+const selectPlaya = document.getElementById("selectPlaya");
+if (selectPlaya) {
+    selectPlaya.addEventListener("change", function() {
+        let playaId = this.value;
+        let puestoSelect = document.getElementById("selectPuesto");
+        puestoSelect.innerHTML = '<option value="">Cargando...</option>';
 
-    puestoSelect.dataset.requiereNuevo = "1";
+        puestoSelect.dataset.requiereNuevo = "1";
 
-    if (!playaId) {
-        puestoSelect.innerHTML = '<option value="">Seleccionar puesto</option>';
-        return;
-    }
+        if (!playaId) {
+            puestoSelect.innerHTML = '<option value="">Seleccionar puesto</option>';
+            return;
+        }
 
-    fetch(`/puestos-por-playa/${playaId}`)
-        .then((response) => response.json())
-        .then((data) => {
-            puestoSelect.innerHTML =
-                '<option value="">Seleccionar puesto</option>';
+        fetch(`/puestos-por-playa/${playaId}`)
+            .then((response) => response.json())
+            .then((data) => {
+                puestoSelect.innerHTML =
+                    '<option value="">Seleccionar puesto</option>';
 
-            data.forEach((puesto) => {
-                let option = document.createElement("option");
-                option.value = puesto.id;
-                option.textContent = puesto.nombre;
-                puestoSelect.appendChild(option);
+                data.forEach((puesto) => {
+                    let option = document.createElement("option");
+                    option.value = puesto.id;
+                    option.textContent = puesto.nombre;
+                    puestoSelect.appendChild(option);
+                });
+            })
+            .catch((error) => {
+                console.error("Error cargando puestos:", error);
+                puestoSelect.innerHTML =
+                    '<option value="">Error al cargar</option>';
             });
-        })
-        .catch((error) => {
-            console.error("Error cargando puestos:", error);
-            puestoSelect.innerHTML =
-                '<option value="">Error al cargar</option>';
-        });
-});
+    });
+}

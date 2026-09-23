@@ -73,9 +73,7 @@ Route::middleware(['auth', 'force.password'])->group(function () {
     /* Nuevas rutas */
     Route::get('/my-profile', [GuardavidaController::class, 'myProfile'])->name('guardavida.myProfile');
     Route::put('/my-profile/{guardavida}', [GuardavidaController::class, 'updateProfile'])->name('guardavida.updateProfile');
-    Route::get('/guardavida/{guardavida}/perfil', [GuardavidaController::class, 'showProfile'])->name('guardavida.profile');
 
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     // Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
@@ -87,7 +85,6 @@ Route::middleware(['auth', 'force.password'])->group(function () {
     //  NUEVAS RUTAS PARA PERFILES (dentro del middleware)
     Route::get('/profile', [GuardavidaController::class, 'myProfile'])->name('guardavida.myProfile');
 
-    Route::get('/guardavida/{guardavida}/perfil', [GuardavidaController::class, 'showProfile'])->name('guardavida.profile');
     Route::put('/profile/{guardavida}', [GuardavidaController::class, 'updateProfile'])->name('guardavida.updateProfile');
 
     // listado de cambios de turno

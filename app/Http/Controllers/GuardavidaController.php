@@ -190,13 +190,12 @@ class GuardavidaController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified resource (reusa la vista de "mi perfil": es
+     * de solo lectura salvo que sea el propio guardavida el que la mira).
      */
     public function show(Guardavida $guardavida)
     {
-        return view('ui.guardavidas.show-fields', compact(
-            'guardavida'
-        ));
+        return $this->showProfile($guardavida);
     }
 
     /**
@@ -230,18 +229,17 @@ class GuardavidaController extends Controller
         $diasFranco = $validated['dias_franco'] ?? null;
         unset($validated['dias_franco']);
 
-        // POR SI DEJO MODIFICAR NOMBRE-APELLIDO EN GUARDAVIDA TMB LO TNGO Q ACTUALIZAR EN USER
-        // POR AHORA SOLO LO EDITA DE USER
-        // DB::transaction(function () use ($validated, $guardavida) {
-        // $user = $guardavida->user;
-        // Actualiza usuario - saque nombre y apellido y lo deje unicamente en perfil
-        // $user->update([
-        //     'name'      => $validated['nombre'],
-        //     'lastname'  => $validated['apellido'],
-        // ]);
-        // });
-
         if ($guardavida->update($validated)) {
+            // Nombre/apellido también viven en "users" (navbar, login, etc.
+            // los leen de ahí) — hay que mantenerlos sincronizados con los
+            // de "guardavidas", igual que hace updateProfile().
+            if ($guardavida->user) {
+                $guardavida->user->update([
+                    'name' => $validated['nombre'],
+                    'lastname' => $validated['apellido'],
+                ]);
+            }
+
             if (! empty($diasFranco)) {
                 $guardavida->establecerDiasFranco($diasFranco, auth()->id());
             }
@@ -396,14 +394,14 @@ class GuardavidaController extends Controller
         $user = Auth::user();
 
         // Verificar permisos
-        $esAdmin = $user->hasRole('admin') || $user->hasRole('encargado');
+        $esAdminOEncargado = $user->hasRole('admin') || $user->hasRole('encargado');
         $esPropietario = $user->guardavida && $user->guardavida->id === $guardavida->id;
 
-        if (! $esAdmin && ! $esPropietario) {
+        if (! $esAdminOEncargado && ! $esPropietario) {
             abort(403, 'No tenés permisos para ver este perfil.');
         }
 
-        $puedeEditar = $esAdmin || $esPropietario;
+        $puedeEditar = $esAdminOEncargado || $esPropietario;
 
         /*
                 // Cargar relaciones necesarias
@@ -411,15 +409,17 @@ class GuardavidaController extends Controller
         */
         // Cargar relaciones necesarias
         $guardavida->load(['playa', 'puesto', 'user']);
-        // Obtener listas para los selects (solo si es admin)
-        $playas = $esAdmin ? Playa::all() : null;
-        $puestos = $esAdmin ? Puesto::all() : null;
-        $turnos = $esAdmin ? CambioDeTurno::all() : null;
+        // Obtener listas para los selects (solo si es admin editando su
+        // propio perfil; viendo el de otro queda todo de solo lectura)
+        $playas = $esAdminOEncargado && $esPropietario ? Playa::all() : null;
+        $puestos = $esAdminOEncargado && $esPropietario ? Puesto::all() : null;
+        $turnos = $esAdminOEncargado && $esPropietario ? CambioDeTurno::all() : null;
 
         return view('profile.profile', compact(
             'guardavida',
             'puedeEditar',
-            'esAdmin',
+            'esAdminOEncargado',
+            'esPropietario',
             'playas',
             'puestos',
             'turnos'
@@ -427,19 +427,28 @@ class GuardavidaController extends Controller
     }
 
     /**
-     * Mi perfil (guardavida logueado)
+     * Mi perfil (usuario logueado). Los admin/encargado que no tienen una
+     * ficha de guardavida asociada también entran acá (para poder cambiar
+     * su email/contraseña), así que la vista debe funcionar con
+     * $guardavida en null.
      */
     public function myProfile()
     {
         $user = Auth::user();
 
-        if (! $user->guardavida) {
-            return redirect()->route('home')
-                ->with('error', 'No tenés un perfil de guardavida asignado.');
+        if ($user->guardavida) {
+            return $this->showProfile($user->guardavida);
         }
 
-        // Reutilizar el método anterior
-        return $this->showProfile($user->guardavida);
+        return view('profile.profile', [
+            'guardavida' => null,
+            'puedeEditar' => true,
+            'esAdminOEncargado' => $user->hasRole('admin') || $user->hasRole('encargado'),
+            'esPropietario' => true,
+            'playas' => null,
+            'puestos' => null,
+            'turnos' => null,
+        ]);
     }
 
     /**
@@ -449,11 +458,14 @@ class GuardavidaController extends Controller
     {
         $user = Auth::user();
 
-        // Verificar permisos                     //ajustar nombre si no coincide con el permiso
-        $esAdmin = $user->hasRole('admin') || $user->hasRole('encargado');
+        // Editar el perfil de OTRO guardavida (playa, puesto, turno, rol,
+        // etc.) se hace desde la vista de admin con tabs (guardavida.edit),
+        // no desde acá — esta ruta es autoservicio, solo el dueño del
+        // perfil puede usarla.
+        $esAdminOEncargado = $user->hasRole('admin') || $user->hasRole('encargado');
         $esPropietario = $user->guardavida && $user->guardavida->id === $guardavida->id;
 
-        if (! $esAdmin && ! $esPropietario) {
+        if (! $esPropietario) {
             abort(403, 'No tenés permisos para editar este perfil.');
         }
 
@@ -469,7 +481,7 @@ class GuardavidaController extends Controller
             'piso_dpto' => 'nullable|string|max:10',
         ];
         // Solo admin puede cambiar playa/puesto/función/turno
-        if ($esAdmin) {
+        if ($esAdminOEncargado) {
             $rules['playa_id'] = 'required|exists:playas,id';
             $rules['puesto_id'] = 'required|exists:puestos,id';
 
@@ -478,7 +490,7 @@ class GuardavidaController extends Controller
 
         $validated = $request->validate($rules);
         // Si no es admin, remover campos que no puede editar
-        if (! $esAdmin) {
+        if (! $esAdminOEncargado) {
 
             unset($validated['playa_id'],
                 $validated['puesto_id']);
@@ -486,11 +498,12 @@ class GuardavidaController extends Controller
         }
         if ($guardavida->update($validated)) {
             // También actualizar el usuario asociado si cambió nombre/apellido
+            // (el email de la cuenta se edita aparte, desde la card de
+            // "Datos de usuario" -> profile.update)
             if ($guardavida->user) {
                 $guardavida->user->update([
                     'name' => $validated['nombre'],
                     'lastname' => $validated['apellido'],
-                    'email' => $validated['email'] ?? $guardavida->user->email,
                 ]);
             }
 

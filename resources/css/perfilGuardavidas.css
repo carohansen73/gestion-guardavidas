@@ -122,6 +122,11 @@
         background: var(--secondary-color);
         color: white;
     }
+
+    .badge-inactive {
+        background: var(--danger-color);
+        color: white;
+    }
     /* Profile Body */
 
     .title {
@@ -170,16 +175,9 @@
         font-size: 14px;
         outline: none;
     }
-    /* Action Buttons */
-
-    .action-buttons {
-        display: flex;
-        gap: 15px;
-        justify-content: center;
-        flex-wrap: wrap;
-        padding-top: 30px;
-        border-top: 2px solid var(--border-color);
-    }
+    /* Action Buttons: alineación y espaciado se manejan con utilidades de
+       Tailwind directamente en cada vista (gap-3, justify-end, border-t,
+       pt-6), no con una clase CSS acá. */
 
     .btn-primary {
         background: var(--primary-color);
@@ -292,15 +290,9 @@
         .profile-name {
             font-size: 24px;
         }
-        .profile-body {
-            padding: 25px 20px;
-        }
         .info-grid {
             grid-template-columns: 1fr;
             gap: 20px;
-        }
-        .action-buttons {
-            flex-direction: column;
         }
         /* .btn {
             width: 100%;
