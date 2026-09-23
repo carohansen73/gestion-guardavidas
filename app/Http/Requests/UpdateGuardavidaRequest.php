@@ -36,6 +36,9 @@ class UpdateGuardavidaRequest extends FormRequest
             'puesto_id' => 'required|exists:puestos,id',
             'funcion' => 'required|string|in:Timonel,Encargado,Guardavida,Jefe_de_playa',
             'turno' => 'required|in:M,T',
+
+            'dias_franco' => 'nullable|array',
+            'dias_franco.*' => 'integer|between:0,6',
         ];
 
         return $rules;

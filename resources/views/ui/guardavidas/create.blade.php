@@ -264,6 +264,20 @@
                                 </div>
                             </div>
 
+                            <!-- Franco fijo -->
+                            <div class="sm:col-span-8">
+                                <label class="block text-sm font-medium text-gray-900 dark:text-white">
+                                    Franco fijo (día/s libres de todas las semanas)
+                                </label>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    Opcional — podés dejarlo sin marcar si todavía no está definido qué día le va a tocar.
+                                    El propio guardavida también puede configurarlo después desde su perfil.
+                                </p>
+                                <div class="mt-2">
+                                    <x-dias-franco-checkboxes :seleccionados="old('dias_franco', [])" />
+                                </div>
+                            </div>
+
                     </div> {{-- HASTA  ACA, SOLO VISIBLE SI VA A AGREGAR UN GUARDAVIDA  --}}
 
 

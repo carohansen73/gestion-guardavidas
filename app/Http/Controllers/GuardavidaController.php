@@ -157,7 +157,7 @@ class GuardavidaController extends Controller
 
             // 3 Si es guardavida o encargado → creo registro en tabla guardavidas
             if (in_array($validated['rol'], ['guardavida', 'encargado'])) {
-                Guardavida::create([
+                $guardavida = Guardavida::create([
                     'nombre' => $validated['nombre'],
                     'apellido' => $validated['apellido'],
                     'dni' => $validated['dni'],
@@ -172,6 +172,15 @@ class GuardavidaController extends Controller
                     'user_id' => $user->id,
                     // 'legajo' => $validated['legajo'] ?? null,
                 ]);
+
+                // El franco fijo no es una columna de "guardavidas" (vive
+                // versionado en guardavida_franco_historial), y es opcional
+                // al alta —
+                // si no se configura, se le avisa al guardavida
+                // cuando inicie sesión.
+                if (! empty($validated['dias_franco'])) {
+                    $guardavida->establecerDiasFranco($validated['dias_franco'], auth()->id());
+                }
             }
         });
 
@@ -214,6 +223,13 @@ class GuardavidaController extends Controller
         // Validación de datos
         $validated = $request->validated();
 
+        // El franco fijo no es una columna de "guardavidas" (vive
+        // en guardavida_franco_historial), así que se saca de
+        // $validated antes del update() normal y se guarda aparte.
+        // Si vino vacío, no se toca.
+        $diasFranco = $validated['dias_franco'] ?? null;
+        unset($validated['dias_franco']);
+
         // POR SI DEJO MODIFICAR NOMBRE-APELLIDO EN GUARDAVIDA TMB LO TNGO Q ACTUALIZAR EN USER
         // POR AHORA SOLO LO EDITA DE USER
         // DB::transaction(function () use ($validated, $guardavida) {
@@ -226,6 +242,10 @@ class GuardavidaController extends Controller
         // });
 
         if ($guardavida->update($validated)) {
+            if (! empty($diasFranco)) {
+                $guardavida->establecerDiasFranco($diasFranco, auth()->id());
+            }
+
             return redirect()->route('guardavida.edit', $guardavida->id)
                 ->with('success', 'Guardavida actualizado correctamente.');
         }

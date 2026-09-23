@@ -9,13 +9,8 @@
             @method('PATCH')
 
             <label class="text-sm text-gray-700 dark:text-gray-300">Día(s) franco fijo(s) de todas las semanas:</label>
-            <div class="flex flex-col gap-1 mt-2">
-                @foreach (['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'] as $i => $nombreDia)
-                    <label class="inline-flex items-center gap-1.5 text-sm text-gray-700 dark:text-gray-200">
-                        <input type="checkbox" name="dias_franco[]" value="{{ $i }}" class="rounded border-gray-300 text-sky-600 focus:ring-sky-500">
-                        {{ $nombreDia }}
-                    </label>
-                @endforeach
+            <div class="mt-2">
+                <x-dias-franco-checkboxes />
             </div>
 
             <div class="flex justify-end gap-2 mt-4">
