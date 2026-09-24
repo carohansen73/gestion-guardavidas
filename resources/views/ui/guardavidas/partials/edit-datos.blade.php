@@ -8,7 +8,7 @@
                 Información personal
         </h3>
         <!-- Nombre -->
-        {{-- <div class="sm:col-span-4">
+       <div class="sm:col-span-4">
             <label for="nombre" class="block text-sm font-medium dark:text-white">Nombre</label>
             <div class="mt-2">
                 <input id="nombre" type="text" name="nombre" placeholder="Nombre"
@@ -18,10 +18,10 @@
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                 @enderror
             </div>
-        </div> --}}
+        </div>
 
         <!-- Apellido -->
-        {{-- <div class="sm:col-span-4">
+         <div class="sm:col-span-4">
             <label for="apellido" class="block text-sm font-medium dark:text-white">Apellido</label>
             <div class="mt-2">
                 <input id="apellido" type="text" name="apellido" placeholder="Apellido"
@@ -31,7 +31,7 @@
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                 @enderror
             </div>
-        </div> --}}
+        </div>
 
         <!-- DNI -->
         <div class="sm:col-span-4">
