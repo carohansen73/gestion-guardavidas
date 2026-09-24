@@ -14,10 +14,34 @@ document.addEventListener('DOMContentLoaded', e => {
         // Actualiza las cards
         document.getElementById('card-intervenciones').textContent = data.totalIntervenciones;
         document.getElementById('card-novedades').textContent = data.totalNovedadesMateriales;
+        document.getElementById('card-guardavidas-activos').textContent = data.totalGuardavidasActivos;
+        document.getElementById('card-asistencias-hoy').textContent = data.asistenciasHoy;
+        document.getElementById('card-licencias-activas').textContent = data.licenciasActivasHoy;
+
+        const cardFueraDeRango = document.getElementById('card-fuera-de-rango');
+        cardFueraDeRango.textContent = data.fueraDeRango30d;
+        cardFueraDeRango.classList.toggle('text-amber-600', data.fueraDeRango30d > 0);
+        cardFueraDeRango.classList.toggle('dark:text-amber-400', data.fueraDeRango30d > 0);
+        cardFueraDeRango.classList.toggle('text-gray-800', data.fueraDeRango30d === 0);
+        cardFueraDeRango.classList.toggle('dark:text-white/90', data.fueraDeRango30d === 0);
 
         // Actualiza los porcentajes
         mostrarPorcentajes(data.intervencionesPorPlaya, playaId, "porcentajeIntervencionesPorPlaya");
         mostrarPorcentajes(data.novedadesMaterialesPorPlaya, playaId, "porcentajeNovedadesPorPlaya");
+
+        // Actualiza la lista de guardavidas por playa
+        const listaGuardavidas = document.getElementById('listaGuardavidasPorPlaya');
+        listaGuardavidas.innerHTML = '';
+        if (!data.guardavidasPorPlaya || data.guardavidasPorPlaya.length === 0) {
+            listaGuardavidas.innerHTML = '<li class="text-sm text-gray-500 dark:text-gray-400">No hay guardavidas activos.</li>';
+        } else {
+            data.guardavidasPorPlaya.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'flex items-center justify-between text-sm text-gray-700 dark:text-gray-200';
+                li.innerHTML = `<span>${item.playa ? item.playa.nombre : 'Sin playa'}</span><span class="font-semibold">${item.total}</span>`;
+                listaGuardavidas.appendChild(li);
+            });
+        }
 
         // Actualiza el gráfico
         const ctx = document.getElementById('graficoBanderas');

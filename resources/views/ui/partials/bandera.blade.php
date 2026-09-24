@@ -30,7 +30,7 @@
         @endif
 
     @else  {{-- si es admin --}}
-        @if($bandera)
+        @if($bandera && count($bandera) > 0)
 
         <div
     x-data="carousel({ total: {{ count($bandera) }} })"

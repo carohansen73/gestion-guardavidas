@@ -1,13 +1,36 @@
 @extends('layouts.app')
-    <x-slot name="header">
-        <h2 class="text-xl font-semibold leading-tight text-gray-800">
-            {{ __('Dashboard') }}
-        </h2>
-    </x-slot>
+    <x-slot name="header"></x-slot>
 @section('content')
+
+@if(session('show_guardavida_setup'))
+    @include('ui.partials.modal-setup')
+@endif
+
+@if(session('show_franco_setup'))
+    @include('ui.partials.aviso-franco-pendiente')
+@endif
+
+<div class="px-4 pt-4">
+    <div class="flex items-center justify-between gap-2 mb-4">
+        <div>
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+                {{ ucfirst(now()->locale('es')->isoFormat('dddd D [de] MMMM')) }}
+            </p>
+            <h1 class="text-xl font-bold text-gray-800 dark:text-white">
+                Hola, {{ Auth::user()->name }} 👋
+            </h1>
+        </div>
+        <x-role-badge :rol="\App\Enums\RolUsuario::principal(Auth::user())" :label="false" size="w-4 h-4" />
+    </div>
+</div>
 
 @include('ui.partials.bandera')
 
+<div class="px-4">
+    <h2 class="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-3 mt-2">
+        Acciones rápidas
+    </h2>
+</div>
 
 @if($isMobile)
     @include('ui.partials.mobile-buttons-create')
@@ -19,14 +42,6 @@
 
 @else
     @include('ui.partials.desktop-cards')
-@endif
-
-@if(session('show_guardavida_setup'))
-    @include('ui.partials.modal-setup')
-@endif
-
-@if(session('show_franco_setup'))
-    @include('ui.partials.aviso-franco-pendiente')
 @endif
 
 
@@ -193,5 +208,6 @@
         </div>
     </div>
 
+    @include('ui.partials.panel-admin')
 
 @endsection

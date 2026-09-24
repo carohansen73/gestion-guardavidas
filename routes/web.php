@@ -49,6 +49,15 @@ Route::middleware(['auth', 'force.password'])->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
     Route::get('/dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
 
+    // Datos para los gráficos del dashboard (dashboard-charts.js). Antes
+    // vivía en routes/api.php sin ningún middleware de autenticación —
+    // estaba totalmente público — pero en realidad se consume con un
+    // fetch() normal de la página (cookie de sesión, sin token Bearer), no
+    // como el resto de las rutas de api.php (pensadas para el token
+    // Sanctum del flujo QR offline). Por eso va acá, autenticado por
+    // sesión igual que la propia página del dashboard.
+    Route::get('/api/dashboard', [HomeController::class, 'getData']);
+
     Route::get('/activeCamera', [QrController::class, 'activeCamera'])->name('activeCamera');
 
     Route::resource('bandera', App\Http\Controllers\BanderaController::class);

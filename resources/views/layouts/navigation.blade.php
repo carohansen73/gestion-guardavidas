@@ -159,11 +159,6 @@
              <x-responsive-nav-link :href="route('home')" :active="request()->routeIs('home')">
                 {{ __('Inicio') }}
             </x-responsive-nav-link>
-            @role('admin')
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
-            @endrole
             @can('ver_bandera')
                 <x-responsive-nav-link :href="route('bandera.index')" :active="request()->routeIs('bandera.*')">
                     {{ __('Banderas') }}
