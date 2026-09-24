@@ -316,13 +316,19 @@ async function guardarDatosOffline(
             contenedorAnimacionCarga.style.display = "none";
             animacionCarga.classList.remove("animacion");
             if (guardado) {
+                // No navegamos a /dashboard: seguimos sin conexión en este
+                // punto, y el service worker no tiene forma de servir esa
+                // página offline (no está precacheada) — navegar ahí daba
+                // la pantalla nativa de "no se puede acceder a este sitio"
+                // justo después de guardar bien la asistencia. Nos quedamos
+                // en la página del escáner, que ya está cargada y anda.
                 Swal.fire({
                     title: "OK",
                     text: "Asistencia guardada. Se registrará automáticamente cuando vuelvas a tener conexión.",
                     icon: "success",
                     confirmButtonColor: "#36be7f",
                 }).then(() => {
-                    window.location.href = "/dashboard";
+                    iniciarCamara();
                 });
             } else {
                 throw new Error(
@@ -435,12 +441,20 @@ async function obtenerId() {
 // obtenerUbicacion()
 // -----------------------------------------------------------
 // Retorna la ubicación GPS actual del usuario usando Promises.
+//
+// timeout en 45s (antes 10s): sin wifi/datos, conseguir el primer fix de
+// GPS "en frío" (sin asistencia de red, que normalmente lo acelera mucho)
+// puede tardar bastante más de 10 segundos, sobre todo con mala vista al
+// cielo — con 10s fallaba aunque el GPS terminara consiguiendo señal poco
+// después. maximumAge en 60s (antes 0): si el celular ya tiene una
+// posición de hace menos de un minuto, la reusa en vez de forzar un fix
+// nuevo — más rápido y con más chances de éxito sin conexión.
 
 function obtenerUbicacion() {
     const opciones = {
         enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0,
+        timeout: 45000,
+        maximumAge: 60000,
     };
     return new Promise((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(resolve, reject, opciones);
@@ -448,8 +462,37 @@ function obtenerUbicacion() {
 }
 
 // -----------------------------------------------------------
+// mensajeDeError(err)
+// -----------------------------------------------------------
+// Convierte lo que sea que llegue a alertaError (string, Error,
+// GeolocationPositionError, etc.) en un texto legible. Sin esto, un
+// GeolocationPositionError (no tiene toString() propio) terminaba
+// mostrando literalmente "[object GeolocationPositionError]" en vez de un
+// mensaje — pasaba en el flujo offline, que llama a obtenerUbicacion()
+// directo sin pasar por el catch de cargarDistancia() que sí lo manejaba.
+
+function mensajeDeError(err) {
+    if (typeof err === "string") return err;
+
+    if (typeof GeolocationPositionError !== "undefined" && err instanceof GeolocationPositionError) {
+        switch (err.code) {
+            case err.PERMISSION_DENIED:
+                return "No se pudo obtener tu ubicación: el permiso de ubicación está desactivado para este sitio.";
+            case err.POSITION_UNAVAILABLE:
+                return "No se pudo obtener tu ubicación. Activá el GPS e intentá de nuevo.";
+            case err.TIMEOUT:
+                return "Tardó demasiado en obtener tu ubicación. Intentá de nuevo.";
+            default:
+                return "No se pudo obtener tu ubicación. Intentá de nuevo.";
+        }
+    }
+
+    return (err && err.message) || "Ocurrió un error inesperado. Por favor, intentá nuevamente.";
+}
+
+// -----------------------------------------------------------
 // alertaError(text, icon)
-// text: string => Mensaje que se le muestra al usuario
+// text: string|Error => Mensaje o error a mostrarle al usuario
 // icon: string => tiene por defecto el valor "error", icono que acompaña al texto
 // -----------------------------------------------------------
 // Muestra un popup Swal con el mensaje de error.
@@ -457,7 +500,7 @@ function obtenerUbicacion() {
 export function alertaError(text, icon = "error") {
     Swal.fire({
         title: "Error",
-        text: text,
+        text: mensajeDeError(text),
         icon: icon,
         confirmButtonColor: "#36be7f",
     }).then(() => {
