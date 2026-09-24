@@ -126,7 +126,12 @@ class AsistenciaController extends Controller
     {
         if (! auth()->user()->hasAnyRole(['admin', 'encargado'])) {
             // Si no tiene permiso, devolvemos vista vacía o redirige (eso no me acuerdo como se veia en la interfaz)
-            return view('admin.usuarios.asistencias', ['guardavidas' => collect()]);
+            return view('admin.usuarios.asistencias', [
+                'guardavidas' => collect(),
+                'playas' => collect(),
+                'inicio' => Carbon::now()->startOfMonth(),
+                'fin' => Carbon::now()->endOfDay(),
+            ]);
         }
 
         // Panel de presentismo: por defecto, mes en curso.
@@ -138,7 +143,24 @@ class AsistenciaController extends Controller
             ? Carbon::parse($request->input('fin'))->endOfDay()
             : Carbon::now()->endOfDay();
 
-        $guardavidas = Guardavida::with(['puesto.playa'])
+        // Filtros de playa y búsqueda
+        $guardavidasQuery = Guardavida::with(['puesto.playa']);
+
+        if ($request->filled('playa_id') && $request->input('playa_id') !== 'all') {
+            $guardavidasQuery->where('playa_id', $request->input('playa_id'));
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $guardavidasQuery->where(function ($q) use ($search) {
+                $q->where('nombre', 'LIKE', "%{$search}%")
+                    ->orWhere('apellido', 'LIKE', "%{$search}%");
+            });
+        }
+
+        $guardavidas = $guardavidasQuery
+            ->orderBy('apellido')
+            ->orderBy('nombre')
             ->paginate(10)
             ->withQueryString();
 

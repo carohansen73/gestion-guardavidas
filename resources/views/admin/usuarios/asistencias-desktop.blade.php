@@ -9,12 +9,38 @@
     </div>
 
     <div x-data="{ selectedId: null }">
-{{--
-        TODO: acomodar export!!! --}}
-    <x-filtros-de-busqueda :playas="$playas" tipo="asistencia-general" />
+
+    {{-- Filtro por playa: links reales por GET (antes eran botones que
+         filtraban del lado del cliente solo entre las 10 filas ya cargadas
+         en pantalla, sin ver el resto de las páginas). --}}
+    <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+        <div class="flex flex-wrap gap-2">
+            <a href="{{ route('asistencias.index', ['playa_id' => 'all'] + request()->except(['page', 'playa_id'])) }}"
+                class="{{ !request('playa_id') || request('playa_id') == 'all' ? 'bg-sky-600 text-white' : 'bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200' }} px-3 py-1 rounded hover:opacity-90">
+                Todas
+            </a>
+            @foreach ($playas as $playa)
+                <a href="{{ route('asistencias.index', ['playa_id' => $playa->id] + request()->except(['page', 'playa_id'])) }}"
+                    class="{{ request('playa_id') == $playa->id ? 'bg-sky-600 text-white' : 'bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200' }} px-3 py-1 rounded hover:opacity-90">
+                    {{ $playa->nombre }}
+                </a>
+            @endforeach
+        </div>
+
+        <x-boton-exportar-asistencia-general />
+    </div>
 
     <div class="flex justify-between items-end my-2 mx-0 px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 shadow-sm rounded">
         <form method="GET" class="flex gap-4 items-end flex-wrap">
+            <input type="hidden" name="playa_id" value="{{ request('playa_id') }}">
+
+            <div>
+                <label for="search" class="text-sm text-gray-700 dark:text-gray-200">Buscar:</label>
+                <input type="text" name="search" id="search" value="{{ request('search') }}"
+                    placeholder="Nombre o apellido"
+                    class="border rounded p-1">
+            </div>
+
             <div>
                 <label for="inicio" class="text-sm text-gray-700 dark:text-gray-200">Desde:</label>
                 <input type="date" name="inicio" id="inicio"
@@ -115,6 +141,4 @@
 
 </div> <!-- selectedId -->
 
-
-<script src="{{ asset('js/table-intervenciones.js') }}"></script>
 @endsection
