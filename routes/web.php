@@ -132,14 +132,14 @@ Route::middleware(['auth', 'force.password'])->group(function () {
 // Ademas guarda Id_user para casos sin wifi.
 Route::post('/loginIdUser', [ApiAuthController::class, 'login'])->name('loginIdUser');
 
-Route::get('/clear-laravel-cache', function () {
+// Route::get('/clear-laravel-cache', function () {
 
-    Artisan::call('cache:clear');
-    Artisan::call('config:clear');
-    Artisan::call('view:clear');
-    Artisan::call('route:clear');
+//     Artisan::call('cache:clear');
+//     Artisan::call('config:clear');
+//     Artisan::call('view:clear');
+//     Artisan::call('route:clear');
 
-    return 'CACHE LIMPIADA ✔';
-});
+//     return 'CACHE LIMPIADA ✔';
+// });
 
 require __DIR__.'/auth.php';

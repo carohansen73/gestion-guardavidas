@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'force.password' => \App\Http\Middleware\ForcePasswordChange::class,
+            'account.enabled' => \App\Http\Middleware\EnsureAccountEnabled::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

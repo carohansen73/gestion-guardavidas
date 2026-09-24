@@ -7,22 +7,31 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-
- /**
+    /**
      * Modifica el estado habilitado/deshabilitado
      *
-     * @param User $guardavida
+     * @param  User  $guardavida
      * @return void
      */
-    public function toggle(User $user){
+    public function toggle(User $user)
+    {
 
-        $user->enabled  = !$user->enabled ;
+        $user->enabled = ! $user->enabled;
         $user->save();
+
+        // Al deshabilitar, revocamos cualquier token de Sanctum
+        // para que no pueda loguearse ni fichar.
+        // Si se lo vuelve a habilitar, va a tener que loguearse
+        // de nuevo con wifi para obtener uno nuevo.
+        if (! $user->enabled) {
+            $user->tokens()->delete();
+        }
 
         return back()->with('success', 'El estado del usuario fue actualizado correctamente.');
     }
 
-    public function verPuestoUsuario(Request $request){
+    public function verPuestoUsuario(Request $request)
+    {
         $validated = $request->validate([
             'user_id' => 'required|integer|exists:users,id',
             'puesto_id' => 'required|integer|exists:puestos,id',
@@ -34,16 +43,16 @@ class UserController extends Controller
         if (is_null($guardavida)) {
             return response()->json([
                 'success' => false,
-                'data' => 'Escaneo en puesto incorrecto'
+                'data' => 'Escaneo en puesto incorrecto',
             ]);
-        }
-        else{
-             return response()->json([
+        } else {
+            return response()->json([
                 'success' => true,
-                'data' => 'Escaneo en puesto correcto'
+                'data' => 'Escaneo en puesto correcto',
             ]);
         }
     }
+
     /**
      * Display a listing of the resource.
      */
