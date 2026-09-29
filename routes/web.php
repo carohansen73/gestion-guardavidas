@@ -60,17 +60,29 @@ Route::middleware(['auth', 'force.password'])->group(function () {
 
     Route::get('/activeCamera', [QrController::class, 'activeCamera'])->name('activeCamera');
 
-    Route::resource('bandera', App\Http\Controllers\BanderaController::class);
-    Route::resource('intervencion', App\Http\Controllers\IntervencionController::class);
-    Route::resource('novedad-de-material', App\Http\Controllers\NovedadMaterialController::class);
+    // Escritura (crear/editar/borrar) bloqueada para guardavida/encargado
+    // fuera de una temporada con ventana operativa activa — ver
+    // EnsureTemporadaActiva. Admin/superadmin no tienen esta restricción.
+    // No se aplica a Asistencia (fichaje): ver nota en el middleware.
+    Route::resource('bandera', App\Http\Controllers\BanderaController::class)
+        ->middlewareFor(['store', 'update', 'destroy'], 'temporada.activa');
+    Route::resource('intervencion', App\Http\Controllers\IntervencionController::class)
+        ->middlewareFor(['store', 'update', 'destroy'], 'temporada.activa');
+    Route::resource('novedad-de-material', App\Http\Controllers\NovedadMaterialController::class)
+        ->middlewareFor(['store', 'update', 'destroy'], 'temporada.activa');
 
     Route::resource('guardavida', App\Http\Controllers\GuardavidaController::class);
     Route::patch('usuario-toggle/{user}', [UserController::class, 'toggle'])->name('user.toggle');
     Route::get('guardavidas-deshabilitados', [GuardavidaController::class, 'getAllDisabled'])->name('guardavidas.disabled');
     Route::get('/get-all-guardavidas', [GuardavidaController::class, 'getAll']);
 
-    Route::resource('licencia', App\Http\Controllers\LicenciaController::class)->parameters(['licencia' => 'licencia']);
-    Route::resource('cambio-de-turno', App\Http\Controllers\CambioDeTurnoController::class);
+    Route::resource('licencia', App\Http\Controllers\LicenciaController::class)
+        ->parameters(['licencia' => 'licencia'])
+        ->middlewareFor(['store', 'update', 'destroy'], 'temporada.activa');
+    Route::resource('cambio-de-turno', App\Http\Controllers\CambioDeTurnoController::class)
+        ->middlewareFor(['store', 'update', 'destroy'], 'temporada.activa');
+
+    Route::resource('temporada', App\Http\Controllers\TemporadaController::class)->except('show');
 
     // Excel
     Route::get('/guardavidas/export', function () {

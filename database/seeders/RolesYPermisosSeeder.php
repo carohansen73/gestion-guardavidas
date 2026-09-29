@@ -67,6 +67,11 @@ class RolesYPermisosSeeder extends Seeder
 
         Permission::create(['name' => 'ver_asistencia_propia']);
 
+        Permission::create(['name' => 'agregar_temporada']);
+        Permission::create(['name' => 'editar_temporada']);
+        Permission::create(['name' => 'eliminar_temporada']);
+        Permission::create(['name' => 'ver_temporada']);
+
         Permission::create(['name' => 'abm_roles_y_permisos']);
 
         // Permission::create(['name' => 'fichar_asistencia']);
