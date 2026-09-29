@@ -24,6 +24,11 @@ class HomeController extends Controller
         // $intervenciones = Intervencion::with('guardavidas')->with('fuerzas')->get();
         $agent = new Agent;
         $isMobile = $agent->isMobile();
+        // Tablet no cuenta como isMobile() para Jenssegers\Agent (esa manda a
+        // ui.home-mobile) — pero sí queda dentro de ui.dashboard igual que
+        // desktop, así que esto es lo que distingue "tablet" de "desktop"
+        // adentro de esa misma vista (ver acceso directo a Fichar).
+        $isTablet = $agent->isTablet();
 
         // bandera segun user->playa
         $user = Auth::user();
@@ -50,50 +55,113 @@ class HomeController extends Controller
             session(['show_franco_setup' => true]);
         }
 
+        // Card "Mi turno": guardavida y encargado, no admin — ambos fichan
+        // (tienen Guardavida propio), y es además el único acceso a Fichar
+        // ahora que se sacó del bloque de Atajos rápidos para no duplicarlo.
+        //
+        // No existe un campo "tipo" (ingreso/egreso) en asistencias — cada
+        // fichaje es solo un evento de escaneo con su fecha_hora. Para
+        // mostrar "pendiente de egreso" sin agregar una columna nueva, se
+        // infiere por cantidad de fichajes de hoy: 0 = falta el ingreso,
+        // 1 = ya fichó ingreso y falta el egreso, 2+ = turno completo (se
+        // muestra el primero y el último).
+        $esGuardavidaOEncargado = $user->hasRole('guardavida') || $user->hasRole('encargado');
+        $asistenciasHoyPropias = collect();
+        if ($esGuardavidaOEncargado) {
+            $asistenciasHoyPropias = Asistencia::where('guardavidas_id', $user->guardavida->id)
+                ->whereDate('fecha_hora', Carbon::today())
+                ->with('puesto')
+                ->orderBy('fecha_hora')
+                ->get();
+        }
+
         $novedades = Novedad::orderBy('fecha', 'desc')->take(10)->get();
 
         // El panel de estadísticas (antes era la vista /dashboard aparte,
-        // ver ui/partials/panel-admin.blade.php) solo lo ve un admin, así
-        // que estas consultas extra solo corren para ese caso.
+        // ver ui/partials/panel-admin.blade.php) ahora lo ve cualquier
+        // usuario autenticado, pero cada uno solo ve lo suyo: admin/
+        // superadmin ven todas las playas (con filtro); encargado/guardavida
+        // quedan limitados a la propia, y qué cards/secciones se muestran
+        // depende de sus permisos (@can en la vista) — nada hardcodeado por
+        // rol acá, así que basta con tocar los permisos para habilitar algo.
         $esAdmin = $user->hasRole('admin');
+        $playaIdUsuario = $user->guardavida->playa_id ?? null;
 
-        $playas = collect();
-        $guardavidasPorPlaya = collect();
-        $asistenciasHoy = 0;
-        $fueraDeRango30d = 0;
-        $licenciasActivasHoy = 0;
+        $playas = $esAdmin ? Playa::all() : collect();
 
-        if ($esAdmin) {
-            $playas = Playa::all();
+        $guardavidasPorPlaya = Guardavida::select('playa_id')
+            ->selectRaw('COUNT(*) as total')
+            ->whereHas('user', function ($q) {
+                $q->where('enabled', true);
+            })
+            ->when(! $esAdmin, fn ($q) => $q->where('playa_id', $playaIdUsuario))
+            ->groupBy('playa_id')
+            ->with('playa')
+            ->get();
 
-            $guardavidasPorPlaya = Guardavida::select('playa_id')
-                ->selectRaw('COUNT(*) as total')
-                ->whereHas('user', function ($q) {
-                    $q->where('enabled', true);
-                })
-                ->groupBy('playa_id')
-                ->with('playa')
-                ->get();
+        $asistenciasHoy = Asistencia::whereDate('fecha_hora', Carbon::today())
+            ->when(! $esAdmin, fn ($q) => $q->whereHas('puesto', fn ($q2) => $q2->where('playa_id', $playaIdUsuario)))
+            ->count();
 
-            $asistenciasHoy = Asistencia::whereDate('fecha_hora', Carbon::today())->count();
+        $fueraDeRango30d = Asistencia::where('estado_validacion', 'fuera_de_rango')
+            ->where('fecha_hora', '>=', Carbon::now()->subDays(30))
+            ->when(! $esAdmin, fn ($q) => $q->whereHas('puesto', fn ($q2) => $q2->where('playa_id', $playaIdUsuario)))
+            ->count();
 
-            $fueraDeRango30d = Asistencia::where('estado_validacion', 'fuera_de_rango')
-                ->where('fecha_hora', '>=', Carbon::now()->subDays(30))
-                ->count();
+        $licenciasActivasHoy = Licencia::whereDate('fecha_inicio', '<=', Carbon::today())
+            ->whereDate('fecha_fin', '>=', Carbon::today())
+            ->when(! $esAdmin, fn ($q) => $q->where('playa_id', $playaIdUsuario))
+            ->count();
 
-            $licenciasActivasHoy = Licencia::whereDate('fecha_inicio', '<=', Carbon::today())
-                ->whereDate('fecha_fin', '>=', Carbon::today())
-                ->count();
-        }
+        // Intervenciones/novedades materiales/guardavidas activos del panel:
+        // total global para admin, acotado a la propia playa para el resto.
+        // Variables propias (no $totales, que ya se usa en otro lado con el
+        // conteo 100% global — ver aside "Guardavidas registrados").
+        $panelIntervenciones = Intervencion::when(! $esAdmin, fn ($q) => $q->where('playa_id', $playaIdUsuario))->count();
+        $panelNovedadesMateriales = NovedadMaterial::when(! $esAdmin, fn ($q) => $q->where('playa_id', $playaIdUsuario))->count();
+        $panelGuardavidasActivos = Guardavida::whereHas('user', fn ($q) => $q->where('enabled', true))
+            ->when(! $esAdmin, fn ($q) => $q->where('playa_id', $playaIdUsuario))
+            ->count();
+
+        // Badge de "novedades de materiales de hoy" sobre el ícono de esa
+        // card — aparte del total de temporada (número grande) de arriba.
+        $novedadesMaterialesHoy = NovedadMaterial::whereDate('fecha', Carbon::today())
+            ->when(! $esAdmin, fn ($q) => $q->where('playa_id', $playaIdUsuario))
+            ->count();
+
+        // Feed de "últimas novedades": solo de los tipos que el usuario
+        // puede ver, y acotado a su playa si no es admin.
+        $modelosPermitidos = collect([
+            Bandera::class => 'ver_bandera',
+            Intervencion::class => 'ver_intervencion',
+            NovedadMaterial::class => 'ver_novedad_material',
+        ])->filter(fn ($permiso) => $user->can($permiso))->keys();
+
+        $novedades = Novedad::orderBy('fecha', 'desc')
+            ->whereIn('referencia_modelo', $modelosPermitidos)
+            ->when(! $esAdmin, fn ($q) => $q->where('playa_id', $playaIdUsuario))
+            ->with(['referencia' => function ($morphTo) {
+                // Solo Bandera/Intervencion tienen puesto — NovedadMaterial
+                // no, así que no se le pide esa relación (moprhWith tirar
+                // un error "relación indefinida" si se la pidiéramos igual).
+                $morphTo->morphWith([
+                    Bandera::class => ['puesto'],
+                    Intervencion::class => ['puesto'],
+                ]);
+            }])
+            ->take(10)
+            ->get();
 
         $data = compact(
-            'isMobile', 'bandera', 'totales', 'novedades', 'esAdmin',
-            'playas', 'guardavidasPorPlaya', 'asistenciasHoy', 'fueraDeRango30d', 'licenciasActivasHoy'
+            'isMobile', 'isTablet', 'bandera', 'totales', 'novedades', 'esAdmin',
+            'playas', 'guardavidasPorPlaya', 'asistenciasHoy', 'fueraDeRango30d', 'licenciasActivasHoy',
+            'panelIntervenciones', 'panelNovedadesMateriales', 'panelGuardavidasActivos', 'novedadesMaterialesHoy',
+            'esGuardavidaOEncargado', 'asistenciasHoyPropias'
         );
 
         return $agent->isMobile()
-            ? view('ui.home-mobile', $data)
-            : view('ui.home-desktop', $data);
+            ? view('ui.dashboard', $data)
+            : view('ui.dashboard', $data);
     }
 
     private function buscarBanderaActual($user)
@@ -105,8 +173,8 @@ class HomeController extends Controller
         $turno = $hora < 13 ? 'mañana' : 'tarde';
 
         if ($user->hasRole('admin')) {
-            // Todas las playas, última bandera del día y turno
-            $bandera = Bandera::with(['playa', 'bandera'])
+            // Última bandera del día por playa (las que ya se cargaron)
+            $banderasPorPlaya = Bandera::with(['bandera'])
                 ->whereDate('fecha', $hoy)
                 // ->where('turno', $turno)
                 ->latest('created_at')
@@ -115,6 +183,16 @@ class HomeController extends Controller
                 ->map(function ($banderas) {
                     return $banderas->first(); // último registro por playa
                 });
+
+            // Una entrada por CADA playa (tenga bandera cargada hoy o no),
+            // para que el carrusel del admin muestre también las que están
+            // pendientes en vez de simplemente omitirlas.
+            $bandera = Playa::all()->map(function ($playa) use ($banderasPorPlaya) {
+                return [
+                    'playa' => $playa,
+                    'bandera' => $banderasPorPlaya->get($playa->id),
+                ];
+            });
         } else {
             // Solo su playa
             $bandera = Bandera::with(['playa', 'bandera'])
@@ -140,109 +218,90 @@ class HomeController extends Controller
 
     public function getData(Request $request)
     {
-        // Mismo criterio que dashboard(): esto solo lo consume esa página,
-        // que ya es admin-only.
-        if (! Auth::user()->hasRole('admin')) {
-            abort(403);
+        // Cualquier usuario autenticado puede pedir estos datos, pero cada
+        // uno recibe solo lo suyo: admin/superadmin pueden filtrar por
+        // cualquier playa (o pedir todas); el resto queda forzado a la
+        // propia, sin importar qué mande el query param ?playa=. Y cada
+        // bloque de datos solo se calcula/devuelve si el usuario tiene el
+        // permiso correspondiente — así el JSON no expone de más aunque la
+        // vista lo tenga oculto.
+        $user = Auth::user();
+        $esAdmin = $user->hasRole('admin');
+        $playaIdUsuario = $user->guardavida->playa_id ?? null;
+        $playaId = $esAdmin ? $request->get('playa') : $playaIdUsuario;
+
+        $response = [];
+
+        if ($user->can('ver_intervencion')) {
+            $totalIntervencionesGlobal = Intervencion::when(! $esAdmin, fn ($q) => $q->where('playa_id', $playaIdUsuario))->count();
+
+            $intervencionesPorPlaya = Intervencion::select('playa_id')
+                ->selectRaw('COUNT(*) as total')
+                ->when($playaId, fn ($q) => $q->where('playa_id', $playaId))
+                ->groupBy('playa_id')
+                ->with('playa')
+                ->get()
+                ->each(function ($item) use ($totalIntervencionesGlobal) {
+                    $item->porcentaje = $totalIntervencionesGlobal > 0 ? round(($item->total / $totalIntervencionesGlobal) * 100) : 0;
+                    $item->sigla = Str::substr($item->playa->nombre, 0, 3);
+                });
+
+            $response['totalIntervenciones'] = Intervencion::when($playaId, fn ($q) => $q->where('playa_id', $playaId))->count();
+            $response['intervencionesPorPlaya'] = $intervencionesPorPlaya;
         }
 
-        $playaId = $request->get('playa');
+        if ($user->can('ver_novedad_material')) {
+            $totalNovedadesGlobal = NovedadMaterial::when(! $esAdmin, fn ($q) => $q->where('playa_id', $playaIdUsuario))->count();
 
-        $intervencionesQuery = Intervencion::query();
-        $novedadesQuery = NovedadMaterial::query();
-        $banderasQuery = Bandera::query();
+            $novedadesMaterialesPorPlaya = NovedadMaterial::select('playa_id')
+                ->selectRaw('COUNT(*) as total')
+                ->when($playaId, fn ($q) => $q->where('playa_id', $playaId))
+                ->groupBy('playa_id')
+                ->with('playa')
+                ->get()
+                ->each(function ($item) use ($totalNovedadesGlobal) {
+                    $item->porcentaje = $totalNovedadesGlobal > 0 ? round(($item->total / $totalNovedadesGlobal) * 100) : 0;
+                    $item->sigla = Str::substr($item->playa->nombre, 0, 3);
+                });
 
-        // Totales globales (sin filtro)
-        $totalIntervencionesGlobal = Intervencion::count();
-        $totalNovedadesGlobal = NovedadMaterial::count();
-
-        if ($playaId) {
-            $intervencionesQuery->where('playa_id', $playaId);
-            $novedadesQuery->where('playa_id', $playaId);
-            $banderasQuery->where('playa_id', $playaId);
+            $response['totalNovedadesMateriales'] = NovedadMaterial::when($playaId, fn ($q) => $q->where('playa_id', $playaId))->count();
+            $response['novedadesMaterialesPorPlaya'] = $novedadesMaterialesPorPlaya;
         }
 
-        /* INTERVENCIONES */
-        $totalIntervenciones = $intervencionesQuery->count();
+        if ($user->can('ver_guardavida')) {
+            $response['totalGuardavidasActivos'] = Guardavida::whereHas('user', fn ($q) => $q->where('enabled', true))
+                ->when($playaId, fn ($q) => $q->where('playa_id', $playaId))
+                ->count();
 
-        $intervencionesPorPlaya = Intervencion::select('playa_id') // count por playa
-            ->selectRaw('COUNT(*) as total')
-            ->when($playaId, fn ($q) => $q->where('playa_id', $playaId))
-            ->groupBy('playa_id')
-            ->with('playa')
-            ->get();
+            $response['guardavidasPorPlaya'] = Guardavida::select('playa_id')
+                ->selectRaw('COUNT(*) as total')
+                ->whereHas('user', fn ($q) => $q->where('enabled', true))
+                ->when($playaId, fn ($q) => $q->where('playa_id', $playaId))
+                ->groupBy('playa_id')
+                ->with('playa')
+                ->get();
+        }
 
-        // Agrego porcentaje
-        $intervencionesPorPlaya->transform(function ($item) use ($totalIntervencionesGlobal) {
-            $item->porcentaje = round(($item->total / $totalIntervencionesGlobal) * 100);
-            $item->sigla = Str::substr($item->playa->nombre, 0, 3);
+        if ($user->can('ver_asistencia')) {
+            $response['asistenciasHoy'] = Asistencia::whereDate('fecha_hora', Carbon::today())
+                ->when($playaId, fn ($q) => $q->whereHas('puesto', fn ($q2) => $q2->where('playa_id', $playaId)))
+                ->count();
 
-            return $item;
-        });
+            $response['fueraDeRango30d'] = Asistencia::where('estado_validacion', 'fuera_de_rango')
+                ->where('fecha_hora', '>=', Carbon::now()->subDays(30))
+                ->when($playaId, fn ($q) => $q->whereHas('puesto', fn ($q2) => $q2->where('playa_id', $playaId)))
+                ->count();
+        }
 
-        /* NOVEDADES MAT */
-        $totalNovedadesMateriales = $novedadesQuery->count();
+        if ($user->can('ver_licencia')) {
+            $response['licenciasActivasHoy'] = Licencia::whereDate('fecha_inicio', '<=', Carbon::today())
+                ->whereDate('fecha_fin', '>=', Carbon::today())
+                ->when($playaId, fn ($q) => $q->where('playa_id', $playaId))
+                ->count();
+        }
 
-        $novedadesMaterialesPorPlaya = NovedadMaterial::select('playa_id') // count por playa
-            ->selectRaw('COUNT(*) as total')
-            ->when($playaId, fn ($q) => $q->where('playa_id', $playaId))
-            ->groupBy('playa_id')
-            ->with('playa')
-            ->get();
-
-        // Agrego porcentaje
-        $novedadesMaterialesPorPlaya->transform(function ($item) use ($totalNovedadesGlobal) {
-            $item->porcentaje = round(($item->total / $totalNovedadesGlobal) * 100);
-            $item->sigla = Str::substr($item->playa->nombre, 0, 3);
-
-            return $item;
-        });
-
-        /* GUARDAVIDAS ACTIVOS (plantel), por playa */
-        $totalGuardavidasActivos = Guardavida::whereHas('user', function ($q) {
-            $q->where('enabled', true);
-        })
-            ->when($playaId, fn ($q) => $q->where('playa_id', $playaId))
-            ->count();
-
-        $guardavidasPorPlaya = Guardavida::select('playa_id')
-            ->selectRaw('COUNT(*) as total')
-            ->whereHas('user', function ($q) {
-                $q->where('enabled', true);
-            })
-            ->when($playaId, fn ($q) => $q->where('playa_id', $playaId))
-            ->groupBy('playa_id')
-            ->with('playa')
-            ->get();
-
-        /* ASISTENCIAS DE HOY */
-        $asistenciasHoy = Asistencia::whereDate('fecha_hora', Carbon::today())
-            ->when($playaId, fn ($q) => $q->whereHas('puesto', fn ($q2) => $q2->where('playa_id', $playaId)))
-            ->count();
-
-        /* FUERA DE RANGO, ÚLTIMOS 30 DÍAS */
-        $fueraDeRango30d = Asistencia::where('estado_validacion', 'fuera_de_rango')
-            ->where('fecha_hora', '>=', Carbon::now()->subDays(30))
-            ->when($playaId, fn ($q) => $q->whereHas('puesto', fn ($q2) => $q2->where('playa_id', $playaId)))
-            ->count();
-
-        /* LICENCIAS ACTIVAS HOY */
-        $licenciasActivasHoy = Licencia::whereDate('fecha_inicio', '<=', Carbon::today())
-            ->whereDate('fecha_fin', '>=', Carbon::today())
-            ->when($playaId, fn ($q) => $q->where('playa_id', $playaId))
-            ->count();
-
-        return response()->json([
-            'totalIntervenciones' => $totalIntervenciones,
-            'intervencionesPorPlaya' => $intervencionesPorPlaya,
-            'totalNovedadesMateriales' => $totalNovedadesMateriales,
-            'novedadesMaterialesPorPlaya' => $novedadesMaterialesPorPlaya,
-            'totalGuardavidasActivos' => $totalGuardavidasActivos,
-            'guardavidasPorPlaya' => $guardavidasPorPlaya,
-            'asistenciasHoy' => $asistenciasHoy,
-            'fueraDeRango30d' => $fueraDeRango30d,
-            'licenciasActivasHoy' => $licenciasActivasHoy,
-            'banderas' => $banderasQuery
+        if ($user->can('ver_bandera')) {
+            $response['banderas'] = Bandera::when($playaId, fn ($q) => $q->where('playa_id', $playaId))
                 ->join('bandera_tipos', 'bandera_tipos.id', '=', 'banderas.bandera_id')
                 ->select(
                     'bandera_tipos.codigo as codigo',
@@ -250,7 +309,9 @@ class HomeController extends Controller
                     DB::raw('count(*) as total')
                 )
                 ->groupBy('bandera_tipos.codigo', 'bandera_tipos.color')
-                ->get(),
-        ]);
+                ->get();
+        }
+
+        return response()->json($response);
     }
 }

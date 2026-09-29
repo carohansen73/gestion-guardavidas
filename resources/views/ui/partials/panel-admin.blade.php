@@ -1,45 +1,48 @@
 {{--
-    Panel de estadísticas, solo para admin. Antes era la vista /dashboard
-    separada (ui/dashboard.blade.php); ahora se incluye acá, dentro de
-    home-desktop/home-mobile, para que el admin tenga todo en un solo lugar
-    en vez de dos pantallas de "inicio" distintas. Requiere $esAdmin,
-    $playas, $totales, $intervencionesPorPlaya, $novedadesMaterialesPorPlaya,
-    $guardavidasPorPlaya, $asistenciasHoy, $fueraDeRango30d,
-    $licenciasActivasHoy y $novedades (esta última ya se calculaba en
-    HomeController::index() para todos, solo que no se usaba en ningún lado).
+    Panel de estadísticas. Antes era admin-only (y antes de eso, la vista
+    /dashboard separada); ahora lo ve cualquier usuario autenticado, pero
+    cada uno ve solo lo suyo: admin/superadmin ven todas las playas (con
+    filtro) o pueden acotar a una; encargado/guardavida quedan limitados a
+    la propia (sin filtro, porque no tienen otra para elegir), y cada
+    card/sección de acá abajo está gateada con @can — se muestra o no según
+    los permisos del usuario, no según su rol. Ver HomeController::index()
+    y ::getData() para el cálculo/scoping de cada variable.
 --}}
-@if ($esAdmin)
 <div class="mt-4 px-6 pb-8">
     <div class="flex items-center gap-3 mb-1">
         <h2 class="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">
-            Panel de administración
+            Panel
         </h2>
         <span class="h-px flex-1 bg-gray-200 dark:bg-gray-700"></span>
     </div>
     <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">
-        Mostrando datos de <span class="tituloPlayaSeleccionada font-medium text-sky-600 dark:text-sky-400">todas las playas</span>
+        Mostrando datos de
+        <span class="tituloPlayaSeleccionada font-medium text-sky-600 dark:text-sky-400">{{ $esAdmin ? 'todas las playas' : (Auth::user()->guardavida->playa->nombre ?? 'tu playa') }}</span>
     </p>
 
-    <!-- Filtro playas: va acá, antes de las cards, para que se entienda que las
-         cards/gráfico de abajo se pueden filtrar por playa (en mobile, la
-         columna del filtro quedaba después de las cards y no se entendía). -->
-    <div class="mb-5 flex flex-wrap gap-2 items-center">
-        <button
-            class="btn-filtro bg-sky-600 text-white px-3 py-1 rounded-full text-xs font-medium transition"
-            data-playa=""
-            data-nombre="Todas">
-            Todas
-        </button>
-        <!-- Botones por cada playa -->
-        @foreach($playas as $playa)
+    @if ($esAdmin)
+        <!-- Filtro playas: va acá, antes de las cards, para que se entienda que las
+             cards/gráfico de abajo se pueden filtrar por playa (en mobile, la
+             columna del filtro quedaba después de las cards y no se entendía).
+             Solo para admin/superadmin: el resto ya está limitado a la suya. -->
+        <div class="mb-5 flex flex-wrap gap-2 items-center">
             <button
-                class="btn-filtro bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 px-3 py-1 rounded-full text-xs font-medium transition"
-                data-playa="{{ $playa->id }}"
-                data-nombre="{{ $playa->nombre }}">
-                {{ $playa->nombre }}
+                class="btn-filtro bg-sky-600 text-white px-3 py-1 rounded-full text-xs font-medium transition"
+                data-playa=""
+                data-nombre="Todas">
+                Todas
             </button>
-        @endforeach
-    </div>
+            <!-- Botones por cada playa -->
+            @foreach($playas as $playa)
+                <button
+                    class="btn-filtro bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 px-3 py-1 rounded-full text-xs font-medium transition"
+                    data-playa="{{ $playa->id }}"
+                    data-nombre="{{ $playa->nombre }}">
+                    {{ $playa->nombre }}
+                </button>
+            @endforeach
+        </div>
+    @endif
 
     <div class="flex flex-col md:flex-row gap-6">
 
@@ -48,6 +51,7 @@
 
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 md:gap-6">
 
+                @can('ver_intervencion')
                 <!-- Metric Intervenciones Start  -->
                 <div class="rounded-2xl border border-gray-200 bg-white p-4 py-4 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
                     <div class="flex justify-between">
@@ -62,7 +66,7 @@
                                 Intervenciones
                             </div>
                             <span id="card-intervenciones" class="text-2xl font-bold text-gray-800 dark:text-white/90">
-                                {{ $totales['intervenciones'] }}
+                                {{ $panelIntervenciones }}
                             </span>
                         </div>
 
@@ -71,7 +75,9 @@
                     </div>
                 </div>
                 <!-- Metric Intervenciones End -->
+                @endcan
 
+                @can('ver_novedad_material')
                 <!-- Metric Novedades de materiales Start  -->
                 <div class="rounded-2xl border border-gray-200 bg-white p-4 py-4 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
                     <div class="flex justify-between">
@@ -86,7 +92,7 @@
                                 Novedades materiales
                             </div>
                             <span id="card-novedades" class="text-2xl font-bold text-gray-800 dark:text-white/90">
-                                {{ $totales['novedades'] }}
+                                {{ $panelNovedadesMateriales }}
                             </span>
                         </div>
                         <div class="flex flex-col justify-end items-end text-end"  id="porcentajeNovedadesPorPlaya">
@@ -94,7 +100,9 @@
                     </div>
                 </div>
                 <!-- Metric Novedades de materiales End -->
+                @endcan
 
+                @can('ver_guardavida')
                 <!-- Metric Guardavidas activos Start -->
                 <div class="rounded-2xl border border-gray-200 bg-white p-4 py-4 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
                     <div class="flex justify-between">
@@ -109,13 +117,15 @@
                                 Guardavidas activos
                             </div>
                             <span id="card-guardavidas-activos" class="text-2xl font-bold text-gray-800 dark:text-white/90">
-                                {{ $totales['guardavidas'] }}
+                                {{ $panelGuardavidasActivos }}
                             </span>
                         </div>
                     </div>
                 </div>
                 <!-- Metric Guardavidas activos End -->
+                @endcan
 
+                @can('ver_asistencia')
                 <!-- Metric Asistencias hoy Start -->
                 <div class="rounded-2xl border border-gray-200 bg-white p-4 py-4 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
                     <div class="flex justify-between">
@@ -158,7 +168,9 @@
                     </div>
                 </div>
                 <!-- Metric Fuera de rango End -->
+                @endcan
 
+                @can('ver_licencia')
                 <!-- Metric Licencias activas Start -->
                 <div class="rounded-2xl border border-gray-200 bg-white p-4 py-4 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
                     <div class="flex justify-between">
@@ -179,18 +191,22 @@
                     </div>
                 </div>
                 <!-- Metric Licencias activas End -->
+                @endcan
             </div>
 
+            @can('ver_bandera')
             <div class="rounded-2xl border border-gray-100 dark:border-gray-700/60 bg-white dark:bg-gray-800 shadow-sm p-5">
                 <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">Banderas más izadas</h3>
                 <canvas id="graficoBanderas" height="120"></canvas>
             </div>
+            @endcan
         </main>
         <!-- End Columna principal (2/3 del ancho) -->
 
         <!-- 🟨 Aside lateral (1/3 del ancho) -->
         <aside class="w-full md:w-1/3">
 
+            @can('ver_guardavida')
             <!-- Guardavidas por playa -->
             <div class="rounded-2xl border border-gray-100 dark:border-gray-700/60 bg-white dark:bg-gray-800 shadow-sm p-5 mb-4">
                 <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">
@@ -207,14 +223,16 @@
                     @endforelse
                 </ul>
             </div>
+            @endcan
 
+            @canany(['ver_bandera', 'ver_intervencion', 'ver_novedad_material'])
             <div class="rounded-2xl border border-gray-100 dark:border-gray-700/60 bg-white dark:bg-gray-800 shadow-sm p-5">
                 <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-4">
                     Últimas novedades
                 </h3>
 
                 <ol class="relative border-s border-gray-200 dark:border-gray-700 mx-2 my-2">
-                    @foreach ($novedades as $index => $novedad)
+                    @forelse ($novedades as $index => $novedad)
                         {{--
                             $novedad->color trae valores heterogéneos según qué la generó
                             (BanderaObserver guarda el código de BanderaTipo, ej.
@@ -255,12 +273,14 @@
                                 {{$novedad->playa->nombre}} · {{ $novedad->fecha }}
                             </p>
                         </li>
-                    @endforeach
+                    @empty
+                        <li class="text-sm text-gray-500 dark:text-gray-400 ms-0">No hay novedades para mostrar.</li>
+                    @endforelse
                 </ol>
             </div>
+            @endcanany
         </aside>
     </div>
 </div>
 
 @vite(['resources/js/dashboard-charts.js'])
-@endif

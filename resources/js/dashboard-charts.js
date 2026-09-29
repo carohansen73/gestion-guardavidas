@@ -6,24 +6,37 @@ document.addEventListener('DOMContentLoaded', e => {
 
     let chartBanderas = null;
 
+    // Qué cards/secciones existen en la página depende de los permisos de
+    // cada usuario (ver panel-admin.blade.php) — por eso cada actualización
+    // de acá revisa que el elemento exista antes de tocarlo, en vez de
+    // asumir que todos están presentes.
+    function setTexto(id, valor) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = valor;
+    }
+
     async function cargarDashboard(playaId = '') {
         const url = `/api/dashboard?playa=${playaId}`;
         const res = await fetch(url);
         const data = await res.json();
 
-        // Actualiza las cards
-        document.getElementById('card-intervenciones').textContent = data.totalIntervenciones;
-        document.getElementById('card-novedades').textContent = data.totalNovedadesMateriales;
-        document.getElementById('card-guardavidas-activos').textContent = data.totalGuardavidasActivos;
-        document.getElementById('card-asistencias-hoy').textContent = data.asistenciasHoy;
-        document.getElementById('card-licencias-activas').textContent = data.licenciasActivasHoy;
+        // Actualiza las cards (solo las que el usuario puede ver: getData()
+        // no devuelve la clave si no tiene el permiso, y acá directamente
+        // no se intenta tocar el elemento si no existe en el DOM).
+        setTexto('card-intervenciones', data.totalIntervenciones);
+        setTexto('card-novedades', data.totalNovedadesMateriales);
+        setTexto('card-guardavidas-activos', data.totalGuardavidasActivos);
+        setTexto('card-asistencias-hoy', data.asistenciasHoy);
+        setTexto('card-licencias-activas', data.licenciasActivasHoy);
 
         const cardFueraDeRango = document.getElementById('card-fuera-de-rango');
-        cardFueraDeRango.textContent = data.fueraDeRango30d;
-        cardFueraDeRango.classList.toggle('text-amber-600', data.fueraDeRango30d > 0);
-        cardFueraDeRango.classList.toggle('dark:text-amber-400', data.fueraDeRango30d > 0);
-        cardFueraDeRango.classList.toggle('text-gray-800', data.fueraDeRango30d === 0);
-        cardFueraDeRango.classList.toggle('dark:text-white/90', data.fueraDeRango30d === 0);
+        if (cardFueraDeRango) {
+            cardFueraDeRango.textContent = data.fueraDeRango30d;
+            cardFueraDeRango.classList.toggle('text-amber-600', data.fueraDeRango30d > 0);
+            cardFueraDeRango.classList.toggle('dark:text-amber-400', data.fueraDeRango30d > 0);
+            cardFueraDeRango.classList.toggle('text-gray-800', data.fueraDeRango30d === 0);
+            cardFueraDeRango.classList.toggle('dark:text-white/90', data.fueraDeRango30d === 0);
+        }
 
         // Actualiza los porcentajes
         mostrarPorcentajes(data.intervencionesPorPlaya, playaId, "porcentajeIntervencionesPorPlaya");
@@ -31,56 +44,61 @@ document.addEventListener('DOMContentLoaded', e => {
 
         // Actualiza la lista de guardavidas por playa
         const listaGuardavidas = document.getElementById('listaGuardavidasPorPlaya');
-        listaGuardavidas.innerHTML = '';
-        if (!data.guardavidasPorPlaya || data.guardavidasPorPlaya.length === 0) {
-            listaGuardavidas.innerHTML = '<li class="text-sm text-gray-500 dark:text-gray-400">No hay guardavidas activos.</li>';
-        } else {
-            data.guardavidasPorPlaya.forEach(item => {
-                const li = document.createElement('li');
-                li.className = 'flex items-center justify-between text-sm text-gray-700 dark:text-gray-200';
-                li.innerHTML = `<span>${item.playa ? item.playa.nombre : 'Sin playa'}</span><span class="font-semibold">${item.total}</span>`;
-                listaGuardavidas.appendChild(li);
-            });
+        if (listaGuardavidas) {
+            listaGuardavidas.innerHTML = '';
+            if (!data.guardavidasPorPlaya || data.guardavidasPorPlaya.length === 0) {
+                listaGuardavidas.innerHTML = '<li class="text-sm text-gray-500 dark:text-gray-400">No hay guardavidas activos.</li>';
+            } else {
+                data.guardavidasPorPlaya.forEach(item => {
+                    const li = document.createElement('li');
+                    li.className = 'flex items-center justify-between text-sm text-gray-700 dark:text-gray-200';
+                    li.innerHTML = `<span>${item.playa ? item.playa.nombre : 'Sin playa'}</span><span class="font-semibold">${item.total}</span>`;
+                    listaGuardavidas.appendChild(li);
+                });
+            }
         }
 
-        // Actualiza el gráfico
+        // Actualiza el gráfico (solo si el usuario puede ver banderas)
         const ctx = document.getElementById('graficoBanderas');
-        const labels = data.banderas.map(b => b.color);
-        const valores = data.banderas.map(b => b.total);
+        if (ctx && data.banderas) {
+            const labels = data.banderas.map(b => b.color);
+            const valores = data.banderas.map(b => b.total);
 
-         const colorPorBandera = {
-            'bandera-bueno': '#0ea5e9',
-            'bandera-dudoso': '#eab308',
-            'bandera-peligroso': '#e93434ff',
-            'bandera-rayos': '#000000',
-            'bandera-prohibido': '#b91c1c',
-            'bandera-perdido': '#f1f0f0ff',
+            const colorPorBandera = {
+                'bandera-bueno': '#0ea5e9',
+                'bandera-dudoso': '#eab308',
+                'bandera-peligroso': '#e93434ff',
+                'bandera-rayos': '#000000',
+                'bandera-prohibido': '#b91c1c',
+                'bandera-perdido': '#f1f0f0ff',
 
-        };
+            };
 
-        const backgroundColors = labels.map(color => colorPorBandera[color] || '#9ca3af');
+            const backgroundColors = labels.map(color => colorPorBandera[color] || '#9ca3af');
 
-        if (chartBanderas) chartBanderas.destroy();
+            if (chartBanderas) chartBanderas.destroy();
 
-        chartBanderas = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels,
-                datasets: [{
-                    data: valores,
-                    backgroundColor: backgroundColors
-                }]
-            },
-            options: {
-                plugins: { legend: { position: 'bottom' } }
-            }
-        });
+            chartBanderas = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels,
+                    datasets: [{
+                        data: valores,
+                        backgroundColor: backgroundColors
+                    }]
+                },
+                options: {
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+        }
     }
 
 
     //Actualiza porcentajes por playa
     function mostrarPorcentajes(lista, playaId, contenedorId) {
         const contenedor = document.getElementById(contenedorId);
+        if (!contenedor) return;
         contenedor.innerHTML = "";
 
         if (!lista || lista.length === 0) return;

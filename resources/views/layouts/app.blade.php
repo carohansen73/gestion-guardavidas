@@ -60,7 +60,8 @@
 
     <!-- Page Content -->
     <div class="desktop-ml-64 min-h-screen bg-gray-100 dark:bg-gray-900 transition-all pb-14">
-        <main class="overflow-x-hidden">
+
+        <main class="overflow-x-hidden  px-4 pb-28 pt-5 lg:px-8 lg:pb-10">
             @yield('content')
             {{-- {{ $slot }} --}}
         </main>

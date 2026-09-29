@@ -41,49 +41,59 @@ header.header-mobile{
 
 /* BANDERA */
 .bandera-bueno{
-    fill: #0ea5e9;
-    stroke: #0ea5e9;
+    /* fill: #0ea5e9;
+    stroke: #0ea5e9; */
+    background-color: #0ea5e9;
 }
 
 .dark .bandera-bueno{
-    fill: #7dd3fc;
-    stroke: #7dd3fc;
+    /* fill: #7dd3fc;
+    stroke: #7dd3fc; */
+    background-color: #7dd3fc;
+
 }
 
 .bandera-dudoso{
-    fill: #eab308;
-    stroke: black;
+    /* fill: #eab308;
+    stroke: black; */
+    background-color: #eab308;
 }
 
 .dark .bandera-dudoso{
-    fill: #fde047;
-    stroke: black;
+    /* fill: #fde047;
+    stroke: black; */
+    background-color: #eab308;
 }
 
 .bandera-peligroso{
-    fill: black;
-    stroke: #b91c1c;
+    /* fill: black;
+    stroke: #b91c1c; */
+    background-color: #b91c1c;
 }
 
 .dark .bandera-peligroso{
-    fill: black;
-    stroke: #fca5a5;
+    /* fill: black;
+    stroke: #fca5a5; */
+     background-color: #b91c1c;
 }
 
 .bandera-rayos{
-    fill: black;
-    stroke: black;
+    /* fill: black;
+    stroke: black; */
+    background-color: black;
 }
 
 .bandera-prohibido{
-    fill: #b91c1c;
-    stroke: #b91c1c;
+    /* fill: #b91c1c;
+    stroke: #b91c1c; */
+    background-color: #b91c1c;
 }
 
 .dark .bandera-prohibido{
-    fill: #fca5a5;
-    /* ef4444 */
-    stroke: #fca5a5;
+    /* fill: #fca5a5;
+    stroke: #fca5a5; */
+    background-color: #b91c1c;
+
 }
 
 .bandera-perdido{
@@ -168,13 +178,11 @@ header.header-mobile{
 }
 
 h1 {
-
-  position: relative;
-
-  padding-bottom: 15px;
+    position: relative;
+    padding-bottom: 15px;
 }
 
-h1::after {
+/* h1::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -184,7 +192,7 @@ h1::after {
   height: 4px;
   background: #0ea5e9;
   border-radius: 2px;
-}
+} */
 
 h2.section-title{
     position: relative;
@@ -192,17 +200,17 @@ h2.section-title{
     /* margin-bottom: 15px; */
 }
 
-h2.section-title::after {
+/* h2.section-title::after {
     content: '';
     position: absolute;
     bottom: 0;
     left: 0;
-    /* transform: translateX(-50%); */
+
     width: 80px;
     height: 4px;
     background: #0ea5e9;
     border-radius: 2px;
-}
+} */
 
 h3.section-title{
     position: relative;
@@ -237,3 +245,50 @@ h3.section-title::after {
     background-size: cover;
     background-position: center;
 }
+
+
+
+
+
+
+
+:root {
+    --glass: oklch(1 0 0 / 55%);
+    --glass-border: oklch(1 0 0 / 75%);
+    --shadow-glass: 0 18px 40px -24px oklch(0.35 0.12 250 / 45%);
+
+
+}
+
+.glass {
+    background-color: var(--glass);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    box-shadow: var(--shadow-glass);
+}
+
+/*
+ * Padding responsivo para cards (mobile: equivalente a px-3 py-4;
+ * tablet/desktop desde 768px: equivalente a p-5).
+ *
+ * Por qué no usar directamente las utilidades de Tailwind (p-3 md:p-5,
+ * etc.): Bootstrap también está cargado en este proyecto y define sus
+ * propias .p-0 a .p-5 con !important (misma escala de nombres que
+ * Tailwind). Cualquier p-3/p-4/p-5 suelto de Tailwind pierde contra la
+ * de Bootstrap sin importar el breakpoint, porque !important ignora
+ * media queries. Esta clase evita el choque directamente.
+ */
+.p-card {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+@media (min-width: 768px) {
+    .p-card {
+        padding: 1.25rem;
+    }
+}
+

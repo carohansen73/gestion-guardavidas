@@ -42,6 +42,11 @@ class Bandera extends Model
         return $this->belongsTo(BanderaTipo::class);
     }
 
+    public function puesto()
+    {
+        return $this->belongsTo(Puesto::class);
+    }
+
 
     public static function boot()
     {

@@ -32,7 +32,7 @@
     <main class="w-full md:w-2/3 space-y-8">
 
         {{-- Bandera del día (o carrusel de banderas por playa si es admin) --}}
-        @include('ui.partials.bandera-desktop')
+        @include('ui.partials.bandera')
 
         <section>
             <h2 class="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-3">
