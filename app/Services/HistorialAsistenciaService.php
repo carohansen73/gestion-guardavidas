@@ -2,11 +2,15 @@
 namespace App\Services;
 
 use App\Models\Asistencia;
+use App\Models\FrancoExcepcion;
+use App\Models\Guardavida;
 use App\Models\Licencia;
 use Carbon\Carbon;
 
 class HistorialAsistenciaService{
     public function generar($guardavidaId, $inicio, $fin){
+
+        $guardavida = Guardavida::with('francoHistorial')->findOrFail($guardavidaId);
 
          // Asistencias del rango
         $asistencias = Asistencia::where('guardavidas_id', $guardavidaId)
@@ -26,6 +30,17 @@ class HistorialAsistenciaService{
                 });
             })
             ->get();
+
+        // Excepciones de franco del rango (cambios puntuales — un
+        // FrancoIntercambio aceptado se materializa acá, ver
+        // FrancoIntercambioController::aceptar()): 'agregado' = ese día
+        // puntual pasa a ser franco aunque no coincida con el fijo;
+        // 'cancelado' = el franco fijo de ese día se corrió a otra fecha
+        // esa semana, así que ese día sí se trabaja.
+        $excepciones = FrancoExcepcion::where('guardavida_id', $guardavidaId)
+            ->whereBetween('fecha', [$inicio, $fin])
+            ->get()
+            ->keyBy(fn ($e) => $e->fecha->toDateString());
 
         // Construcción del historial día x día
         $historial = [];
@@ -73,7 +88,32 @@ class HistorialAsistenciaService{
                 continue;
             }
 
-            // 3- Si no hay ni licencia ni asistencia → FALTÓ
+            // 3- No hay licencia ni asistencia: ¿era franco ese día?
+            $excepcion = $excepciones->get($dateString);
+
+            if ($excepcion) {
+                $esFranco = $excepcion->tipo === 'agregado';
+            } else {
+                // Esquema fijo vigente EN ESA FECHA puntual (no el actual —
+                // si cambió de franco en el medio del rango, cada día se
+                // evalúa contra lo que regía en ese momento).
+                $diasFrancoVigentes = $guardavida->diasFrancoVigentesEn($dateString);
+                $esFranco = in_array((int) $fecha->dayOfWeek, $diasFrancoVigentes, true);
+            }
+
+            if ($esFranco) {
+                $historial[] = [
+                    'fecha' => $dateString,
+                    'estado' => 'FRANCO',
+                    'ingreso' => null,
+                    'egreso' => null,
+                    'puesto' => '-',
+                    'fuera_de_rango' => false,
+                ];
+                continue;
+            }
+
+            // 4- Ni licencia, ni asistencia, ni franco → FALTÓ
             $historial[] = [
                 'fecha' => $dateString,
                 'estado' => 'FALTA',

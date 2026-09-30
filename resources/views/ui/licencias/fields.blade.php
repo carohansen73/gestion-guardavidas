@@ -54,7 +54,7 @@
                                     @if( isset($licencia) && $licencia->guardavida_id == $guardavida->id )
                                         selected
                                     @endif >
-                                        {{ $guardavida->nombre }} {{ $guardavida->apellido }}
+                                        {{ $guardavida->apellido }}, {{ $guardavida->nombre }}
                                 </option>
                                 @endforeach
                             </select>

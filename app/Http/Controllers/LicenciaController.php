@@ -48,7 +48,17 @@ class LicenciaController extends Controller
      */
     public function create()
     {
-        $guardavidas = Guardavida::with('playa', 'puesto')->get();
+        // apellido/nombre viven en users (Fase 3b) — se ordena en PHP. Se
+        // usa la forma "user.lastname" (dot notation) en vez de un closure
+        // extractor: sortBy([[callback, dir], ...]) espera un comparador
+        // de 2 argumentos, no un extractor de 1 valor.
+        $guardavidas = Guardavida::with(['playa', 'puesto', 'user:id,name,lastname'])
+            ->get()
+            ->sortBy([
+                ['user.lastname', 'asc'],
+                ['user.name', 'asc'],
+            ], SORT_FLAG_CASE | SORT_NATURAL)
+            ->values();
         $licencia = null;
 
         return view('ui.licencias.fields', compact(
@@ -106,7 +116,13 @@ class LicenciaController extends Controller
         $user = Auth::user();
         $guardavidaAuth = $user->guardavida;
 
-        $guardavidas = Guardavida::with('playa', 'puesto')->get();
+        $guardavidas = Guardavida::with(['playa', 'puesto', 'user:id,name,lastname'])
+            ->get()
+            ->sortBy([
+                ['user.lastname', 'asc'],
+                ['user.name', 'asc'],
+            ], SORT_FLAG_CASE | SORT_NATURAL)
+            ->values();
         $playas = Playa::with('puestos')->get();
 
         return view('ui.licencias.fields', compact(

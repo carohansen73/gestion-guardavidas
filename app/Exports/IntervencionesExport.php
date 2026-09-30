@@ -25,7 +25,7 @@ class IntervencionesExport implements FromCollection, WithHeadings, WithTitle, W
     */
     public function collection()
     {
-        return Intervencion::with(['puesto', 'bandera', 'user', 'guardavidas', 'fuerzas'])
+        return Intervencion::with(['puesto', 'bandera', 'user', 'guardavidas.user', 'fuerzas'])
         ->where('playa_id', $this->playa->id)
         ->orderBy('fecha', 'desc')
         ->get();
@@ -43,7 +43,11 @@ class IntervencionesExport implements FromCollection, WithHeadings, WithTitle, W
             optional($i->puesto)->nombre ?? '—',
             $i->detalles,
             $i->guardavidas
-                ->map(fn($g) => "{$g->nombre} {$g->apellido}")
+                ->sortBy([
+                    ['user.lastname', 'asc'],
+                    ['user.name', 'asc'],
+                ], SORT_FLAG_CASE | SORT_NATURAL)
+                ->map(fn($g) => "{$g->apellido}, {$g->nombre}")
                 ->implode(', '),
             $i->fuerzas->pluck('nombre')->implode(', '),
             optional($i->user)->name ?? '—',

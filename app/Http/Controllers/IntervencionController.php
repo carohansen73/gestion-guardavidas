@@ -73,15 +73,31 @@ class IntervencionController extends Controller
             $guardavidas = Guardavida::where('playa_id', $guardavidaAuth->playa_id)
                 ->with('user:id,name,lastname')
                 ->get()
-                ->sortBy(fn ($g) => $g->user?->name)
+                // Ojo: sortBy([[callback, dir], ...]) necesita un COMPARADOR
+                // de 2 argumentos (a, b) => ..., no un extractor de 1 valor
+                // — con un extractor, Laravel lo llama igual con (a, b), el
+                // segundo argumento se ignora, y el string que devuelve se
+                // castea a 0 como resultado de comparación (no ordena nada).
+                // Por eso acá se usa la forma con string "user.lastname"
+                // (dot notation vía data_get), que sí es segura.
+                ->sortBy([
+                    ['user.lastname', 'asc'],
+                    ['user.name', 'asc'],
+                ], SORT_FLAG_CASE | SORT_NATURAL)
                 ->values();
         } else {
             $playas = Playa::all();
             $puestos = Puesto::orderBy('nombre')->get();
-            // Ídem, lista completa sin filtrar por playa (caso admin).
+            // Lista completa (sin filtrar por playa a nivel servidor): el
+            // admin ve todas las playas, y el select de guardavidas se
+            // acota por playa en el cliente (ver fields.blade.php) a medida
+            // que cambia el select de playa, sin recargar la página.
             $guardavidas = Guardavida::with('user:id,name,lastname')
                 ->get()
-                ->sortBy(fn ($g) => $g->user?->name)
+                ->sortBy([
+                    ['user.lastname', 'asc'],
+                    ['user.name', 'asc'],
+                ], SORT_FLAG_CASE | SORT_NATURAL)
                 ->values();
         }
 
@@ -157,15 +173,23 @@ class IntervencionController extends Controller
             $guardavidas = Guardavida::where('playa_id', $guardavidaAuth->playa_id)
                 ->with('user:id,name,lastname')
                 ->get()
-                ->sortBy(fn ($g) => $g->user?->name)
+                ->sortBy([
+                    ['user.lastname', 'asc'],
+                    ['user.name', 'asc'],
+                ], SORT_FLAG_CASE | SORT_NATURAL)
                 ->values();
         } else {
             $playas = Playa::all();
             $puestos = Puesto::orderBy('nombre')->get();
-            // Lista completa sin filtrar por playa (para admin).
+            // Lista completa (sin filtrar por playa a nivel servidor): ver
+            // comentario equivalente en create() — se acota por playa en
+            // el cliente.
             $guardavidas = Guardavida::with('user:id,name,lastname')
                 ->get()
-                ->sortBy(fn ($g) => $g->user?->name)
+                ->sortBy([
+                    ['user.lastname', 'asc'],
+                    ['user.name', 'asc'],
+                ], SORT_FLAG_CASE | SORT_NATURAL)
                 ->values();
         }
 

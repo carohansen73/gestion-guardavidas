@@ -22,14 +22,18 @@ class GuardavidasExport implements FromCollection, WithHeadings, WithStyles
 
         // apellido/nombre ya no viven en guardavidas  — se ordena
         // por los del user relacionado (ya viene eager-loaded),
-        // preservando playa_id como criterio principal.
+        // preservando playa_id como criterio principal. Se usa dot
+        // notation ("user.lastname") en vez de un closure extractor:
+        // sortBy([[callback, dir], ...]) espera un comparador de 2
+        // argumentos, no un extractor de 1 valor (con un extractor no
+        // ordena nada, ver nota en IntervencionController/LicenciaController).
         $guardavidas = Guardavida::with(['user', 'playa', 'puesto'])
             ->get()
             ->sortBy([
-                [fn ($g) => $g->playa_id, 'asc'],
-                [fn ($g) => $g->user->lastname ?? '', 'asc'],
-                [fn ($g) => $g->user->name ?? '', 'asc'],
-            ]);
+                ['playa_id', 'asc'],
+                ['user.lastname', 'asc'],
+                ['user.name', 'asc'],
+            ], SORT_FLAG_CASE | SORT_NATURAL);
 
         return $guardavidas->map(function ($g) {
             return [

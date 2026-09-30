@@ -37,7 +37,10 @@ class AsistenciaGeneralExport implements FromCollection, WithHeadings, WithTitle
             ->whereHas('user', fn($q) => $q->where('enabled', true))
             ->with('user:id,name,lastname')
             ->get()
-            ->sortBy(fn ($g) => $g->user?->lastname)
+            ->sortBy([
+                ['user.lastname', 'asc'],
+                ['user.name', 'asc'],
+            ], SORT_FLAG_CASE | SORT_NATURAL)
             ->values();
 
         $rows = [];
@@ -48,7 +51,7 @@ class AsistenciaGeneralExport implements FromCollection, WithHeadings, WithTitle
 
             foreach ($historial as $h) {
                 $rows[] = [
-                    $g->nombre . ' ' . $g->apellido,
+                    $g->apellido . ', ' . $g->nombre,
                     Carbon::parse($h['fecha'])->format('d/m/Y'),
                     $h['estado'],
                     // $h['detalle'] ?? '',

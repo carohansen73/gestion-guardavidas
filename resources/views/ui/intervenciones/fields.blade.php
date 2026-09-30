@@ -174,11 +174,11 @@
             <div class="mt-2">
             <select id="guardavidas" name="guardavidas[]" multiple>
                 @foreach($guardavidas as $g)
-                    <option value="{{ $g->id }}"
+                    <option value="{{ $g->id }}" data-playa="{{ $g->playa_id }}"
                         @if(collect(old('guardavidas', $intervencion?->guardavidas->pluck('id') ?? []))->contains($g->id))
                             selected
                         @endif>
-                        {{ $g->nombre }} {{ $g->apellido }}
+                        {{ $g->apellido }}, {{ $g->nombre }}
                     </option>
                 @endforeach
             </select>
@@ -234,10 +234,38 @@ new TomSelect("#fuerzas",{
     create: false,
 });
 
-new TomSelect("#guardavidas",{
+const tsGuardavidas = new TomSelect("#guardavidas",{
     plugins: ['remove_button'],
     persist: false,
     create: false,
+});
+
+// Acota el listado de guardavidas a la playa seleccionada
+document.addEventListener('DOMContentLoaded', () => {
+    const playaSelect = document.getElementById('playa_id');
+    const guardavidaSelectEl = document.getElementById('guardavidas');
+
+    const todosLosGuardavidas = Array.from(guardavidaSelectEl.options).map(opt => ({
+        value: opt.value,
+        text: opt.textContent.trim(),
+        playa: opt.dataset.playa,
+    }));
+
+    function filtrarGuardavidasPorPlaya() {
+        const playaSeleccionada = playaSelect.value;
+        const seleccionados = tsGuardavidas.getValue();
+
+        tsGuardavidas.clearOptions();
+        todosLosGuardavidas
+            .filter(g => g.playa === playaSeleccionada || seleccionados.includes(g.value))
+            .forEach(g => tsGuardavidas.addOption({ value: g.value, text: g.text }));
+
+        tsGuardavidas.refreshOptions(false);
+        tsGuardavidas.setValue(seleccionados, true);
+    }
+
+    filtrarGuardavidasPorPlaya();
+    playaSelect.addEventListener('change', filtrarGuardavidasPorPlaya);
 });
 </script>
 
