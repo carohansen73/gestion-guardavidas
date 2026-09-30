@@ -20,7 +20,16 @@ class GuardavidasExport implements FromCollection, WithHeadings, WithStyles
         //o seleccionando columnas
         //return Guardavida::select('nombre', 'dni', 'email')->get();
 
-        $guardavidas = Guardavida::with(['user', 'playa', 'puesto'])->orderBy('playa_id')->orderBy('apellido')->orderBy('nombre')->get();
+        // apellido/nombre ya no viven en guardavidas  — se ordena
+        // por los del user relacionado (ya viene eager-loaded),
+        // preservando playa_id como criterio principal.
+        $guardavidas = Guardavida::with(['user', 'playa', 'puesto'])
+            ->get()
+            ->sortBy([
+                [fn ($g) => $g->playa_id, 'asc'],
+                [fn ($g) => $g->user->lastname ?? '', 'asc'],
+                [fn ($g) => $g->user->name ?? '', 'asc'],
+            ]);
 
         return $guardavidas->map(function ($g) {
             return [

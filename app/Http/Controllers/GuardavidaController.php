@@ -69,8 +69,8 @@ class GuardavidaController extends Controller
         ----------------------- */
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('guardavidas.nombre', 'LIKE', "%$search%")
-                    ->orWhere('guardavidas.apellido', 'LIKE', "%$search%")
+                $q->where('users.name', 'LIKE', "%$search%")
+                    ->orWhere('users.lastname', 'LIKE', "%$search%")
                     ->orWhere('users.email', 'LIKE', "%$search%")
                     ->orWhere('puestos.nombre', 'LIKE', "%$search%")
                     ->orWhere('playas.nombre', 'LIKE', "%$search%");
@@ -80,8 +80,11 @@ class GuardavidaController extends Controller
         /* ----------------------
         ORDEN
         ----------------------- */
-        $query->orderBy('guardavidas.apellido', $sortOrder)
-            ->orderBy('guardavidas.nombre', $sortOrder);
+        // nombre/apellido ya no viven en guardavidas - se ordena
+        // por users.name/lastname, (el join a
+        // users ya existe arriba, para el email).
+        $query->orderBy('users.lastname', $sortOrder)
+            ->orderBy('users.name', $sortOrder);
 
         /* ----------------------
         PAGINACIÓN
@@ -144,6 +147,7 @@ class GuardavidaController extends Controller
             $user = User::create([
                 'name' => $validated['nombre'],
                 'lastname' => $validated['apellido'],
+                'dni' => $validated['dni'] ?? null,
                 'email' => $validated['email'],
                 'password' => bcrypt('123456789'),
                 'must_change_password' => true,
@@ -157,10 +161,10 @@ class GuardavidaController extends Controller
 
             // 3 Si es guardavida o encargado → creo registro en tabla guardavidas
             if (in_array($validated['rol'], ['guardavida', 'encargado'])) {
+                // nombre/apellido/dni NO se guardan acá — ya quedaron en
+                // $user arriba, y Guardavida::nombre/apellido/dni son
+                // accessors que leen de ahí (ver Guardavida model, Fase 3b).
                 $guardavida = Guardavida::create([
-                    'nombre' => $validated['nombre'],
-                    'apellido' => $validated['apellido'],
-                    'dni' => $validated['dni'],
                     'telefono' => $validated['telefono'],
                     'direccion' => $validated['direccion'],
                     'numero' => $validated['numero'],
@@ -229,14 +233,21 @@ class GuardavidaController extends Controller
         $diasFranco = $validated['dias_franco'] ?? null;
         unset($validated['dias_franco']);
 
-        if ($guardavida->update($validated)) {
-            // Nombre/apellido también viven en "users" (navbar, login, etc.
-            // los leen de ahí) — hay que mantenerlos sincronizados con los
-            // de "guardavidas", igual que hace updateProfile().
+        // nombre/apellido/dni ya no se guardan en "guardavidas" (Fase 3b) —
+        // viven únicamente en "users", y Guardavida::nombre/apellido/dni
+        // son accessors que leen de ahí. Se sacan del array antes del
+        // update() de guardavida; abajo se siguen usando desde $validated
+        // para actualizar $user, que es donde efectivamente se guardan.
+        $datosGuardavida = collect($validated)->except(['nombre', 'apellido', 'dni'])->all();
+
+        if ($guardavida->update($datosGuardavida)) {
+            // Nombre/apellido/dni viven en "users" (navbar, login, etc. los
+            // leen de ahí).
             if ($guardavida->user) {
                 $guardavida->user->update([
                     'name' => $validated['nombre'],
                     'lastname' => $validated['apellido'],
+                    'dni' => $validated['dni'],
                 ]);
             }
 
@@ -380,7 +391,11 @@ class GuardavidaController extends Controller
 
     public function getAll()
     {
-        $guardavidas = Guardavida::select('id', 'nombre', 'apellido')->get();
+        // user_id es necesario para que los accessors nombre/apellido
+        // (Fase 3b) puedan resolver la relación — sin él devolverían null.
+        $guardavidas = Guardavida::with('user:id,name,lastname')
+            ->select('id', 'user_id', 'nombre', 'apellido')
+            ->get();
 
         return response()->json($guardavidas);
     }
@@ -496,7 +511,11 @@ class GuardavidaController extends Controller
                 $validated['puesto_id']);
 
         }
-        if ($guardavida->update($validated)) {
+        // nombre/apellido/dni ya no se guardan en "guardavidas" (Fase 3b) —
+        // viven únicamente en "users" (accessors en el modelo Guardavida).
+        $datosGuardavida = collect($validated)->except(['nombre', 'apellido', 'dni'])->all();
+
+        if ($guardavida->update($datosGuardavida)) {
             // También actualizar el usuario asociado si cambió nombre/apellido
             // (el email de la cuenta se edita aparte, desde la card de
             // "Datos de usuario" -> profile.update)
@@ -504,6 +523,7 @@ class GuardavidaController extends Controller
                 $guardavida->user->update([
                     'name' => $validated['nombre'],
                     'lastname' => $validated['apellido'],
+                    'dni' => $validated['dni'],
                 ]);
             }
 

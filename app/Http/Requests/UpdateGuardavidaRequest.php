@@ -27,7 +27,14 @@ class UpdateGuardavidaRequest extends FormRequest
         $rules = [
             'nombre' => 'required|string|max:255',
             'apellido' => 'required|string|max:255',
-            'dni' => ['required', 'digits_between:7,8', Rule::unique('guardavidas', 'dni')->ignore($this->guardavida->id)],
+            'dni' => [
+                'required',
+                'digits_between:7,8',
+                Rule::unique('guardavidas', 'dni')->ignore($this->guardavida->id),
+                // Ignora el propio users.dni del guardavida que se está
+                // editando (ver nota en StoreGuardavidaRequest).
+                Rule::unique('users', 'dni')->ignore($this->guardavida->user_id),
+            ],
             'telefono' => 'required|string|max:20',
             'direccion' => 'required|string|max:255',
             'numero' => 'required|string|max:10',

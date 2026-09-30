@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'force.password' => \App\Http\Middleware\ForcePasswordChange::class,
             'account.enabled' => \App\Http\Middleware\EnsureAccountEnabled::class,
             'temporada.activa' => \App\Http\Middleware\EnsureTemporadaActiva::class,
+            'postulante.redirect' => \App\Http\Middleware\RedirectPostulante::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -27,6 +27,12 @@ class RolesYPermisosSeeder extends Seeder
         // permiso abm_roles_y_permisos (ver más abajo), que gatea la pantalla de
         // administración de permisos.
         $superadmin = Role::firstOrCreate(['name' => 'superadmin']);
+        // postulante: sin ningún permiso asignado a propósito — queda
+        // bloqueado de todo el sistema existente por el propio sistema de
+        // permisos, sin necesidad de chequeos ad-hoc en cada pantalla. Solo
+        // puede acceder a lo que esté explícitamente fuera del sistema de
+        // permisos (su propia postulación), vía RedirectPostulante.
+        Role::firstOrCreate(['name' => 'postulante']);
 
 
         // --- Permisos ---

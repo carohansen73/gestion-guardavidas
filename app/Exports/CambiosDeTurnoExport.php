@@ -16,12 +16,15 @@ class CambiosDeTurnoExport implements FromCollection, WithHeadings, WithStyles
     public function collection()
     {
 
+        // apellido/nombre ya no viven en guardavidas —
+        // join a users para poder ordenar.
         $CambioDeTurno = CambioDeTurno::select(['cambio_de_turnos.*'])
         ->join('guardavidas', 'cambio_de_turnos.guardavida_id', '=', 'guardavidas.id')
+        ->join('users', 'users.id', '=', 'guardavidas.user_id')
         ->orderBy('cambio_de_turnos.playa_id')
-        ->orderBy('guardavidas.apellido')
-        ->orderBy('guardavidas.nombre')
-        ->with(['guardavida', 'playa', 'puesto'])
+        ->orderBy('users.lastname')
+        ->orderBy('users.name')
+        ->with(['guardavida.user', 'playa', 'puesto'])
         ->get();
 
         return $CambioDeTurno->map(function ($ct) {

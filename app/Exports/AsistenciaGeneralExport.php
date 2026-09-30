@@ -35,8 +35,10 @@ class AsistenciaGeneralExport implements FromCollection, WithHeadings, WithTitle
         //busca los guardavidas habilitados que pertenecen a esa playa
         $guardavidas = Guardavida::where('playa_id', $this->playa->id)
             ->whereHas('user', fn($q) => $q->where('enabled', true))
-            ->orderBy('apellido')
-            ->get();
+            ->with('user:id,name,lastname')
+            ->get()
+            ->sortBy(fn ($g) => $g->user?->lastname)
+            ->values();
 
         $rows = [];
 

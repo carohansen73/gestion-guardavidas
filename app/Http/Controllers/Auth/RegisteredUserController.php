@@ -18,6 +18,11 @@ class RegisteredUserController extends Controller
 {
     /**
      * Display the registration view.
+     *
+     * Formulario de registro público, exclusivamente para
+     * postulantes - es el único caso de alta de cuenta "self-service" del
+     * sistema; todos los demás usuarios (guardavida, encargado, admin) los
+     * crea un admin desde GuardavidaController::store().
      */
     public function create(): View
     {
@@ -31,24 +36,36 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'lastname' => ['required', 'string', 'max:255'],
+            // DNI único a nivel users (no solo en guardavidas) para que no
+            // se pueda postular dos veces con el mismo DNI usando emails
+            // distintos — ver CLAUDE.md.
+            'dni' => ['required', 'digits_between:7,8', 'unique:'.User::class.',dni'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'name' => $validated['name'],
+            'lastname' => $validated['lastname'],
+            'dni' => $validated['dni'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            // Eligió su propia contraseña recién, a diferencia de las
+            // cuentas que crea un admin con una por defecto — no tiene
+            // sentido forzarle un cambio inmediato.
+            'must_change_psw' => false,
         ]);
+
+        $user->assignRole('postulante');
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect(route('postulacion.index', absolute: false));
     }
 
     /**
@@ -78,13 +95,12 @@ class RegisteredUserController extends Controller
 
         $user->update($validated);
 
-         //sincroniza nombre en Guardavida
-        if($user->guardavida) {
-            $user->guardavida->update([
-                'nombre' => $validated['nombre'],
-                'apellido' => $validated['apellido'],
-            ]);
-        }
+        // No hace falta sincronizar nada en Guardavida: nombre/apellido ya
+        // no se guardan ahí (Fase 3b) — Guardavida::nombre/apellido son
+        // accessors que leen directo de $user, así que ya quedan al día
+        // con el update() de arriba. (Antes este bloque además tenía un
+        // bug: usaba $validated['nombre']/['apellido'], que no existen acá
+        // — los campos validados son name/lastname.)
 
         return redirect()->route('perfil.edit')->with('success', 'Perfil actualizado correctamente.');
     }
@@ -119,13 +135,8 @@ class RegisteredUserController extends Controller
 
         $user->save();
 
-        //sincroniza nombre en Guardavida
-        if($user->guardavida) {
-            $user->guardavida->update([
-                'nombre' => $validated['nombre'],
-                'apellido' => $validated['apellido'],
-            ]);
-        }
+        // No hace falta sincronizar nada en Guardavida acá tampoco, mismo
+        // motivo que en update() arriba (Fase 3b).
 
         return redirect()->back()->with('success', 'Usuario actualizado correctamente.');
         // return redirect()->route('guardavida.edit', [$user->guardavida->id, 'tab' => 'profile'])

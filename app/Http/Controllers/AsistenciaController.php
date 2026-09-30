@@ -143,24 +143,30 @@ class AsistenciaController extends Controller
             ? Carbon::parse($request->input('fin'))->endOfDay()
             : Carbon::now()->endOfDay();
 
-        // Filtros de playa y búsqueda
-        $guardavidasQuery = Guardavida::with(['puesto.playa']);
+        // Filtros de playa y búsqueda. nombre/apellido ya no viven en
+        // guardavidas -> join a users para buscar/ordenar.
+        // (select('guardavidas.*') evita ambigüedad de columnas
+        // con el join.
+        $guardavidasQuery = Guardavida::query()
+            ->select('guardavidas.*')
+            ->join('users', 'users.id', '=', 'guardavidas.user_id')
+            ->with(['puesto.playa', 'user']);
 
         if ($request->filled('playa_id') && $request->input('playa_id') !== 'all') {
-            $guardavidasQuery->where('playa_id', $request->input('playa_id'));
+            $guardavidasQuery->where('guardavidas.playa_id', $request->input('playa_id'));
         }
 
         if ($request->filled('search')) {
             $search = $request->input('search');
             $guardavidasQuery->where(function ($q) use ($search) {
-                $q->where('nombre', 'LIKE', "%{$search}%")
-                    ->orWhere('apellido', 'LIKE', "%{$search}%");
+                $q->where('users.name', 'LIKE', "%{$search}%")
+                    ->orWhere('users.lastname', 'LIKE', "%{$search}%");
             });
         }
 
         $guardavidas = $guardavidasQuery
-            ->orderBy('apellido')
-            ->orderBy('nombre')
+            ->orderBy('users.lastname')
+            ->orderBy('users.name')
             ->paginate(10)
             ->withQueryString();
 

@@ -169,6 +169,29 @@ class Guardavida extends Model
         });
     }
 
+    // ******************** Nombre/apellido/dni ***********************************
+    // Fase 3b: guardavidas.nombre/apellido/dni quedaron duplicados con
+    // users.name/lastname/dni (dos fuentes de verdad sincronizadas a mano,
+    // que ya causó bugs de sincronización). Estos accessors hacen que
+    // $guardavida->nombre siga funcionando en toda la app sin tocar cada
+    // vista/controller, pero leyendo siempre de `user` — la columna de
+    // guardavidas queda sin usarse (se borra más adelante, en un paso
+    // aparte, una vez confirmado que todo anda bien así).
+    public function getNombreAttribute()
+    {
+        return $this->user?->name;
+    }
+
+    public function getApellidoAttribute()
+    {
+        return $this->user?->lastname;
+    }
+
+    public function getDniAttribute()
+    {
+        return $this->user?->dni;
+    }
+
     // ******************** Contadores ******************************************
     public function getAsistenciasCountAttribute()
     {

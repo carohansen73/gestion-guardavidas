@@ -22,16 +22,28 @@ class StoreGuardavidaRequest extends FormRequest
      */
     public function rules(): array
     {
+        $esGuardavidaOEncargado = in_array($this->input('rol'), ['guardavida', 'encargado']);
+
         //verifico datos primero para usuario, luego, si es guardavida para guardavidas.
         $rules = [
             'nombre' => 'required|string|max:255',
             'apellido' => 'required|string|max:255',
+            // DNI: obligatorio para cualquier rol (admin incluido) — vive en
+            // users.dni (Fase 3b), único ahí siempre. Además único en
+            // guardavidas.dni cuando corresponde crear ese registro (esa
+            // columna quedó en desuso pero todavía tiene datos históricos,
+            // se valida igual como resguardo mientras no se borre del todo).
+            'dni' => array_filter([
+                'required',
+                'digits_between:7,8',
+                $esGuardavidaOEncargado ? 'unique:guardavidas,dni' : null,
+                'unique:users,dni',
+            ]),
             'email' => 'required|email|unique:users,email',
             'rol' => 'required|string|in:guardavida,encargado,admin',
         ];
-        if (in_array($this->input('rol'), ['guardavida', 'encargado'])) {
+        if ($esGuardavidaOEncargado) {
             $rules = array_merge($rules, [
-                'dni' => 'required|digits_between:7,8|unique:guardavidas,dni',
                 'telefono' => 'required|string|max:20',
                 'direccion' => 'required|string|max:255',
                 'numero' => 'required|string|max:10',

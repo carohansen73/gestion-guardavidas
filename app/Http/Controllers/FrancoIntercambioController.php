@@ -49,8 +49,10 @@ class FrancoIntercambioController extends Controller
         // Compañeros de la misma playa para elegir a quién pedirle el cambio.
         $companeros = Guardavida::where('playa_id', $guardavida->playa_id)
             ->where('id', '!=', $guardavida->id)
-            ->orderBy('apellido')
-            ->get();
+            ->with('user:id,name,lastname')
+            ->get()
+            ->sortBy(fn ($g) => $g->user?->lastname)
+            ->values();
 
         return view('franco.index', compact('guardavida', 'recibidas', 'enviadas', 'companeros'));
     }

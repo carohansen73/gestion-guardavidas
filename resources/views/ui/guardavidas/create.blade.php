@@ -96,6 +96,21 @@
                                         </select>
                                 </div>
                             </div>
+
+                            <!-- DNI: siempre visible/obligatorio (vive en users.dni, ya no
+                                 solo en guardavidas.dni) — cualquier usuario, sea admin,
+                                 guardavida o encargado, tiene DNI. -->
+                            <div class="sm:col-span-3">
+                                <label for="dni" class="block text-sm font-medium text-gray-900 dark:text-white">DNI</label>
+                                <div class="mt-2">
+                                    <input id="dni" type="number" name="dni" placeholder="Ej: 11111111"
+                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
+                                    value="{{ old('dni', $guardavida->dni ?? '') }}" required/>
+                                    @error('dni')
+                                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            </div>
                         </div>
 
 {{-- A PARTIR DE ACA, SOLO VISIBLE SI VA A AGREGAR UN GUARDAVIDA  --}}
@@ -108,19 +123,6 @@
                                 <p class="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">
                                     Complete los datos personales del guardavidas. Asegúrese de que la información sea correcta, ya que será utilizada para su identificación y gestión interna.
                                 </p>
-                            </div>
-
-                            <!-- DNI -->
-                            <div class="sm:col-span-4">
-                                <label for="dni" class="block text-sm font-medium text-gray-900 dark:text-white">DNI</label>
-                                <div class="mt-2">
-                                    <input id="dni" type="number" name="dni" placeholder="Ej: 11111111"
-                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
-                                    value="{{ old('dni', $guardavida->dni ?? '') }}" />
-                                    @error('dni')
-                                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                                    @enderror
-                                </div>
                             </div>
 
                             <!-- telefono -->

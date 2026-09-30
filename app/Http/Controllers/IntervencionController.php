@@ -69,11 +69,20 @@ class IntervencionController extends Controller
         if ($user->hasAnyRole(['guardavida', 'encargado']) && $guardavidaAuth){
             $playas = Playa::where('id', $guardavidaAuth->playa_id)->get();
             $puestos = Puesto::where('playa_id', $guardavidaAuth->playa_id)->get();
-            $guardavidas = Guardavida::where('playa_id', $guardavidaAuth->playa_id)->orderBy('nombre')->get();
+
+            $guardavidas = Guardavida::where('playa_id', $guardavidaAuth->playa_id)
+                ->with('user:id,name,lastname')
+                ->get()
+                ->sortBy(fn ($g) => $g->user?->name)
+                ->values();
         } else {
             $playas = Playa::all();
             $puestos = Puesto::orderBy('nombre')->get();
-            $guardavidas = Guardavida::orderBy('nombre')->get();
+            // Ídem, lista completa sin filtrar por playa (caso admin).
+            $guardavidas = Guardavida::with('user:id,name,lastname')
+                ->get()
+                ->sortBy(fn ($g) => $g->user?->name)
+                ->values();
         }
 
         return view('ui.intervenciones.create', compact(
@@ -143,11 +152,21 @@ class IntervencionController extends Controller
         if ($user->hasAnyRole(['guardavida', 'encargado']) && $guardavidaAuth){
             $playas = Playa::where('id', $guardavidaAuth->playa_id)->get();
             $puestos = Puesto::where('playa_id', $guardavidaAuth->playa_id)->get();
-            $guardavidas = Guardavida::where('playa_id', $guardavidaAuth->playa_id)->orderBy('nombre')->get();
+            // nombre ya no vive en guardavidas - lista chica para
+            // un <select>.
+            $guardavidas = Guardavida::where('playa_id', $guardavidaAuth->playa_id)
+                ->with('user:id,name,lastname')
+                ->get()
+                ->sortBy(fn ($g) => $g->user?->name)
+                ->values();
         } else {
             $playas = Playa::all();
             $puestos = Puesto::orderBy('nombre')->get();
-            $guardavidas = Guardavida::orderBy('nombre')->get();
+            // Lista completa sin filtrar por playa (para admin).
+            $guardavidas = Guardavida::with('user:id,name,lastname')
+                ->get()
+                ->sortBy(fn ($g) => $g->user?->name)
+                ->values();
         }
 
         return view('ui.intervenciones.edit', compact(

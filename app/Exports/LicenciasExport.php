@@ -24,12 +24,14 @@ class LicenciasExport implements FromCollection, WithHeadings, WithTitle, WithMa
     */
     public function collection() {
 
+       // apellido/nombre ya no viven en guardavidas - join a users.
        return Licencia::select(['licencias.*'])
         ->join('guardavidas', 'licencias.guardavida_id', '=', 'guardavidas.id')
+        ->join('users', 'users.id', '=', 'guardavidas.user_id')
         ->orderBy('licencias.playa_id')
-        ->orderBy('guardavidas.apellido')
-        ->orderBy('guardavidas.nombre')
-        ->with(['guardavida', 'playa', 'puesto'])
+        ->orderBy('users.lastname')
+        ->orderBy('users.name')
+        ->with(['guardavida.user', 'playa', 'puesto'])
         ->get();
     }
 

@@ -12,6 +12,7 @@ use App\Http\Controllers\FrancoIntercambioController;
 use App\Http\Controllers\GuardavidaController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\PostulacionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QrController;
 use App\Http\Controllers\UserController;
@@ -27,7 +28,7 @@ Route::get('/ping', function () {
     return response('', 204);
 });
 
-Route::middleware(['auth', 'force.password'])->group(function () {
+Route::middleware(['auth', 'force.password', 'postulante.redirect'])->group(function () {
     /* Fuerzo a que actualice la contraseña la 1era vez que se loguea */
     Route::get('/force-password', [ForcedPasswordController::class, 'edit'])
         ->middleware('auth')
@@ -36,6 +37,12 @@ Route::middleware(['auth', 'force.password'])->group(function () {
     Route::post('/force-password', [ForcedPasswordController::class, 'update'])
         ->middleware('auth')
         ->name('password.force.update');
+
+    // Área del postulante — un postulante no tiene ningún permiso asignado
+    // (ver RolesYPermisosSeeder), así que ya queda bloqueado de casi todo
+    // por el propio sistema de @can/Policy; postulante.redirect (arriba)
+    // se encarga de mandarlo para acá si intenta ir a cualquier otro lado.
+    Route::get('/postulacion', [PostulacionController::class, 'index'])->name('postulacion.index');
 
     // Ruta que actualiza los datos del guardavida (turno, puesto, etc.)
     Route::post('/guardavida/setup', [GuardavidaController::class, 'setup'])
