@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
 
-<section class="text-gray-600 dark:text-gray-100 body-font px-4 py-10  ">
+<section class="text-gray-600 dark:text-gray-100 body-font sm:px-4 sm:py-10">
 
     <div class="flex justify-between align-center mb-sm-2">
          <h2 class="text-gray-700 dark:text-white text-2xl font-bold tracking-tight text-heading md:text-3xl lg:text-4xl">Detalles de la novedad</h2>
@@ -15,7 +15,7 @@
     </div>
 
     <div class="container bg-white rounded shadow-md  px-4 py-4">
-        <div class="pb-12">
+        <div class="pb-4 sm:pb-12">
 
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
                 {{ $novedadDeMaterial->tipo_novedad }} {{ $novedadDeMaterial->material->nombre ?? '-' }} {{ $novedadDeMaterial->material->detalle ?? '-' }}

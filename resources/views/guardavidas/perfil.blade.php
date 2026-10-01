@@ -15,7 +15,7 @@
 @section('content')
 
     {{-- <div class="lg:ml-64 min-h-screen bg-gray-100 dark:bg-gray-800 "> --}}
-        <main class="overflow-x-hidden pb-5 mx-4">
+        <main class="overflow-x-hidden sm:pb-5 sm:mx-4">
 
 
 

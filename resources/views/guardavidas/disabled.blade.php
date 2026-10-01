@@ -3,8 +3,8 @@
 
 @section('content')
 
-<div class="text-gray-600 dark:text-gray-100 body-font px-4 ">
-    <div class="flex justify-between align-center my-4">
+<div class="text-gray-600 dark:text-gray-100 body-font sm:px-4 ">
+    <div class="flex justify-between align-center mb-4 sm:mt-4">
          <h2 class="text-gray-700 dark:text-white text-2xl font-bold tracking-tight text-heading md:text-3xl lg:text-4xl"> Guardavidas bloqueados </h2>
 
         <a href="{{ route('guardavida.create') }}" class="btn hidden sm:flex align-center bg-sky-500 dark:bg-sky-700 hover:bg-sky-400 dark:hover:bg-sky-600 rounded-full px-3 py-2 shadow">
@@ -29,7 +29,7 @@
 <div x-data="{ selectedId: null }">
     {{-- Lista para Mobile --}}
     <div class="space-y-4 sm:hidden">
-    <section class="text-gray-600 dark:text-gray-100 body-font px-4 py-4 mb-16">
+    <section class="text-gray-600 dark:text-gray-100 body-font pt-4 sm:px-4 sm:pb-4 sm:mb-16">
         <div id="accordion-collapse" data-accordion="collapse" class="bg-gray-100 dark:bg-gray-700">
             @foreach ($guardavidasDeshabilitados as $registro)
                 <div class="registro-item-lista rounded "

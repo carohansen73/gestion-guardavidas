@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
 
-<section class="text-gray-600 dark:text-gray-100 body-font px-4 py-10">
+<section class="text-gray-600 dark:text-gray-100 body-font sm:px-4 sm:py-10">
     <h2 class="mb-3 text-gray-700 dark:text-white text-2xl font-bold tracking-tight text-heading md:text-3xl lg:text-4xl section-title">
         @if(isset($novedadDeMaterial))
             Editar novedad de materiales
@@ -20,7 +20,7 @@
         @method('PUT')
     @endif
 
-    <div class="container px-2 py-4 mx-auto">
+    <div class="container px-4 sm:px-2 py-4 mx-auto">
 
         @if ($errors->any())
             <div class="bg-red-100 text-red-700 p-3 rounded mb-4">
@@ -33,7 +33,7 @@
         @endif
 
         <div class="space-y-12">
-            <div class="pb-12  px-4 py-2">
+            <div class="pb-4 sm:pb-12 sm:px-4 py-2">
 
                 <div class=" grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                     <!-- Playa -->

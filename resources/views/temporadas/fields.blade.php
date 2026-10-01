@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
 
-<section class="text-gray-600 dark:text-gray-100 body-font px-4 py-10">
+<section class="text-gray-600 dark:text-gray-100 body-font sm:px-4 sm:py-10">
     <h2 class="mb-3 text-gray-700 dark:text-white text-2xl font-bold tracking-tight text-heading md:text-3xl lg:text-4xl section-title">
         {{ isset($temporada) ? 'Editar temporada' : 'Nueva temporada' }}
     </h2>

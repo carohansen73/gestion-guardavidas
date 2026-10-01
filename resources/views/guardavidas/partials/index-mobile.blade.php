@@ -1,5 +1,5 @@
 <div class="space-y-4 sm:hidden">
-    <section class="text-gray-600 dark:text-gray-100 body-font px-4 py-4 mb-16">
+    <section class="text-gray-600 dark:text-gray-100 body-font pt-4">
         <div id="accordion-collapse" data-accordion="collapse" class="bg-white dark:bg-gray-600">
             @foreach ($guardavidasHabilitados as $registro)
                 <div class="registro-item-lista rounded "

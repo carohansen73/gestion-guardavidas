@@ -13,7 +13,7 @@
     $dato = fn ($valor) => filled($valor) ? $valor : '—';
 @endphp
 
-<div class="text-gray-600 dark:text-gray-100 px-4 py-6 max-w-4xl mx-auto space-y-6">
+<div class="text-gray-600 dark:text-gray-100 sm:px-4 sm:py-6 max-w-4xl mx-auto space-y-6">
     <div class="flex items-center justify-between gap-3">
         <div>
             <a href="{{ route('postulaciones.index', ['temporada' => $postulacion->temporada_id]) }}" class="text-sm text-sky-500 hover:underline">← Volver al listado</a>

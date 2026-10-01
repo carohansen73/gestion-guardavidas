@@ -11,7 +11,7 @@
 @section('content')
 
     {{-- <div class="lg:ml-64 min-h-screen bg-gray-100 dark:bg-gray-800 "> --}}
-        <section class="pb-5 mx-4">
+        <section class="sm:pb-5 sm:mx-4">
 
             <!-- Header -->
             <div class="relative flex items-center h-16 mt-4">
@@ -74,7 +74,7 @@
                 @csrf
                 @method('PUT')
 
-                <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6 text-gray-600 rounded sm:px-10 md:px-10 pb-12 py-10">
+                <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6 text-gray-600 rounded sm:px-10 md:px-10 pb-4 sm:pb-12 py-4 sm:py-10">
 
                     <!-- Personal Information -->
                     <div class="sm:col-span-6">

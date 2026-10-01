@@ -2,7 +2,7 @@
 
 @section('content')
 
-<div class="text-gray-600 dark:text-gray-100 body-font px-4">
+<div class="text-gray-600 dark:text-gray-100 body-font sm:px-4">
     <div class="flex justify-between align-center mb-sm-4">
         <h1 class="text-lg font-semibold text-gray-900 dark:text-white mt-3">Permisos por rol</h1>
     </div>
@@ -23,14 +23,14 @@
     @endif
 </div>
 
-<div class="px-4">
+<div class="sm:px-4">
     <form action="{{ route('permisos.update') }}" method="POST">
         @csrf
         @method('PUT')
 
-        <div class="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg shadow-md">
+        <div class="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg shadow">
             <table class="min-w-full text-sm text-left">
-                <thead class="bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200">
+                <thead class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
                     <tr>
                         <th class="px-4 py-3 font-semibold">Permiso</th>
                         @foreach ($roles as $role)

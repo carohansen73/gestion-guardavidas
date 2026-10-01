@@ -4,8 +4,8 @@
 
 @php($diasFranco = $guardavida->diasFrancoActuales())
 
-<div class="text-gray-600 dark:text-gray-100 body-font px-4">
-    <div class="flex justify-between align-center my-4">
+<div class="text-gray-600 dark:text-gray-100 body-font sm:px-4">
+    <div class="flex justify-between align-center mb-4 sm:mt-4">
         <h2 class="text-gray-700 dark:text-white text-2xl font-bold tracking-tight text-heading md:text-3xl lg:text-4xl">
             Cambios de Franco
         </h2>

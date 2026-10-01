@@ -4,7 +4,7 @@
     @csrf
     @method('PUT')
 
-    <div class="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-8 bg-white text-gray-600 rounded shadow-md pb-12 px-6 py-6">
+    <div class="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-8 bg-white text-gray-600 rounded shadow-md pb-6 sm:pb-12 px-4 sm:px-6 py-6">
 
         <h3 class="sm:col-span-6 text-gray-900 dark:text-white text-lg font-medium ">
             Rol

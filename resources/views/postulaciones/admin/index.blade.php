@@ -12,8 +12,8 @@
     $input = 'rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm text-sm';
 @endphp
 
-<div class="text-gray-600 dark:text-gray-100 body-font px-4">
-    <div class="flex justify-between align-center my-4">
+<div class="text-gray-600 dark:text-gray-100 body-font sm:px-4">
+    <div class="flex justify-between align-center mb-4 sm:mt-4">
         <h2 class="text-gray-700 dark:text-white text-2xl font-bold tracking-tight text-heading md:text-3xl lg:text-4xl">Postulaciones</h2>
     </div>
 
@@ -60,51 +60,48 @@
         <button type="submit" class="px-3 py-2 rounded-md bg-sky-500 hover:bg-sky-400 text-white text-sm">Filtrar</button>
     </form>
 
-    <div class="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg shadow">
-        <table class="min-w-full text-sm text-gray-600 dark:text-gray-100">
-            <thead class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                <tr>
-                    <th class="px-4 py-2 text-left">Apellido y nombre</th>
-                    <th class="px-4 py-2 text-left">DNI</th>
-                    <th class="px-4 py-2 text-left">Playas preferidas</th>
-                    <th class="px-4 py-2 text-left">Enviada</th>
-                    <th class="px-4 py-2 text-left">Estado</th>
-                    <th class="px-4 py-2 text-left"></th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200 dark:divide-gray-600">
-                @forelse ($postulaciones as $postulacion)
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                        <td class="px-4 py-2">{{ $postulacion->user->lastname }}, {{ $postulacion->user->name }}</td>
-                        <td class="px-4 py-2">{{ $postulacion->user->dni }}</td>
-                        <td class="px-4 py-2">
-                            {{ $postulacion->playas->pluck('nombre')->implode(' / ') ?: '—' }}
-                        </td>
-                        <td class="px-4 py-2">{{ $postulacion->enviada_at?->format('d/m/y H:i') }}</td>
-                        <td class="px-4 py-2">
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {{ $colores[$postulacion->estado] ?? '' }}">
-                                {{ ucfirst($postulacion->estado) }}
-                            </span>
-                            @if ($postulacion->seleccionado)
-                                <span class="ms-1 text-xs text-sky-600 dark:text-sky-400">seleccionado/a</span>
-                            @endif
-                        </td>
-                        <td class="px-4 py-2">
-                            <a href="{{ route('postulaciones.show', $postulacion) }}" class="text-sky-500 hover:text-sky-400 dark:text-sky-400">Ver</a>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="6" class="px-4 py-6 text-center text-gray-500 dark:text-gray-400">
-                            No hay postulaciones para estos filtros.
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-
-    <div class="mt-4">{{ $postulaciones->links() }}</div>
 </div>
+
+<x-index-table :registros="$postulaciones" movil paginar>
+    <thead class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+        <tr>
+            <th class="px-4 py-2 text-left">Apellido y nombre</th>
+            <th class="px-4 py-2 text-left">DNI</th>
+            <th class="px-4 py-2 text-left">Playas preferidas</th>
+            <th class="px-4 py-2 text-left">Enviada</th>
+            <th class="px-4 py-2 text-left">Estado</th>
+            <th class="px-4 py-2 text-left"></th>
+        </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-200 dark:divide-gray-600">
+        @forelse ($postulaciones as $postulacion)
+            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                <td class="px-4 py-2">{{ $postulacion->user->lastname }}, {{ $postulacion->user->name }}</td>
+                <td class="px-4 py-2">{{ $postulacion->user->dni }}</td>
+                <td class="px-4 py-2">
+                    {{ $postulacion->playas->pluck('nombre')->implode(' / ') ?: '—' }}
+                </td>
+                <td class="px-4 py-2">{{ $postulacion->enviada_at?->format('d/m/y H:i') }}</td>
+                <td class="px-4 py-2">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {{ $colores[$postulacion->estado] ?? '' }}">
+                        {{ ucfirst($postulacion->estado) }}
+                    </span>
+                    @if ($postulacion->seleccionado)
+                        <span class="ms-1 text-xs text-sky-600 dark:text-sky-400">seleccionado/a</span>
+                    @endif
+                </td>
+                <td class="px-4 py-2">
+                    <a href="{{ route('postulaciones.show', $postulacion) }}" class="text-sky-500 hover:text-sky-400 dark:text-sky-400">Ver</a>
+                </td>
+            </tr>
+        @empty
+            <tr>
+                <td colspan="6" class="px-4 py-6 text-center text-gray-500 dark:text-gray-400">
+                    No hay postulaciones para estos filtros.
+                </td>
+            </tr>
+        @endforelse
+    </tbody>
+</x-index-table>
 
 @endsection

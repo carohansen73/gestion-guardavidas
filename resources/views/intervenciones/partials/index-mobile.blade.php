@@ -1,6 +1,6 @@
 {{-- Lista para Mobile --}}
     <div class="space-y-4 sm:hidden">
-        <section class="text-gray-600 dark:text-gray-100 body-font py-3 px-4 mb-10">
+        <section class="text-gray-600 dark:text-gray-100 body-font pt-3">
             <div id="accordion-collapse" data-accordion="collapse" class="bg-white dark:bg-gray-600">
                 @foreach ($intervenciones as $intervencion)
                     <div class=" rounded "

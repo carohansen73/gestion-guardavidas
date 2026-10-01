@@ -18,7 +18,7 @@
 @endif
 
     <div class="space-y-12">
-        <div class="pb-12  px-4 py-2">
+        <div class="pb-4 sm:pb-12 sm:px-4 py-2">
 
             <div class=" grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
 

@@ -2,7 +2,7 @@
 
 @section('content')
 
-<section class="text-gray-600 dark:text-gray-100 body-font px-4 py-10  ">
+<section class="text-gray-600 dark:text-gray-100 body-font sm:px-4 sm:py-10">
 
     <div class="flex justify-between align-center mb-sm-2">
         <h2 class="text-gray-700 dark:text-white text-2xl font-bold tracking-tight text-heading md:text-3xl lg:text-4xl">Bandera</h2>
@@ -18,7 +18,7 @@
     </div>
 
     <div class="container bg-white rounded shadow-md  px-4 py-4 ">
-        <div class="pb-12">
+        <div class="pb-4 sm:pb-12">
             <div class="flex items-center rounded-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
                     class="bandera {{$bandera->bandera->color}} w-8 h-8 flex-shrink-0 mr-4 animate-ondear">
