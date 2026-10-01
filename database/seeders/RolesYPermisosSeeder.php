@@ -78,6 +78,11 @@ class RolesYPermisosSeeder extends Seeder
         Permission::create(['name' => 'eliminar_temporada']);
         Permission::create(['name' => 'ver_temporada']);
 
+        // ver_postulacion: ver el listado/detalle de inscripciones y sus
+        // documentos. revisar_postulacion: aceptar/rechazar + observaciones.
+        Permission::create(['name' => 'ver_postulacion']);
+        Permission::create(['name' => 'revisar_postulacion']);
+
         Permission::create(['name' => 'abm_roles_y_permisos']);
 
         // Permission::create(['name' => 'fichar_asistencia']);

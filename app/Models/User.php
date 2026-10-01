@@ -62,6 +62,18 @@ class User extends Authenticatable
         return $this->hasOne(Guardavida::class);
     }
 
+    /** Inscripciones del usuario, una por temporada. */
+    public function postulaciones()
+    {
+        return $this->hasMany(Postulacion::class);
+    }
+
+    /** Datos fijos que se precargan en cada inscripción. */
+    public function postulacionPerfil()
+    {
+        return $this->hasOne(PostulacionPerfil::class);
+    }
+
     public function scopeHabilitados($query){
         return $query->where('enabled', true);
     }

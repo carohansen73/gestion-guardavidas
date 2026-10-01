@@ -12,6 +12,7 @@ use App\Http\Controllers\FrancoIntercambioController;
 use App\Http\Controllers\GuardavidaController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\PostulacionAdminController;
 use App\Http\Controllers\PostulacionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QrController;
@@ -43,6 +44,18 @@ Route::middleware(['auth', 'force.password', 'postulante.redirect'])->group(func
     // por el propio sistema de @can/Policy; postulante.redirect (arriba)
     // se encarga de mandarlo para acá si intenta ir a cualquier otro lado.
     Route::get('/postulacion', [PostulacionController::class, 'index'])->name('postulacion.index');
+    Route::get('/postulacion/paso/{paso}', [PostulacionController::class, 'paso'])->whereNumber('paso')->name('postulacion.paso');
+    Route::post('/postulacion/paso/{paso}', [PostulacionController::class, 'guardar'])->whereNumber('paso')->name('postulacion.guardar');
+    Route::post('/postulacion/enviar', [PostulacionController::class, 'enviar'])->name('postulacion.enviar');
+    Route::get('/postulacion/{postulacion}/documento/{tipo}', [PostulacionController::class, 'documento'])->name('postulacion.documento');
+
+    // Revisión de inscripciones por el admin. Nombres `postulaciones.*` (plural)
+    // a propósito: NO coinciden con `postulacion.*`, así RedirectPostulante no
+    // deja pasar a un postulante por estas rutas.
+    Route::get('/postulaciones', [PostulacionAdminController::class, 'index'])->name('postulaciones.index');
+    Route::get('/postulaciones/{postulacion}', [PostulacionAdminController::class, 'show'])->name('postulaciones.show');
+    Route::patch('/postulaciones/{postulacion}/revisar', [PostulacionAdminController::class, 'revisar'])->name('postulaciones.revisar');
+    Route::get('/postulaciones/{postulacion}/documento/{tipo}', [PostulacionAdminController::class, 'documento'])->name('postulaciones.documento');
 
     // Ruta que actualiza los datos del guardavida (turno, puesto, etc.)
     Route::post('/guardavida/setup', [GuardavidaController::class, 'setup'])

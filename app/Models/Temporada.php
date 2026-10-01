@@ -22,6 +22,19 @@ class Temporada extends Model
         'fecha_fin' => 'date',
     ];
 
+    public function postulaciones()
+    {
+        return $this->hasMany(Postulacion::class);
+    }
+
+    /** ¿Hoy cae dentro de la ventana de postulación de esta temporada? */
+    public function postulacionAbierta(): bool
+    {
+        $hoy = Carbon::today();
+
+        return $this->fecha_inicio_postulacion->lte($hoy) && $this->fecha_fin_postulacion->gte($hoy);
+    }
+
     /**
      * La temporada cuya ventana OPERATIVA (fecha_inicio/fecha_fin) incluye
      * hoy. Es la que rige para cargar intervenciones/banderas/etc. y para

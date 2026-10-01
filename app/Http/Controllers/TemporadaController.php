@@ -66,6 +66,13 @@ class TemporadaController extends Controller
      */
     public function destroy(Temporada $temporada)
     {
+        // No se puede eliminar una temporada con postulaciones porque
+        // la FK de postulaciones.temporada_id es restrict.
+        if ($temporada->postulaciones()->exists()) {
+            return redirect()->route('temporada.index')
+                ->with('error', 'No se puede eliminar una temporada que ya tiene postulaciones.');
+        }
+
         $temporada->delete();
 
         return redirect()->route('temporada.index')->with('success', 'Temporada eliminada correctamente.');

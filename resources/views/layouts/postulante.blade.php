@@ -11,6 +11,8 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/darkMode.js'])
 
+    <style>[x-cloak] { display: none !important; }</style>
+
     <script>
         // Evita el FOUC (Flash Of Unstyled Content) - mismo criterio que layouts/app.blade.php
         (function() {
@@ -49,6 +51,7 @@
     </nav>
 
     <main class="max-w-3xl mx-auto px-4 py-8">
+        <x-session-alerts />
         @yield('content')
     </main>
 
