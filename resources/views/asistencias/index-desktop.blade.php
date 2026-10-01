@@ -8,8 +8,6 @@
         <h2 class="text-gray-700 dark:text-white text-2xl font-bold tracking-tight text-heading md:text-3xl lg:text-4xl"> Asistencias </h2>
     </div>
 
-    <div x-data="{ selectedId: null }">
-
     {{-- Filtro por playa: links reales por GET (antes eran botones que
          filtraban del lado del cliente solo entre las 10 filas ya cargadas
          en pantalla, sin ver el resto de las páginas). --}}

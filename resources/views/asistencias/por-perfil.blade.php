@@ -212,8 +212,6 @@
                     </div>
                 </div>
             </form>
-        </div>
-    </div>
 
     <!--popap para ver historial de licencias -->
     <!-- Esto: Carga todas las licencias del guardavida.

@@ -497,7 +497,6 @@ Tu email es tu usuario. Verificá que sea correcto para poder iniciar sesión o 
 
 
         </main>
-    </div>
  {{-- </div> --}}
  <script>
     window.esAdminOEncargado = @json($esAdminOEncargado);

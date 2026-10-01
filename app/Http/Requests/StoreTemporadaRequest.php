@@ -29,6 +29,11 @@ class StoreTemporadaRequest extends FormRequest
             'fecha_fin_postulacion' => 'required|date|after_or_equal:fecha_inicio_postulacion',
             'fecha_inicio' => 'required|date',
             'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
+            // Modelo de declaración jurada que descargan los postulantes. No
+            // es una columna: el controlador lo guarda aparte (ver
+            // TemporadaController::guardarModelo).
+            'modelo_declaracion' => 'nullable|file|mimes:pdf|max:5120',
+            'quitar_modelo' => 'nullable|boolean',
         ];
     }
 

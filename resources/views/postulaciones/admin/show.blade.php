@@ -83,7 +83,7 @@
                         <a href="{{ route('postulaciones.documento', [$postulacion, $tipo]) }}" target="_blank" class="text-sky-500 hover:text-sky-400 dark:text-sky-400">
                             Ver ({{ $doc->nombre_original }})
                         </a>
-                    @elseif ($config['obligatorio'])
+                    @elseif ($postulacion->documentoRequerido($tipo))
                         <span class="text-amber-600 dark:text-amber-400">No subido</span>
                     @else
                         <span class="text-gray-400">—</span>

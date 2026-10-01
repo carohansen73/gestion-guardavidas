@@ -48,6 +48,7 @@ Route::middleware(['auth', 'force.password', 'postulante.redirect'])->group(func
     Route::post('/postulacion/paso/{paso}', [PostulacionController::class, 'guardar'])->whereNumber('paso')->name('postulacion.guardar');
     Route::post('/postulacion/enviar', [PostulacionController::class, 'enviar'])->name('postulacion.enviar');
     Route::get('/postulacion/{postulacion}/documento/{tipo}', [PostulacionController::class, 'documento'])->name('postulacion.documento');
+    Route::get('/postulacion/modelo-declaracion/{temporada}', [PostulacionController::class, 'modeloDeclaracion'])->name('postulacion.modelo-declaracion');
 
     // Revisión de inscripciones por el admin. Nombres `postulaciones.*` (plural)
     // a propósito: NO coinciden con `postulacion.*`, así RedirectPostulante no
@@ -103,6 +104,7 @@ Route::middleware(['auth', 'force.password', 'postulante.redirect'])->group(func
         ->middlewareFor(['store', 'update', 'destroy'], 'temporada.activa');
 
     Route::resource('temporada', App\Http\Controllers\TemporadaController::class)->except('show');
+    Route::get('temporada/{temporada}/modelo-declaracion', [App\Http\Controllers\TemporadaController::class, 'modeloDeclaracion'])->name('temporada.modelo-declaracion');
 
     // Excel
     Route::get('/guardavidas/export', function () {

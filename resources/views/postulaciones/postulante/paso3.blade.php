@@ -23,17 +23,20 @@
     <div class="space-y-4">
         @foreach ($tipos as $tipo => $config)
             @php $subido = $postulacion->documento($tipo); @endphp
+            {{-- Declaración jurada: si la temporada todavía no tiene modelo no se muestra
+                 (ni se exige), salvo que la persona ya haya subido una. --}}
+            @continue($tipo === 'declaracion_jurada' && ! $modeloDeclaracion && ! $subido)
             <div class="rounded-md border border-gray-200 dark:border-gray-700 p-3">
                 <div class="flex items-center justify-between gap-2">
                     <label for="doc_{{ $tipo }}" class="text-sm font-medium text-gray-700 dark:text-gray-300">
                         {{ $config['label'] }}
-                        @unless ($config['obligatorio'])
-                            <span class="text-gray-400">(opcional — solo si tenés)</span>
+                        @unless ($postulacion->documentoRequerido($tipo))
+                            <span class="text-gray-400">(opcional{{ $tipo === 'licencia_motonautica' ? ' — solo si tenés' : '' }})</span>
                         @endunless
                     </label>
                     @if ($subido)
                         <span class="text-xs text-emerald-600 dark:text-emerald-400">✓ Subido</span>
-                    @elseif ($config['obligatorio'])
+                    @elseif ($postulacion->documentoRequerido($tipo))
                         <span class="text-xs text-amber-600 dark:text-amber-400">Falta</span>
                     @endif
                 </div>

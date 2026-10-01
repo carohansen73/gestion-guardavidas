@@ -13,7 +13,7 @@
     </div>
 
     <form action="{{ isset($temporada) ? route('temporada.update', $temporada) : route('temporada.store') }}"
-        method="POST" class="bg-white dark:bg-gray-800 rounded shadow-md">
+        method="POST" enctype="multipart/form-data" class="bg-white dark:bg-gray-800 rounded shadow-md">
         @csrf
         @if(isset($temporada))
             @method('PUT')
@@ -67,6 +67,35 @@
                         value="{{ old('fecha_fin', isset($temporada) ? $temporada->fecha_fin->format('Y-m-d') : '') }}"
                         class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm">
                 </div>
+            </div>
+
+            {{-- Modelo de declaración jurada: lo descargan los postulantes en el paso 3
+                 del formulario. Cada temporada tiene el suyo (cambia de un año al otro). --}}
+            <div class="mb-6">
+                <label for="modelo_declaracion" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Modelo de declaración jurada <span class="text-gray-400">(PDF, hasta 5 MB)</span>
+                </label>
+
+                @if (isset($temporada) && $temporada->declaracion_jurada_modelo)
+                    <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
+                        Modelo cargado:
+                        <a href="{{ route('temporada.modelo-declaracion', $temporada) }}" target="_blank"
+                            class="text-sky-600 dark:text-sky-400 hover:underline">ver / descargar</a>.
+                        Si subís otro archivo, reemplaza al actual.
+                    </p>
+                @else
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Todavía no hay un modelo cargado para esta temporada.</p>
+                @endif
+
+                <input type="file" name="modelo_declaracion" id="modelo_declaracion" accept=".pdf,application/pdf"
+                    class="mt-2 block w-full text-sm text-gray-700 dark:text-gray-200">
+
+                @if (isset($temporada) && $temporada->declaracion_jurada_modelo)
+                    <label class="mt-2 inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                        <input type="checkbox" name="quitar_modelo" value="1" class="rounded border-gray-300">
+                        Quitar el modelo actual (los postulantes dejan de verlo)
+                    </label>
+                @endif
             </div>
 
             <div class="flex items-center gap-3">

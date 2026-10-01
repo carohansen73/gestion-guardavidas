@@ -110,6 +110,22 @@ class Postulacion extends Model
         return $this->documentos->firstWhere('tipo', $tipo);
     }
 
+    /**
+     * ¿Hace falta este documento para poder enviar la inscripción? Los
+     * obligatorios sí, salvo la declaración jurada: solo se exige cuando la
+     * temporada ya tiene su modelo cargado (si no, el postulante no tendría
+     * qué completar ni firmar).
+     */
+    public function documentoRequerido(string $tipo): bool
+    {
+        $config = PostulacionDocumento::TIPOS[$tipo] ?? null;
+        if (! $config || ! $config['obligatorio']) {
+            return false;
+        }
+
+        return $tipo !== 'declaracion_jurada' || filled($this->temporada->declaracion_jurada_modelo);
+    }
+
     /** Puede corregirla el postulante: estado editable y ventana de postulación abierta. */
     public function editablePorPostulante(): bool
     {
@@ -140,7 +156,7 @@ class Postulacion extends Model
 
         $subidos = $this->documentos->pluck('tipo')->all();
         foreach (PostulacionDocumento::TIPOS as $tipo => $config) {
-            if ($config['obligatorio'] && ! in_array($tipo, $subidos, true)) {
+            if ($this->documentoRequerido($tipo) && ! in_array($tipo, $subidos, true)) {
                 $faltantes[] = $config['label'];
             }
         }

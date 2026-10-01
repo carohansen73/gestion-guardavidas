@@ -13,6 +13,7 @@ class Temporada extends Model
         'fecha_fin_postulacion',
         'fecha_inicio',
         'fecha_fin',
+        'declaracion_jurada_modelo',
     ];
 
     protected $casts = [

@@ -73,8 +73,11 @@ class PostulacionController extends Controller
         } elseif ($paso === 3) {
             $data['tipos'] = PostulacionDocumento::TIPOS;
             $data['maxKb'] = PostulacionDocumento::MAX_KB;
-            $data['modeloDeclaracion'] = file_exists(public_path('docs/declaracion_jurada.pdf'))
-                ? asset('docs/declaracion_jurada.pdf')
+            // Modelo de Declaración Jurada de la temporada (lo sube un admin desde Temporadas). Si la
+            // temporada todavía no tiene, no hay link ni se pide la declaración
+            // firmada (ver Postulacion::documentoRequerido).
+            $data['modeloDeclaracion'] = $postulacion->temporada->declaracion_jurada_modelo
+                ? route('postulacion.modelo-declaracion', $postulacion->temporada)
                 : null;
         } else {
             $data['faltantes'] = $postulacion->faltantes();
@@ -128,6 +131,14 @@ class PostulacionController extends Controller
         }
 
         return redirect()->route('postulacion.index')->with('success', '¡Inscripción enviada! Te avisamos por acá cuando sea revisada.');
+    }
+
+    /** El postulante descarga el modelo de declaración jurada de la temporada. */
+    public function modeloDeclaracion(Temporada $temporada)
+    {
+        $this->autorizarPostulante();
+
+        return TemporadaController::servirModelo($temporada);
     }
 
     /** El postulante descarga/ve un documento propio. */
