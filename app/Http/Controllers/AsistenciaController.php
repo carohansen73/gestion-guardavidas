@@ -126,7 +126,7 @@ class AsistenciaController extends Controller
     {
         if (! auth()->user()->hasAnyRole(['admin', 'encargado'])) {
             // Si no tiene permiso, devolvemos vista vacía o redirige (eso no me acuerdo como se veia en la interfaz)
-            return view('admin.usuarios.asistencias', [
+            return view('asistencias.index', [
                 'guardavidas' => collect(),
                 'playas' => collect(),
                 'inicio' => Carbon::now()->startOfMonth(),
@@ -176,9 +176,9 @@ class AsistenciaController extends Controller
         $agent = new Agent;
 
         if ($agent->isMobile()) {
-            return view('admin.usuarios.asistencias', compact('guardavidas', 'playas', 'resumen', 'inicio', 'fin'));
+            return view('asistencias.index', compact('guardavidas', 'playas', 'resumen', 'inicio', 'fin'));
         } else {
-            return view('admin.usuarios.asistencias-desktop', compact('guardavidas', 'playas', 'resumen', 'inicio', 'fin'));
+            return view('asistencias.index-desktop', compact('guardavidas', 'playas', 'resumen', 'inicio', 'fin'));
         }
 
     }
@@ -208,7 +208,7 @@ class AsistenciaController extends Controller
             $francoIntercambios = $comoSolicitante->concat($comoDestinatario)->sortByDesc('created_at')->take(15)->values();
         }
 
-        return view('admin.usuarios.asistencia-show-desktop', compact('guardavida', 'esAdmin', 'balnearios', 'puestos', 'historial', 'francoExcepciones', 'francoIntercambios'));
+        return view('asistencias.show-desktop', compact('guardavida', 'esAdmin', 'balnearios', 'puestos', 'historial', 'francoExcepciones', 'francoIntercambios'));
     }
 
     /**
@@ -229,7 +229,7 @@ class AsistenciaController extends Controller
         $esAdmin = false;
 
         // No necesitamos filtros ni balnearios/puestos para este caso
-        return view('admin.asistenciaPorPerfil', compact('guardavida', 'esAdmin'));
+        return view('asistencias.por-perfil', compact('guardavida', 'esAdmin'));
     }
 
     /**
@@ -245,7 +245,7 @@ class AsistenciaController extends Controller
         // Extraigo los guardavidas únicos
         $guardavidas = $asistencias->pluck('guardavida')->unique('id')->values();
 
-        return view('admin.usuarios.asistencias', compact('guardavidas'));
+        return view('asistencias.index', compact('guardavidas'));
     }
 
     /**

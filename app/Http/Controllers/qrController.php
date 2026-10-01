@@ -30,6 +30,6 @@ class QrController extends Controller
 
     public function activeCamera(){
         $puestos = Puesto::with('playa')->get();
-        return view('qr.qr' , compact('puestos'));
+        return view('qr.index' , compact('puestos'));
     }
 }

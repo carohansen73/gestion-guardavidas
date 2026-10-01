@@ -49,7 +49,7 @@ class PostulacionAdminController extends Controller
 
         $playas = Playa::orderBy('nombre')->get();
 
-        return view('ui.postulaciones.index', compact(
+        return view('postulaciones.admin.index', compact(
             'postulaciones', 'temporadas', 'temporadaId', 'estado', 'playaId', 'buscar', 'conteos', 'playas'
         ));
     }
@@ -62,7 +62,7 @@ class PostulacionAdminController extends Controller
         $postulacion->load(['user', 'temporada', 'perfil', 'playas', 'documentos', 'revisadoPor', 'playaAsignada', 'puestoAsignado']);
         $tipos = PostulacionDocumento::TIPOS;
 
-        return view('ui.postulaciones.show', compact('postulacion', 'tipos'));
+        return view('postulaciones.admin.show', compact('postulacion', 'tipos'));
     }
 
     public function revisar(Request $request, Postulacion $postulacion)

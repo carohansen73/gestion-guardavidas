@@ -20,7 +20,7 @@ class TemporadaController extends Controller
     {
         $temporadas = Temporada::orderByDesc('fecha_inicio')->get();
 
-        return view('ui.temporadas.index', compact('temporadas'));
+        return view('temporadas.index', compact('temporadas'));
     }
 
     /**
@@ -30,7 +30,7 @@ class TemporadaController extends Controller
     {
         $temporada = null;
 
-        return view('ui.temporadas.fields', compact('temporada'));
+        return view('temporadas.fields', compact('temporada'));
     }
 
     /**
@@ -48,7 +48,7 @@ class TemporadaController extends Controller
      */
     public function edit(Temporada $temporada)
     {
-        return view('ui.temporadas.fields', compact('temporada'));
+        return view('temporadas.fields', compact('temporada'));
     }
 
     /**

@@ -39,7 +39,7 @@ class PermissionController extends Controller
                 return $this->recursoDelPermiso($permiso->name);
             });
 
-        return view('admin.permisos.index', compact('roles', 'permisos'));
+        return view('permisos.index', compact('roles', 'permisos'));
     }
 
     /**

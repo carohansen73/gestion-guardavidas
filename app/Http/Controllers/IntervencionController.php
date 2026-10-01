@@ -47,7 +47,7 @@ class IntervencionController extends Controller
 
         $playas = Playa::all();
 
-        return view('ui.intervenciones.index')
+        return view('intervenciones.index')
         ->with('intervenciones', $intervenciones)
         ->with('playas', $playas)
         ->with('user', $user);
@@ -101,7 +101,7 @@ class IntervencionController extends Controller
                 ->values();
         }
 
-        return view('ui.intervenciones.create', compact(
+        return view('intervenciones.create', compact(
             'guardavidas', 'banderas', 'playas', 'puestos', 'fuerzas', 'guardavidaAuth', 'intervencion'
         ));
     }
@@ -149,7 +149,7 @@ class IntervencionController extends Controller
      */
     public function show(Intervencion $intervencion)
     {
-         return view('ui.intervenciones.show-fields', compact(
+         return view('intervenciones.show-fields', compact(
            'intervencion'
         ));
     }
@@ -193,7 +193,7 @@ class IntervencionController extends Controller
                 ->values();
         }
 
-        return view('ui.intervenciones.edit', compact(
+        return view('intervenciones.edit', compact(
             'guardavidas', 'banderas', 'playas', 'puestos', 'fuerzas', 'guardavidaAuth', 'intervencion'
         ));
     }

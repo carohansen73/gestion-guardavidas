@@ -25,7 +25,7 @@ class HomeController extends Controller
         $agent = new Agent;
         $isMobile = $agent->isMobile();
         // Tablet no cuenta como isMobile() para Jenssegers\Agent (esa manda a
-        // ui.home-mobile) — pero sí queda dentro de ui.dashboard igual que
+        // home-mobile) — pero sí queda dentro de dashboard.index igual que
         // desktop, así que esto es lo que distingue "tablet" de "desktop"
         // adentro de esa misma vista (ver acceso directo a Fichar).
         $isTablet = $agent->isTablet();
@@ -160,8 +160,8 @@ class HomeController extends Controller
         );
 
         return $agent->isMobile()
-            ? view('ui.dashboard', $data)
-            : view('ui.dashboard', $data);
+            ? view('dashboard.index', $data)
+            : view('dashboard.index', $data);
     }
 
     private function buscarBanderaActual($user)

@@ -31,7 +31,7 @@ class GuardavidaController extends Controller
         // Para mobile - solo muestro habilitados
         $guardavidasHabilitados = $this->getlifeguardsLeaked($request, true);
 
-        return view('ui.guardavidas.index')
+        return view('guardavidas.index')
             ->with('registros', $guardavidas)
             ->with('playas', $playas)
             ->with('guardavidasHabilitados', $guardavidasHabilitados);
@@ -108,7 +108,7 @@ class GuardavidaController extends Controller
 
         $playas = Playa::all();
 
-        return view('ui.guardavidas.disabled')
+        return view('guardavidas.disabled')
             ->with('guardavidasDeshabilitados', $guardavidasDeshabilitados)
             ->with('playas', $playas);
     }
@@ -129,7 +129,7 @@ class GuardavidaController extends Controller
 
         $guardavida = null;
 
-        return view('ui.guardavidas.create', compact(
+        return view('guardavidas.create', compact(
             'playas', 'puestos', 'guardavida'
         ));
     }
@@ -213,7 +213,7 @@ class GuardavidaController extends Controller
 
         $playas = Playa::with('puestos')->get();
 
-        return view('ui.guardavidas.edit', compact(
+        return view('guardavidas.edit', compact(
             'guardavidaAuth', 'rol', 'playas', 'guardavida'
         ));
     }
@@ -430,7 +430,7 @@ class GuardavidaController extends Controller
         $puestos = $esAdminOEncargado && $esPropietario ? Puesto::all() : null;
         $turnos = $esAdminOEncargado && $esPropietario ? CambioDeTurno::all() : null;
 
-        return view('profile.profile', compact(
+        return view('guardavidas.perfil', compact(
             'guardavida',
             'puedeEditar',
             'esAdminOEncargado',
@@ -455,7 +455,7 @@ class GuardavidaController extends Controller
             return $this->showProfile($user->guardavida);
         }
 
-        return view('profile.profile', [
+        return view('guardavidas.perfil', [
             'guardavida' => null,
             'puedeEditar' => true,
             'esAdminOEncargado' => $user->hasRole('admin') || $user->hasRole('encargado'),

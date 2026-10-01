@@ -51,7 +51,7 @@ class BanderaController extends Controller
 
         $playas = Playa::all();
 
-        return view('ui.banderas.index')
+        return view('banderas.index')
         ->with('registros', $registros)
         ->with('playas', $playas)
         ->with('user', $user);
@@ -77,7 +77,7 @@ class BanderaController extends Controller
         $banderas = BanderaTipo::all();
         $bandera = null;
 
-        return view('ui.banderas.fields', compact(
+        return view('banderas.fields', compact(
             'guardavidaAuth', 'banderas', 'playas', 'puestos', 'bandera'
         ));
     }
@@ -113,7 +113,7 @@ class BanderaController extends Controller
      */
     public function show(Bandera $bandera)
     {
-        return view('ui.banderas.show-fields', compact(
+        return view('banderas.show-fields', compact(
            'bandera'
         ));
     }
@@ -136,7 +136,7 @@ class BanderaController extends Controller
             $puestos = Puesto::orderBy('nombre')->get();
         }
 
-        return view('ui.banderas.fields', compact(
+        return view('banderas.fields', compact(
             'guardavidaAuth', 'banderas', 'playas', 'puestos', 'bandera'
         ));
     }

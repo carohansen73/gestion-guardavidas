@@ -48,7 +48,7 @@ class PostulacionController extends Controller
             ->latest('id')
             ->get();
 
-        return view('ui.postulacion.index', compact('temporada', 'postulacion', 'anteriores'));
+        return view('postulaciones.postulante.index', compact('temporada', 'postulacion', 'anteriores'));
     }
 
     public function paso(int $paso)
@@ -82,7 +82,7 @@ class PostulacionController extends Controller
             $data['tipos'] = PostulacionDocumento::TIPOS;
         }
 
-        return view("ui.postulacion.paso{$paso}", $data);
+        return view("postulaciones.postulante.paso{$paso}", $data);
     }
 
     public function guardar(Request $request, int $paso)

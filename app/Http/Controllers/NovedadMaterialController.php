@@ -37,7 +37,7 @@ class NovedadMaterialController extends Controller
 
         $playas = Playa::all();
 
-        return view('ui.novedades-materiales.index')
+        return view('novedades-materiales.index')
         ->with('registros', $novedades)
         ->with('playas', $playas)
         ->with('user', $user);
@@ -61,7 +61,7 @@ class NovedadMaterialController extends Controller
         //Enums
         $tipoNovedad = TipoNovedad::values();
 
-        return view('ui.novedades-materiales.fields', compact(
+        return view('novedades-materiales.fields', compact(
             'guardavidaAuth', 'playas', 'materiales', 'tipoNovedad'
         ));
     }
@@ -104,7 +104,7 @@ class NovedadMaterialController extends Controller
         //si no me toma el binding automatico: pasar el parametro a ($id) y buscar el registro:
         // $novedadMaterial = NovedadMaterial::findOrFail($id);
         // dd($novedadMaterial);
-        return view('ui.novedades-materiales.show-fields', compact(
+        return view('novedades-materiales.show-fields', compact(
             'novedadDeMaterial'));
     }
 
@@ -125,7 +125,7 @@ class NovedadMaterialController extends Controller
         $materiales = Material::all();
         $tipoNovedad = TipoNovedad::values();
 
-        return view('ui.novedades-materiales.fields', compact(
+        return view('novedades-materiales.fields', compact(
             'guardavidaAuth', 'playas', 'materiales', 'tipoNovedad', 'novedadDeMaterial'
         ));
     }

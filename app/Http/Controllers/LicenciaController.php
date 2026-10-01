@@ -37,7 +37,7 @@ class LicenciaController extends Controller
 
         $playas = Playa::all();
 
-        return view('ui.licencias.index')
+        return view('licencias.index')
         ->with('registros', $licencias)
         ->with('playas', $playas)
         ->with('user', $user);
@@ -61,7 +61,7 @@ class LicenciaController extends Controller
             ->values();
         $licencia = null;
 
-        return view('ui.licencias.fields', compact(
+        return view('licencias.fields', compact(
             'guardavidas', 'licencia'
         ));
     }
@@ -104,7 +104,7 @@ class LicenciaController extends Controller
      */
     public function show(Licencia $licencia)
     {
-        return view('ui.licencias.show-fields', compact(
+        return view('licencias.show-fields', compact(
             'licencia'));
     }
 
@@ -125,7 +125,7 @@ class LicenciaController extends Controller
             ->values();
         $playas = Playa::with('puestos')->get();
 
-        return view('ui.licencias.fields', compact(
+        return view('licencias.fields', compact(
             'guardavidaAuth', 'guardavidas', 'licencia', 'playas'
         ));
     }
@@ -186,7 +186,7 @@ class LicenciaController extends Controller
         // Pasamos $esAdmin = false para que el Blade detecte que no es vista administrativa
         $esAdmin = false;
         // No necesitamos filtros ni balnearios/puestos para este caso
-        return view('admin.asistenciaPorPerfil', compact('guardavida', 'esAdmin'));
+        return view('asistencias.por-perfil', compact('guardavida', 'esAdmin'));
     }
 
 }

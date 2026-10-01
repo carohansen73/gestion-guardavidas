@@ -36,7 +36,7 @@ class CambioDeTurnoController extends Controller
 
         $playas = Playa::all();
 
-        return view('ui.cambios-de-turno.index')
+        return view('cambios-de-turno.index')
         ->with('registros', $cambiosDeTurno)
         ->with('playas', $playas)
         ->with('user', $user);
@@ -69,7 +69,7 @@ class CambioDeTurnoController extends Controller
         $registros = $query->paginate(10)->withQueryString();
         $playas = Playa::all();
 
-        return view('admin.usuarios.listadoTurnos', compact('registros', 'playas'));
+        return view('cambios-de-turno.listado', compact('registros', 'playas'));
     }
 
 
@@ -82,7 +82,7 @@ class CambioDeTurnoController extends Controller
         $guardavidas = Guardavida::with('playa', 'puesto')->get();
         $cambioDeTurno = null;
 
-        return view('ui.cambios-de-turno.fields', compact(
+        return view('cambios-de-turno.fields', compact(
             'guardavidas', 'cambioDeTurno'
         ));
     }
@@ -122,7 +122,7 @@ class CambioDeTurnoController extends Controller
      */
     public function show(CambioDeTurno $cambioDeTurno)
     {
-        return view('ui.cambios-de-turno.show-fields', compact(
+        return view('cambios-de-turno.show-fields', compact(
             'cambioDeTurno'));
     }
 
@@ -137,7 +137,7 @@ class CambioDeTurnoController extends Controller
         $guardavidas = Guardavida::with('playa', 'puesto')->get();
         $playas = Playa::with('puestos')->get();
 
-        return view('ui.cambios-de-turno.fields', compact(
+        return view('cambios-de-turno.fields', compact(
             'guardavidaAuth', 'guardavidas', 'cambioDeTurno', 'playas'
         ));
     }
