@@ -125,8 +125,13 @@ class PostulacionTest extends TestCase
         $this->actingAs($user)->get(route('postulacion.paso', 1))->assertOk()->assertSee('Datos personales');
         $this->actingAs($user)->post(route('postulacion.guardar', 1), $this->datosPaso1());
 
-        foreach ([1, 2, 3, 4] as $paso) {
-            $this->actingAs($user)->get(route('postulacion.paso', $paso))->assertOk();
+        // Cada paso muestra su encabezado ("Paso N de 4") y sus secciones con subtítulo.
+        $secciones = [1 => 'Domicilio', 2 => 'Playas de preferencia', 3 => 'Identidad', 4 => 'Resumen'];
+        foreach ($secciones as $paso => $seccion) {
+            $this->actingAs($user)->get(route('postulacion.paso', $paso))
+                ->assertOk()
+                ->assertSee("Paso {$paso} de 4")
+                ->assertSee($seccion);
         }
     }
 
