@@ -3,7 +3,7 @@
 
 <section class="text-gray-600 dark:text-gray-100 body-font sm:px-4 sm:py-10">
 
-    <div class="flex justify-between align-center mb-sm-2">
+    <div class="flex justify-between align-center sm:mb-2">
         <h2 class="text-gray-700 dark:text-white text-2xl font-bold tracking-tight text-heading md:text-3xl lg:text-4xl"> Cambio de turno </h2>
         <a href="{{ route('cambio-de-turno.edit', $cambioDeTurno) }}" class="btn hidden sm:flex align-center bg-sky-500 dark:bg-sky-700 hover:bg-sky-400 dark:hover:bg-sky-600 rounded-full px-3 py-2 shadow-md hover:shadow-xl">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
@@ -14,7 +14,7 @@
         </a>
     </div>
 
-    <div class="container bg-white rounded shadow-md  px-4 py-4">
+    <div class="container mx-auto bg-white rounded shadow-md  px-4 py-4">
         <div class="pb-4 sm:pb-12">
 
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white">

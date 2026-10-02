@@ -116,6 +116,20 @@ class PostulacionTest extends TestCase
         return Postulacion::where('user_id', $user->id)->firstOrFail();
     }
 
+    public function test_los_cuatro_pasos_del_formulario_se_muestran(): void
+    {
+        $this->temporadaAbierta();
+        $user = $this->usuario('postulante');
+
+        // El paso 1 se ve aun sin inscripción creada; los demás piden haber guardado el 1.
+        $this->actingAs($user)->get(route('postulacion.paso', 1))->assertOk()->assertSee('Datos personales');
+        $this->actingAs($user)->post(route('postulacion.guardar', 1), $this->datosPaso1());
+
+        foreach ([1, 2, 3, 4] as $paso) {
+            $this->actingAs($user)->get(route('postulacion.paso', $paso))->assertOk();
+        }
+    }
+
     public function test_sin_inscripcion_abierta_no_puede_iniciar(): void
     {
         $user = $this->usuario('postulante');

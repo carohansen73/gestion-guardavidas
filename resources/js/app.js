@@ -1,4 +1,3 @@
-import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "flowbite";
 import "./bootstrap";
 // resources/js/app.js

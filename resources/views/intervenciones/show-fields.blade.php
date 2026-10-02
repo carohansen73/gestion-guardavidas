@@ -15,7 +15,7 @@
         </a>
     </div>
 
-    <div class="container bg-white rounded shadow-md  px-4 py-4">
+    <div class="container mx-auto bg-white rounded shadow-md  px-4 py-4">
 
         <div class="pb-4 sm:pb-12">
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
@@ -91,7 +91,7 @@
                 Guardavidas que intervinieron:
                 <span class="text-sm text-gray-500 dark:text-gray-300">
                     @if($intervencion->guardavidas->isNotEmpty())
-                     <ul>
+                     <ul class="list-disc pl-5">
                         @foreach($intervencion->guardavidas as $guardavida)
                             <li class="text-sm text-gray-500 dark:text-gray-300 px-2">
                                 {{ $guardavida->nombre }} {{ $guardavida->apellido }}

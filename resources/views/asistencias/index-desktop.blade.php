@@ -133,7 +133,7 @@
 
                 {{-- VOLVER --}}
                 <div class="text-center mt-4">
-                    <a class="btn btn-secondary" onclick="window.history.back()">Volver</a>
+                    <a class="inline-block px-3 py-1.5 rounded-md bg-gray-500 hover:bg-gray-600 text-white cursor-pointer" onclick="window.history.back()">Volver</a>
                 </div>
 
 

@@ -1,5 +1,5 @@
     {{-- @role('admin|encargado') --}}
-    <div class="flex flex-col-reverse md:flex-row justify-between align-center ">
+    <div class="flex flex-col-reverse md:flex-row md:items-center justify-between gap-3">
          {{-- <div class="">
             <input
                 type="text"
@@ -8,7 +8,7 @@
                 class="w-full px-3 py-2 border rounded"
                 oninput="applyFilters()">
         </div> --}}
-        <div class="flex flex-wrap gap-2 align-content-center">
+        <div class="flex flex-wrap items-center gap-2">
             <button
                 class="playa-tag px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-gray-200"
                 onclick="filterByPlaya('all')">
@@ -43,12 +43,12 @@
             @endif
         </div>
         {{-- Busqueda --}}
-        <div class="relative w-full md:w-auto my-3 sm:!my-0">
+        <div class="relative w-full md:w-auto">
             <input
                 type="text"
                 id="searchInput"
                 placeholder='Buscar... '
-                class="w-full px-3 py-2 border rounded"
+                class="w-full px-3 py-1 border rounded dark:bg-gray-700 dark:text-gray-200"
                 oninput="applyFilters()">
 
                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"

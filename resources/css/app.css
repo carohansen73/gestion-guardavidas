@@ -1,6 +1,20 @@
- @import "bootstrap/dist/css/bootstrap.min.css";
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+    /*
+     * Campos de formulario con la clase `border` pero sin color de borde
+     * (los buscadores y filtros de varias vistas): sin esto toman el gris
+     * oscuro del plugin de formularios. Se unifican en un gris claro.
+     * :where() deja la especificidad en la de una clase, así que cualquier
+     * border-* explícito (border-red-500, etc.) sigue ganando.
+     */
+    :where(input, select, textarea).border {
+        border-color: theme('colors.gray.300');
+    }
+
+    :where(.dark) :where(input, select, textarea).border {
+        border-color: theme('colors.gray.600');
+    }
+}

@@ -13,7 +13,7 @@
         href="{{ route('login') }}">
         {{ __('Iniciar Sesión') }}
     </a>
-    <div class="d-flex justify-center">
+    <div class="flex justify-center">
    <img src="{{ asset('img/muni-tsas.png') }}" alt="Logo" class="w-40 mt-4">
     </div>
 

@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container sm:mt-4 !px-0 sm:!px-3">
-        <div class="card shadow-sm">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">Listado de Asistencia del Personal</h5>
+    <div class="container mx-auto sm:mt-4 sm:px-4">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
+            <div class="bg-sky-600 text-white px-4 py-3">
+                <h5 class="text-lg font-semibold">Listado de Asistencia del Personal</h5>
             </div>
 
-            <div class="card-body">
+            <div class="p-4">
 
                 {{-- Filtro por playa: links reales por GET (antes eran
                      botones que filtraban del lado del cliente solo entre
@@ -61,18 +61,18 @@
                 {{-- /LISTADO DE GUARDAVIDAS --}}
                 <div  class="bg-white dark:bg-gray-600 my-2">
                     @foreach ($guardavidas as $g)
-                        <ul class="registro-item-lista rounded lista-guardavidas list-group" data-playa="{{ $g->playa->id ?? '' }}">
-                            <li class="list-group-item d-flex justify-content-between align-items-center mb-2 shadow-sm rounded registro-item-lista">
+                        <ul class="registro-item-lista rounded lista-guardavidas" data-playa="{{ $g->playa->id ?? '' }}">
+                            <li class="flex justify-between items-center mb-2 shadow-sm rounded registro-item-lista bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 px-4 py-2">
                                 <div class="info">
-                                    <h5 class="mb-1 fw-semibold text-primary">{{ $g->nombre ?? 'Sin nombre' }}</h4>
-                                    <p class="mb-0 text-muted small">
+                                    <h5 class="mb-1 font-semibold text-sky-600 dark:text-sky-400">{{ $g->nombre ?? 'Sin nombre' }}</h5>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">
                                         {{ $g->updated_at ? $g->updated_at->diffForHumans() : '' }}
                                         · Puesto {{ $g->puesto->nombre ?? 'sin asignar' }}
                                     </p>
                                 </div>
                                 <div class="acciones">
                                     <a href="{{ route('asistencias.guardavida', $g->id) }}"
-                                        class="btn btn-outline-primary btn-sm">
+                                        class="inline-block px-2 py-1 text-sm rounded border border-sky-600 text-sky-600 hover:bg-sky-600 hover:text-white dark:border-sky-400 dark:text-sky-400 dark:hover:bg-sky-500 dark:hover:text-white">
                                         Historial
                                     </a>
                                 </div>
@@ -90,7 +90,7 @@
 
                 {{-- VOLVER --}}
                 <div class="text-center mt-4">
-                    <a class="btn btn-secondary" onclick="window.history.back()">Volver</a>
+                    <a class="inline-block px-3 py-1.5 rounded-md bg-gray-500 hover:bg-gray-600 text-white cursor-pointer" onclick="window.history.back()">Volver</a>
                 </div>
 
             </div>

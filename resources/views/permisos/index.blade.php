@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="text-gray-600 dark:text-gray-100 body-font sm:px-4">
-    <div class="flex justify-between align-center mb-sm-4">
+    <div class="flex justify-between align-center sm:mb-6">
         <h1 class="text-lg font-semibold text-gray-900 dark:text-white mt-3">Permisos por rol</h1>
     </div>
 

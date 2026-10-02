@@ -272,12 +272,10 @@ h3.section-title::after {
  * Padding responsivo para cards (mobile: equivalente a px-3 py-4;
  * tablet/desktop desde 768px: equivalente a p-5).
  *
- * Por qué no usar directamente las utilidades de Tailwind (p-3 md:p-5,
- * etc.): Bootstrap también está cargado en este proyecto y define sus
- * propias .p-0 a .p-5 con !important (misma escala de nombres que
- * Tailwind). Cualquier p-3/p-4/p-5 suelto de Tailwind pierde contra la
- * de Bootstrap sin importar el breakpoint, porque !important ignora
- * media queries. Esta clase evita el choque directamente.
+ * Nota histórica: esta clase se creó para esquivar un choque con las
+ * utilidades p-0..p-5 de Bootstrap (con !important). Bootstrap ya se quitó
+ * del proyecto, así que p-3 md:p-5 de Tailwind funcionaría igual; se deja
+ * porque está en uso.
  */
 .p-card {
     padding-left: 0.75rem;

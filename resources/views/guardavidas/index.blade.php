@@ -19,7 +19,7 @@
 
 
     {{-- FILTROS BACK --}}
-    <div class="flex flex-wrap gap-2 align-content-center">
+    <div class="flex flex-wrap items-center gap-2 mb-3">
         @if(request()->is('guardavida'))
             <a href="{{ route('guardavidas.disabled')}}"
             class="playa-tag px-3 py-1 bg-orange-600 text-gray-100 rounded hover:bg-orange-400 hover:shadow-lg dark:bg-orange-600 dark:hover:bg-orange-500 dark:text-gray-200">
@@ -39,9 +39,9 @@
             </a>
     </div>
 
-    <form method="GET" class="flex flex-col-reverse md:flex-row justify-between align-center ">
+    <form method="GET" class="flex flex-col-reverse md:flex-row md:items-center justify-between gap-3">
 
-            <div class="flex flex-wrap gap-2 align-content-center">
+            <div class="flex flex-wrap items-center gap-2">
                  <a href="{{ route('guardavida.index', ['playa_id' => 'all'] + request()->except('page')) }}"
                     class="  {{ request('playa_id') == 'all' ? 'bg-sky-600 text-white' : 'bg-gray-200 text-gray-700' }} playa-tag px-3 py-1 rounded hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-gray-200"
                     >
@@ -57,16 +57,16 @@
 
             </div>
             {{-- Busqueda --}}
-            <div class="relative flex w-full md:w-auto my-3 sm:!my-0">
+            <div class="relative flex w-full md:w-auto">
                 <input
                     type="text"
                     name="search"
                     value="{{ request('search') }}"
                     placeholder='Buscar... '
-                    class="w-full px-3 py-2 border rounded"
+                    class="w-full px-3 py-1 border rounded dark:bg-gray-700 dark:text-gray-200"
                     oninput="applyFilters()">
 
-                    <button type="submit" class="bg-sky-600 text-white px-3 py-2 rounded">
+                    <button type="submit" class="bg-sky-600 text-white px-3 py-1 rounded">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                         </svg>

@@ -204,7 +204,7 @@
                         <div class="stat-label">Licencias
 
 
-                            <a href="#" id="verLicenciasBtn"> ver historial</a>
+                            <a href="#" id="verLicenciasBtn" class="text-sky-600 underline hover:text-sky-500"> ver historial</a>
                         </div>
                     </div>
 
@@ -239,7 +239,7 @@
                                     {{ $licencia->detalle ?? 'Sin detalles adicionales.' }}
                                 </small>
                                 @if ($licencia->archivo)
-                                    <br><a href="{{ $licencia->archivo_url }}" target="_blank">
+                                    <br><a href="{{ $licencia->archivo_url }}" target="_blank" class="text-sky-600 underline hover:text-sky-500">
                                         <i class="fas fa-file-download"></i> Ver archivo
                                     </a>
                                 @endif

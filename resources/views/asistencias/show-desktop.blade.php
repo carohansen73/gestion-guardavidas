@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="text-gray-600 dark:text-gray-100 body-font sm:px-4 ">
-    <div class="flex justify-between align-center mb-sm-4 mb-3 sm:mt-3">
+    <div class="flex justify-between align-center mb-3 sm:mt-3 sm:mb-6">
         <h2 class="text-gray-700 dark:text-white text-xl font-bold tracking-tight text-heading md:text-3xl lg:text-4xl">
             Historial de Asistencias de
             <span class="text-lg text-sky-600">
@@ -284,7 +284,7 @@
 
                 {{-- VOLVER --}}
                 <div class="text-center mt-4">
-                    <a class="btn btn-secondary" onclick="window.history.back()">Volver</a>
+                    <a class="inline-block px-3 py-1.5 rounded-md bg-gray-500 hover:bg-gray-600 text-white cursor-pointer" onclick="window.history.back()">Volver</a>
                 </div>
 
 
