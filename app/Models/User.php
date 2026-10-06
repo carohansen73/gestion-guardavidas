@@ -6,13 +6,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Spatie\Permission\Traits\HasRoles;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles, HasApiTokens;
+    use HasApiTokens, HasFactory, HasRoles, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -56,9 +56,9 @@ class User extends Authenticatable
 
     /**
      * Relación con Guardavidas
-     *
      */
-    public function guardavida() {
+    public function guardavida()
+    {
         return $this->hasOne(Guardavida::class);
     }
 
@@ -69,28 +69,31 @@ class User extends Authenticatable
     }
 
     /** Datos fijos que se precargan en cada inscripción. */
-    public function postulacionPerfil()
+    public function perfil()
     {
-        return $this->hasOne(PostulacionPerfil::class);
+        return $this->hasOne(Perfil::class);
     }
 
-    public function scopeHabilitados($query){
+    public function scopeHabilitados($query)
+    {
         return $query->where('enabled', true);
     }
 
-    public function scopeDeshabilitados($query){
+    public function scopeDeshabilitados($query)
+    {
         return $query->where('enabled', false);
     }
 
-    public static function obtenerPuesto($idUser, $idPuesto){
+    public static function obtenerPuesto($idUser, $idPuesto)
+    {
         $datosGuardavidas = User::select('*')
-        ->where('user_id', $idUser)
-        ->join('guardavidas', 'guardavidas.user_id', '=','users.id')
-        ->join('puestos', 'guardavidas.puesto_id', '=', 'puestos.id')
-        ->where('puestos.id', $idPuesto)
-        ->first();
+            ->where('user_id', $idUser)
+            ->join('guardavidas', 'guardavidas.user_id', '=', 'users.id')
+            ->join('puestos', 'guardavidas.puesto_id', '=', 'puestos.id')
+            ->where('puestos.id', $idPuesto)
+            ->first();
 
-        return !empty($datosGuardavidas) ? $datosGuardavidas : null;
+        return ! empty($datosGuardavidas) ? $datosGuardavidas : null;
 
     }
 }

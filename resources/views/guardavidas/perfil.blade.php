@@ -154,9 +154,9 @@
                             @if ($esPropietario)
                                 <input type="text" name="direccion" placeholder="Dirección"
                                 class="block w-full bg-gray-100 rounded-md border px-3 py-1.5 text-gray-600 shadow-sm focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500 mt-2"
-                                value="{{ old('direccion', $guardavida->direccion ?? 'No especificado') }}" required/>
+                                value="{{ old('direccion', $guardavida->direccion) }}" />
                             @else
-                                <div class="info-value text-gray-700 dark:text-gray-200">{{ $guardavida->direccion ?? 'No especificado' }}</div>
+                                <div class="info-value text-gray-700 dark:text-gray-200">{{ $guardavida->direccion ?: 'No especificado' }}</div>
                             @endif
                         </div>
 
@@ -165,9 +165,9 @@
                             @if ($esPropietario)
                                 <input type="number" name="numero" placeholder="Número"
                                 class="block w-full bg-gray-100 rounded-md border px-3 py-1.5 text-gray-600 shadow-sm focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500 mt-2"
-                                value="{{ old('numero', $guardavida->numero ?? 'No especificado') }}" required/>
+                                value="{{ old('numero', $guardavida->numero) }}" />
                             @else
-                                <div class="info-value text-gray-700 dark:text-gray-200">{{ $guardavida->numero ?? 'No especificado' }}</div>
+                                <div class="info-value text-gray-700 dark:text-gray-200">{{ $guardavida->numero ?: 'No especificado' }}</div>
                             @endif
                         </div>
 

@@ -61,7 +61,7 @@ class ImportadorInscripciones
             $porEmail[Str::lower($u->email)] = (object) ['id' => $u->id, 'dni' => $u->dni, 'email' => $u->email, 'nuevo' => false];
         }
         $guardavidas = DB::table('guardavidas')->get(['user_id', 'direccion', 'numero', 'piso_dpto'])->keyBy('user_id');
-        $conPerfil = DB::table('postulacion_perfiles')->pluck('user_id')->flip()->all();
+        $conPerfil = DB::table('perfiles')->pluck('user_id')->flip()->all();
         $conPostulacion = DB::table('postulaciones')->where('temporada_id', $this->temporadaId)->pluck('user_id')->flip()->all();
         $playas = [];
         foreach (DB::table('playas')->get(['id', 'nombre']) as $p) {
@@ -272,7 +272,7 @@ class ImportadorInscripciones
                 }
 
                 if ($p['crear_perfil']) {
-                    DB::table('postulacion_perfiles')->insert(['user_id' => $usuarioId] + $p['perfil'] + ['created_at' => $ahora, 'updated_at' => $ahora]);
+                    DB::table('perfiles')->insert(['user_id' => $usuarioId] + $p['perfil'] + ['created_at' => $ahora, 'updated_at' => $ahora]);
                     $cuenta['perfiles']++;
                 }
 
@@ -336,7 +336,7 @@ class ImportadorInscripciones
         $sql[] = '-- 2) Datos del sistema viejo, en una tabla temporal (desaparece sola al cerrar la conexión)';
         $sql[] = 'DROP TEMPORARY TABLE IF EXISTS imp_usuario;';
         $sql[] = 'DROP TEMPORARY TABLE IF EXISTS imp_inscripciones;';
-        $sql[] = "CREATE TEMPORARY TABLE imp_inscripciones (
+        $sql[] = 'CREATE TEMPORARY TABLE imp_inscripciones (
   dni VARCHAR(20) NOT NULL, email VARCHAR(255) NOT NULL, nombre VARCHAR(255) NULL, apellido VARCHAR(255) NULL,
   password VARCHAR(255) NULL, usuario_creado_at DATETIME NULL,
   telefono VARCHAR(30) NULL, fecha_nacimiento DATE NULL, grupo_sanguineo VARCHAR(3) NULL, numero_libreta VARCHAR(50) NULL,
@@ -345,7 +345,7 @@ class ImportadorInscripciones
   estado VARCHAR(20) NOT NULL, enviada_at DATETIME NULL, disponible_desde DATE NULL, disponible_hasta DATE NULL,
   observaciones TEXT NULL, fecha_revision DATETIME NULL, postulacion_creada_at DATETIME NULL, postulacion_actualizada_at DATETIME NULL,
   playa_1 INT NULL, playa_2 INT NULL
-) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;';
 
         $cols = ['dni', 'email', 'nombre', 'apellido', 'password', 'usuario_creado_at', 'telefono', 'fecha_nacimiento', 'grupo_sanguineo',
             'numero_libreta', 'talle_remera', 'talle_pantalon', 'talle_campera', 'talle_traje_bano', 'obra_social_nombre',
@@ -394,7 +394,7 @@ WHERE m.user_id IS NOT NULL
 
         // ---- 6) perfiles ----
         $sql[] = '-- 6) Perfiles (datos fijos). IGNORE: si ya tiene perfil no se toca. El domicilio sale de su ficha de guardavida, si la tiene.';
-        $sql[] = "INSERT IGNORE INTO postulacion_perfiles
+        $sql[] = "INSERT IGNORE INTO perfiles
   (user_id, telefono, direccion, numero, piso_dpto, fecha_nacimiento, genero, grupo_sanguineo, numero_libreta,
    talle_remera, talle_pantalon, talle_campera, talle_traje_bano, obra_social_nombre, obra_social_numero_afiliado, created_at, updated_at)
 SELECT m.user_id, t.telefono, LEFT(NULLIF(TRIM(g.direccion), ''), 255), LEFT(NULLIF(TRIM(g.numero), ''), 10), LEFT(NULLIF(TRIM(g.piso_dpto), ''), 255),
@@ -461,8 +461,8 @@ WHERE m.user_id IS NOT NULL AND t.{$campo} IS NOT NULL;";
         $sql[] = "DELETE p FROM postulaciones p JOIN users u ON u.id = p.user_id WHERE p.temporada_id = {$t} AND p.seleccionado = 0 AND u.dni IN (".$lista($dnis).');';
 
         $sql[] = '-- Perfiles de esas personas que no tienen postulaciones en ninguna otra temporada (o sea, que existen por esta importación)';
-        $sql[] = 'DELETE pf FROM postulacion_perfiles pf JOIN users u ON u.id = pf.user_id WHERE u.dni IN ('.$lista($dnis).")
-  AND NOT EXISTS (SELECT 1 FROM postulaciones p2 WHERE p2.user_id = pf.user_id);";
+        $sql[] = 'DELETE pf FROM perfiles pf JOIN users u ON u.id = pf.user_id WHERE u.dni IN ('.$lista($dnis).')
+  AND NOT EXISTS (SELECT 1 FROM postulaciones p2 WHERE p2.user_id = pf.user_id);';
 
         if ($nuevos) {
             $pares = implode(' OR ', array_map(fn ($p) => '(u.email = '.$q($p['email']).' AND u.created_at = '.$q($p['origen']['created_at']).')', $nuevos));

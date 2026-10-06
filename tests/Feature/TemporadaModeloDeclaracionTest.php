@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\Perfil;
 use App\Models\Postulacion;
 use App\Models\PostulacionDocumento;
-use App\Models\PostulacionPerfil;
 use App\Models\Temporada;
 use App\Models\User;
 use Database\Seeders\RolesYPermisosSeeder;
@@ -223,7 +223,7 @@ class TemporadaModeloDeclaracionTest extends TestCase
     private function postulacionCompleta(Temporada $temporada, bool $conDeclaracion): Postulacion
     {
         $user = $this->usuario('postulante', '30000001');
-        PostulacionPerfil::create([
+        Perfil::create([
             'user_id' => $user->id, 'telefono' => '2262', 'direccion' => 'Calle', 'numero' => '1',
             'fecha_nacimiento' => '1995-05-10', 'genero' => 'Femenino', 'grupo_sanguineo' => 'O+',
             'numero_libreta' => 'L-1', 'talle_remera' => 'M', 'talle_pantalon' => '40',

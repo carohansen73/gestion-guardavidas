@@ -181,7 +181,7 @@ class ImportarPostulacionesTest extends TestCase
         $this->assertStringContainsString('SIMULACRO', $salida);
         $this->assertSame($usuarios, User::count());
         $this->assertDatabaseCount('postulaciones', 0);
-        $this->assertDatabaseCount('postulacion_perfiles', 0);
+        $this->assertDatabaseCount('perfiles', 0);
     }
 
     public function test_usuario_nuevo_se_crea_como_postulante_con_su_contrasena_y_datos_normalizados(): void
@@ -197,7 +197,7 @@ class ImportarPostulacionesTest extends TestCase
         $this->assertTrue((bool) $user->enabled);
         $this->assertFalse((bool) $user->must_change_psw);
 
-        $perfil = DB::table('postulacion_perfiles')->where('user_id', $user->id)->first();
+        $perfil = DB::table('perfiles')->where('user_id', $user->id)->first();
         $this->assertSame('O+', $perfil->grupo_sanguineo);
         $this->assertSame('L', $perfil->talle_remera);
         $this->assertSame('XL', $perfil->talle_traje_bano);
@@ -229,7 +229,7 @@ class ImportarPostulacionesTest extends TestCase
 
         // Pero ahora tiene postulación y perfil, con el domicilio tomado de su ficha de guardavida.
         $this->assertDatabaseHas('postulaciones', ['user_id' => $existente->id, 'temporada_id' => $this->temporada->id, 'estado' => 'aceptada']);
-        $perfil = DB::table('postulacion_perfiles')->where('user_id', $existente->id)->first();
+        $perfil = DB::table('perfiles')->where('user_id', $existente->id)->first();
         $this->assertSame('Calle Real', $perfil->direccion);
         $this->assertSame('742', $perfil->numero);
         $this->assertSame('2B', $perfil->piso_dpto);
@@ -290,7 +290,7 @@ class ImportarPostulacionesTest extends TestCase
 
         $this->assertSame($usuarios, User::count());
         $this->assertDatabaseCount('postulaciones', 2);
-        $this->assertDatabaseCount('postulacion_perfiles', 2);
+        $this->assertDatabaseCount('perfiles', 2);
         $this->assertDatabaseCount('postulacion_playas', 4);
     }
 
@@ -312,7 +312,7 @@ class ImportarPostulacionesTest extends TestCase
         $this->assertStringContainsString('CREATE TEMPORARY TABLE imp_inscripciones', $contenido);
         $this->assertStringContainsString("'otra@test.com'", $contenido);
         $this->assertMatchesRegularExpression('/INSERT INTO users .*?WHERE NOT EXISTS \(SELECT 1 FROM users u WHERE u\.dni = t\.dni/s', $contenido);
-        $this->assertStringContainsString('INSERT IGNORE INTO postulacion_perfiles', $contenido);
+        $this->assertStringContainsString('INSERT IGNORE INTO perfiles', $contenido);
         $this->assertStringContainsString('INSERT IGNORE INTO postulaciones', $contenido);
         $this->assertStringContainsString('INSERT IGNORE INTO postulacion_playas', $contenido);
         $this->assertStringContainsString('COMMIT', $contenido);

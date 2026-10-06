@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
 class Guardavida extends Model
@@ -13,6 +14,9 @@ class Guardavida extends Model
 
     protected $perPage = 10;
 
+    /** Datos personales que viven en `perfiles` (ver más abajo). */
+    public const DATOS_PERSONALES = ['telefono', 'direccion', 'numero', 'piso_dpto'];
+
     protected $table = 'guardavidas'; // tu tabla real
 
     protected $fillable = [
@@ -20,10 +24,6 @@ class Guardavida extends Model
         'nombre',
         'apellido',
         'dni',
-        'telefono',
-        'direccion',
-        'numero',
-        'piso_dpto',
         'user_id',
         'playa_id',
         'puesto_id',
@@ -190,6 +190,45 @@ class Guardavida extends Model
     public function getDniAttribute()
     {
         return $this->user?->dni;
+    }
+
+    // ******************** Datos personales (viven en `perfiles`) ****************
+    // Igual que nombre/apellido/dni: una sola fuente de verdad por persona.
+    // Las columnas telefono/direccion/numero/piso_dpto de `guardavidas`
+    // quedan sin usarse (se borran en un paso aparte). Para ESCRIBIR usar
+    // guardarDatosPersonales().
+    public function getTelefonoAttribute()
+    {
+        return $this->user?->perfil?->telefono;
+    }
+
+    public function getDireccionAttribute()
+    {
+        return $this->user?->perfil?->direccion;
+    }
+
+    public function getNumeroAttribute()
+    {
+        return $this->user?->perfil?->numero;
+    }
+
+    public function getPisoDptoAttribute()
+    {
+        return $this->user?->perfil?->piso_dpto;
+    }
+
+    /** Guarda telefono/direccion/numero/piso_dpto en el perfil de su usuario (lo crea si no existe). */
+    public function guardarDatosPersonales(array $datos): void
+    {
+        $datos = Arr::only($datos, self::DATOS_PERSONALES);
+
+        if ($datos === []) {
+            return;
+        }
+
+        Perfil::updateOrCreate(['user_id' => $this->user_id], $datos);
+
+        $this->user?->unsetRelation('perfil');
     }
 
     // ******************** Contadores ******************************************

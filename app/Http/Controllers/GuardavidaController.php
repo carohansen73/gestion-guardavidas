@@ -48,7 +48,7 @@ class GuardavidaController extends Controller
             ->join('playas', 'playas.id', '=', 'guardavidas.playa_id')
             ->join('puestos', 'puestos.id', '=', 'guardavidas.puesto_id')
             ->join('users', 'users.id', '=', 'guardavidas.user_id')
-            ->with(['playa', 'puesto', 'user']);
+            ->with(['playa', 'puesto', 'user.perfil']);
 
         // FILTRO SOLO PARA HABILITADOS
         if ($enabledOnly) {
@@ -165,10 +165,6 @@ class GuardavidaController extends Controller
                 // $user arriba, y Guardavida::nombre/apellido/dni son
                 // accessors que leen de ahí (ver Guardavida model, Fase 3b).
                 $guardavida = Guardavida::create([
-                    'telefono' => $validated['telefono'],
-                    'direccion' => $validated['direccion'],
-                    'numero' => $validated['numero'],
-                    'piso_dpto' => $validated['piso_dpto'],
                     'playa_id' => $validated['playa_id'],
                     'puesto_id' => $validated['puesto_id'],
                     'funcion' => $validated['funcion'],
@@ -176,6 +172,9 @@ class GuardavidaController extends Controller
                     'user_id' => $user->id,
                     // 'legajo' => $validated['legajo'] ?? null,
                 ]);
+
+                // Teléfono/domicilio viven en `perfiles` (una fila por persona).
+                $guardavida->guardarDatosPersonales($validated);
 
                 // El franco fijo no es una columna de "guardavidas" (vive
                 // versionado en guardavida_franco_historial), y es opcional
@@ -238,9 +237,12 @@ class GuardavidaController extends Controller
         // son accessors que leen de ahí. Se sacan del array antes del
         // update() de guardavida; abajo se siguen usando desde $validated
         // para actualizar $user, que es donde efectivamente se guardan.
-        $datosGuardavida = collect($validated)->except(['nombre', 'apellido', 'dni'])->all();
+        // Teléfono/domicilio tampoco: viven en `perfiles` (Guardavida::guardarDatosPersonales).
+        $datosGuardavida = collect($validated)->except(['nombre', 'apellido', 'dni', ...Guardavida::DATOS_PERSONALES])->all();
 
         if ($guardavida->update($datosGuardavida)) {
+            $guardavida->guardarDatosPersonales($validated);
+
             // Nombre/apellido/dni viven en "users" (navbar, login, etc. los
             // leen de ahí).
             if ($guardavida->user) {
@@ -491,8 +493,8 @@ class GuardavidaController extends Controller
             'apellido' => 'required|string|max:100',
             'dni' => 'required|string|max:20',
             'telefono' => 'required|string|max:20',
-            'direccion' => 'required|string|max:255',
-            'numero' => 'required|string|max:10',
+            'direccion' => 'nullable|string|max:255',
+            'numero' => 'nullable|string|max:10',
             'piso_dpto' => 'nullable|string|max:10',
         ];
         // Solo admin puede cambiar playa/puesto/función/turno
@@ -513,9 +515,12 @@ class GuardavidaController extends Controller
         }
         // nombre/apellido/dni ya no se guardan en "guardavidas" (Fase 3b) —
         // viven únicamente en "users" (accessors en el modelo Guardavida).
-        $datosGuardavida = collect($validated)->except(['nombre', 'apellido', 'dni'])->all();
+        // Teléfono/domicilio viven en `perfiles`, se guardan aparte.
+        $datosGuardavida = collect($validated)->except(['nombre', 'apellido', 'dni', ...Guardavida::DATOS_PERSONALES])->all();
 
         if ($guardavida->update($datosGuardavida)) {
+            $guardavida->guardarDatosPersonales($validated);
+
             // También actualizar el usuario asociado si cambió nombre/apellido
             // (el email de la cuenta se edita aparte, desde la card de
             // "Datos de usuario" -> profile.update)

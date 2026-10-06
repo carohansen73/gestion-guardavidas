@@ -129,7 +129,7 @@
                             <div class="sm:col-span-4">
                                 <label for="telefono" class="block text-sm font-medium text-gray-900 dark:text-white">Telefono</label>
                                 <div class="mt-2">
-                                    <input id="telefono" type="number" name="telefono" placeholder="2983111111"
+                                    <input id="telefono" type="tel" name="telefono" placeholder="2983111111"
                                     class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
                                     value="{{ old('telefono', $guardavida->telefono ?? '') }}" />
                                     @error('telefono')

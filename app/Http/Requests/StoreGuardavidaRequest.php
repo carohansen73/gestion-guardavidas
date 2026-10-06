@@ -45,8 +45,8 @@ class StoreGuardavidaRequest extends FormRequest
         if ($esGuardavidaOEncargado) {
             $rules = array_merge($rules, [
                 'telefono' => 'required|string|max:20',
-                'direccion' => 'required|string|max:255',
-                'numero' => 'required|string|max:10',
+                'direccion' => 'nullable|string|max:255',
+                'numero' => 'nullable|string|max:10',
                 'piso_dpto' => 'nullable|string|max:10',
                 'playa_id' => 'required|exists:playas,id',
                 'puesto_id' => 'required|exists:puestos,id',

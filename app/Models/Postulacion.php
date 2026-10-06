@@ -8,16 +8,20 @@ use Illuminate\Database\Eloquent\Model;
  * Una inscripción (persona + temporada). El historial año a año son las
  * filas de temporadas anteriores del mismo usuario. Nombre, apellido, DNI y
  * email se leen de `users`; los datos fijos (talles, domicilio, etc.) de
- * `PostulacionPerfil`.
+ * `Perfil`.
  */
 class Postulacion extends Model
 {
     protected $table = 'postulaciones';
 
     public const ESTADO_BORRADOR = 'borrador';
+
     public const ESTADO_PENDIENTE = 'pendiente';
+
     public const ESTADO_ACEPTADA = 'aceptada';
+
     public const ESTADO_RECHAZADA = 'rechazada';
+
     public const ESTADO_INCOMPLETA = 'incompleta';
 
     /** Estados que puede asignar el admin al revisar (incompleta se suma más adelante). */
@@ -88,7 +92,7 @@ class Postulacion extends Model
     /** Datos fijos de la persona (una fila por usuario, compartida entre temporadas). */
     public function perfil()
     {
-        return $this->hasOne(PostulacionPerfil::class, 'user_id', 'user_id');
+        return $this->hasOne(Perfil::class, 'user_id', 'user_id');
     }
 
     /** Playas preferidas, ordenadas por prioridad (1 = primera opción). */
@@ -144,7 +148,7 @@ class Postulacion extends Model
         $faltantes = [];
         $perfil = $this->perfil;
 
-        foreach (PostulacionPerfil::OBLIGATORIOS as $campo => $label) {
+        foreach (Perfil::OBLIGATORIOS as $campo => $label) {
             if (blank($perfil?->{$campo})) {
                 $faltantes[] = $label;
             }

@@ -5,13 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Datos "fijos" de un postulante (una sola fila por persona). Se precargan
- * en cada inscripción nueva. Nombre, apellido, DNI y email NO viven acá: se
- * leen de `users`.
+ * Datos personales de una persona (una sola fila por usuario): contacto,
+ * domicilio, talles, etc. Los usan tanto las postulaciones (se precargan en
+ * cada inscripción nueva) como los guardavidas (`Guardavida` los lee de acá).
+ * Nombre, apellido, DNI y email NO viven acá: se leen de `users`.
  */
-class PostulacionPerfil extends Model
+class Perfil extends Model
 {
-    protected $table = 'postulacion_perfiles';
+    protected $table = 'perfiles';
 
     public const GENEROS = ['Femenino', 'Masculino', 'Otro', 'Prefiero no decirlo'];
 

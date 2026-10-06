@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Perfil;
 use App\Models\Playa;
 use App\Models\Postulacion;
 use App\Models\PostulacionDocumento;
-use App\Models\PostulacionPerfil;
 use App\Models\Temporada;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -65,8 +65,8 @@ class PostulacionController extends Controller
 
         if ($paso === 1) {
             $data['perfil'] = $this->perfilPrecargado($user);
-            $data['generos'] = PostulacionPerfil::GENEROS;
-            $data['gruposSanguineos'] = PostulacionPerfil::GRUPOS_SANGUINEOS;
+            $data['generos'] = Perfil::GENEROS;
+            $data['gruposSanguineos'] = Perfil::GRUPOS_SANGUINEOS;
         } elseif ($paso === 2) {
             $data['playas'] = Playa::orderBy('nombre')->get();
             $data['playaIds'] = $postulacion->playas->pluck('id', 'pivot.prioridad');
@@ -159,8 +159,8 @@ class PostulacionController extends Controller
             'numero' => 'required|string|max:10',
             'piso_dpto' => 'nullable|string|max:255',
             'fecha_nacimiento' => 'required|date|before:today',
-            'genero' => ['required', Rule::in(PostulacionPerfil::GENEROS)],
-            'grupo_sanguineo' => ['required', Rule::in(PostulacionPerfil::GRUPOS_SANGUINEOS)],
+            'genero' => ['required', Rule::in(Perfil::GENEROS)],
+            'grupo_sanguineo' => ['required', Rule::in(Perfil::GRUPOS_SANGUINEOS)],
             'numero_libreta' => 'required|string|max:50',
             'talle_remera' => 'required|string|max:10',
             'talle_pantalon' => 'required|string|max:10',
@@ -180,7 +180,7 @@ class PostulacionController extends Controller
 
         DB::transaction(function () use ($datos, $temporada) {
             $userId = Auth::id();
-            PostulacionPerfil::updateOrCreate(['user_id' => $userId], $datos);
+            Perfil::updateOrCreate(['user_id' => $userId], $datos);
             Postulacion::firstOrCreate(
                 ['user_id' => $userId, 'temporada_id' => $temporada->id],
                 ['estado' => Postulacion::ESTADO_BORRADOR]
@@ -286,14 +286,14 @@ class PostulacionController extends Controller
      * Datos del paso 1. Si la persona todavía no tiene perfil pero ya es
      * guardavida, se precargan teléfono y domicilio desde su ficha.
      */
-    private function perfilPrecargado($user): PostulacionPerfil
+    private function perfilPrecargado($user): Perfil
     {
-        $perfil = PostulacionPerfil::firstWhere('user_id', $user->id);
+        $perfil = Perfil::firstWhere('user_id', $user->id);
         if ($perfil) {
             return $perfil;
         }
 
-        $perfil = new PostulacionPerfil;
+        $perfil = new Perfil;
         if ($guardavida = $user->guardavida) {
             $perfil->fill($guardavida->only(['telefono', 'direccion', 'numero', 'piso_dpto']));
         }

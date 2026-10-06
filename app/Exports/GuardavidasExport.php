@@ -4,21 +4,21 @@ namespace App\Exports;
 
 use App\Models\Guardavida;
 use Maatwebsite\Excel\Concerns\FromCollection;
-//Para encabezados personalizados
+// Para encabezados personalizados
 use Maatwebsite\Excel\Concerns\WithHeadings;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Maatwebsite\Excel\Concerns\WithStyles;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class GuardavidasExport implements FromCollection, WithHeadings, WithStyles
 {
     /**
-    * @return \Illuminate\Support\Collection
-    */
+     * @return \Illuminate\Support\Collection
+     */
     public function collection()
     {
-        //return Guardavida::all();
-        //o seleccionando columnas
-        //return Guardavida::select('nombre', 'dni', 'email')->get();
+        // return Guardavida::all();
+        // o seleccionando columnas
+        // return Guardavida::select('nombre', 'dni', 'email')->get();
 
         // apellido/nombre ya no viven en guardavidas  — se ordena
         // por los del user relacionado (ya viene eager-loaded),
@@ -27,7 +27,7 @@ class GuardavidasExport implements FromCollection, WithHeadings, WithStyles
         // sortBy([[callback, dir], ...]) espera un comparador de 2
         // argumentos, no un extractor de 1 valor (con un extractor no
         // ordena nada, ver nota en IntervencionController/LicenciaController).
-        $guardavidas = Guardavida::with(['user', 'playa', 'puesto'])
+        $guardavidas = Guardavida::with(['user.perfil', 'playa', 'puesto'])
             ->get()
             ->sortBy([
                 ['playa_id', 'asc'],
@@ -56,13 +56,11 @@ class GuardavidasExport implements FromCollection, WithHeadings, WithStyles
 
     /**
      * Agrega cabeceras al excel de guardavidas
-     *
-     * @return array
      */
-     public function headings(): array
+    public function headings(): array
     {
         return [
-             'Nombre',
+            'Nombre',
             'Apellido',
             'Email',
             'DNI',
