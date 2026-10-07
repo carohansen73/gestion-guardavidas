@@ -2,24 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Intervencion;
-use App\Models\BanderaTipo;
-use App\Models\Guardavida;
-use App\Models\Playa;
-use App\Models\Puesto;
-use App\Models\Fuerza;
-use App\Models\User;
 use App\Http\Requests\StoreIntervencionRequest;
 use App\Http\Requests\UpdateIntervencionRequest;
 use App\Models\Bandera;
+use App\Models\BanderaTipo;
+use App\Models\Fuerza;
+use App\Models\Guardavida;
+use App\Models\Intervencion;
+use App\Models\Playa;
+use App\Models\Puesto;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
-
-
 class IntervencionController extends Controller
 {
-
     public function __construct()
     {
         $this->authorizeResource(Intervencion::class, 'intervencion');
@@ -30,27 +27,27 @@ class IntervencionController extends Controller
      */
     public function index()
     {
-        //TODO ver que rol puede ver en tdas las playas o solo algunas
+        // TODO ver que rol puede ver en tdas las playas o solo algunas
         $user = Auth::user();
         if ($user->hasRole('guardavida')) {
             $intervenciones = Intervencion::where('playa_id', $user->guardavida->playa_id)
-            ->with(['guardavidas', 'fuerzas', 'puesto', 'playa'])
-            ->latest()
-            ->get();
-        }  elseif ($user->hasAnyRole(['admin', 'encargado'])) {
+                ->with(['guardavidas', 'fuerzas', 'puesto', 'playa'])
+                ->latest()
+                ->get();
+        } elseif ($user->hasAnyRole(['admin', 'encargado'])) {
             $intervenciones = Intervencion::with(['guardavidas', 'fuerzas', 'puesto', 'playa'])
-            ->latest()
-            ->get();
+                ->latest()
+                ->get();
         } else {
-            abort (403, 'No tienes permisos para ver estas intervenciones');
+            abort(403, 'No tienes permisos para ver estas intervenciones');
         }
 
         $playas = Playa::all();
 
         return view('intervenciones.index')
-        ->with('intervenciones', $intervenciones)
-        ->with('playas', $playas)
-        ->with('user', $user);
+            ->with('intervenciones', $intervenciones)
+            ->with('playas', $playas)
+            ->with('user', $user);
     }
 
     /**
@@ -65,12 +62,12 @@ class IntervencionController extends Controller
         $fuerzas = Fuerza::all();
         $intervencion = null;
 
-        //Los guardavidas solo agregan registros en la playa a la que pertenecen
-        if ($user->hasAnyRole(['guardavida', 'encargado']) && $guardavidaAuth){
+        // Los guardavidas solo agregan registros en la playa a la que pertenecen
+        if ($user->hasAnyRole(['guardavida', 'encargado']) && $guardavidaAuth) {
             $playas = Playa::where('id', $guardavidaAuth->playa_id)->get();
             $puestos = Puesto::where('playa_id', $guardavidaAuth->playa_id)->get();
 
-            $guardavidas = Guardavida::where('playa_id', $guardavidaAuth->playa_id)
+            $guardavidas = Guardavida::activos()->where('playa_id', $guardavidaAuth->playa_id)
                 ->with('user:id,name,lastname')
                 ->get()
                 // Ojo: sortBy([[callback, dir], ...]) necesita un COMPARADOR
@@ -92,7 +89,7 @@ class IntervencionController extends Controller
             // admin ve todas las playas, y el select de guardavidas se
             // acota por playa en el cliente (ver fields.blade.php) a medida
             // que cambia el select de playa, sin recargar la página.
-            $guardavidas = Guardavida::with('user:id,name,lastname')
+            $guardavidas = Guardavida::activos()->with('user:id,name,lastname')
                 ->get()
                 ->sortBy([
                     ['user.lastname', 'asc'],
@@ -117,23 +114,23 @@ class IntervencionController extends Controller
 
         // Buscar la bandera correspondiente
         $bandera = $this->buscarBanderaDelDiaYTurno(
-                $validated['playa_id'],
-                $validated['fecha']
+            $validated['playa_id'],
+            $validated['fecha']
         );
 
-        //Se crea la intervencion con datos validados + user_id
+        // Se crea la intervencion con datos validados + user_id
         $intervencion = Intervencion::create([
             ...$validated,
             'user_id' => $user_id,
             'bandera_id' => $bandera?->id,
         ]);
 
-        //chequea que lleguen fuerzas y guardavidas y los sincroniza
-        if ( $request->has('fuerzas')){
+        // chequea que lleguen fuerzas y guardavidas y los sincroniza
+        if ($request->has('fuerzas')) {
             $intervencion->fuerzas()->sync($request->fuerzas);
         }
 
-        if ( $request->has('guardavidas')){
+        if ($request->has('guardavidas')) {
             $guardavidas_ids = $request->input('guardavidas');
 
             // Sincroniza los guardavidas con la intervención
@@ -141,7 +138,7 @@ class IntervencionController extends Controller
         }
 
         return redirect()->route('intervencion.index')
-                     ->with('success', 'Intervención creada');
+            ->with('success', 'Intervención creada');
     }
 
     /**
@@ -149,8 +146,8 @@ class IntervencionController extends Controller
      */
     public function show(Intervencion $intervencion)
     {
-         return view('intervenciones.show-fields', compact(
-           'intervencion'
+        return view('intervenciones.show-fields', compact(
+            'intervencion'
         ));
     }
 
@@ -160,17 +157,19 @@ class IntervencionController extends Controller
     public function edit(Intervencion $intervencion)
     {
         $user = Auth::user();
+        // Los que ya figuran en esta intervención se mantienen aunque ya no estén en el plantel.
+        $idsActuales = $intervencion->guardavidas()->pluck('guardavidas.id')->all();
         $guardavidaAuth = $user->guardavida;
         $banderas = BanderaTipo::all();
         $fuerzas = Fuerza::all();
 
-        //Los guardavidas solo agregan registros en la playa a la que pertenecen
-        if ($user->hasAnyRole(['guardavida', 'encargado']) && $guardavidaAuth){
+        // Los guardavidas solo agregan registros en la playa a la que pertenecen
+        if ($user->hasAnyRole(['guardavida', 'encargado']) && $guardavidaAuth) {
             $playas = Playa::where('id', $guardavidaAuth->playa_id)->get();
             $puestos = Puesto::where('playa_id', $guardavidaAuth->playa_id)->get();
             // nombre ya no vive en guardavidas - lista chica para
             // un <select>.
-            $guardavidas = Guardavida::where('playa_id', $guardavidaAuth->playa_id)
+            $guardavidas = Guardavida::activos($idsActuales)->where('playa_id', $guardavidaAuth->playa_id)
                 ->with('user:id,name,lastname')
                 ->get()
                 ->sortBy([
@@ -184,7 +183,7 @@ class IntervencionController extends Controller
             // Lista completa (sin filtrar por playa a nivel servidor): ver
             // comentario equivalente en create() — se acota por playa en
             // el cliente.
-            $guardavidas = Guardavida::with('user:id,name,lastname')
+            $guardavidas = Guardavida::activos($idsActuales)->with('user:id,name,lastname')
                 ->get()
                 ->sortBy([
                     ['user.lastname', 'asc'],
@@ -212,29 +211,29 @@ class IntervencionController extends Controller
             $validated['fecha']
         );
 
-        //actualizo los datos
+        // actualizo los datos
         $intervencion->update([
             ...$validated,
             'bandera_id' => $bandera?->id,
         ]);
 
-        //Sincroniza fuerzas
-        if($request->has('fuerzas')){
+        // Sincroniza fuerzas
+        if ($request->has('fuerzas')) {
             $intervencion->fuerzas()->sync($request->fuerzas);
         } else {
             // Si no vienen, se limpian
             $intervencion->fuerzas()->sync([]);
         }
 
-        //Sincroniza guardavidas
-        if($request->has('guardavidas')){
+        // Sincroniza guardavidas
+        if ($request->has('guardavidas')) {
             $intervencion->guardavidas()->sync($request->guardavidas);
         } else {
             $intervencion->guardavidas()->sync([]);
         }
 
         return redirect()->route('intervencion.index')
-        ->with('success', 'Intervención actualizada');
+            ->with('success', 'Intervención actualizada');
     }
 
     /**
@@ -255,12 +254,12 @@ class IntervencionController extends Controller
 
         $intervencion->delete();
 
-          return redirect()->route('intervencion.index')
-        ->with('success', 'Intervención eliminada');
+        return redirect()->route('intervencion.index')
+            ->with('success', 'Intervención eliminada');
     }
 
-
-    public function buscarBanderaDelDiaYTurno($playaId, $fecha){
+    public function buscarBanderaDelDiaYTurno($playaId, $fecha)
+    {
         if ($fecha) {
             $hora = Carbon::parse($fecha)->format('H');
 
@@ -272,7 +271,6 @@ class IntervencionController extends Controller
             }
         }
 
-
         // 1- Busca bandera en el turno, cargada antes
         $bandera = Bandera::where('playa_id', $playaId)
             ->whereDate('fecha', Carbon::parse($fecha)->toDateString())
@@ -282,7 +280,7 @@ class IntervencionController extends Controller
             ->first();
 
         // 2- busca bandera en el turno, cargada despues
-        if (!$bandera) {
+        if (! $bandera) {
             $bandera = Bandera::where('playa_id', $playaId)
                 ->whereDate('fecha', Carbon::parse($fecha)->toDateString())
                 ->whereTime('fecha', '>', Carbon::parse($fecha)->toTimeString())
@@ -292,7 +290,7 @@ class IntervencionController extends Controller
         }
 
         // 3- Si no hay bandera en ese turno, busca en el otro turno
-        if (!$bandera) {
+        if (! $bandera) {
             $otroTurno = $turno === 'M' ? 'T' : 'M';
 
             $bandera = Bandera::where('playa_id', $playaId)
@@ -303,9 +301,9 @@ class IntervencionController extends Controller
                 ->first();
 
             // Si tampoco hay previa, probamos la siguiente del otro turno
-            if (!$bandera) {
+            if (! $bandera) {
                 $bandera = Bandera::where('playa_id', $playaId)
-                    ->whereDate('fecha',  Carbon::parse($fecha)->toDateString())
+                    ->whereDate('fecha', Carbon::parse($fecha)->toDateString())
                     ->whereTime('fecha', '>', Carbon::parse($fecha)->toTimeString())
                     ->where('turno', $otroTurno)
                     ->orderBy('fecha', 'asc')

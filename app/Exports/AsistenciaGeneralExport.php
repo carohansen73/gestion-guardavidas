@@ -11,10 +11,12 @@ use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class AsistenciaGeneralExport implements FromCollection, WithHeadings, WithTitle, WithStyles
+class AsistenciaGeneralExport implements FromCollection, WithHeadings, WithStyles, WithTitle
 {
     protected $playa;
+
     protected $inicio;
+
     protected $fin;
 
     public function __construct($playaId, $inicio, $fin)
@@ -25,16 +27,16 @@ class AsistenciaGeneralExport implements FromCollection, WithHeadings, WithTitle
     }
 
     /**
-    * @return \Illuminate\Support\Collection
-    */
+     * @return \Illuminate\Support\Collection
+     */
     public function collection()
     {
-        //Instancia al service
-        $service = new HistorialAsistenciaService();
+        // Instancia al service
+        $service = new HistorialAsistenciaService;
 
-        //busca los guardavidas habilitados que pertenecen a esa playa
-        $guardavidas = Guardavida::where('playa_id', $this->playa->id)
-            ->whereHas('user', fn($q) => $q->where('enabled', true))
+        // busca los guardavidas habilitados que pertenecen a esa playa
+        $guardavidas = Guardavida::activosOConAsistenciaEn($this->inicio, $this->fin)->where('playa_id', $this->playa->id)
+            ->whereHas('user', fn ($q) => $q->where('enabled', true))
             ->with('user:id,name,lastname')
             ->get()
             ->sortBy([
@@ -45,13 +47,13 @@ class AsistenciaGeneralExport implements FromCollection, WithHeadings, WithTitle
 
         $rows = [];
 
-        //Genera el historial de asistencias por cada guardavida
+        // Genera el historial de asistencias por cada guardavida
         foreach ($guardavidas as $g) {
             $historial = $service->generar($g->id, $this->inicio, $this->fin);
 
             foreach ($historial as $h) {
                 $rows[] = [
-                    $g->apellido . ', ' . $g->nombre,
+                    $g->apellido.', '.$g->nombre,
                     Carbon::parse($h['fecha'])->format('d/m/Y'),
                     $h['estado'],
                     // $h['detalle'] ?? '',
@@ -79,14 +81,11 @@ class AsistenciaGeneralExport implements FromCollection, WithHeadings, WithTitle
     public function styles(Worksheet $sheet)
     {
         $highestColumn = $sheet->getHighestColumn();
-        $headerRange = 'A1:' . $highestColumn .'1';
+        $headerRange = 'A1:'.$highestColumn.'1';
         $sheet->getStyle($headerRange)->getFont()->setBold(true);
 
         $sheet->getStyle($headerRange)->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB('FFB3C6E5');
     }
-
-
-
 }

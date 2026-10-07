@@ -47,7 +47,7 @@ class FrancoIntercambioController extends Controller
             ->markAsRead();
 
         // Compañeros de la misma playa para elegir a quién pedirle el cambio.
-        $companeros = Guardavida::where('playa_id', $guardavida->playa_id)
+        $companeros = Guardavida::activos()->where('playa_id', $guardavida->playa_id)
             ->where('id', '!=', $guardavida->id)
             ->with('user:id,name,lastname')
             ->get()

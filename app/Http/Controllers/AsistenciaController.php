@@ -147,7 +147,7 @@ class AsistenciaController extends Controller
         // guardavidas -> join a users para buscar/ordenar.
         // (select('guardavidas.*') evita ambigüedad de columnas
         // con el join.
-        $guardavidasQuery = Guardavida::query()
+        $guardavidasQuery = Guardavida::activosOConAsistenciaEn($inicio, $fin)
             ->select('guardavidas.*')
             ->join('users', 'users.id', '=', 'guardavidas.user_id')
             ->with(['puesto.playa', 'user']);

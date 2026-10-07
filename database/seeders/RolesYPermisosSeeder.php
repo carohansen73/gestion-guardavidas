@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -16,7 +15,7 @@ class RolesYPermisosSeeder extends Seeder
     {
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
-         // --- Roles ---
+        // --- Roles ---
         $guardavida = Role::firstOrCreate(['name' => 'guardavida']);
         $encargado = Role::firstOrCreate(['name' => 'encargado']);
         $admin = Role::firstOrCreate(['name' => 'admin']);
@@ -33,7 +32,6 @@ class RolesYPermisosSeeder extends Seeder
         // puede acceder a lo que esté explícitamente fuera del sistema de
         // permisos (su propia postulación), vía RedirectPostulante.
         Role::firstOrCreate(['name' => 'postulante']);
-
 
         // --- Permisos ---
         Permission::create(['name' => 'agregar_bandera']);
@@ -82,6 +80,8 @@ class RolesYPermisosSeeder extends Seeder
         // documentos. revisar_postulacion: aceptar/rechazar + observaciones.
         Permission::create(['name' => 'ver_postulacion']);
         Permission::create(['name' => 'revisar_postulacion']);
+        // seleccionar_postulacion: elegir postulantes en lote (los pasa a guardavida) y cerrar la selección.
+        Permission::create(['name' => 'seleccionar_postulacion']);
 
         Permission::create(['name' => 'abm_roles_y_permisos']);
 
@@ -94,12 +94,12 @@ class RolesYPermisosSeeder extends Seeder
 
         // Asignación de permisos
         $guardavida->givePermissionTo([
-        'agregar_bandera',
-        'editar_bandera',
-        'eliminar_bandera',
-        'ver_bandera',
-        'ver_asistencia_propia'
-    ]);
+            'agregar_bandera',
+            'editar_bandera',
+            'eliminar_bandera',
+            'ver_bandera',
+            'ver_asistencia_propia',
+        ]);
 
         $encargado->givePermissionTo([
             'agregar_bandera',

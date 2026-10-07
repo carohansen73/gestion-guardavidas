@@ -14,6 +14,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PostulacionAdminController;
 use App\Http\Controllers\PostulacionController;
+use App\Http\Controllers\PostulacionSeleccionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QrController;
 use App\Http\Controllers\UserController;
@@ -54,6 +55,13 @@ Route::middleware(['auth', 'force.password', 'postulante.redirect'])->group(func
     // a propósito: NO coinciden con `postulacion.*`, así RedirectPostulante no
     // deja pasar a un postulante por estas rutas.
     Route::get('/postulaciones', [PostulacionAdminController::class, 'index'])->name('postulaciones.index');
+    // Selección en lote (Fase 5). Van ANTES de /postulaciones/{postulacion} para que "seleccion" no se tome como un id.
+    Route::get('/postulaciones/seleccion', [PostulacionSeleccionController::class, 'index'])->name('postulaciones.seleccion');
+    Route::get('/postulaciones/seleccion/revisar', [PostulacionSeleccionController::class, 'revisar'])->name('postulaciones.seleccion.revisar');
+    Route::post('/postulaciones/seleccion/confirmar', [PostulacionSeleccionController::class, 'confirmar'])->name('postulaciones.seleccion.confirmar');
+    Route::get('/postulaciones/seleccion/cierre', [PostulacionSeleccionController::class, 'cierre'])->name('postulaciones.seleccion.cierre');
+    Route::post('/postulaciones/seleccion/cierre', [PostulacionSeleccionController::class, 'cerrar'])->name('postulaciones.seleccion.cerrar');
+    Route::post('/postulaciones/{postulacion}/deseleccionar', [PostulacionSeleccionController::class, 'deseleccionar'])->name('postulaciones.deseleccionar');
     Route::get('/postulaciones/{postulacion}', [PostulacionAdminController::class, 'show'])->name('postulaciones.show');
     Route::patch('/postulaciones/{postulacion}/revisar', [PostulacionAdminController::class, 'revisar'])->name('postulaciones.revisar');
     Route::get('/postulaciones/{postulacion}/documento/{tipo}', [PostulacionAdminController::class, 'documento'])->name('postulaciones.documento');

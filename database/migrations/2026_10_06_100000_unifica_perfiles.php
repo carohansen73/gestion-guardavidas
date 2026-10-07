@@ -20,6 +20,11 @@ return new class extends Migration
             $table->string('telefono')->nullable()->change();
             $table->string('direccion')->nullable()->change();
             $table->string('numero')->nullable()->change();
+            // nombre/apellido/dni ya no se escriben acá desde la Fase 3b (viven en `users`);
+            // en MySQL ya son opcionales, esto alinea el esquema de las migraciones (tests).
+            $table->string('nombre')->nullable()->change();
+            $table->string('apellido')->nullable()->change();
+            $table->string('dni')->nullable()->change();
         });
     }
 

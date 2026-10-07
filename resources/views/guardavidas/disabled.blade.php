@@ -44,7 +44,7 @@
                             {{ str_replace('_', ' ', $registro->funcion) }}
                             </p>
                             <span class="text-sm text-gray-500 dark:text-gray-300">
-                            {{ $registro->playa->nombre }}-{{ $registro->puesto->nombre }}
+                            {{ $registro->playa->nombre }}{{ $registro->puesto ? "-{$registro->puesto->nombre}" : " (sin puesto)" }}
                             </span>
                             <p class="text-sm text-gray-700 dark:text-gray-400 mt-1 line-clamp-2">
                                 {!!$registro->user->email !!}

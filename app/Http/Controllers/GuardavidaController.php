@@ -44,9 +44,9 @@ class GuardavidaController extends Controller
         $playaId = $request->input('playa_id');
         $sortOrder = $request->input('sort', 'asc'); // asc o desc
 
-        $query = Guardavida::select('guardavidas.*')
+        $query = Guardavida::activos()->select('guardavidas.*')
             ->join('playas', 'playas.id', '=', 'guardavidas.playa_id')
-            ->join('puestos', 'puestos.id', '=', 'guardavidas.puesto_id')
+            ->leftJoin('puestos', 'puestos.id', '=', 'guardavidas.puesto_id')
             ->join('users', 'users.id', '=', 'guardavidas.user_id')
             ->with(['playa', 'puesto', 'user.perfil']);
 
@@ -395,7 +395,7 @@ class GuardavidaController extends Controller
     {
         // user_id es necesario para que los accessors nombre/apellido
         // (Fase 3b) puedan resolver la relación — sin él devolverían null.
-        $guardavidas = Guardavida::with('user:id,name,lastname')
+        $guardavidas = Guardavida::activos()->with('user:id,name,lastname')
             ->select('id', 'user_id', 'nombre', 'apellido')
             ->get();
 

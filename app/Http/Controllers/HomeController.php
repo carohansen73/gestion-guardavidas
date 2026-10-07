@@ -38,13 +38,13 @@ class HomeController extends Controller
             'intervenciones' => Intervencion::count(),
             'banderas' => Bandera::count(),
             'novedades' => NovedadMaterial::count(),
-            'guardavidas' => Guardavida::whereHas('user', function ($u) {
+            'guardavidas' => Guardavida::activos()->whereHas('user', function ($u) {
                 $u->where('enabled', 1);
             })->count(),
         ];
 
         // Exije que actualice puesto y turno al loguearse la 1era vez
-        if ($user->guardavida && is_null($user->guardavida->turno)) {
+        if ($user->guardavida && (is_null($user->guardavida->turno) || is_null($user->guardavida->puesto_id))) {
             session(['show_guardavida_setup' => true]);
         }
 
@@ -89,7 +89,7 @@ class HomeController extends Controller
 
         $playas = $esAdmin ? Playa::all() : collect();
 
-        $guardavidasPorPlaya = Guardavida::select('playa_id')
+        $guardavidasPorPlaya = Guardavida::activos()->select('playa_id')
             ->selectRaw('COUNT(*) as total')
             ->whereHas('user', function ($q) {
                 $q->where('enabled', true);
@@ -119,7 +119,7 @@ class HomeController extends Controller
         // conteo 100% global — ver aside "Guardavidas registrados").
         $panelIntervenciones = Intervencion::when(! $esAdmin, fn ($q) => $q->where('playa_id', $playaIdUsuario))->count();
         $panelNovedadesMateriales = NovedadMaterial::when(! $esAdmin, fn ($q) => $q->where('playa_id', $playaIdUsuario))->count();
-        $panelGuardavidasActivos = Guardavida::whereHas('user', fn ($q) => $q->where('enabled', true))
+        $panelGuardavidasActivos = Guardavida::activos()->whereHas('user', fn ($q) => $q->where('enabled', true))
             ->when(! $esAdmin, fn ($q) => $q->where('playa_id', $playaIdUsuario))
             ->count();
 
@@ -269,11 +269,11 @@ class HomeController extends Controller
         }
 
         if ($user->can('ver_guardavida')) {
-            $response['totalGuardavidasActivos'] = Guardavida::whereHas('user', fn ($q) => $q->where('enabled', true))
+            $response['totalGuardavidasActivos'] = Guardavida::activos()->whereHas('user', fn ($q) => $q->where('enabled', true))
                 ->when($playaId, fn ($q) => $q->where('playa_id', $playaId))
                 ->count();
 
-            $response['guardavidasPorPlaya'] = Guardavida::select('playa_id')
+            $response['guardavidasPorPlaya'] = Guardavida::activos()->select('playa_id')
                 ->selectRaw('COUNT(*) as total')
                 ->whereHas('user', fn ($q) => $q->where('enabled', true))
                 ->when($playaId, fn ($q) => $q->where('playa_id', $playaId))

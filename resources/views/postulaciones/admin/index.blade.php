@@ -15,6 +15,10 @@
 <div class="text-gray-600 dark:text-gray-100 body-font sm:px-4">
     <div class="flex justify-between align-center mb-4 sm:mt-4">
         <h2 class="text-gray-700 dark:text-white text-2xl font-bold tracking-tight text-heading md:text-3xl lg:text-4xl">Postulaciones</h2>
+        @can('seleccionar_postulacion')
+            <a href="{{ route('postulaciones.seleccion', ['temporada' => $temporadaId]) }}"
+                class="px-3 py-2 rounded-md bg-sky-500 hover:bg-sky-400 text-white text-sm font-medium self-center">Selección de postulantes</a>
+        @endcan
     </div>
 
     <x-session-alerts />

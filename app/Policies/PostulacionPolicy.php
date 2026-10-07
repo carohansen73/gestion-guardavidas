@@ -27,4 +27,10 @@ class PostulacionPolicy
     {
         return $user->can('revisar_postulacion');
     }
+
+    /** Selección en lote de postulantes (alta de guardavidas), deshacer y cierre. */
+    public function seleccionar(User $user): bool
+    {
+        return $user->can('seleccionar_postulacion');
+    }
 }

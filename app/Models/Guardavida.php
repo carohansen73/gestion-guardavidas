@@ -169,12 +169,47 @@ class Guardavida extends Model
         });
     }
 
+    // ******************** Plantel activo (por rol) ******************************
+    /**
+     * Guardavidas del plantel actual: su usuario tiene rol `guardavida` o
+     * `encargado`. Quien no fue seleccionado en la temporada vuelve a rol
+     * `postulante` pero conserva su fila acá (historial de asistencias,
+     * intervenciones, licencias), y por eso hay que filtrarlo de los
+     * listados/selectores "de hoy". `$incluirIds` permite mantener a quienes
+     * ya figuran en un registro viejo que se está editando (si no, al guardar
+     * se perderían del registro).
+     */
+    public function scopeActivos($query, array $incluirIds = [])
+    {
+        return $query->where(function ($q) use ($incluirIds) {
+            $q->whereHas('user', fn ($u) => $u->role(['guardavida', 'encargado']));
+
+            if ($incluirIds !== []) {
+                $q->orWhereIn('guardavidas.id', $incluirIds);
+            }
+        });
+    }
+
+    /**
+     * Para reportes de PRESENTISMO de un período: el plantel actual MÁS
+     * cualquiera que haya registrado asistencias en ese período, aunque
+     * después haya vuelto a postulante. Así un reporte de una temporada
+     * pasada (o del mes en curso) sigue incluyendo a todos los que trabajaron
+     * en esas fechas, y quien no trabajó en el período y ya no está en el
+     * plantel no aparece como "ausente" todos los días.
+     */
+    public function scopeActivosOConAsistenciaEn($query, $inicio, $fin)
+    {
+        return $query->where(function ($q) use ($inicio, $fin) {
+            $q->whereHas('user', fn ($u) => $u->role(['guardavida', 'encargado']))
+                ->orWhereHas('asistencias', fn ($a) => $a->whereBetween('fecha_hora', [$inicio, $fin]));
+        });
+    }
+
     // ******************** Nombre/apellido/dni ***********************************
-    // Fase 3b: guardavidas.nombre/apellido/dni quedaron duplicados con
-    // users.name/lastname/dni (dos fuentes de verdad sincronizadas a mano,
-    // que ya causó bugs de sincronización). Estos accessors hacen que
+    // Estos accessors hacen que
     // $guardavida->nombre siga funcionando en toda la app sin tocar cada
-    // vista/controller, pero leyendo siempre de `user` — la columna de
+    // vista/controller, pero leyendo de `user` — la columna de
     // guardavidas queda sin usarse (se borra más adelante, en un paso
     // aparte, una vez confirmado que todo anda bien así).
     public function getNombreAttribute()
@@ -249,7 +284,7 @@ class Guardavida extends Model
 
     public static function obtenerGuardavidas($idUser)
     {
-        return self::with(['puesto.playa'])
+        return self::activos()->with(['puesto.playa'])
             ->where('user_id', $idUser)
             ->first();
     }

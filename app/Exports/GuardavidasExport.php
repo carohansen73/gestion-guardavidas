@@ -27,7 +27,7 @@ class GuardavidasExport implements FromCollection, WithHeadings, WithStyles
         // sortBy([[callback, dir], ...]) espera un comparador de 2
         // argumentos, no un extractor de 1 valor (con un extractor no
         // ordena nada, ver nota en IntervencionController/LicenciaController).
-        $guardavidas = Guardavida::with(['user.perfil', 'playa', 'puesto'])
+        $guardavidas = Guardavida::activos()->with(['user.perfil', 'playa', 'puesto'])
             ->get()
             ->sortBy([
                 ['playa_id', 'asc'],

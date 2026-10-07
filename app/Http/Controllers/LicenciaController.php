@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Licencia;
 use App\Http\Requests\StoreLicenciaRequest;
 use App\Http\Requests\UpdateLicenciaRequest;
 use App\Models\Guardavida;
+use App\Models\Licencia;
 use App\Models\Playa;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class LicenciaController extends Controller
 {
-     /**
+    /**
      * authorizeResource()  agrega automaticamente los permisos de la policy
      * a cada método del controller.
      *
@@ -32,15 +32,15 @@ class LicenciaController extends Controller
         $user = Auth::user();
 
         $licencias = Licencia::with(['guardavida', 'playa', 'puesto'])
-        ->latest()
-        ->get();
+            ->latest()
+            ->get();
 
         $playas = Playa::all();
 
         return view('licencias.index')
-        ->with('registros', $licencias)
-        ->with('playas', $playas)
-        ->with('user', $user);
+            ->with('registros', $licencias)
+            ->with('playas', $playas)
+            ->with('user', $user);
     }
 
     /**
@@ -52,7 +52,7 @@ class LicenciaController extends Controller
         // usa la forma "user.lastname" (dot notation) en vez de un closure
         // extractor: sortBy([[callback, dir], ...]) espera un comparador
         // de 2 argumentos, no un extractor de 1 valor.
-        $guardavidas = Guardavida::with(['playa', 'puesto', 'user:id,name,lastname'])
+        $guardavidas = Guardavida::activos()->with(['playa', 'puesto', 'user:id,name,lastname'])
             ->get()
             ->sortBy([
                 ['user.lastname', 'asc'],
@@ -71,12 +71,12 @@ class LicenciaController extends Controller
      */
     public function store(StoreLicenciaRequest $request)
     {
-        //$user_id = Auth::id();
+        // $user_id = Auth::id();
 
         $guardavida = Guardavida::findOrFail($request->guardavida_id);
 
-        //AUTOCOMPLETE DEL GUARDAVIDA
-        $licencia = new Licencia();
+        // AUTOCOMPLETE DEL GUARDAVIDA
+        $licencia = new Licencia;
         $licencia->guardavida_id = $request->guardavida_id;
         $licencia->playa_id = $guardavida->playa_id;
         $licencia->puesto_id = $guardavida->puesto_id;
@@ -96,6 +96,7 @@ class LicenciaController extends Controller
         $licencia->save();
 
         $licencia->save();
+
         return redirect()->route('licencia.index')->with('success', 'Licencia registrada correctamente.');
     }
 
@@ -116,7 +117,7 @@ class LicenciaController extends Controller
         $user = Auth::user();
         $guardavidaAuth = $user->guardavida;
 
-        $guardavidas = Guardavida::with(['playa', 'puesto', 'user:id,name,lastname'])
+        $guardavidas = Guardavida::activos([$licencia->guardavida_id])->with(['playa', 'puesto', 'user:id,name,lastname'])
             ->get()
             ->sortBy([
                 ['user.lastname', 'asc'],
@@ -137,7 +138,7 @@ class LicenciaController extends Controller
     {
         $licencia->update($request->except('archivo'));
 
-       if ($request->hasFile('archivo')) {
+        if ($request->hasFile('archivo')) {
             // Eliminar archivo anterior si existe
             if ($licencia->archivo && Storage::disk('public')->exists($licencia->archivo)) {
                 Storage::disk('public')->delete($licencia->archivo);
@@ -145,7 +146,7 @@ class LicenciaController extends Controller
 
             $path = $request->file('archivo')->store('licencias', 'public');
             $licencia->archivo = $path;
-               $licencia->save();
+            $licencia->save();
         }
 
         return redirect()->route('licencia.index')->with('success', 'Licencia actualizada correctamente.');
@@ -154,29 +155,28 @@ class LicenciaController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Licencia $licencia){
+    public function destroy(Licencia $licencia)
+    {
 
         // Elimina archivo si existe
         if ($licencia->archivo && Storage::disk('public')->exists($licencia->archivo)) {
             Storage::disk('public')->delete($licencia->archivo);
         }
 
-        //Elimina el registro
+        // Elimina el registro
         $licencia->delete();
 
         return redirect()->route('licencia.index')->with('success', 'Licencia eliminada correctamente.');
     }
 
-
     /**
      * funcion para que de la cantidad de licencias en la seccion licencias del perfil del guardavidas y en el historial de
      * sus licencias
      */
-
     public function misLicencias()
     {
         $guardavida = auth()->user()->guardavida;
-        if (!$guardavida) {
+        if (! $guardavida) {
             abort(403, 'No tiene un perfil de guardavida asignado.');
         }
 
@@ -185,10 +185,8 @@ class LicenciaController extends Controller
 
         // Pasamos $esAdmin = false para que el Blade detecte que no es vista administrativa
         $esAdmin = false;
+
         // No necesitamos filtros ni balnearios/puestos para este caso
         return view('asistencias.por-perfil', compact('guardavida', 'esAdmin'));
     }
-
 }
-
-
