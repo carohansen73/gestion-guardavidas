@@ -26,6 +26,10 @@
             class="playa-tag px-3 py-1 bg-orange-600 text-gray-100 rounded hover:bg-orange-400 hover:shadow-lg dark:bg-orange-600 dark:hover:bg-orange-500 dark:text-gray-200">
                Bloqueados
             </a>
+            <a href="{{ route('guardavidas.bajas') }}"
+            class="playa-tag px-3 py-1 bg-gray-600 text-gray-100 rounded hover:bg-gray-500 hover:shadow-lg dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-gray-200">
+               Dados de baja
+            </a>
             @else
              <a href="{{ route('guardavida.index')}}"
             class="@if (request()->routeIs('guardavidas.disabled'))  bg-gray-600 text-white  @endif playa-tag px-3 py-1 text-gray-100 rounded hover:bg-gray-600 hover:shadow-lg dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-gray-200">

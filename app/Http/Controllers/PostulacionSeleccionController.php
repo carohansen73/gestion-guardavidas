@@ -7,6 +7,7 @@ use App\Models\Postulacion;
 use App\Models\Puesto;
 use App\Models\Temporada;
 use App\Services\SeleccionPostulantes;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 /**
@@ -122,6 +123,7 @@ class PostulacionSeleccionController extends Controller
 
         $request->validate([
             'temporada' => 'required|exists:temporadas,id',
+            'desde' => 'required|date',
             'filas' => 'required|array|min:1',
             'filas.*.playa_id' => 'required|integer|exists:playas,id',
             'filas.*.puesto_id' => 'nullable|integer|exists:puestos,id',
@@ -161,7 +163,7 @@ class PostulacionSeleccionController extends Controller
         }
 
         try {
-            $resultado = $this->seleccion->confirmar($filas);
+            $resultado = $this->seleccion->confirmar($filas, Carbon::parse($request->input('desde')));
         } catch (\DomainException $e) {
             return back()->withInput()->withErrors($e->getMessage());
         }
@@ -201,6 +203,7 @@ class PostulacionSeleccionController extends Controller
             'temporada' => 'required|exists:temporadas,id',
             'guardavidas' => 'nullable|array',
             'guardavidas.*' => 'integer',
+            'hasta' => 'required|date',
             'entiendo' => 'accepted',
         ], ['entiendo.accepted' => 'Tildá la casilla de confirmación para continuar.']);
 
@@ -211,7 +214,7 @@ class PostulacionSeleccionController extends Controller
             return back()->withErrors('Todavía no seleccionaste a nadie en esta temporada: el cierre dejaría a todos como postulantes.');
         }
 
-        $total = $this->seleccion->cerrar($temporada, $datos['guardavidas'] ?? []);
+        $total = $this->seleccion->cerrar($temporada, $datos['guardavidas'] ?? [], Carbon::parse($datos['hasta']));
 
         return redirect()->route('postulaciones.seleccion', ['temporada' => $temporada->id])
             ->with('success', "{$total} guardavida(s) de la temporada anterior pasaron a postulante.");

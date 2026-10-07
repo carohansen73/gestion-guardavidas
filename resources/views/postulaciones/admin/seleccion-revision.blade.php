@@ -35,6 +35,11 @@
         @csrf
         <input type="hidden" name="temporada" value="{{ $temporada->id }}">
 
+        <div class="mb-4 max-w-xs">
+            <label for="desde" class="block text-xs text-gray-500 dark:text-gray-400">Fecha de inicio en el plantel (para el presentismo)</label>
+            <input type="date" id="desde" name="desde" value="{{ old('desde', now()->toDateString()) }}" required class="{{ $input }}">
+        </div>
+
         {{-- Atajo: la misma playa y puesto para todos los que todavía no tienen puesto (ej. una tanda de una sola playa) --}}
         <div class="flex flex-wrap items-end gap-3 mb-4">
             <div>

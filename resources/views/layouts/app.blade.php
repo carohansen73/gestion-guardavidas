@@ -19,6 +19,8 @@
 
     <!-- CSS y JS Generales -->
     @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/css/style.css',  'resources/js/darkMode.js'])
+    {{-- Alpine: lo marcado con x-cloak (modales, etc.) no se ve hasta que Alpine arranca --}}
+    <style>[x-cloak] { display: none !important; }</style>
 
     <!-- CSS específico por vista -->
     @stack('styles')

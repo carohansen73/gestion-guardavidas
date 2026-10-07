@@ -36,6 +36,16 @@ class Temporada extends Model
         return $this->fecha_inicio_postulacion->lte($hoy) && $this->fecha_fin_postulacion->gte($hoy);
     }
 
+    /** La temporada cuya ventana operativa incluye esa fecha (null si ninguna). */
+    public static function enLaFecha($fecha): ?self
+    {
+        $fecha = Carbon::parse($fecha)->toDateString();
+
+        return static::whereDate('fecha_inicio', '<=', $fecha)
+            ->whereDate('fecha_fin', '>=', $fecha)
+            ->first();
+    }
+
     /**
      * La temporada cuya ventana OPERATIVA (fecha_inicio/fecha_fin) incluye
      * hoy. Es la que rige para cargar intervenciones/banderas/etc. y para

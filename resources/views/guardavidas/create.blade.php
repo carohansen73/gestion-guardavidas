@@ -180,6 +180,18 @@
 
 
 
+                            <!-- fecha de alta en el plantel -->
+                            <div class="sm:col-span-4">
+                                <label for="fecha_alta" class="block text-sm font-medium text-gray-900 dark:text-white">Fecha de alta (primer día de trabajo)</label>
+                                <div class="mt-2">
+                                    <input id="fecha_alta" type="date" name="fecha_alta" value="{{ old('fecha_alta', now()->toDateString()) }}"
+                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500" />
+                                    @error('fecha_alta')
+                                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            </div>
+
                             <div class="sm:col-span-8 border-t border-gray-200 dark:border-gray-700">
                                 <h3 class="font-semibold text-gray-900 dark:text-white text-lg pt-4">
                                     Información profesional

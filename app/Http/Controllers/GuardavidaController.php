@@ -8,7 +8,10 @@ use App\Models\CambioDeTurno;
 use App\Models\Guardavida;
 use App\Models\Playa;
 use App\Models\Puesto;
+use App\Models\Temporada;
 use App\Models\User;
+use App\Services\SeleccionPostulantes;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -176,6 +179,12 @@ class GuardavidaController extends Controller
                 // Teléfono/domicilio viven en `perfiles` (una fila por persona).
                 $guardavida->guardarDatosPersonales($validated);
 
+                // Alta en el plantel desde la fecha indicada (por defecto hoy): es lo que usa el presentismo.
+                // El período queda asociado a la temporada de esa fecha: así "quién trabajó en cada
+                // temporada" sale igual de las altas por postulación que de las manuales.
+                $fechaAlta = Carbon::parse($validated['fecha_alta'] ?? now());
+                $guardavida->darDeAlta($fechaAlta, Temporada::enLaFecha($fechaAlta)?->id, 'Alta manual', true);
+
                 // El franco fijo no es una columna de "guardavidas" (vive
                 // versionado en guardavida_franco_historial), y es opcional
                 // al alta —
@@ -262,6 +271,77 @@ class GuardavidaController extends Controller
         }
 
         return back()->withErrors('No se pudo actualizar el guardavida. Intente nuevamente.');
+    }
+
+    /**
+     * Baja de un guardavida que ya está trabajando (renuncia, etc.): cierra su
+     * período en la fecha indicada y lo devuelve a postulante. Deja de aparecer
+     * en listados, selectores y asistencias, conserva todo su historial y puede
+     * volver a postularse la próxima temporada.
+     */
+    public function baja(Request $request, Guardavida $guardavida, SeleccionPostulantes $seleccion)
+    {
+        abort_unless(auth()->user()->can('eliminar_guardavida'), 403);
+
+        $datos = $request->validate([
+            'fecha' => 'required|date|before_or_equal:today',
+            'motivo' => 'nullable|string|max:255',
+        ]);
+
+        $user = $guardavida->user;
+
+        if (! $user || ! $user->hasAnyRole(['guardavida', 'encargado']) || $user->hasAnyRole(['admin', 'superadmin'])) {
+            return back()->withErrors('Solo se puede dar de baja a un guardavida o encargado del plantel actual.');
+        }
+
+        $seleccion->darDeBaja($guardavida, Carbon::parse($datos['fecha']), $datos['motivo'] ?? null);
+
+        return redirect()->route('guardavida.index')
+            ->with('success', "{$user->lastname}, {$user->name} fue dado de baja el ".Carbon::parse($datos['fecha'])->format('d/m/Y').'. Ya no aparece en los listados y puede volver a postularse.');
+    }
+
+    /** Personas con fila de guardavida que hoy están fuera del plantel (bajas y no seleccionados). */
+    public function bajas(Request $request)
+    {
+        abort_unless(auth()->user()->can('ver_guardavida'), 403);
+
+        $buscar = trim((string) $request->input('buscar'));
+
+        $guardavidas = Guardavida::whereDoesntHave('user', fn ($u) => $u->role(['guardavida', 'encargado', 'admin', 'superadmin']))
+            ->join('users', 'users.id', '=', 'guardavidas.user_id')
+            ->select('guardavidas.*')
+            ->when($buscar !== '', fn ($q) => $q->where(function ($w) use ($buscar) {
+                $w->where('users.name', 'like', "%{$buscar}%")
+                    ->orWhere('users.lastname', 'like', "%{$buscar}%")
+                    ->orWhere('users.dni', 'like', "%{$buscar}%");
+            }))
+            ->with(['user', 'playa', 'puesto', 'periodos'])
+            ->orderBy('users.lastname')->orderBy('users.name')
+            ->paginate(30)
+            ->withQueryString();
+
+        return view('guardavidas.bajas', compact('guardavidas', 'buscar'));
+    }
+
+    /** Vuelve a dar de alta a alguien que estaba fuera del plantel. */
+    public function reincorporar(Request $request, Guardavida $guardavida, SeleccionPostulantes $seleccion)
+    {
+        abort_unless(auth()->user()->can('agregar_guardavida'), 403);
+
+        $datos = $request->validate(['fecha' => 'required|date']);
+
+        if ($guardavida->user?->hasAnyRole(['guardavida', 'encargado'])) {
+            return back()->withErrors('Esta persona ya está en el plantel.');
+        }
+
+        try {
+            $seleccion->reincorporar($guardavida, Carbon::parse($datos['fecha']));
+        } catch (\DomainException $e) {
+            return back()->withErrors($e->getMessage());
+        }
+
+        return redirect()->route('guardavidas.bajas')
+            ->with('success', "{$guardavida->user->lastname}, {$guardavida->user->name} volvió al plantel desde el ".Carbon::parse($datos['fecha'])->format('d/m/Y').'.');
     }
 
     /**

@@ -100,6 +100,9 @@ Route::middleware(['auth', 'force.password', 'postulante.redirect'])->group(func
     Route::resource('novedad-de-material', App\Http\Controllers\NovedadMaterialController::class)
         ->middlewareFor(['store', 'update', 'destroy'], 'temporada.activa');
 
+    Route::post('guardavida/{guardavida}/baja', [GuardavidaController::class, 'baja'])->name('guardavida.baja');
+    Route::post('guardavida/{guardavida}/reincorporar', [GuardavidaController::class, 'reincorporar'])->name('guardavida.reincorporar');
+    Route::get('guardavidas-dados-de-baja', [GuardavidaController::class, 'bajas'])->name('guardavidas.bajas');
     Route::resource('guardavida', App\Http\Controllers\GuardavidaController::class);
     Route::patch('usuario-toggle/{user}', [UserController::class, 'toggle'])->name('user.toggle');
     Route::get('guardavidas-deshabilitados', [GuardavidaController::class, 'getAllDisabled'])->name('guardavidas.disabled');

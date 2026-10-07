@@ -24,7 +24,7 @@ class StoreGuardavidaRequest extends FormRequest
     {
         $esGuardavidaOEncargado = in_array($this->input('rol'), ['guardavida', 'encargado']);
 
-        //verifico datos primero para usuario, luego, si es guardavida para guardavidas.
+        // verifico datos primero para usuario, luego, si es guardavida para guardavidas.
         $rules = [
             'nombre' => 'required|string|max:255',
             'apellido' => 'required|string|max:255',
@@ -52,11 +52,23 @@ class StoreGuardavidaRequest extends FormRequest
                 'puesto_id' => 'required|exists:puestos,id',
                 'funcion' => 'required|string|in:Timonel,Encargado,Guardavida,Jefe_de_playa',
                 'turno' => 'required|in:M,T',
+                'fecha_alta' => 'nullable|date',
 
                 'dias_franco' => 'nullable|array',
                 'dias_franco.*' => 'integer|between:0,6',
             ]);
         }
+
         return $rules;
+    }
+
+    public function messages(): array
+    {
+        $yaExiste = 'Ya existe una persona con %s. No la des de alta de nuevo: si se postuló, seleccionala desde Postulaciones; si ya fue guardavida, volvela a dar de alta desde "Dados de baja".';
+
+        return [
+            'dni.unique' => sprintf($yaExiste, 'ese DNI'),
+            'email.unique' => sprintf($yaExiste, 'ese email'),
+        ];
     }
 }

@@ -28,6 +28,32 @@
         <x-role-badge :rol="\App\Enums\RolUsuario::principal(Auth::user())" size="w-4 h-4" />
     </div>
 
+    @if (! empty($postularme))
+        @php
+            $tempPost = $postularme['temporada'];
+            $miPostulacion = $postularme['postulacion'];
+            $enviada = $miPostulacion && $miPostulacion->estado !== 'borrador';
+        @endphp
+        <div class="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-sky-200 bg-sky-50 p-4 dark:border-sky-800 dark:bg-sky-900/30">
+            <div>
+                <p class="font-semibold text-sky-900 dark:text-sky-100">Inscripción abierta: {{ $tempPost->nombre }}</p>
+                <p class="text-sm text-sky-800 dark:text-sky-200">
+                    @if ($enviada)
+                        Ya enviaste tu postulación (estado: {{ $miPostulacion->estado }}).
+                    @elseif ($miPostulacion)
+                        Empezaste tu postulación y todavía no la enviaste.
+                    @else
+                        Para seguir en la próxima temporada tenés que postularte, aunque ya hayas trabajado.
+                    @endif
+                    Podés hacerlo hasta el {{ $tempPost->fecha_fin_postulacion->format('d/m/Y') }}.
+                </p>
+            </div>
+            <a href="{{ route('postulacion.index') }}" class="rounded-md bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-500">
+                {{ $enviada ? 'Ver mi postulación' : ($miPostulacion ? 'Continuar' : 'Postularme') }}
+            </a>
+        </div>
+    @endif
+
       <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">
         Mostrando datos de
         <span class="tituloPlayaSeleccionada font-medium text-sky-600 dark:text-sky-400">{{ $esAdmin ? 'todas las playas' : (Auth::user()->guardavida->playa->nombre ?? 'tu playa') }}</span>

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use App\Models\Asistencia;
@@ -7,27 +8,29 @@ use App\Models\Guardavida;
 use App\Models\Licencia;
 use Carbon\Carbon;
 
-class HistorialAsistenciaService{
-    public function generar($guardavidaId, $inicio, $fin){
+class HistorialAsistenciaService
+{
+    public function generar($guardavidaId, $inicio, $fin)
+    {
 
-        $guardavida = Guardavida::with('francoHistorial')->findOrFail($guardavidaId);
+        $guardavida = Guardavida::with(['francoHistorial', 'periodos', 'user'])->findOrFail($guardavidaId);
 
-         // Asistencias del rango
+        // Asistencias del rango
         $asistencias = Asistencia::where('guardavidas_id', $guardavidaId)
             ->whereBetween('fecha_hora', [$inicio, $fin])
             ->orderBy('fecha_hora')
             ->get()
-            ->groupBy(fn($a) => Carbon::parse($a->fecha_hora)->toDateString());
+            ->groupBy(fn ($a) => Carbon::parse($a->fecha_hora)->toDateString());
 
         // Licencias del rango
         $licencias = Licencia::where('guardavida_id', $guardavidaId)
-            ->where(function($q) use ($inicio, $fin) {
+            ->where(function ($q) use ($inicio, $fin) {
                 $q->whereBetween('fecha_inicio', [$inicio, $fin])
-                ->orWhereBetween('fecha_fin', [$inicio, $fin])
-                ->orWhere(function ($q2) use ($inicio, $fin) {
-                    $q2->where('fecha_inicio', '<=', $inicio)
-                        ->where('fecha_fin', '>=', $fin);
-                });
+                    ->orWhereBetween('fecha_fin', [$inicio, $fin])
+                    ->orWhere(function ($q2) use ($inicio, $fin) {
+                        $q2->where('fecha_inicio', '<=', $inicio)
+                            ->where('fecha_fin', '>=', $fin);
+                    });
             })
             ->get();
 
@@ -49,6 +52,12 @@ class HistorialAsistenciaService{
 
             $dateString = $fecha->toDateString();
 
+            // 0- Fuera de su período de alta/baja en el plantel: el día no se lista
+            // (ni falta ni franco), salvo que haya fichado ese día.
+            if (! $guardavida->enPlantelEl($dateString) && ! $asistencias->has($dateString)) {
+                continue;
+            }
+
             // 1- Verifica si hay licencia ese día
             $licencia = $licencias->first(function ($l) use ($fecha) {
                 return $fecha->between($l->fecha_inicio, $l->fecha_fin);
@@ -64,6 +73,7 @@ class HistorialAsistenciaService{
                     'puesto' => $licencia->puesto->nombre ?? '-',
                     'fuera_de_rango' => false,
                 ];
+
                 continue;
             }
 
@@ -85,6 +95,7 @@ class HistorialAsistenciaService{
                     'puesto' => $asistencia->first()->puesto->nombre ?? '-',
                     'fuera_de_rango' => $asistencia->contains(fn ($a) => $a->estado_validacion === 'fuera_de_rango'),
                 ];
+
                 continue;
             }
 
@@ -110,6 +121,7 @@ class HistorialAsistenciaService{
                     'puesto' => '-',
                     'fuera_de_rango' => false,
                 ];
+
                 continue;
             }
 

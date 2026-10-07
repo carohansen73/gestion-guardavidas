@@ -51,7 +51,7 @@ class ResumenAsistenciaService
         // la Collection de Eloquent, no de la Collection genérica — por eso
         // se envuelve acá, para que este método funcione sin importar qué
         // tipo de Collection le haya pasado el caller.
-        \Illuminate\Database\Eloquent\Collection::make($guardavidas)->load('francoHistorial');
+        \Illuminate\Database\Eloquent\Collection::make($guardavidas)->load(['francoHistorial', 'periodos', 'user']);
 
         // Días distintos con fichaje por guardavida, y si alguno de esos
         // fichajes quedó marcado fuera de rango.
@@ -115,6 +115,15 @@ class ResumenAsistenciaService
                     continue;
                 }
 
+                // Fuera de su período de alta/baja en el plantel (ej. todavía no había
+                // arrancado, o ya lo habían dado de baja): ni falta ni día hábil.
+                // Un día con asistencia sí cuenta siempre (se evaluó arriba).
+                if (! $guardavida->enPlantelEl($fechaStr)) {
+                    $clasificacion[$fechaStr] = 'fuera';
+
+                    continue;
+                }
+
                 if (isset($diasLicencia[$fechaStr])) {
                     $clasificacion[$fechaStr] = 'licencia';
 
@@ -153,6 +162,7 @@ class ResumenAsistenciaService
 
             foreach ($clasificacion as $fechaStr => $estado) {
                 match ($estado) {
+                    'fuera' => null,
                     'asistencia' => $asistencias++,
                     'licencia' => $licencias++,
                     'franco' => $francos++,
@@ -164,7 +174,7 @@ class ResumenAsistenciaService
                 }
             }
 
-            $diasTotales = $fechas->count();
+            $diasTotales = collect($clasificacion)->reject(fn ($estado) => $estado === 'fuera')->count();
             $diasHabiles = $diasTotales - $licencias - $francos;
 
             $resumen[$guardavida->id] = [

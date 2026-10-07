@@ -10,6 +10,8 @@ use App\Models\Licencia;
 use App\Models\Novedad;
 use App\Models\NovedadMaterial;
 use App\Models\Playa;
+use App\Models\Postulacion;
+use App\Models\Temporada;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -152,7 +154,18 @@ class HomeController extends Controller
             ->take(10)
             ->get();
 
+        // Guardavidas y encargados también se postulan cada temporada: si la ventana está abierta,
+        // se les muestra el acceso (y el estado de su inscripción, si ya la empezaron).
+        $postularme = null;
+        if ($esGuardavidaOEncargado && $temporadaAbierta = Temporada::conPostulacionAbierta()) {
+            $postularme = [
+                'temporada' => $temporadaAbierta,
+                'postulacion' => Postulacion::where('user_id', $user->id)->where('temporada_id', $temporadaAbierta->id)->first(),
+            ];
+        }
+
         $data = compact(
+            'postularme',
             'isMobile', 'isTablet', 'bandera', 'totales', 'novedades', 'esAdmin',
             'playas', 'guardavidasPorPlaya', 'asistenciasHoy', 'fueraDeRango30d', 'licenciasActivasHoy',
             'panelIntervenciones', 'panelNovedadesMateriales', 'panelGuardavidasActivos', 'novedadesMaterialesHoy',

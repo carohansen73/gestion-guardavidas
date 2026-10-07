@@ -89,10 +89,8 @@
                                         Editar
                                     </a>
                                    @can('eliminar_guardavida')
-                                        <form action="{{ route('user.toggle', $registro->user->id) }}" method="POST" class="inline">
-                                            @csrf
-                                            @method('PATCH')
-                                            <button type="submit" onclick="return confirm('¿Estás seguro de que querés bloquear a este usuario? Esta acción puede revertirse más tarde.')"
+                                        <div class="inline">
+                                            <button type="button" @click="baja = { url: @js(route('guardavida.baja', $registro)), nombre: @js($registro->user->lastname.', '.$registro->user->name) }"
                                             class="inline-flex items-center px-4 py-2 text-sm font-medium text-red-700 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-red-300 dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
                                                 <svg xmlns="http://www.w3.org/2000/svg"
                                                     fill="none"
@@ -102,9 +100,9 @@
                                                     class="w-3 h-3 me-2">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
                                                 </svg>
-                                                Bloquear
+                                                Dar de baja
                                             </button>
-                                        </form>
+                                        </div>
                                     @else
                                         <button disabled class="inline-flex items-center px-4 py-2 text-sm font-medium bg-gray-100 border border-gray-200 rounded-e-lg hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 ">
                                              <svg xmlns="http://www.w3.org/2000/svg"

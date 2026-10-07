@@ -64,6 +64,12 @@ class Guardavida extends Model
         return $this->hasMany(Licencia::class, 'guardavida_id');
     }
 
+    /** Períodos de alta -> baja en el plantel (ver GuardavidaPeriodo). */
+    public function periodos()
+    {
+        return $this->hasMany(GuardavidaPeriodo::class)->orderBy('desde')->orderBy('id');
+    }
+
     public function francoExcepciones()
     {
         return $this->hasMany(FrancoExcepcion::class);
@@ -169,6 +175,83 @@ class Guardavida extends Model
         });
     }
 
+    // ******************** Alta / baja en el plantel (períodos) ******************
+    /** Períodos usando la relación cargada si la hay (así el presentismo no consulta una vez por día). */
+    private function periodosCargados()
+    {
+        return $this->relationLoaded('periodos') ? $this->periodos : $this->periodos()->get();
+    }
+
+    public function periodoAbierto(): ?GuardavidaPeriodo
+    {
+        return $this->periodosCargados()->first(fn (GuardavidaPeriodo $p) => $p->hasta === null);
+    }
+
+    /**
+     * ¿Estaba en el plantel ese día? Es lo que usa el presentismo para no
+     * contar faltas fuera de las fechas de trabajo. Sin ningún período
+     * registrado (guardavidas anteriores a este registro) se mantiene el
+     * comportamiento de siempre: cuenta si hoy tiene rol de guardavida o encargado.
+     */
+    public function enPlantelEl($fecha): bool
+    {
+        $periodos = $this->periodosCargados();
+
+        if ($periodos->isEmpty()) {
+            return (bool) $this->user?->hasAnyRole(['guardavida', 'encargado']);
+        }
+
+        return $periodos->contains(fn (GuardavidaPeriodo $p) => $p->cubre($fecha));
+    }
+
+    /**
+     * Da de alta en el plantel a partir de una fecha (si ya tiene un período
+     * abierto, no hace nada). Si es un guardavida anterior a este registro,
+     * antes deja asentado su período "histórico" hasta el día previo al alta,
+     * para no cambiar los reportes de fechas pasadas. `$esNuevo` = acaba de crearse la fila
+     * (no hay nada anterior que conservar).
+     */
+    public function darDeAlta(Carbon $desde, ?int $temporadaId = null, ?string $motivo = null, bool $esNuevo = false): GuardavidaPeriodo
+    {
+        if ($abierto = $this->periodos()->whereNull('hasta')->first()) {
+            return $abierto;
+        }
+
+        if (! $esNuevo && ! $this->periodos()->exists()) {
+            $this->periodos()->create([
+                'desde' => null,
+                'hasta' => $desde->copy()->subDay()->toDateString(),
+                'motivo' => 'Anterior al registro de altas',
+            ]);
+        }
+
+        $periodo = $this->periodos()->create([
+            'temporada_id' => $temporadaId,
+            'desde' => $desde->toDateString(),
+            'hasta' => null,
+            'motivo' => $motivo,
+        ]);
+        $this->unsetRelation('periodos');
+
+        return $periodo;
+    }
+
+    /** Cierra el período abierto en esa fecha (la baja es inclusive: ese día todavía cuenta). */
+    public function darDeBajaDelPeriodo(Carbon $hasta, ?string $motivo = null): void
+    {
+        $abierto = $this->periodos()->whereNull('hasta')->first();
+
+        if ($abierto) {
+            $fin = $abierto->desde && $hasta->lt($abierto->desde) ? $abierto->desde : $hasta;
+            $abierto->update(['hasta' => $fin->toDateString(), 'motivo' => $motivo ?? $abierto->motivo]);
+        } elseif (! $this->periodos()->exists()) {
+            // Guardavida anterior a este registro: se asienta su período histórico, que termina acá.
+            $this->periodos()->create(['desde' => null, 'hasta' => $hasta->toDateString(), 'motivo' => $motivo]);
+        }
+
+        $this->unsetRelation('periodos');
+    }
+
     // ******************** Plantel activo (por rol) ******************************
     /**
      * Guardavidas del plantel actual: su usuario tiene rol `guardavida` o
@@ -202,7 +285,11 @@ class Guardavida extends Model
     {
         return $query->where(function ($q) use ($inicio, $fin) {
             $q->whereHas('user', fn ($u) => $u->role(['guardavida', 'encargado']))
-                ->orWhereHas('asistencias', fn ($a) => $a->whereBetween('fecha_hora', [$inicio, $fin]));
+                ->orWhereHas('asistencias', fn ($a) => $a->whereBetween('fecha_hora', [$inicio, $fin]))
+                // ...o que algún período de alta/baja se solape con el rango pedido.
+                ->orWhereHas('periodos', fn ($p) => $p
+                    ->where(fn ($d) => $d->whereNull('desde')->orWhere('desde', '<=', $fin))
+                    ->where(fn ($h) => $h->whereNull('hasta')->orWhere('hasta', '>=', $inicio)));
         });
     }
 

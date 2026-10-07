@@ -81,6 +81,10 @@
         @if ($candidatos->isNotEmpty())
             <div class="sm:px-4 pb-8 -mt-6 sm:-mt-8">
                 <div class="flex flex-wrap items-center justify-end gap-4">
+                    <div>
+                        <label for="hasta" class="block text-xs text-gray-500 dark:text-gray-400">Fecha de baja (último día en el plantel)</label>
+                        <input type="date" id="hasta" name="hasta" value="{{ old('hasta', now()->toDateString()) }}" required class="{{ $input }}">
+                    </div>
                     <label class="flex items-center gap-2 text-sm">
                         <input type="checkbox" name="entiendo" value="1" class="rounded border-gray-300 text-sky-600 focus:ring-sky-500">
                         Entiendo que los tildados pasan a postulante y pierden el acceso a la operación del sistema.

@@ -220,6 +220,7 @@ class SeleccionPostulantesTest extends TestCase
 
         $this->actingAs($admin)->post(route('postulaciones.seleccion.confirmar'), [
             'temporada' => $this->temporada->id,
+            'desde' => '2026-12-01',
             'filas' => [
                 $p1->id => ['playa_id' => $this->reta->id, 'puesto_id' => $this->puestoReta->id, 'turno' => '', 'encargado' => '0'],
                 $p2->id => ['playa_id' => $this->claromeco->id, 'puesto_id' => $this->puestoClaro->id, 'turno' => 'M', 'encargado' => '1'],
@@ -241,6 +242,7 @@ class SeleccionPostulantesTest extends TestCase
 
         $this->actingAs($this->admin())->post(route('postulaciones.seleccion.confirmar'), [
             'temporada' => $this->temporada->id,
+            'desde' => '2026-12-01',
             'filas' => [$p->id => ['playa_id' => '', 'puesto_id' => '', 'turno' => '', 'encargado' => '0']],
         ])->assertSessionHasErrors('filas.'.$p->id.'.playa_id');
 
@@ -256,6 +258,7 @@ class SeleccionPostulantesTest extends TestCase
 
         $this->actingAs($admin)->post(route('postulaciones.seleccion.confirmar'), [
             'temporada' => $this->temporada->id,
+            'desde' => '2026-12-01',
             'filas' => [$p->id => ['playa_id' => $this->reta->id, 'puesto_id' => '', 'turno' => '', 'encargado' => '0']],
         ])->assertSessionHas('success');
 
@@ -277,6 +280,7 @@ class SeleccionPostulantesTest extends TestCase
 
         $this->actingAs($this->admin())->post(route('postulaciones.seleccion.confirmar'), [
             'temporada' => $this->temporada->id,
+            'desde' => '2026-12-01',
             'filas' => [$p->id => ['playa_id' => $this->reta->id, 'puesto_id' => $this->puestoClaro->id, 'turno' => '', 'encargado' => '0']],
         ])->assertSessionHasErrors();
 
@@ -289,6 +293,7 @@ class SeleccionPostulantesTest extends TestCase
 
         $this->actingAs($this->admin())->post(route('postulaciones.seleccion.confirmar'), [
             'temporada' => $this->temporada->id,
+            'desde' => '2026-12-01',
             'filas' => [$pendiente->id => ['puesto_id' => $this->puestoReta->id, 'turno' => '', 'encargado' => '0']],
         ])->assertSessionHasErrors();
 

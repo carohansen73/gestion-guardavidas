@@ -51,6 +51,14 @@
                          <td class="px-4 py-2">
                                 @can('eliminar_guardavida')
                                    {{-- Switch de habilitado --}}
+                                    @if ($registro->user->enabled)
+                                        {{-- Apagar el interruptor = dar de baja (pide fecha y motivo en un modal) --}}
+                                        <button type="button" @click="baja = { url: @js(route('guardavida.baja', $registro)), nombre: @js($registro->user->lastname.', '.$registro->user->name) }" title="Dar de baja"
+                                            class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none bg-sky-500">
+                                            <span class="sr-only">Dar de baja</span>
+                                            <span class="inline-block h-4 w-4 transform rounded-full bg-white translate-x-6"></span>
+                                        </button>
+                                    @else
                                     <form action="{{ route('user.toggle', $registro->user->id) }}" method="POST" class="inline">
                                         @csrf
                                         @method('PATCH')
@@ -62,6 +70,7 @@
                                                 {{ $registro->user->enabled ? 'translate-x-6' : 'translate-x-1' }}"></span>
                                         </button>
                                     </form>
+                                    @endif
                                 @endcan
                             </div>
                         </td>

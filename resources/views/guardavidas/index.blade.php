@@ -25,6 +25,10 @@
             class="playa-tag px-3 py-1 bg-orange-600 text-gray-100 rounded hover:bg-orange-400 hover:shadow-lg dark:bg-orange-600 dark:hover:bg-orange-500 dark:text-gray-200">
             Bloqueados
             </a>
+            <a href="{{ route('guardavidas.bajas') }}"
+            class="playa-tag px-3 py-1 bg-gray-600 text-gray-100 rounded hover:bg-gray-500 hover:shadow-lg dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-gray-200">
+            Dados de baja
+            </a>
             @else
             <a href="{{ route('guardavida.index')}}"
             class="playa-tag px-3 py-1 bg-sky-500 text-gray-100 rounded hover:bg-gray-300 hover:shadow-lg dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-gray-200">
@@ -95,7 +99,7 @@
 
 </div>
 
-<div x-data="{ selectedId: null }">
+<div x-data="{ selectedId: null, baja: null }">
 
     {{-- Lista para Mobile --}}
     @include('guardavidas.partials.index-mobile')
@@ -103,6 +107,36 @@
     {{-- Tabla para Desktop --}}
     @include('guardavidas.partials.index-desktop')
 
+
+{{-- Modal de baja: lo abre el interruptor / botón "Dar de baja" de cada guardavida --}}
+@can('eliminar_guardavida')
+<div x-show="baja" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4" @keydown.escape.window="baja = null">
+    <div class="w-full max-w-md rounded-lg bg-white dark:bg-gray-800 shadow-lg p-6" @click.outside="baja = null">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Dar de baja</h3>
+        <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
+            <strong x-text="baja && baja.nombre"></strong> deja de aparecer en listados y asistencias a partir de esa fecha.
+            Conserva su historial y puede volver a postularse la próxima temporada.
+        </p>
+        <form :action="baja && baja.url" method="POST" class="mt-4 space-y-3">
+            @csrf
+            <div>
+                <label for="baja-fecha" class="block text-sm font-medium text-gray-900 dark:text-white">Último día de trabajo</label>
+                <input id="baja-fecha" type="date" name="fecha" value="{{ now()->toDateString() }}" max="{{ now()->toDateString() }}" required
+                    class="mt-1 w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm text-sm">
+            </div>
+            <div>
+                <label for="baja-motivo" class="block text-sm font-medium text-gray-900 dark:text-white">Motivo (opcional)</label>
+                <input id="baja-motivo" type="text" name="motivo" maxlength="255" placeholder="Ej. renuncia"
+                    class="mt-1 w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm text-sm">
+            </div>
+            <div class="flex justify-end gap-3 pt-2">
+                <button type="button" @click="baja = null" class="px-3 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200">Cancelar</button>
+                <button type="submit" class="rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white hover:bg-red-500">Dar de baja</button>
+            </div>
+        </form>
+    </div>
+</div>
+@endcan
 </div> <!-- selectedId -->
 
 
