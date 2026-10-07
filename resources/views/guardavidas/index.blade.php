@@ -20,21 +20,10 @@
 
     {{-- FILTROS BACK --}}
     <div class="flex flex-wrap items-center gap-2 mb-3">
-        @if(request()->is('guardavida'))
-            <a href="{{ route('guardavidas.disabled')}}"
-            class="playa-tag px-3 py-1 bg-orange-600 text-gray-100 rounded hover:bg-orange-400 hover:shadow-lg dark:bg-orange-600 dark:hover:bg-orange-500 dark:text-gray-200">
-            Bloqueados
-            </a>
-            <a href="{{ route('guardavidas.bajas') }}"
+        <a href="{{ route('guardavidas.bajas') }}"
             class="playa-tag px-3 py-1 bg-gray-600 text-gray-100 rounded hover:bg-gray-500 hover:shadow-lg dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-gray-200">
             Dados de baja
-            </a>
-            @else
-            <a href="{{ route('guardavida.index')}}"
-            class="playa-tag px-3 py-1 bg-sky-500 text-gray-100 rounded hover:bg-gray-300 hover:shadow-lg dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-gray-200">
-            Habilitados
-            </a>
-        @endif
+        </a>
 
             <a href="{{ route('guardavidas.export') }}" class="px-3 py-1 bg-emerald-600 text-gray-100 rounded hover:bg-emerald-500 hover:shadow-lg dark:bg-emerald-700 dark:hover:bg-teal-500 dark:text-gray-200">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">

@@ -101,21 +101,6 @@ class GuardavidaController extends Controller
         return $registros;
     }
 
-    public function getAllDisabled()
-    {
-        $guardavidasDeshabilitados = Guardavida::with('user', 'playa', 'puesto')
-            ->whereHas('user', function ($query) {
-                $query->where('enabled', false);
-            })
-            ->get();
-
-        $playas = Playa::all();
-
-        return view('guardavidas.disabled')
-            ->with('guardavidasDeshabilitados', $guardavidasDeshabilitados)
-            ->with('playas', $playas);
-    }
-
     /**
      * Show the form for creating a new resource.
      */

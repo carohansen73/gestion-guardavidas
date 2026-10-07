@@ -7,29 +7,6 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    /**
-     * Modifica el estado habilitado/deshabilitado
-     *
-     * @param  User  $guardavida
-     * @return void
-     */
-    public function toggle(User $user)
-    {
-
-        $user->enabled = ! $user->enabled;
-        $user->save();
-
-        // Al deshabilitar, revocamos cualquier token de Sanctum
-        // para que no pueda loguearse ni fichar.
-        // Si se lo vuelve a habilitar, va a tener que loguearse
-        // de nuevo con wifi para obtener uno nuevo.
-        if (! $user->enabled) {
-            $user->tokens()->delete();
-        }
-
-        return back()->with('success', 'El estado del usuario fue actualizado correctamente.');
-    }
-
     public function verPuestoUsuario(Request $request)
     {
         $validated = $request->validate([

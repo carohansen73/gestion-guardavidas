@@ -17,7 +17,6 @@ use App\Http\Controllers\PostulacionController;
 use App\Http\Controllers\PostulacionSeleccionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QrController;
-use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
@@ -104,8 +103,6 @@ Route::middleware(['auth', 'force.password', 'postulante.redirect'])->group(func
     Route::post('guardavida/{guardavida}/reincorporar', [GuardavidaController::class, 'reincorporar'])->name('guardavida.reincorporar');
     Route::get('guardavidas-dados-de-baja', [GuardavidaController::class, 'bajas'])->name('guardavidas.bajas');
     Route::resource('guardavida', App\Http\Controllers\GuardavidaController::class);
-    Route::patch('usuario-toggle/{user}', [UserController::class, 'toggle'])->name('user.toggle');
-    Route::get('guardavidas-deshabilitados', [GuardavidaController::class, 'getAllDisabled'])->name('guardavidas.disabled');
     Route::get('/get-all-guardavidas', [GuardavidaController::class, 'getAll']);
 
     Route::resource('licencia', App\Http\Controllers\LicenciaController::class)

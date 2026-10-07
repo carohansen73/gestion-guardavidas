@@ -79,11 +79,6 @@ class User extends Authenticatable
         return $query->where('enabled', true);
     }
 
-    public function scopeDeshabilitados($query)
-    {
-        return $query->where('enabled', false);
-    }
-
     public static function obtenerPuesto($idUser, $idPuesto)
     {
         $datosGuardavidas = User::select('*')
