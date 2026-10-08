@@ -7,6 +7,7 @@ use App\Models\Playa;
 use App\Models\Postulacion;
 use App\Models\PostulacionDocumento;
 use App\Models\Temporada;
+use App\Services\ReductorImagenes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -230,21 +231,31 @@ class PostulacionController extends Controller
             }
 
             $existente = $postulacion->documentos()->where('tipo', $tipo)->first();
-            if ($existente) {
+            // El archivo puede estar compartido con la inscripción de otra temporada (foto/DNI
+            // reutilizados): solo se borra del disco si ningún otro registro lo usa.
+            if ($existente && ! PostulacionDocumento::where('ruta', $existente->ruta)->where('id', '!=', $existente->id)->exists()) {
                 Storage::disk('local')->delete($existente->ruta);
             }
 
-            $ruta = $archivo->storeAs(
-                "postulaciones/{$postulacion->temporada_id}/{$postulacion->id}",
-                $tipo.'.'.strtolower($archivo->getClientOriginalExtension()),
-                'local'
-            );
+            $directorio = "postulaciones/{$postulacion->temporada_id}/{$postulacion->id}";
+
+            // Las fotos se achican y se pasan a WebP para ahorrar espacio; los PDF (y lo que no se
+            // pueda convertir) se guardan tal cual.
+            $reducido = app(ReductorImagenes::class)->reducir($archivo);
+            if ($reducido !== null) {
+                $ruta = "{$directorio}/{$tipo}.webp";
+                Storage::disk('local')->put($ruta, $reducido);
+                $nombreOriginal = pathinfo($archivo->getClientOriginalName(), PATHINFO_FILENAME).'.webp';
+            } else {
+                $ruta = $archivo->storeAs($directorio, $tipo.'.'.strtolower($archivo->getClientOriginalExtension()), 'local');
+                $nombreOriginal = $archivo->getClientOriginalName();
+            }
 
             $postulacion->documentos()->updateOrCreate(['tipo' => $tipo], [
                 'ruta' => $ruta,
-                'nombre_original' => $archivo->getClientOriginalName(),
-                'mime' => $archivo->getMimeType() ?? 'application/octet-stream',
-                'tamano' => $archivo->getSize(),
+                'nombre_original' => $nombreOriginal,
+                'mime' => $reducido !== null ? 'image/webp' : ($archivo->getMimeType() ?? 'application/octet-stream'),
+                'tamano' => $reducido !== null ? strlen($reducido) : $archivo->getSize(),
             ]);
         }
     }
@@ -277,6 +288,11 @@ class PostulacionController extends Controller
         if (! $postulacion->editablePorPostulante()) {
             return redirect()->route('postulacion.index')
                 ->with('error', 'Tu inscripción ya fue revisada y no se puede modificar.');
+        }
+
+        // Foto y DNI de la temporada anterior se copian solos (no hace falta volver a subirlos).
+        if ($postulacion->reutilizarDocumentosAnteriores() > 0) {
+            $postulacion->load('documentos');
         }
 
         return null;

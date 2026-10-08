@@ -19,16 +19,20 @@ class PostulacionDocumento extends Model
      * Tipos de documento. Un tipo nuevo se agrega acá, sin migración.
      * `obligatorio` define qué hace falta para poder enviar la inscripción
      * (la licencia motonáutica solo aplica a quien la tiene).
+     * `reutilizable`: si la persona ya lo subió en una temporada anterior, se copia solo a la
+     * inscripción nueva (documentos que no cambian: foto, DNI). Los que se renuevan o vencen
+     * (antecedentes, declaración jurada, libreta, etc.) hay que subirlos cada temporada.
+     * Para que otro tipo se reutilice, basta con poner su `reutilizable` en true.
      */
     public const TIPOS = [
-        'foto_personal' => ['label' => 'Foto personal', 'obligatorio' => true, 'mimes' => ['jpg', 'jpeg', 'png']],
-        'dni_frente' => ['label' => 'DNI (frente)', 'obligatorio' => true, 'mimes' => ['jpg', 'jpeg', 'png', 'pdf']],
-        'dni_dorso' => ['label' => 'DNI (dorso)', 'obligatorio' => true, 'mimes' => ['jpg', 'jpeg', 'png', 'pdf']],
-        'curriculum' => ['label' => 'Currículum', 'obligatorio' => true, 'mimes' => ['jpg', 'jpeg', 'png', 'pdf']],
-        'libreta' => ['label' => 'Libreta de guardavidas', 'obligatorio' => true, 'mimes' => ['pdf']],
-        'antecedentes_penales' => ['label' => 'Antecedentes penales', 'obligatorio' => true, 'mimes' => ['pdf']],
-        'declaracion_jurada' => ['label' => 'Declaración jurada firmada', 'obligatorio' => true, 'mimes' => ['jpg', 'jpeg', 'png', 'pdf']],
-        'licencia_motonautica' => ['label' => 'Licencia motonáutica', 'obligatorio' => false, 'mimes' => ['jpg', 'jpeg', 'png', 'pdf']],
+        'foto_personal' => ['reutilizable' => true, 'label' => 'Foto personal', 'obligatorio' => true, 'mimes' => ['jpg', 'jpeg', 'png']],
+        'dni_frente' => ['reutilizable' => true, 'label' => 'DNI (frente)', 'obligatorio' => true, 'mimes' => ['jpg', 'jpeg', 'png', 'pdf']],
+        'dni_dorso' => ['reutilizable' => true, 'label' => 'DNI (dorso)', 'obligatorio' => true, 'mimes' => ['jpg', 'jpeg', 'png', 'pdf']],
+        'curriculum' => ['reutilizable' => false, 'label' => 'Currículum', 'obligatorio' => true, 'mimes' => ['jpg', 'jpeg', 'png', 'pdf']],
+        'libreta' => ['reutilizable' => false, 'label' => 'Libreta de guardavidas', 'obligatorio' => true, 'mimes' => ['pdf']],
+        'antecedentes_penales' => ['reutilizable' => false, 'label' => 'Antecedentes penales', 'obligatorio' => true, 'mimes' => ['pdf']],
+        'declaracion_jurada' => ['reutilizable' => false, 'label' => 'Declaración jurada firmada', 'obligatorio' => true, 'mimes' => ['jpg', 'jpeg', 'png', 'pdf']],
+        'licencia_motonautica' => ['reutilizable' => false, 'label' => 'Licencia motonáutica', 'obligatorio' => false, 'mimes' => ['jpg', 'jpeg', 'png', 'pdf']],
     ];
 
     protected $fillable = [
@@ -43,6 +47,12 @@ class PostulacionDocumento extends Model
     public function postulacion()
     {
         return $this->belongsTo(Postulacion::class);
+    }
+
+    /** @return array<int,string> tipos que se copian de una temporada a la siguiente */
+    public static function tiposReutilizables(): array
+    {
+        return array_keys(array_filter(self::TIPOS, fn ($config) => $config['reutilizable'] ?? false));
     }
 
     public function getLabelAttribute(): string

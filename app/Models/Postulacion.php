@@ -109,6 +109,48 @@ class Postulacion extends Model
     }
 
     // -------------------------------------------- Helpers --------------------------------------------
+    /**
+     * Copia a esta inscripción los documentos reutilizables (foto, DNI) que la persona ya subió en
+     * una temporada anterior y todavía no tiene acá. NO se duplica el archivo: el registro nuevo
+     * apunta a la misma `ruta` (ahorra almacenamiento). Reemplazar uno en esta temporada crea un
+     * archivo nuevo y no toca el de la anterior; ver `guardarDocumentos()` (solo borra un archivo
+     * si ningún otro registro lo usa).
+     * Es idempotente. Devuelve cuántos copió.
+     */
+    public function reutilizarDocumentosAnteriores(): int
+    {
+        $faltan = array_diff(PostulacionDocumento::tiposReutilizables(), $this->documentos()->pluck('tipo')->all());
+        if ($faltan === []) {
+            return 0;
+        }
+
+        $anteriores = PostulacionDocumento::whereIn('tipo', $faltan)
+            ->whereHas('postulacion', fn ($p) => $p->where('user_id', $this->user_id)->where('id', '!=', $this->id))
+            ->orderByDesc('postulacion_id')
+            ->get()
+            ->unique('tipo');
+
+        $disco = \Illuminate\Support\Facades\Storage::disk('local');
+        $copiados = 0;
+
+        foreach ($anteriores as $anterior) {
+            if (! $disco->exists($anterior->ruta)) {
+                continue; // el archivo viejo ya no está: se le va a pedir de nuevo
+            }
+
+            $this->documentos()->create([
+                'tipo' => $anterior->tipo,
+                'ruta' => $anterior->ruta,
+                'nombre_original' => $anterior->nombre_original,
+                'mime' => $anterior->mime,
+                'tamano' => $anterior->tamano,
+            ]);
+            $copiados++;
+        }
+
+        return $copiados;
+    }
+
     public function documento(string $tipo): ?PostulacionDocumento
     {
         return $this->documentos->firstWhere('tipo', $tipo);
