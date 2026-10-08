@@ -160,7 +160,7 @@ class HomeController extends Controller
         if ($esGuardavidaOEncargado && $temporadaAbierta = Temporada::conPostulacionAbierta()) {
             $postularme = [
                 'temporada' => $temporadaAbierta,
-                'postulacion' => Postulacion::where('user_id', $user->id)->where('temporada_id', $temporadaAbierta->id)->first(),
+                'postulacion' => Postulacion::with(['temporada', 'perfil', 'documentos'])->where('user_id', $user->id)->where('temporada_id', $temporadaAbierta->id)->first(),
             ];
         }
 

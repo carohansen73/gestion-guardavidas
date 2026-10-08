@@ -16,10 +16,10 @@
     </div>
 
     @if (session('success'))
-        <div class="bg-green-100 text-green-700 p-3 rounded my-2">{{ session('success') }}</div>
+        <div class="bg-green-100 text-green-700 p-3 rounded my-2 dark:bg-green-900/40 dark:text-green-300">{{ session('success') }}</div>
     @endif
     @if (session('error'))
-        <div class="bg-red-100 text-red-700 p-3 rounded my-2">{{ session('error') }}</div>
+        <div class="bg-red-100 text-red-700 p-3 rounded my-2 dark:bg-red-900/40 dark:text-red-300">{{ session('error') }}</div>
     @endif
 </div>
 

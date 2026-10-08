@@ -52,7 +52,7 @@
             @endcan
 
             <!-- Botón flotante en el centro -->
-            <a href="{{route('home')}}" class="relative flex flex-1 flex-col items-center justify-center text-xs font-medium text-gray-700 py-2 px-4 flex-grow text-center">
+            <a href="{{route('home')}}" class="relative flex flex-1 flex-col items-center justify-center text-xs font-medium text-gray-700 py-2 px-4 flex-grow text-center dark:text-gray-200">
                 <div class="absolute bottom-0 p-2 rounded-full border-4 border-sky-200 bg-gray-100 dark:bg-gray-800 dark:border-sky-800 shadow-lg">
 
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"

@@ -12,12 +12,12 @@
     </div>
 
     @if (session('success'))
-        <div class="bg-green-100 text-green-700 p-3 rounded my-2">
+        <div class="bg-green-100 text-green-700 p-3 rounded my-2 dark:bg-green-900/40 dark:text-green-300">
             {{ session('success') }}
         </div>
     @endif
     @if ($errors->any())
-        <div class="bg-red-100 text-red-700 p-3 rounded my-2">
+        <div class="bg-red-100 text-red-700 p-3 rounded my-2 dark:bg-red-900/40 dark:text-red-300">
             {{ $errors->first() }}
         </div>
     @endif
@@ -46,8 +46,8 @@
                 @csrf
 
                 <div class="sm:col-span-2">
-                    <label class="text-sm text-gray-700 dark:text-gray-200">Compañero:</label>
-                    <select name="guardavida_destinatario_id" required class="border rounded p-1.5 w-full">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Compañero:</label>
+                    <select name="guardavida_destinatario_id" required class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm">
                         <option value="">Seleccionar...</option>
                         @foreach ($companeros as $c)
                             <option value="{{ $c->id }}">{{ $c->apellido }} {{ $c->nombre }} — franco {{ $c->dias_franco_nombres ?? 'sin configurar' }}</option>
@@ -56,25 +56,25 @@
                 </div>
 
                 <div>
-                    <label class="text-sm text-gray-700 dark:text-gray-200">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Tu día que cedés (tiene que ser tu franco: {{ $guardavida->dias_franco_nombres }}):
                     </label>
-                    <input type="date" name="fecha_propia" id="fecha_propia_input" required class="border rounded p-1.5 w-full">
+                    <input type="date" name="fecha_propia" id="fecha_propia_input" required class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm">
                     <p id="fecha_propia_error" class="hidden text-red-500 text-xs mt-1"></p>
                 </div>
 
                 <div>
-                    <label class="text-sm text-gray-700 dark:text-gray-200">Día que querés tomar en su lugar:</label>
-                    <input type="date" name="fecha_deseada" required class="border rounded p-1.5 w-full">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Día que querés tomar en su lugar:</label>
+                    <input type="date" name="fecha_deseada" required class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm">
                 </div>
 
                 <div class="sm:col-span-2">
-                    <label class="text-sm text-gray-700 dark:text-gray-200">Mensaje (opcional):</label>
-                    <input type="text" name="mensaje" maxlength="255" class="border rounded p-1.5 w-full" placeholder="Ej: tengo un trámite ese día">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Mensaje (opcional):</label>
+                    <input type="text" name="mensaje" maxlength="255" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm" placeholder="Ej: tengo un trámite ese día">
                 </div>
 
                 <div class="sm:col-span-2">
-                    <button type="submit" class="bg-sky-600 hover:bg-sky-500 text-white px-4 py-1.5 rounded">
+                    <button type="submit" class="bg-sky-500 hover:bg-sky-400 text-white rounded-full px-5 py-2 shadow">
                         Enviar pedido
                     </button>
                 </div>

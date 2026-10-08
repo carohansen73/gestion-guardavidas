@@ -74,7 +74,7 @@
                 @csrf
                 @method('PUT')
 
-                <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6 text-gray-600 rounded sm:px-10 md:px-10 pb-4 sm:pb-12 py-4 sm:py-10">
+                <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6 text-gray-600 rounded sm:px-10 md:px-10 pb-4 sm:pb-12 py-4 sm:py-10 dark:text-gray-300">
 
                     <!-- Personal Information -->
                     <div class="sm:col-span-6">

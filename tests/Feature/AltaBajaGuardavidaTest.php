@@ -337,7 +337,7 @@ class AltaBajaGuardavidaTest extends TestCase
             'nombre' => '2027/28', 'fecha_inicio_postulacion' => now()->subDays(2), 'fecha_fin_postulacion' => now()->addDays(10),
             'fecha_inicio' => '2027-11-01', 'fecha_fin' => '2028-03-31',
         ]);
-        $this->actingAs($user)->get(route('home'))->assertOk()->assertSee('Inscripción abierta: 2027/28')->assertSee('Postularme');
+        $this->actingAs($user)->get(route('home'))->assertOk()->assertSee('INSCRIPCIÓN ABIERTA')->assertSee('2027/28')->assertSee('Postularme');
         $this->actingAs($user)->get(route('postulacion.index'))->assertOk();
 
         // Selección: ya tiene un período abierto, no se duplica; se actualiza su fila (no se crea otra).

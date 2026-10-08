@@ -64,7 +64,7 @@
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                         <td class="px-4 py-2">
                             <input type="checkbox" name="guardavidas[]" value="{{ $guardavida->id }}" checked
-                                class="rounded border-gray-300 text-sky-600 focus:ring-sky-500">
+                                class="rounded border-gray-300 text-sky-600 focus:ring-sky-500 dark:border-gray-600">
                         </td>
                         <td class="px-4 py-2">{{ $guardavida->user->lastname }}, {{ $guardavida->user->name }}</td>
                         <td class="px-4 py-2">{{ $guardavida->user->dni }}</td>
@@ -86,7 +86,7 @@
                         <input type="date" id="hasta" name="hasta" value="{{ old('hasta', now()->toDateString()) }}" required class="{{ $input }}">
                     </div>
                     <label class="flex items-center gap-2 text-sm">
-                        <input type="checkbox" name="entiendo" value="1" class="rounded border-gray-300 text-sky-600 focus:ring-sky-500">
+                        <input type="checkbox" name="entiendo" value="1" class="rounded border-gray-300 text-sky-600 focus:ring-sky-500 dark:border-gray-600">
                         Entiendo que los tildados pasan a postulante y pierden el acceso a la operación del sistema.
                     </label>
                     <button type="submit" class="px-4 py-2 rounded-md bg-red-500 hover:bg-red-400 text-white text-sm font-medium"

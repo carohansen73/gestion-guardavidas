@@ -126,7 +126,7 @@
     @can('agregar_cambio_turno')
         <a href="{{ route('cambio-de-turno.create') }}" class="btn fixed z-40 flex items-center bg-sky-500 bottom-24 right-8 rounded-full px-3 py-3 shadow">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-            class="text-sky-500 w-6 h-6 z-50 bg-gray-100 rounded me-2">
+            class="text-sky-500 w-6 h-6 z-50 bg-gray-100 rounded me-2 dark:bg-gray-700">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
             <span class="text-gray-100 text-lg"> Agregar</span>

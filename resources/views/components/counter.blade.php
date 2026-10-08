@@ -21,7 +21,7 @@
         </span>
         <p class="truncate text-sm font-semibold">{{ $label }}</p>
         @if($description)
-            <p class="text-xs text-gray-800">{{ $description }}</p>
+            <p class="text-xs text-gray-800 dark:text-gray-100">{{ $description }}</p>
         @endif
 
           <!-- TODO Ocultar mobile

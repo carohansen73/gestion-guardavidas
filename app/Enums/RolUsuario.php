@@ -1,14 +1,16 @@
 <?php
+
 namespace App\Enums;
 
 use App\Models\User;
 
-enum RolUsuario: string {
-
+enum RolUsuario: string
+{
     case Superadmin = 'superadmin';
     case Admin = 'admin';
     case Encargado = 'encargado';
     case Guardavida = 'guardavida';
+    case Postulante = 'postulante';
 
     /**
      * Rol "principal" a mostrar en la UI para un usuario que puede tener más
@@ -34,6 +36,7 @@ enum RolUsuario: string {
             self::Admin => 'Admin',
             self::Encargado => 'Encargado',
             self::Guardavida => 'Guardavida',
+            self::Postulante => 'Postulante',
         };
     }
 
@@ -44,6 +47,7 @@ enum RolUsuario: string {
             self::Admin => 'text-sky-600 dark:text-sky-400',
             self::Encargado => 'text-amber-600 dark:text-amber-400',
             self::Guardavida => 'text-emerald-600 dark:text-emerald-400',
+            self::Postulante => 'text-slate-600 dark:text-slate-300',
         };
     }
 
@@ -54,6 +58,7 @@ enum RolUsuario: string {
             self::Admin => 'bg-sky-100 dark:bg-sky-900/40',
             self::Encargado => 'bg-amber-100 dark:bg-amber-900/40',
             self::Guardavida => 'bg-emerald-100 dark:bg-emerald-900/40',
+            self::Postulante => 'bg-slate-100 dark:bg-slate-700/60',
         };
     }
 
@@ -68,6 +73,7 @@ enum RolUsuario: string {
             self::Admin => 'shield-check',
             self::Encargado => 'star',
             self::Guardavida => 'lifebuoy',
+            self::Postulante => 'user',
         };
     }
 }

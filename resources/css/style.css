@@ -26,16 +26,29 @@ header.header-mobile{
     border-radius: 0 0 30px 30px;
 }
 
-/* Ocultar sidebar en pantallas mobile */
-@media (hover: none) {
-    #separator-sidebar {
-        transform: translateX(-100%) !important;
-    }
-}
-
+/*
+ * "Escritorio" = pantalla de 640px o más con mouse. Solo ahí se ve el sidebar fijo (y el contenido
+ * se corre 16rem a la derecha). En cualquier otro caso (celular, o tablet táctil de cualquier ancho)
+ * no hay sidebar y se navega con el menú hamburguesa de layouts/navigation.blade.php.
+ * Las clases .solo-escritorio y .solo-celular-o-tablet siguen esta misma condición.
+ */
 @media (min-width: 640px) and (hover: hover) and (pointer: fine) {
     .desktop-ml-64 {
         margin-left: 16rem; /* 64 Tailwind */
+    }
+
+    .solo-celular-o-tablet {
+        display: none !important;
+    }
+}
+
+@media not all and (min-width: 640px) and (hover: hover) and (pointer: fine) {
+    #separator-sidebar {
+        transform: translateX(-100%) !important;
+    }
+
+    .solo-escritorio {
+        display: none !important;
     }
 }
 
@@ -296,3 +309,38 @@ h3.section-title::after {
     }
 }
 
+
+
+/*
+ * Tom Select (selectores múltiples de intervenciones): su tema viene claro desde el CDN,
+ * acá se adapta al modo oscuro.
+ */
+.dark .ts-control,
+.dark .ts-wrapper.single.input-active .ts-control {
+    background-color: #374151;
+    border-color: #4b5563;
+    color: #fff;
+}
+
+.dark .ts-control input,
+.dark .ts-control .item {
+    color: #fff;
+}
+
+.dark .ts-wrapper.multi .ts-control > div {
+    background-color: #0369a1;
+    color: #fff;
+}
+
+.dark .ts-dropdown,
+.dark .ts-dropdown.form-control {
+    background-color: #1f2937;
+    border-color: #4b5563;
+    color: #e5e7eb;
+}
+
+.dark .ts-dropdown .option:hover,
+.dark .ts-dropdown .active {
+    background-color: #374151;
+    color: #fff;
+}

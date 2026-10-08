@@ -29,26 +29,13 @@
 </head>
 <body class="font-sans antialiased bg-gray-100 dark:bg-gray-900 min-h-screen">
 
-    {{-- Layout minimal a propósito: un postulante no tiene que ver el
-         sidebar ni la navegación del sistema principal (intervenciones,
-         banderas, etc.) — solo su postulación y cómo salir. --}}
-    <nav class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <x-application-logo class="h-8 w-auto fill-current text-gray-800 dark:text-gray-200" />
-                <span class="font-semibold text-gray-800 dark:text-gray-100">Postulación</span>
-            </div>
-
-            @auth
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
-                        Cerrar sesión
-                    </button>
-                </form>
-            @endauth
-        </div>
-    </nav>
+    {{-- Layout acotado a propósito: sin el sidebar ni la navegación del sistema principal, pero con la
+         MISMA barra superior (layouts/navigation) para que se vea como el mismo sistema. Un postulante
+         "puro" solo puede ir a su postulación (ver RedirectPostulante), así que la barra le muestra solo
+         "Mis datos" y "Cerrar sesión"; un guardavida/encargado que se postula conserva su menú completo. --}}
+    @auth
+        @include('layouts.navigation', ['conSidebar' => false])
+    @endauth
 
     <main class="max-w-3xl mx-auto px-4 py-8">
         <x-session-alerts />

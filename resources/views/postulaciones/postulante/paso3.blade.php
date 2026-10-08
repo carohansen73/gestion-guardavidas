@@ -21,17 +21,16 @@
     }
 @endphp
 
-<form method="POST" action="{{ route('postulacion.guardar', 3) }}" enctype="multipart/form-data"
-    class="glass rounded-xl px-6 pb-6 space-y-10">
+<x-form-tarjeta method="POST" action="{{ route('postulacion.guardar', 3) }}" enctype="multipart/form-data">
     @csrf
 
-    <x-postulacion-encabezado :paso="3" titulo="Documentación">
+    <x-form-encabezado :paso="3" titulo="Documentación">
         Podés subir solo lo que tengas hoy y completar el resto más adelante. Formatos: PDF o imagen (JPG/PNG), hasta {{ $maxKb / 1024 }} MB por archivo.
         Si volvés a subir un documento, reemplaza al anterior.
-    </x-postulacion-encabezado>
+    </x-form-encabezado>
 
     @foreach ($grupos as $grupo)
-        <x-postulacion-seccion :titulo="$grupo['titulo']" :icono="$grupo['icono']" :descripcion="$grupo['descripcion']">
+        <x-form-seccion :titulo="$grupo['titulo']" :icono="$grupo['icono']" :descripcion="$grupo['descripcion']">
 
             {{-- El modelo de declaración jurada va junto a donde se sube la firmada. --}}
             @if ($modeloDeclaracion && in_array('declaracion_jurada', $grupo['tipos'], true))
@@ -79,13 +78,13 @@
                     </div>
                 @endforeach
             </div>
-        </x-postulacion-seccion>
+        </x-form-seccion>
     @endforeach
 
     <div class="flex justify-between items-center">
         <a href="{{ route('postulacion.paso', 2) }}" class="text-sm text-gray-500 dark:text-gray-400 hover:underline">← Anterior</a>
         <button type="submit" class="bg-sky-500 hover:bg-sky-400 text-white rounded-full px-5 py-2 shadow">Guardar y continuar</button>
     </div>
-</form>
+</x-form-tarjeta>
 
 @endsection

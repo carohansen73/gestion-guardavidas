@@ -1,16 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
-<section class="text-gray-600 dark:text-gray-100 body-font sm:px-4 sm:py-10">
-
-    <h2 class="mb-3 text-gray-700 dark:text-white text-2xl font-bold tracking-tight text-heading md:text-3xl lg:text-4xl section-title">Editar usuario
-        <span class="text-lg text-sky-600">
-            {!! $guardavida->nombre !!}   {!! $guardavida->apellido !!}
-        </span>
-    </h2>
+<section class="sm:px-4 sm:py-10">
 
     @if ($errors->any())
-        <div class="bg-red-100 text-red-700 p-3 rounded mb-4">
+        <div class="bg-red-100 text-red-700 p-3 rounded mb-4 dark:bg-red-900/40 dark:text-red-300">
             <ul class="list-disc pl-5">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
@@ -19,7 +13,7 @@
         </div>
     @endif
     @if (session('success'))
-        <div class="mb-4 rounded-lg bg-green-100 border border-green-300 text-green-800 px-4 py-3">
+        <div class="mb-4 rounded-lg bg-green-100 border border-green-300 text-green-800 px-4 py-3 dark:bg-green-900/40 dark:text-green-200 dark:border-green-800">
             <p>{{ session('success') }}</p>
         </div>
     @endif
@@ -50,19 +44,19 @@
     </div>
     {{-- DATOS GUARDAVIDA --}}
     <div id="default-tab-content">
-        <div class="hidden  rounded-lg bg-gray-50 dark:bg-gray-800 py-3" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
+        <div class="hidden pt-6" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
             @include('guardavidas.partials.edit-datos')
         </div>
         {{-- termina datos guardavida  --}}
 
         {{-- PERFIL --}}
-        <div class="hidden rounded-lg bg-gray-50 dark:bg-gray-800 py-3" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+        <div class="hidden pt-6" id="profile" role="tabpanel" aria-labelledby="profile-tab">
            @include('guardavidas.partials.edit-perfil')
         </div>
         {{-- termina perfil  --}}
         {{-- ROL Y PERMISOS --}}
         {{-- @can('admin') --}}
-        <div class="hidden rounded-lg bg-gray-50 dark:bg-gray-800 py-3" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+        <div class="hidden pt-6" id="settings" role="tabpanel" aria-labelledby="settings-tab">
             @include('guardavidas.partials.edit-rol')
         </div>
         {{-- @endcan --}}

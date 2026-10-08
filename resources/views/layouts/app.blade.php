@@ -21,6 +21,10 @@
     @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/css/style.css',  'resources/js/darkMode.js'])
     {{-- Alpine: lo marcado con x-cloak (modales, etc.) no se ve hasta que Alpine arranca --}}
     <style>[x-cloak] { display: none !important; }</style>
+    {{-- El sidebar solo se ve en escritorio (640px+ con mouse; misma condición que en style.css). Se repite acá,
+         inline, para que en celular/tablet nazca oculto y sin transición: si dependiera de style.css, mientras
+         carga se vería un instante y después "se iría" deslizándose. --}}
+    <style>@media not all and (min-width: 640px) and (hover: hover) and (pointer: fine) { #separator-sidebar { transform: translateX(-100%) !important; transition: none !important; } }</style>
 
     <!-- CSS específico por vista -->
     @stack('styles')

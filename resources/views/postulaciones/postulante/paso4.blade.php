@@ -3,13 +3,13 @@
 
 @include('postulaciones.postulante._pasos', ['paso' => 4])
 
-<div class="glass rounded-xl p-6 pt-10 space-y-10">
+<x-form-tarjeta tag="div">
 
-    <x-postulacion-encabezado :paso="4" titulo="Revisar y enviar">
+    <x-form-encabezado :paso="4" titulo="Revisar y enviar">
         Mientras no la envíes, el equipo no podrá ver tu inscripción. Una vez enviada, podrás seguir corrigiéndola hasta que sea aceptada/rechazada.
-    </x-postulacion-encabezado>
+    </x-form-encabezado>
 
-    <x-postulacion-seccion titulo="Estado de tu inscripción" icono="shield-check">
+    <x-form-seccion titulo="Estado de tu inscripción" icono="shield-check">
         @if ($faltantes)
             <div class="rounded-md bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 p-3 text-sm text-amber-800 dark:text-amber-200">
                 <p class="font-semibold mb-1">Todavía falta completar:</p>
@@ -24,9 +24,9 @@
                 ¡Está todo completo! Ya podés enviar tu inscripción.
             </div>
         @endif
-    </x-postulacion-seccion>
+    </x-form-seccion>
 
-    <x-postulacion-seccion titulo="Resumen" icono="clipboard-check" descripcion="Lo que vas a enviar. Podés volver a cualquier paso para corregirlo.">
+    <x-form-seccion titulo="Resumen" icono="clipboard-check" descripcion="Lo que vas a enviar. Podés volver a cualquier paso para corregirlo.">
         <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm">
             <div><dt class="text-gray-500 dark:text-gray-400">Disponibilidad</dt>
                 <dd class="text-gray-800 dark:text-gray-100">
@@ -45,7 +45,7 @@
                     {{ $postulacion->documentos->count() }} de {{ count($tipos) }}
                 </dd></div>
         </dl>
-    </x-postulacion-seccion>
+    </x-form-seccion>
 
     <div class="flex justify-between items-center">
         <a href="{{ route('postulacion.paso', 3) }}" class="text-sm text-gray-500 dark:text-gray-400 hover:underline">← Anterior</a>
@@ -57,6 +57,6 @@
             </button>
         </form>
     </div>
-</div>
+</x-form-tarjeta>
 
 @endsection

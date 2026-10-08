@@ -2,322 +2,277 @@
 
 @section('content')
 
-<section class="text-gray-600 dark:text-gray-100 body-font sm:px-4 sm:py-10">
-<h2 class="mb-3 text-gray-700 dark:text-white text-2xl font-bold tracking-tight text-heading md:text-3xl lg:text-4xl section-title">Agregar Guardavida</h2>
+<section class="sm:px-4 sm:py-10">
+    <x-form-tarjeta action="{{ isset($guardavida) ? route('guardavida.update', $guardavida->id) : route('guardavida.store') }}" method="POST">
+        @csrf
+        @if(isset($guardavida))
+            @method('PUT')
+        @endif
 
-        {{-- <form action="{{ route('bandera.store') }}" method="POST" class="bg-white rounded shadow-md ">
-            @csrf --}}
+        <x-form-encabezado titulo="Agregar usuario" icono="users">
+            Alta de un guardavidas, encargado o administrador del sistema.
+        </x-form-encabezado>
 
+        @if ($errors->any())
+            <div class="bg-red-100 text-red-700 p-3 rounded dark:bg-red-900/40 dark:text-red-300">
+                <ul class="list-disc pl-5">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
-<form action="{{ isset($guardavida) ? route('guardavida.update', $guardavida->id) :
-    route('guardavida.store') }}" method="POST" class="bg-white rounded shadow-md ">
-    @csrf
-    @if(isset($guardavida))
-        @method('PUT')
-    @endif
-
-    <div class="container px-4 sm:px-2 py-4 mx-auto">
-
-
-                @if ($errors->any())
-                    <div class="bg-red-100 text-red-700 p-3 rounded mb-4">
-                        <ul class="list-disc pl-5">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
+        <x-form-seccion titulo="Registro de usuario" icono="user" descripcion="El correo ingresado será su usuario para acceder al sistema. La contraseña inicial será del 1 al 9 y deberá cambiarla al ingresar por primera vez. Seleccione el rol correspondiente.">
+            <div class="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-8">
+                 <!-- Nombre -->
+                <div class="sm:col-span-4">
+                    <label for="nombre" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre</label>
+                    <div>
+                        <input id="nombre" type="text" name="nombre" placeholder="Nombre"
+                        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm"
+                        value="{{ old('nombre', $guardavida->nombre ?? '') }}" required/>
+                        @error('nombre')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
-                @endif
+                </div>
 
-                <div class="space-y-12">
-                    <div class="pb-4 sm:pb-12 sm:px-4 py-2">
+                <!-- Apellido -->
+                <div class="sm:col-span-4">
+                    <label for="apellido" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Apellido</label>
+                    <div>
+                        <input id="apellido" type="text" name="apellido" placeholder="Apellido"
+                        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm"
+                        value="{{ old('apellido', $guardavida->apellido ?? '') }}" required/>
+                        @error('apellido')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
 
+                <div class="sm:col-span-4">
+                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
+                    <div>
+                        <input id="email" type="email" name="email" placeholder="usuario@gmail.com"
+                        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm"
+                        value="{{ old('email', $guardavida->user->email ?? '') }}" required/>
+                        @error('email')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
 
-                        <div class=" grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                            <div class="sm:col-span-6">
-                                <h3 class="font-semibold text-gray-900 dark:text-white text-lg pt-2 ">
-                                    Registro de usuario
-                                </h3>
-                                <p class="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">El correo ingresado será su usuario para acceder al sistema. La contraseña inicial será del 1 al 9 y deberá cambiarla al ingresar por primera vez. Seleccione el rol correspondiente.</p>
-                            </div>
-                             <!-- Nombre -->
-                            <div class="sm:col-span-3">
-                                <label for="nombre" class="block text-sm font-medium text-gray-900 dark:text-white">Nombre</label>
-                                <div class="mt-2">
-                                    <input id="nombre" type="text" name="nombre" placeholder="Nombre"
-                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
-                                    value="{{ old('nombre', $guardavida->nombre ?? '') }}" required/>
-                                    @error('nombre')
-                                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                                    @enderror
-                                </div>
-                            </div>
+                {{-- CONTRASEÑA 123456789? Y QUE LUEGO LO CAMBIEN ?! obligatorio q lo cambien!
+                <div>
+                    <label>Contraseña</label>
+                    <input type="password" name="password" required>
+                </div> --}}
+                <div class="sm:col-span-4">
+                    <label for="Rol" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Rol</label>
+                         <div class="mt-2 relative overflow-hidden">
+                            <select name="rol" id="rol-select"
+                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm"
+                            required>
+                                <option class="w-auto" value="">Seleccione</option>
+                                <option value="guardavida" {{ old('rol', $rol ?? '' ) == 'guardavida' ? 'selected' : '' }}>Guardavida</option>
+                                <option value="encargado" {{ old('rol', $rol ?? '' ) == 'encargado' ? 'selected' : '' }}>Encargado</option>
+                                <option value="admin" {{ old('rol', $rol ?? '' ) == 'admin' ? 'selected' : '' }}>Administrador</option>
+                            </select>
+                    </div>
+                </div>
 
-                            <!-- Apellido -->
-                            <div class="sm:col-span-3">
-                                <label for="apellido" class="block text-sm font-medium text-gray-900 dark:text-white">Apellido</label>
-                                <div class="mt-2">
-                                    <input id="apellido" type="text" name="apellido" placeholder="Apellido"
-                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
-                                    value="{{ old('apellido', $guardavida->apellido ?? '') }}" required/>
-                                    @error('apellido')
-                                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="sm:col-span-3">
-                                <label for="email" class="block text-sm font-medium text-gray-900 dark:text-white">Email</label>
-                                <div class="mt-2">
-                                    <input id="email" type="email" name="email" placeholder="usuario@gmail.com"
-                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
-                                    value="{{ old('email', $guardavida->user->email ?? '') }}" required/>
-                                    @error('email')
-                                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            {{-- CONTRASEÑA 123456789? Y QUE LUEGO LO CAMBIEN ?! obligatorio q lo cambien!
-                            <div>
-                                <label>Contraseña</label>
-                                <input type="password" name="password" required>
-                            </div> --}}
-                            <div class="sm:col-span-3">
-                                <label for="Rol" class="block text-sm font-medium text-gray-900 dark:text-white">Rol</label>
-                                     <div class="mt-2 relative overflow-hidden">
-                                        <select name="rol" id="rol-select"
-                                        class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
-                                        required>
-                                            <option class="w-auto" value="">Seleccione</option>
-                                            <option value="guardavida" {{ old('rol', $rol ?? '' ) == 'guardavida' ? 'selected' : '' }}>Guardavida</option>
-                                            <option value="encargado" {{ old('rol', $rol ?? '' ) == 'encargado' ? 'selected' : '' }}>Encargado</option>
-                                            <option value="admin" {{ old('rol', $rol ?? '' ) == 'admin' ? 'selected' : '' }}>Administrador</option>
-                                        </select>
-                                </div>
-                            </div>
-
-                            <!-- DNI: siempre visible/obligatorio (vive en users.dni, ya no
-                                 solo en guardavidas.dni) — cualquier usuario, sea admin,
-                                 guardavida o encargado, tiene DNI. -->
-                            <div class="sm:col-span-3">
-                                <label for="dni" class="block text-sm font-medium text-gray-900 dark:text-white">DNI</label>
-                                <div class="mt-2">
-                                    <input id="dni" type="number" name="dni" placeholder="Ej: 11111111"
-                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
-                                    value="{{ old('dni', $guardavida->dni ?? '') }}" required/>
-                                    @error('dni')
-                                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-{{-- A PARTIR DE ACA, SOLO VISIBLE SI VA A AGREGAR UN GUARDAVIDA  --}}
-                        <div id="guardavida-fields" style="display: none;" class=" grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-8 py-4">
-
-                            <div class="sm:col-span-8 border-t border-gray-200 dark:border-gray-700">
-                                <h3 class="font-semibold text-gray-900 dark:text-white text-lg pt-4">
-                                    Información personal
-                                </h3>
-                                <p class="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">
-                                    Complete los datos personales del guardavidas. Asegúrese de que la información sea correcta, ya que será utilizada para su identificación y gestión interna.
-                                </p>
-                            </div>
-
-                            <!-- telefono -->
-                            <div class="sm:col-span-4">
-                                <label for="telefono" class="block text-sm font-medium text-gray-900 dark:text-white">Telefono</label>
-                                <div class="mt-2">
-                                    <input id="telefono" type="tel" name="telefono" placeholder="2983111111"
-                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
-                                    value="{{ old('telefono', $guardavida->telefono ?? '') }}" />
-                                    @error('telefono')
-                                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <!-- Direccion -->
-                            <div class="sm:col-span-4">
-                                <label for="direccion" class="block text-sm font-medium text-gray-900 dark:text-white">Dirección</label>
-                                <div class="mt-2">
-                                    <input id="direccion" type="text" name="direccion" placeholder="Ej. calle 11"
-                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
-                                    value="{{ old('direccion', $guardavida->direccion ?? '') }}" />
-                                    @error('direccion')
-                                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                                    @enderror
-                                </div>
-                            </div>
-
-
-                            <!-- numero -->
-                            <div class="sm:col-span-2">
-                                <label for="dni" class="block text-sm font-medium text-gray-900 dark:text-white">Número</label>
-                                <div class="mt-2">
-                                    <input id="numero" type="number" name="numero" placeholder="Ej: 1250"
-                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
-                                    value="{{ old('numero', $guardavida->numero ?? '') }}" />
-                                    @error('numero')
-                                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <!-- piso_dpto -->
-                            <div class="sm:col-span-2">
-                                <label for="piso_dpto" class="block text-sm font-medium text-gray-900 dark:text-white">Piso - Dpto</label>
-                                <div class="mt-2">
-                                    <input id="piso_dpto" type="text" name="piso_dpto" placeholder="Ej. 2-A"
-                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500"
-                                    value="{{ old('piso_dpto', $guardavida->piso_dpto ?? '') }}" />
-                                    @error('piso_dpto')
-                                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                                    @enderror
-                                </div>
-                            </div>
-
-
-
-                            <!-- fecha de alta en el plantel -->
-                            <div class="sm:col-span-4">
-                                <label for="fecha_alta" class="block text-sm font-medium text-gray-900 dark:text-white">Fecha de alta (primer día de trabajo)</label>
-                                <div class="mt-2">
-                                    <input id="fecha_alta" type="date" name="fecha_alta" value="{{ old('fecha_alta', now()->toDateString()) }}"
-                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500" />
-                                    @error('fecha_alta')
-                                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="sm:col-span-8 border-t border-gray-200 dark:border-gray-700">
-                                <h3 class="font-semibold text-gray-900 dark:text-white text-lg pt-4">
-                                    Información profesional
-                                </h3>
-
-                                <p class="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">
-                                    Indique correctamente la playa, puesto, función y turno asignados. Estos datos determinan dónde deberá fichar el guardavidas y cómo se gestionarán sus tareas.
-                                </p>
-                            </div>
-
-
-                            <!-- Playa -->
-                            <div class="sm:col-span-4">
-                                <label for="playa_id" class="block text-sm font-medium text-gray-900 dark:text-white">Playa</label>
-                                <div class="mt-2">
-                                    <select id="playa_id" name="playa_id"
-                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500">
-                                        @foreach($playas as $playa)
-                                        <option value="{{ $playa->id }}"
-                                            @if( isset($guardavida) && $guardavida->playa_id == $playa->id )
-                                                selected
-                                            @elseif(!isset($guardavida) && isset($guardavidaAuth) && $guardavidaAuth->playa_id == $playa->id)
-                                                selected
-                                            @endif >
-                                            {{ $playa->nombre }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Puesto
-                             TODO: Necesito saber el puesto o el estado de la bandera es el mismo en todos los puestos?  -->
-                        <div class="sm:col-span-4">
-                            <label for="puesto_id" class="block text-sm font-medium text-gray-900 dark:text-white">Puesto</label>
-                            <div class="mt-2">
-                                <select id="puesto_id" name="puesto_id"
-                                class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500">
-                                @foreach($puestos as $puesto)
-                                    <option value="{{ $puesto->id }}" data-playa="{{ $puesto->playa_id }}"
-                                        @if( isset($guardavida) && $guardavida->puesto_id == $puesto->id )
-                                            selected
-                                        @elseif(!isset($guardavida) && isset($guardavidaAuth) && $guardavidaAuth->puesto_id == $puesto->id)
-                                            selected
-                                        @endif
-                                    >
-                                        {{ $puesto->nombre }}
-                                    </option>
-                                @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-                          <!-- Función -->
-                            <div class="sm:col-span-4">
-                                <label for="funcion"
-                                class="block text-sm font-medium text-gray-900 dark:text-white">Función</label>
-                               <div class="mt-2 relative overflow-hidden">
-                                <select id="funcion" name="funcion" class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 shadow-sm outline outline-1 outline-gray-300 focus:outline-sky-600 sm:text-sm dark:bg-gray-700 dark:text-white dark:outline-gray-500">
-                                    <option value="Guardavida">Guardavida</option>
-                                    <option value="Timonel">Timonel</option>
-                                    <option value="Encargado">Encargado</option>
-                                    <option value="Jefe_de_playa">Jefe de playa</option>
-                                </select>
-                                </div>
-                            </div>
-
-                            <!-- Turno -->
-                            <div class="sm:col-span-2">
-                                <label class="block text-sm font-medium text-gray-900 dark:text-white">Turno</label>
-                                <div class="mt-2 flex gap-4">
-                                    <label class="inline-flex items-center">
-                                        <input type="radio" name="turno" value="M"
-                                            {{ old('turno', $guardavida->turno ?? '') == 'M' ? 'checked' : '' }}
-                                            class="text-sky-600 border-gray-300 focus:ring-sky-500">
-                                        <span class="ml-2">Mañana</span>
-                                    </label>
-                                    <label class="inline-flex items-center">
-                                        <input type="radio" name="turno" value="T"
-                                            {{ old('turno', $guardavida->turno ?? '') == 'T' ? 'checked' : '' }}
-                                            class="text-sky-600 border-gray-300 focus:ring-sky-500">
-                                        <span class="ml-2">Tarde</span>
-                                    </label>
-                                </div>
-                            </div>
-
-                            <!-- Franco fijo -->
-                            <div class="sm:col-span-8">
-                                <label class="block text-sm font-medium text-gray-900 dark:text-white">
-                                    Franco fijo (día/s libres de todas las semanas)
-                                </label>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                    Opcional — podés dejarlo sin marcar si todavía no está definido qué día le va a tocar.
-                                    El propio guardavida también puede configurarlo después desde su perfil.
-                                </p>
-                                <div class="mt-2">
-                                    <x-dias-franco-checkboxes :seleccionados="old('dias_franco', [])" />
-                                </div>
-                            </div>
-
-                    </div> {{-- HASTA  ACA, SOLO VISIBLE SI VA A AGREGAR UN GUARDAVIDA  --}}
-
-
+                <!-- DNI: siempre visible/obligatorio (vive en users.dni, ya no
+                     solo en guardavidas.dni) — cualquier usuario, sea admin,
+                     guardavida o encargado, tiene DNI. -->
+                <div class="sm:col-span-4">
+                    <label for="dni" class="block text-sm font-medium text-gray-700 dark:text-gray-300">DNI</label>
+                    <div>
+                        <input id="dni" type="number" name="dni" placeholder="Ej: 11111111"
+                        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm"
+                        value="{{ old('dni', $guardavida->dni ?? '') }}" required/>
+                        @error('dni')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
             </div>
+        </x-form-seccion>
 
-            <!-- Botones -->
-            <div class="m-6 mb-6 mt-8 flex flex-col-reverse gap-4 md:flex-row md:items-center md:justify-end md:gap-x-6">
-                <!-- Cancelar -->
-                <button type="button"
-                    class="text-sm font-semibold text-gray-900 dark:text-white"
-                    onclick="window.history.back()">
-                    Cancelar
-                </button>
+        {{-- A PARTIR DE ACA, SOLO VISIBLE SI VA A AGREGAR UN GUARDAVIDAS (lo muestra el script de abajo según el rol) --}}
+        <div id="guardavida-fields" style="display: none;" class="grid grid-cols-1 gap-y-14 sm:gap-y-16">
+            <x-form-seccion titulo="Información personal" icono="user" descripcion="Complete los datos personales del guardavidas. Asegúrese de que la información sea correcta, ya que será utilizada para su identificación y gestión interna.">
+                <div class="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-8">
+    <!-- telefono -->
+    <div class="sm:col-span-4">
+        <label for="telefono" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Telefono</label>
+        <div>
+            <input id="telefono" type="tel" name="telefono" placeholder="2983111111"
+            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm"
+            value="{{ old('telefono', $guardavida->telefono ?? '') }}" />
+            @error('telefono')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
+        </div>
+    </div>
 
-                <!-- Guardar -->
-                <button type="submit"
-                    class="w-full md:w-auto rounded-md bg-sky-600 px-3 py-2 text-sm font-semibold text-white shadow hover:bg-sky-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 dark:bg-sky-500">
-                    Guardar
-                </button>
+    <!-- Direccion -->
+    <div class="sm:col-span-4">
+        <label for="direccion" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Dirección</label>
+        <div>
+            <input id="direccion" type="text" name="direccion" placeholder="Ej. calle 11"
+            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm"
+            value="{{ old('direccion', $guardavida->direccion ?? '') }}" />
+            @error('direccion')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
+        </div>
+    </div>
+
+
+    <!-- numero -->
+    <div class="sm:col-span-2">
+        <label for="dni" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Número</label>
+        <div>
+            <input id="numero" type="number" name="numero" placeholder="Ej: 1250"
+            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm"
+            value="{{ old('numero', $guardavida->numero ?? '') }}" />
+            @error('numero')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
+        </div>
+    </div>
+
+    <!-- piso_dpto -->
+    <div class="sm:col-span-2">
+        <label for="piso_dpto" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Piso - Dpto</label>
+        <div>
+            <input id="piso_dpto" type="text" name="piso_dpto" placeholder="Ej. 2-A"
+            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm"
+            value="{{ old('piso_dpto', $guardavida->piso_dpto ?? '') }}" />
+            @error('piso_dpto')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
+        </div>
+    </div>
+
+
+
+    <!-- fecha de alta en el plantel -->
+    <div class="sm:col-span-4">
+        <label for="fecha_alta" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Fecha de alta (primer día de trabajo)</label>
+        <div>
+            <input id="fecha_alta" type="date" name="fecha_alta" value="{{ old('fecha_alta', now()->toDateString()) }}"
+            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm" />
+            @error('fecha_alta')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
+        </div>
+    </div>
+                </div>
+            </x-form-seccion>
+
+            <x-form-seccion titulo="Información profesional" icono="life-buoy" descripcion="Indique correctamente la playa, puesto, función y turno asignados. Estos datos determinan dónde deberá fichar el guardavidas y cómo se gestionarán sus tareas.">
+                <div class="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-8">
+        <!-- Playa -->
+        <div class="sm:col-span-4">
+            <label for="playa_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Playa</label>
+            <div>
+                <select id="playa_id" name="playa_id"
+                class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm">
+                    @foreach($playas as $playa)
+                    <option value="{{ $playa->id }}"
+                        @if( isset($guardavida) && $guardavida->playa_id == $playa->id )
+                            selected
+                        @elseif(!isset($guardavida) && isset($guardavidaAuth) && $guardavidaAuth->playa_id == $playa->id)
+                            selected
+                        @endif >
+                        {{ $playa->nombre }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+    </div>
+
+    <!-- Puesto
+         TODO: Necesito saber el puesto o el estado de la bandera es el mismo en todos los puestos?  -->
+    <div class="sm:col-span-4">
+        <label for="puesto_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Puesto</label>
+        <div>
+            <select id="puesto_id" name="puesto_id"
+            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm">
+            @foreach($puestos as $puesto)
+                <option value="{{ $puesto->id }}" data-playa="{{ $puesto->playa_id }}"
+                    @if( isset($guardavida) && $guardavida->puesto_id == $puesto->id )
+                        selected
+                    @elseif(!isset($guardavida) && isset($guardavidaAuth) && $guardavidaAuth->puesto_id == $puesto->id)
+                        selected
+                    @endif
+                >
+                    {{ $puesto->nombre }}
+                </option>
+            @endforeach
+            </select>
+        </div>
+    </div>
+
+      <!-- Función -->
+        <div class="sm:col-span-4">
+            <label for="funcion"
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300">Función</label>
+           <div class="mt-2 relative overflow-hidden">
+            <select id="funcion" name="funcion" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm">
+                <option value="Guardavida">Guardavida</option>
+                <option value="Timonel">Timonel</option>
+                <option value="Encargado">Encargado</option>
+                <option value="Jefe_de_playa">Jefe de playa</option>
+            </select>
             </div>
-
         </div>
 
-    </form>
+        <!-- Turno -->
+        <div class="sm:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Turno</label>
+            <div class="mt-2 flex gap-4">
+                <label class="inline-flex items-center">
+                    <input type="radio" name="turno" value="M"
+                        {{ old('turno', $guardavida->turno ?? '') == 'M' ? 'checked' : '' }}
+                        class="text-sky-600 border-gray-300 focus:ring-sky-500 dark:border-gray-600">
+                    <span class="ml-2">Mañana</span>
+                </label>
+                <label class="inline-flex items-center">
+                    <input type="radio" name="turno" value="T"
+                        {{ old('turno', $guardavida->turno ?? '') == 'T' ? 'checked' : '' }}
+                        class="text-sky-600 border-gray-300 focus:ring-sky-500 dark:border-gray-600">
+                    <span class="ml-2">Tarde</span>
+                </label>
+            </div>
+        </div>
 
+        <!-- Franco fijo -->
+        <div class="sm:col-span-8">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Franco fijo (día/s libres de todas las semanas)
+            </label>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                Opcional — podés dejarlo sin marcar si todavía no está definido qué día le va a tocar.
+                El propio guardavida también puede configurarlo después desde su perfil.
+            </p>
+            <div>
+                <x-dias-franco-checkboxes :seleccionados="old('dias_franco', [])" />
+            </div>
+        </div>
+                </div>
+            </x-form-seccion>
+        </div>
+        {{-- HASTA ACA, SOLO VISIBLE SI VA A AGREGAR UN GUARDAVIDAS --}}
+
+        <!-- Botones -->
+        <div class="flex flex-col-reverse gap-4 sm:flex-row sm:items-center sm:justify-end sm:gap-x-6">
+            <button type="button" class="text-sm text-gray-500 dark:text-gray-400 hover:underline" onclick="window.history.back()">Cancelar</button>
+            <button type="submit" class="w-full sm:w-auto bg-sky-500 hover:bg-sky-400 text-white rounded-full px-5 py-2 shadow">Guardar</button>
+        </div>
+    </x-form-tarjeta>
 
     <div class="py-4 w-full sm:hidden">
         <a href="{{ route('guardavida.index') }}" class="bg-sky-600 rounded flex py-4 px-4 h-full justify-between">
@@ -360,9 +315,7 @@
             </svg>
         </a>
     </div> --}}
-
-
- </section>
+</section>
 
  {{-- pasar a .js --}}
 

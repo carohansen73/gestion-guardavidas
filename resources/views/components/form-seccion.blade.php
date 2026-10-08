@@ -1,10 +1,11 @@
 @props(['titulo', 'icono' => 'user', 'descripcion' => null])
 
-{{-- Una parte del formulario: subtítulo con ícono (+ descripción opcional) y su contenido (slot). --}}
+{{-- Una parte de un formulario: subtítulo con ícono (+ descripción opcional) y su contenido (slot).
+     La separación entre secciones la da <x-form-tarjeta>. --}}
 <section class="space-y-3">
     <div class="mb-2">
         <div class="flex items-center gap-3">
-            <x-postulacion-icono :nombre="$icono" class="h-5 w-5 shrink-0 text-sky-600" />
+            <x-form-icono :nombre="$icono" class="h-5 w-5 shrink-0 text-sky-600" />
             <p class="text-xs font-semibold uppercase tracking-wide dark:text-white">{{ $titulo }}</p>
         </div>
 

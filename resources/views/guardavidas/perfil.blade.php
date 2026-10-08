@@ -88,7 +88,7 @@
                     @csrf
                     @method('PUT')
 
-                    <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-8 text-gray-600 rounded px-4 sm:px-10 py-6">
+                    <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-8 text-gray-600 rounded px-4 sm:px-10 py-6 dark:text-gray-300">
 
                         <!-- Personal Information -->
                         <div class="sm:col-span-8">
@@ -259,13 +259,13 @@
                                         <label class="inline-flex items-center">
                                             <input type="radio" name="turno" value="M"
                                                 {{ old('turno', $guardavida->turno ?? '') == 'M' ? 'checked' : '' }}
-                                                class="text-sky-600 border-gray-300 focus:ring-indigo-500">
+                                                class="text-sky-600 border-gray-300 focus:ring-indigo-500 dark:border-gray-600">
                                             <span class="ml-2">Mañana</span>
                                         </label>
                                         <label class="inline-flex items-center">
                                             <input type="radio" name="turno" value="T"
                                                 {{ old('turno', $guardavida->turno ?? '') == 'T' ? 'checked' : '' }}
-                                                class="text-sky-600 border-gray-300 focus:ring-indigo-500">
+                                                class="text-sky-600 border-gray-300 focus:ring-indigo-500 dark:border-gray-600">
                                             <span class="ml-2">Tarde</span>
                                         </label>
                                     </div>
@@ -359,7 +359,7 @@
                             <label class="inline-flex items-center gap-1.5 text-sm text-gray-700 dark:text-gray-200">
                                 <input type="checkbox" name="dias_franco[]" value="{{ $i }}" form="francoForm"
                                     {{ in_array($i, old('dias_franco', $guardavida->diasFrancoActuales())) ? 'checked' : '' }}
-                                    class="rounded border-gray-300 text-sky-600 focus:ring-sky-500">
+                                    class="rounded border-gray-300 text-sky-600 focus:ring-sky-500 dark:border-gray-600">
                                 {{ $nombreDia }}
                             </label>
                         @endforeach

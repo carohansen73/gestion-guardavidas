@@ -51,9 +51,9 @@
                     <td class="px-4 py-2">{{ $cambio->guardavida->nombre }} {{ $cambio->guardavida->apellido }}</td>
                     <td class="px-4 py-2">
                         @if ($cambio->turno_nuevo === 'M')
-                            <span class="bg-blue-200 text-blue-800 px-2 py-1 rounded">Mañana</span>
+                            <span class="bg-blue-200 text-blue-800 px-2 py-1 rounded dark:text-blue-200">Mañana</span>
                         @else
-                            <span class="bg-yellow-200 text-yellow-800 px-2 py-1 rounded">Tarde</span>
+                            <span class="bg-yellow-200 text-yellow-800 px-2 py-1 rounded dark:text-yellow-200">Tarde</span>
                         @endif
                     </td>
                     <td class="px-4 py-2">{{ $cambio->fecha->format('d/m/Y') }}</td>

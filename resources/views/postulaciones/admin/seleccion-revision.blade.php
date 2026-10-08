@@ -125,7 +125,7 @@
                     <input type="hidden" name="filas[{{ $id }}][encargado]" value="0" form="form-revision">
                     <input type="checkbox" name="filas[{{ $id }}][encargado]" value="1" form="form-revision"
                         @checked(old("filas.$id.encargado", $postulacion->user->hasRole('encargado')))
-                        class="rounded border-gray-300 text-sky-600 focus:ring-sky-500">
+                        class="rounded border-gray-300 text-sky-600 focus:ring-sky-500 dark:border-gray-600">
                 </td>
             </tr>
         @endforeach

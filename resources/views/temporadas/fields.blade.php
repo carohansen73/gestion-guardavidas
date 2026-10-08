@@ -1,45 +1,46 @@
 @extends('layouts.app')
 @section('content')
 
-<section class="text-gray-600 dark:text-gray-100 body-font sm:px-4 sm:py-10">
-    <h2 class="mb-3 text-gray-700 dark:text-white text-2xl font-bold tracking-tight text-heading md:text-3xl lg:text-4xl section-title">
-        {{ isset($temporada) ? 'Editar temporada' : 'Nueva temporada' }}
-    </h2>
-
-    <div class="mb-4 rounded-md bg-blue-50 dark:bg-blue-900/30 p-3 text-sm text-blue-800 dark:text-blue-200 border border-blue-200 dark:border-blue-800">
-        La ventana de <strong>postulación</strong> es cuando alguien puede completar el formulario de inscripción
-        (normalmente meses antes). La ventana <strong>operativa</strong> es la temporada en sí — la que se usa para
-        cargar intervenciones, banderas, etc., y fuera de la cual guardavida/encargado no pueden crear/editar nada.
-    </div>
-
-    <form action="{{ isset($temporada) ? route('temporada.update', $temporada) : route('temporada.store') }}"
-        method="POST" enctype="multipart/form-data" class="bg-white dark:bg-gray-800 rounded shadow-md">
+<section class="sm:px-4 sm:py-10">
+    <x-form-tarjeta action="{{ isset($temporada) ? route('temporada.update', $temporada) : route('temporada.store') }}"
+        method="POST" enctype="multipart/form-data">
         @csrf
         @if(isset($temporada))
             @method('PUT')
         @endif
 
-        <div class="container px-4 py-6 mx-auto max-w-2xl">
+        <x-form-encabezado :titulo="isset($temporada) ? 'Editar temporada' : 'Nueva temporada'" icono="calendar">
+            Cada temporada tiene dos ventanas de fechas: la de postulación y la operativa.
+        </x-form-encabezado>
 
-            @if ($errors->any())
-                <div class="bg-red-100 text-red-700 p-3 rounded mb-4">
-                    <ul class="list-disc pl-5">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+        @if ($errors->any())
+            <div class="bg-red-100 text-red-700 p-3 rounded dark:bg-red-900/40 dark:text-red-300">
+                <ul class="list-disc pl-5">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
-            <div class="mb-4">
+        <x-form-seccion titulo="Nombre" icono="file-text">
+            <div class="mb-1 rounded-md bg-blue-50 dark:bg-blue-900/30 p-3 text-sm text-blue-800 dark:text-blue-200 border border-blue-200 dark:border-blue-800">
+                La ventana de <strong>postulación</strong> es cuando alguien puede completar el formulario de inscripción
+                (normalmente meses antes). La ventana <strong>operativa</strong> es la temporada en sí — la que se usa para
+                cargar intervenciones, banderas, etc., y fuera de la cual guardavida/encargado no pueden crear/editar nada.
+            </div>
+
+            <div>
                 <label for="nombre" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre</label>
                 <input type="text" name="nombre" id="nombre"
                     value="{{ old('nombre', $temporada->nombre ?? '') }}"
                     placeholder="Ej. Temporada 2026-27"
                     class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm">
             </div>
+        </x-form-seccion>
 
-            <div class="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <x-form-seccion titulo="Ventana de postulación" icono="calendar" descripcion="Cuándo se puede completar el formulario de inscripción.">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label for="fecha_inicio_postulacion" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Postulación desde</label>
                     <input type="date" name="fecha_inicio_postulacion" id="fecha_inicio_postulacion"
@@ -53,8 +54,10 @@
                         class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm">
                 </div>
             </div>
+        </x-form-seccion>
 
-            <div class="mb-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <x-form-seccion titulo="Ventana operativa" icono="clock" descripcion="La temporada en sí: cuándo se opera en las playas.">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label for="fecha_inicio" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Temporada desde</label>
                     <input type="date" name="fecha_inicio" id="fecha_inicio"
@@ -68,10 +71,12 @@
                         class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm">
                 </div>
             </div>
+        </x-form-seccion>
 
-            {{-- Modelo de declaración jurada: lo descargan los postulantes en el paso 3
-                 del formulario. Cada temporada tiene el suyo (cambia de un año al otro). --}}
-            <div class="mb-6">
+        {{-- Modelo de declaración jurada: lo descargan los postulantes en el paso 3
+             del formulario. Cada temporada tiene el suyo (cambia de un año al otro). --}}
+        <x-form-seccion titulo="Declaración jurada" icono="paperclip" descripcion="El modelo que descargan los postulantes en el paso 3.">
+            <div>
                 <label for="modelo_declaracion" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Modelo de declaración jurada <span class="text-gray-400">(PDF, hasta 5 MB)</span>
                 </label>
@@ -92,19 +97,18 @@
 
                 @if (isset($temporada) && $temporada->declaracion_jurada_modelo)
                     <label class="mt-2 inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                        <input type="checkbox" name="quitar_modelo" value="1" class="rounded border-gray-300">
+                        <input type="checkbox" name="quitar_modelo" value="1" class="rounded border-gray-300 dark:border-gray-600">
                         Quitar el modelo actual (los postulantes dejan de verlo)
                     </label>
                 @endif
             </div>
+        </x-form-seccion>
 
-            <div class="flex items-center gap-3">
-                <button type="submit" class="bg-sky-500 dark:bg-sky-700 hover:bg-sky-400 dark:hover:bg-sky-600 text-white px-4 py-2 rounded-full shadow-md">
-                    Guardar
-                </button>
-                <a href="{{ route('temporada.index') }}" class="text-gray-500 dark:text-gray-400 hover:underline">Cancelar</a>
-            </div>
+        <!-- Botones -->
+        <div class="flex flex-col-reverse gap-4 sm:flex-row sm:items-center sm:justify-end sm:gap-x-6">
+            <a href="{{ route('temporada.index') }}" class="text-sm text-gray-500 dark:text-gray-400 hover:underline">Cancelar</a>
+            <button type="submit" class="w-full sm:w-auto bg-sky-500 hover:bg-sky-400 text-white rounded-full px-5 py-2 shadow">Guardar</button>
         </div>
-    </form>
+    </x-form-tarjeta>
 </section>
 @endsection

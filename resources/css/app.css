@@ -4,6 +4,14 @@
 
 @layer base {
     /*
+     * Color de texto base en modo oscuro: lo que no define un color propio hereda uno legible.
+     * Sin esto, cualquier texto sin clase text-* queda negro sobre fondo oscuro.
+     */
+    .dark body {
+        color: theme('colors.gray.200');
+    }
+
+    /*
      * Campos de formulario con la clase `border` pero sin color de borde
      * (los buscadores y filtros de varias vistas): sin esto toman el gris
      * oscuro del plugin de formularios. Se unifican en un gris claro.

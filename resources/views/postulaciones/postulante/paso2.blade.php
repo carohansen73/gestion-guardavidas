@@ -8,16 +8,16 @@
     $label = 'block text-sm font-medium text-gray-700 dark:text-gray-300';
 @endphp
 
-<form method="POST" action="{{ route('postulacion.guardar', 2) }}" class="glass rounded-xl px-6 pb-6 space-y-10">
+<x-form-tarjeta method="POST" action="{{ route('postulacion.guardar', 2) }}">
     @csrf
 
-    <x-postulacion-encabezado :paso="2" :titulo="'Inscripción a '.$temporada->nombre">
+    <x-form-encabezado :paso="2" :titulo="'Inscripción a '.$temporada->nombre">
         Indicá cuándo podés trabajar y, si querés, qué playas preferís. La asignación final la define el equipo según los cupos.
-    </x-postulacion-encabezado>
+    </x-form-encabezado>
 
-    {{-- Cada parte va en su propia sección (ver x-postulacion-seccion): poco espacio adentro y
-         mucho más entre partes (space-y-10 del <form>). --}}
-    <x-postulacion-seccion titulo="Disponibilidad" icono="calendar" descripcion="¿Entre qué fechas podés trabajar?">
+    {{-- Cada parte va en su propia sección (ver x-form-seccion): poco espacio adentro y
+         mucho más entre partes (la separación la da <x-form-tarjeta>). --}}
+    <x-form-seccion titulo="Disponibilidad" icono="calendar" descripcion="¿Entre qué fechas podés trabajar?">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
                 <label for="disponible_desde" class="{{ $label }}">Disponible desde</label>
@@ -30,9 +30,9 @@
                     value="{{ old('disponible_hasta', $postulacion->disponible_hasta?->format('Y-m-d')) }}">
             </div>
         </div>
-    </x-postulacion-seccion>
+    </x-form-seccion>
 
-    <x-postulacion-seccion titulo="Playas de preferencia" icono="map-pin" descripcion="Opcional. La segunda opción se tiene en cuenta si no hay cupo en la primera.">
+    <x-form-seccion titulo="Playas de preferencia" icono="map-pin" descripcion="Opcional. La segunda opción se tiene en cuenta si no hay cupo en la primera.">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
                 <label for="playa_1" class="{{ $label }}">Playa preferida <span class="text-gray-400">(opcional)</span></label>
@@ -53,12 +53,12 @@
                 </select>
             </div>
         </div>
-    </x-postulacion-seccion>
+    </x-form-seccion>
 
     <div class="flex justify-between items-center">
         <a href="{{ route('postulacion.paso', 1) }}" class="text-sm text-gray-500 dark:text-gray-400 hover:underline">← Anterior</a>
         <button type="submit" class="bg-sky-500 hover:bg-sky-400 text-white rounded-full px-5 py-2 shadow">Guardar y continuar</button>
     </div>
-</form>
+</x-form-tarjeta>
 
 @endsection

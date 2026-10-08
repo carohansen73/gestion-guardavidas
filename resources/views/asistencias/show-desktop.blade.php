@@ -14,17 +14,17 @@
     </div>
 
     @if (session('success'))
-         <div class="bg-green-100 text-green-700 p-3 rounded my-2">
+         <div class="bg-green-100 text-green-700 p-3 rounded my-2 dark:bg-green-900/40 dark:text-green-300">
             {{ session('success') }}
         </div>
     @endif
     @if (session('error'))
-        <div class="bg-red-100 text-red-700 p-3 rounded my-2">
+        <div class="bg-red-100 text-red-700 p-3 rounded my-2 dark:bg-red-900/40 dark:text-red-300">
             {{ session('error') }}
         </div>
     @endif
     @if ($errors->any())
-        <div class="bg-red-100 text-red-700 p-3 rounded my-2">
+        <div class="bg-red-100 text-red-700 p-3 rounded my-2 dark:bg-red-900/40 dark:text-red-300">
             {{ $errors->first() }}
         </div>
     @endif
@@ -108,7 +108,7 @@
         </div>
     @endif
 
-    <div  class="flex justify-between my-2 mx-4 px-4 py-2 bg-gray-50 border border-gray-200 dark:border-gray-700  shadow-sm">
+    <div  class="flex justify-between my-2 mx-4 px-4 py-2 bg-gray-50 border border-gray-200 dark:border-gray-700  shadow-sm dark:bg-gray-800">
         <form method="GET" class="flex gap-4">
             <div>
                 <label for="inicio">Desde:</label>
@@ -175,7 +175,7 @@
                                 <span class="text-sm text-gray-500 dark:text-gray-300">
                                 Estado: <strong>{{ $h['estado'] }}</strong>
                                 @if ($h['fuera_de_rango'] ?? false)
-                                    <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800" title="El fichaje quedó a más de 200m del puesto (según GPS) - revisar">
+                                    <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200" title="El fichaje quedó a más de 200m del puesto (según GPS) - revisar">
                                         ⚠ Revisar ubicación
                                     </span>
                                 @endif
@@ -249,7 +249,7 @@
                     <td class="px-4 py-2">
                         {{ $h['estado'] }}
                         @if ($h['fuera_de_rango'] ?? false)
-                            <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800" title="El fichaje quedó a más de 200m del puesto (según GPS) - revisar">
+                            <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200" title="El fichaje quedó a más de 200m del puesto (según GPS) - revisar">
                                 ⚠ Revisar ubicación
                             </span>
                         @endif

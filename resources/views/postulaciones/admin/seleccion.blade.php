@@ -146,7 +146,7 @@
         <tr>
             <th class="px-4 py-2 text-left w-10">
                 <input type="checkbox" :checked="paginaCompleta" @change="alternarPagina()" title="Tildar esta página"
-                    class="rounded border-gray-300 text-sky-600 focus:ring-sky-500">
+                    class="rounded border-gray-300 text-sky-600 focus:ring-sky-500 dark:border-gray-600">
             </th>
             <th class="px-4 py-2 text-left">Apellido y nombre</th>
             <th class="px-4 py-2 text-left">DNI</th>
@@ -166,9 +166,9 @@
                 <td class="px-4 py-2">
                     @if ($seleccionable)
                         <input type="checkbox" :checked="tiene({{ $postulacion->id }})" @change="alternar({{ $postulacion->id }})"
-                            class="rounded border-gray-300 text-sky-600 focus:ring-sky-500">
+                            class="rounded border-gray-300 text-sky-600 focus:ring-sky-500 dark:border-gray-600">
                     @else
-                        <input type="checkbox" disabled class="rounded border-gray-300 opacity-40">
+                        <input type="checkbox" disabled class="rounded border-gray-300 opacity-40 dark:border-gray-600">
                     @endif
                 </td>
                 <td class="px-4 py-2">{{ $postulacion->user->lastname }}, {{ $postulacion->user->name }}</td>

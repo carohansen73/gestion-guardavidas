@@ -180,6 +180,25 @@ class Postulacion extends Model
     }
 
     /**
+     * Por cada paso del formulario (1 a 4), si ya tiene todo lo que ese paso pide. Se calcula con los
+     * datos cargados y no con "el último paso visitado": la persona puede completar los pasos en cualquier orden.
+     *
+     * @return array<int,bool>
+     */
+    public function pasosCompletos(): array
+    {
+        $subidos = $this->documentos->pluck('tipo')->all();
+
+        return [
+            1 => collect(array_keys(Perfil::OBLIGATORIOS))->every(fn ($campo) => filled($this->perfil?->{$campo})),
+            2 => filled($this->disponible_desde) && filled($this->disponible_hasta),
+            3 => collect(array_keys(PostulacionDocumento::TIPOS))
+                ->every(fn ($tipo) => ! $this->documentoRequerido($tipo) || in_array($tipo, $subidos, true)),
+            4 => $this->estado !== self::ESTADO_BORRADOR,
+        ];
+    }
+
+    /**
      * Lo que todavía falta para poder enviar la inscripción (lista de
      * etiquetas legibles). Vacía = lista para enviar.
      *

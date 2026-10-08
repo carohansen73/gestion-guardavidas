@@ -22,7 +22,7 @@
     <div id="contenedorCarga">
         <div class="position">
             <div id="carga"></div>
-            <p class="text-xl font-medium text-gray-800 py-2 px-4 flex-grow text-center">
+            <p class="text-xl font-medium text-gray-800 py-2 px-4 flex-grow text-center dark:text-gray-100">
                 Guardando Asistencia...
             </p>
         </div>
@@ -32,7 +32,7 @@
     <div>
         @if(isset($puestos) && $puestos->count())
         <form action="#" method="get">
-            <label for="puestoSeleccionadoFichar" class="font-medium text-gray-700 py-2 px-4 flex-grow text-center mt-[5rem]">En caso de no fichar en el puesto asignado, debe seleccionar donde va a registrar la asistencia: </label>
+            <label for="puestoSeleccionadoFichar" class="font-medium text-gray-700 py-2 px-4 flex-grow text-center mt-[5rem] dark:text-gray-200">En caso de no fichar en el puesto asignado, debe seleccionar donde va a registrar la asistencia: </label>
             <div class="flex justify-center mb-[1rem]">
                 <select name="puestoSeleccionadoFichar" id="puestoSeleccionadoFichar">
                 <option value="default">Seleccionar</option>
@@ -53,9 +53,9 @@
 
 
     <div
-        class="fixed bottom-0 left-0 right-0 z-40 bg-gray-100 lg:hidden buttom-navigation border-t border-gray-200 shadow rounded-t-lg">
+        class="fixed bottom-0 left-0 right-0 z-40 bg-gray-100 lg:hidden buttom-navigation border-t border-gray-200 shadow rounded-t-lg dark:bg-gray-700 dark:border-gray-700">
         <div class="flex justify-around items-center px-2 border-t-[3px] border-[#4d4d4d] rounded-[10px]">
-            <p class="text-xl font-medium text-gray-700 py-2 px-4 flex-grow text-center">
+            <p class="text-xl font-medium text-gray-700 py-2 px-4 flex-grow text-center dark:text-gray-200">
                 Escanea el código QR para guardar la asistencia
             </p>
         </div>
