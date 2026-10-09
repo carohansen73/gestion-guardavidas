@@ -170,6 +170,12 @@ Route::middleware(['auth', 'force.password', 'postulante.redirect'])->group(func
     Route::get('/mis-asistencias', [AsistenciaController::class, 'misAsistencias'])
         ->name('guardavida.misAsistencias');
 
+    // Guía de ayuda para administradores (temporada, postulaciones, selección).
+    // Reutiliza ver_postulacion: lo tienen admin/superadmin, no guardavida ni encargado.
+    Route::get('/ayuda/temporada', fn () => view('ayuda.temporada'))
+        ->middleware('can:ver_postulacion')
+        ->name('ayuda.temporada');
+
     // Gestión de permisos por rol. Gateado por el permiso abm_roles_y_permisos,
     // que hoy solo tiene el rol superadmin (ver RolesYPermisosSeeder) — un admin
     // normal no lo tiene y por lo tanto no puede acceder a estas rutas.

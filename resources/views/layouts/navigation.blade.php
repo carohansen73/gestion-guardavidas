@@ -219,6 +219,16 @@
                     </div>
                 </div>
             @endcanany
+            @can('ver_postulacion')
+                <div class="py-2 border-t border-gray-200 dark:border-gray-700">
+                    <p class="px-4 pt-1 pb-1 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Ayuda</p>
+                    <div class="space-y-1">
+                        <x-responsive-nav-link :href="route('ayuda.temporada')" :active="request()->routeIs('ayuda.*')">
+                            {{ __('Guía de temporada') }}
+                        </x-responsive-nav-link>
+                    </div>
+                </div>
+            @endcan
             @canany(['abm_roles_y_permisos'])
                 <div class="py-2 border-t border-gray-200 dark:border-gray-700">
                     <p class="px-4 pt-1 pb-1 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Administración</p>

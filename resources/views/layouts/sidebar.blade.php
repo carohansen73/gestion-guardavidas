@@ -252,6 +252,20 @@
                 @endcan
                 </ul>
             @endcanany
+            @can('ver_postulacion')
+                <ul class="pt-4 mt-4 space-y-2 font-medium border-t border-gray-200 dark:border-gray-700">
+                    <li>
+                        <h2 class="px-2 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Ayuda</h2>
+                    </li>
+                    <li>
+                        <a href="{{ route('ayuda.temporada') }}"
+                            class="{{ request()->routeIs('ayuda.*') ? 'text-sky-600 bg-sky-100 dark:bg-gray-600' : 'text-gray-800' }} flex items-center p-2 text-gray-800 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                            <x-form-icono nombre="life-buoy" class="shrink-0 w-5 h-5 text-sky-600 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
+                            <span class="flex-1 ms-3 whitespace-nowrap">Guía de temporada</span>
+                        </a>
+                    </li>
+                </ul>
+            @endcan
             {{-- <ul class="pt-4 mt-4 space-y-2 font-medium border-t border-gray-200 dark:border-gray-700">
                 <li>
                     <h2>Panel de administración</h2>
