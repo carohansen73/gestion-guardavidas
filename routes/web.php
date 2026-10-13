@@ -63,6 +63,8 @@ Route::middleware(['auth', 'force.password', 'postulante.redirect'])->group(func
     Route::post('/postulaciones/{postulacion}/deseleccionar', [PostulacionSeleccionController::class, 'deseleccionar'])->name('postulaciones.deseleccionar');
     Route::get('/postulaciones/{postulacion}', [PostulacionAdminController::class, 'show'])->name('postulaciones.show');
     Route::patch('/postulaciones/{postulacion}/revisar', [PostulacionAdminController::class, 'revisar'])->name('postulaciones.revisar');
+    Route::get('/postulaciones/{postulacion}/editar', [PostulacionAdminController::class, 'edit'])->name('postulaciones.edit');
+    Route::put('/postulaciones/{postulacion}', [PostulacionAdminController::class, 'update'])->name('postulaciones.update');
     Route::get('/postulaciones/{postulacion}/documento/{tipo}', [PostulacionAdminController::class, 'documento'])->name('postulaciones.documento');
 
     // Ruta que actualiza los datos del guardavida (turno, puesto, etc.)

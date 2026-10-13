@@ -23,20 +23,22 @@
 
     <x-session-alerts />
 
-    {{-- Solapas por estado (los contadores son de toda la temporada, sin los otros filtros) --}}
-    <div class="flex flex-wrap gap-2 mb-4">
+    {{-- Solapas por estado: se pueden tocar (son filtros). Van subrayadas, a diferencia de los datos
+         informativos de otras pantallas, que son tarjetas. Los contadores son de toda la temporada. --}}
+    <nav class="flex flex-wrap gap-x-6 gap-y-1 mb-4 border-b border-gray-200 dark:border-gray-700" aria-label="Filtrar por estado">
         @foreach ($solapas as $clave => $titulo)
             @php
-                $total = $clave === 'todas' ? collect($conteos)->sum() : ($conteos[$clave] ?? 0);
+                $total = $clave === 'todas' ? collect($conteosPorEstado)->sum() : ($conteosPorEstado[$clave] ?? 0);
             @endphp
             <a href="{{ request()->fullUrlWithQuery(['estado' => $clave, 'page' => null]) }}"
-                class="px-3 py-1.5 rounded-full text-sm border {{ $estado === $clave
-                    ? 'bg-sky-500 text-white border-sky-500'
-                    : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700' }}">
-                {{ $titulo }} <span class="font-semibold">{{ $total }}</span>
+                @if ($estado === $clave) aria-current="page" @endif
+                class="-mb-px border-b-2 px-1 pb-2 pt-1 text-sm font-medium {{ $estado === $clave
+                    ? 'border-sky-500 text-sky-600 dark:border-sky-400 dark:text-sky-400'
+                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 hover:text-gray-700 dark:hover:border-gray-500 dark:hover:text-gray-200' }}">
+                {{ $titulo }} <span class="ms-1 text-xs font-normal opacity-70">({{ $total }})</span>
             </a>
         @endforeach
-    </div>
+    </nav>
 
     <form method="GET" action="{{ route('postulaciones.index') }}" class="flex flex-wrap items-end gap-3 mb-4">
         <input type="hidden" name="estado" value="{{ $estado }}">

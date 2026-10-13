@@ -7,7 +7,7 @@ use App\Models\Playa;
 use App\Models\Postulacion;
 use App\Models\PostulacionDocumento;
 use App\Models\Temporada;
-use App\Services\ReductorImagenes;
+use App\Services\GuardadoPostulacion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -204,60 +204,15 @@ class PostulacionController extends Controller
                 'disponible_hasta' => $datos['disponible_hasta'],
             ]);
 
-            // detach + attach (no sync): con la restricción única
-            // (postulacion, prioridad), intercambiar el orden de dos playas
-            // con sync chocaría a mitad de camino.
-            $postulacion->playas()->detach();
-            foreach ([1 => $datos['playa_1'] ?? null, 2 => $datos['playa_2'] ?? null] as $prioridad => $playaId) {
-                if ($playaId) {
-                    $postulacion->playas()->attach($playaId, ['prioridad' => $prioridad]);
-                }
-            }
+            app(GuardadoPostulacion::class)->guardarPlayas($postulacion, $datos['playa_1'] ?? null, $datos['playa_2'] ?? null);
         });
     }
 
     private function guardarDocumentos(Request $request, Postulacion $postulacion): void
     {
-        $reglas = [];
-        foreach (PostulacionDocumento::TIPOS as $tipo => $config) {
-            $reglas["doc_{$tipo}"] = ['nullable', 'file', 'mimes:'.implode(',', $config['mimes']), 'max:'.PostulacionDocumento::MAX_KB];
-        }
-        $request->validate($reglas);
+        $request->validate(GuardadoPostulacion::reglasDocumentos());
 
-        foreach (PostulacionDocumento::TIPOS as $tipo => $config) {
-            $archivo = $request->file("doc_{$tipo}");
-            if (! $archivo) {
-                continue; // subió solo algunos: el resto queda como estaba
-            }
-
-            $existente = $postulacion->documentos()->where('tipo', $tipo)->first();
-            // El archivo puede estar compartido con la inscripción de otra temporada (foto/DNI
-            // reutilizados): solo se borra del disco si ningún otro registro lo usa.
-            if ($existente && ! PostulacionDocumento::where('ruta', $existente->ruta)->where('id', '!=', $existente->id)->exists()) {
-                Storage::disk('local')->delete($existente->ruta);
-            }
-
-            $directorio = "postulaciones/{$postulacion->temporada_id}/{$postulacion->id}";
-
-            // Las fotos se achican y se pasan a WebP para ahorrar espacio; los PDF (y lo que no se
-            // pueda convertir) se guardan tal cual.
-            $reducido = app(ReductorImagenes::class)->reducir($archivo);
-            if ($reducido !== null) {
-                $ruta = "{$directorio}/{$tipo}.webp";
-                Storage::disk('local')->put($ruta, $reducido);
-                $nombreOriginal = pathinfo($archivo->getClientOriginalName(), PATHINFO_FILENAME).'.webp';
-            } else {
-                $ruta = $archivo->storeAs($directorio, $tipo.'.'.strtolower($archivo->getClientOriginalExtension()), 'local');
-                $nombreOriginal = $archivo->getClientOriginalName();
-            }
-
-            $postulacion->documentos()->updateOrCreate(['tipo' => $tipo], [
-                'ruta' => $ruta,
-                'nombre_original' => $nombreOriginal,
-                'mime' => $reducido !== null ? 'image/webp' : ($archivo->getMimeType() ?? 'application/octet-stream'),
-                'tamano' => $reducido !== null ? strlen($reducido) : $archivo->getSize(),
-            ]);
-        }
+        app(GuardadoPostulacion::class)->guardarDocumentos($request, $postulacion);
     }
 
     /**

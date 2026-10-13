@@ -153,7 +153,9 @@
 
                 <p class="text-sm font-semibold pt-2">Alta fuera de la inscripción</p>
                 <ul class="{{ $lista }}">
-                    <li>Se puede crear manualmente desde <strong>Guardavidas → Agregar</strong>. Si es posible, mejor que pase por la inscripción para tener sus documentos.</li>
+                    <li>Se puede crear manualmente desde <strong>Guardavidas → Agregar</strong>. Queda <strong>seleccionado</strong> en la temporada que corresponde a la fecha de alta, igual que el resto: el cierre no lo da de baja.</li>
+                    <li>Si la fecha cae fuera de toda temporada, se lo incluye en la más cercana.</li>
+                    <li>Sus datos y documentos son opcionales: podés cargarlos después desde <strong>Postulaciones → su inscripción → Completar datos y documentos</strong>.</li>
                 </ul>
             </x-form-seccion>
         </div>

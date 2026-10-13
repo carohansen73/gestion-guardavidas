@@ -55,21 +55,28 @@
 
     <x-session-alerts />
 
-    {{-- Resumen de la temporada --}}
-    <div class="flex flex-wrap gap-2 mb-4 text-sm">
-        <span class="px-3 py-1.5 rounded-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600">
-            Aceptadas <span class="font-semibold">{{ $resumen['aceptadas'] }}</span>
-        </span>
-        <span class="px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">
-            Seleccionadas <span class="font-semibold">{{ $resumen['seleccionadas'] }}</span>
-        </span>
-        @foreach ($playas as $playa)
-            @if (($resumen['porPlaya'][$playa->id] ?? 0) > 0)
-                <span class="px-3 py-1.5 rounded-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600">
-                    {{ $playa->nombre }} <span class="font-semibold">{{ $resumen['porPlaya'][$playa->id] }}</span>
-                </span>
-            @endif
-        @endforeach
+    {{-- Resumen de la temporada: son datos, no se tocan. Van como tarjetas con el número grande
+         (los filtros de otras pantallas son solapas subrayadas). --}}
+    <div class="mb-4">
+        <p class="mb-1.5 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Resumen de la temporada</p>
+        <dl class="flex flex-wrap gap-3">
+            <div class="min-w-[6.5rem] rounded-lg bg-gray-50 dark:bg-gray-800 px-4 py-2">
+                <dd class="text-xl font-semibold text-gray-800 dark:text-gray-100">{{ $resumen['aceptadas'] }}</dd>
+                <dt class="text-xs text-gray-500 dark:text-gray-400">Aceptadas</dt>
+            </div>
+            <div class="min-w-[6.5rem] rounded-lg bg-emerald-50 dark:bg-emerald-900/30 px-4 py-2">
+                <dd class="text-xl font-semibold text-emerald-700 dark:text-emerald-300">{{ $resumen['seleccionadas'] }}</dd>
+                <dt class="text-xs text-emerald-700/80 dark:text-emerald-300/80">Seleccionadas</dt>
+            </div>
+            @foreach ($playas as $playa)
+                @if (($resumen['porPlaya'][$playa->id] ?? 0) > 0)
+                    <div class="min-w-[6.5rem] rounded-lg bg-gray-50 dark:bg-gray-800 px-4 py-2">
+                        <dd class="text-xl font-semibold text-gray-800 dark:text-gray-100">{{ $resumen['porPlaya'][$playa->id] }}</dd>
+                        <dt class="text-xs text-gray-500 dark:text-gray-400">{{ $playa->nombre }}</dt>
+                    </div>
+                @endif
+            @endforeach
+        </dl>
     </div>
 
     <form method="GET" action="{{ route('postulaciones.seleccion') }}" class="flex flex-wrap items-end gap-3 mb-4">

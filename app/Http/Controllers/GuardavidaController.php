@@ -165,10 +165,15 @@ class GuardavidaController extends Controller
                 $guardavida->guardarDatosPersonales($validated);
 
                 // Alta en el plantel desde la fecha indicada (por defecto hoy): es lo que usa el presentismo.
-                // El período queda asociado a la temporada de esa fecha: así "quién trabajó en cada
-                // temporada" sale igual de las altas por postulación que de las manuales.
+                // Pertenece a la temporada de esa fecha (inscripción, tramo previo o temporada en curso; si
+                // cae fuera de todas, la más cercana) y queda como seleccionado/a en ella, igual que el resto
+                // del plantel: así el cierre de la selección no lo da de baja.
                 $fechaAlta = Carbon::parse($validated['fecha_alta'] ?? now());
-                $guardavida->darDeAlta($fechaAlta, Temporada::enLaFecha($fechaAlta)?->id, 'Alta manual', true);
+                $temporadaAlta = Temporada::paraFecha($fechaAlta);
+                $guardavida->darDeAlta($fechaAlta, $temporadaAlta?->id, 'Alta manual', true);
+                if ($temporadaAlta) {
+                    app(SeleccionPostulantes::class)->incluirEnTemporada($guardavida, $temporadaAlta);
+                }
 
                 // El franco fijo no es una columna de "guardavidas" (vive
                 // versionado en guardavida_franco_historial), y es opcional
@@ -183,7 +188,9 @@ class GuardavidaController extends Controller
 
         return redirect()
             ->route('guardavida.index')
-            ->with('success', 'Guardavida creado correctamente.');
+            ->with('success', in_array($validated['rol'], ['guardavida', 'encargado'])
+                ? 'Guardavida creado correctamente. Quedó incluido en la temporada como seleccionado; si querés cargar sus datos de inscripción y documentos, hacelo desde Postulaciones → su inscripción → "Completar datos y documentos".'
+                : 'Usuario creado correctamente.');
     }
 
     /**

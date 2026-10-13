@@ -298,7 +298,7 @@ class AltaBajaGuardavidaTest extends TestCase
         ];
     }
 
-    public function test_el_alta_manual_queda_en_el_plantel_con_su_periodo_y_temporada_y_sin_postulacion(): void
+    public function test_el_alta_manual_queda_en_el_plantel_con_su_periodo_y_temporada_y_como_seleccionado(): void
     {
         $admin = $this->usuario('20000001', 'admin');
 
@@ -306,7 +306,9 @@ class AltaBajaGuardavidaTest extends TestCase
 
         $user = User::where('dni', '31222333')->first();
         $this->assertTrue($user->hasRole('guardavida'));
-        $this->assertSame(0, Postulacion::where('user_id', $user->id)->count(), 'el alta manual no inventa una postulación');
+        $postulacion = Postulacion::where('user_id', $user->id)->sole();
+        $this->assertTrue($postulacion->seleccionado, 'figura como seleccionado en la temporada, igual que el resto');
+        $this->assertSame($this->temporada->id, $postulacion->temporada_id);
         $periodo = $user->guardavida->periodos()->first();
         $this->assertSame('2026-12-01', $periodo->desde->toDateString());
         $this->assertSame($this->temporada->id, $periodo->temporada_id);

@@ -29,6 +29,15 @@
 
     <x-session-alerts />
 
+    @can('revisar', $postulacion)
+        <div class="flex justify-end">
+            <a href="{{ route('postulaciones.edit', $postulacion) }}"
+                class="inline-flex items-center rounded-full border border-sky-500 px-4 py-1.5 text-sm text-sky-600 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-gray-700">
+                Completar datos y documentos
+            </a>
+        </div>
+    @endcan
+
     {{-- Datos personales --}}
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-5">
         <h3 class="font-semibold text-gray-800 dark:text-white mb-3">Datos personales</h3>

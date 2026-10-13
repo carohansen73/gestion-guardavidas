@@ -9,6 +9,7 @@ use App\Models\Temporada;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -101,6 +102,39 @@ class SeleccionPostulantes
     }
 
     /**
+     * Deja a alguien que entró SIN pasar por la selección (alta manual, reincorporación) igual que a
+     * los demás: con una postulación aceptada y seleccionada en esa temporada, con la playa/puesto/
+     * turno/función que tiene hoy. Así "seleccionado en la temporada" es la única regla (la usa el
+     * cierre, los listados, etc.). No exige datos ni documentos: el admin los puede completar después
+     * desde la postulación. Si ya figuraba como seleccionado en esa temporada no la toca.
+     */
+    public function incluirEnTemporada(Guardavida $guardavida, Temporada $temporada, string $nota = 'Dado/a de alta por la administración'): Postulacion
+    {
+        $postulacion = Postulacion::firstOrNew(['user_id' => $guardavida->user_id, 'temporada_id' => $temporada->id]);
+
+        if ($postulacion->exists && $postulacion->seleccionado) {
+            return $postulacion;
+        }
+
+        $postulacion->fill([
+            'estado' => Postulacion::ESTADO_ACEPTADA,
+            'seleccionado' => true,
+            'playa_asignada_id' => $guardavida->playa_id,
+            'puesto_asignado_id' => $guardavida->puesto_id,
+            'turno_asignado' => $guardavida->turno,
+            'funcion_asignada' => $guardavida->funcion,
+            'revisado_por_user_id' => Auth::id(),
+            'fecha_revision' => now(),
+        ]);
+        if (blank($postulacion->observaciones)) {
+            $postulacion->observaciones = $nota;
+        }
+        $postulacion->save();
+
+        return $postulacion;
+    }
+
+    /**
      * Corrige una selección hecha por error: saca a la persona de la selección, borra el
      * alta de esa temporada y la devuelve a postulante (conserva su fila de guardavidas).
      * Para una baja de alguien que ya trabajó usar darDeBaja().
@@ -150,7 +184,11 @@ class SeleccionPostulantes
         }
 
         DB::transaction(function () use ($guardavida, $user, $desde) {
-            $guardavida->darDeAlta($desde, null, 'Reincorporación');
+            $temporada = Temporada::paraFecha($desde);
+            $guardavida->darDeAlta($desde, $temporada?->id, 'Reincorporación');
+            if ($temporada) {
+                $this->incluirEnTemporada($guardavida, $temporada, 'Reincorporado/a por la administración');
+            }
             $user->syncRoles([$guardavida->funcion === 'Encargado' ? 'encargado' : 'guardavida']);
             $user->update(['enabled' => true]);
         });
