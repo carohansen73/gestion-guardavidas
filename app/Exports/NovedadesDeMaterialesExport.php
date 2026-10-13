@@ -10,28 +10,33 @@ use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class NovedadesDeMaterialesExport implements FromCollection, WithHeadings, WithTitle, WithMapping, WithStyles
+class NovedadesDeMaterialesExport implements FromCollection, WithHeadings, WithMapping, WithStyles, WithTitle
 {
-
     protected $playa;
 
-    public function __construct($playa)
+    protected $temporada;
+
+    /** @param \App\Models\Temporada|null $temporada null = todas */
+    public function __construct($playa, $temporada = null)
     {
         $this->playa = $playa;
+        $this->temporada = $temporada;
     }
 
     /**
-    * @return \Illuminate\Support\Collection
-    */
+     * @return \Illuminate\Support\Collection
+     */
     public function collection()
     {
         return NovedadMaterial::with(['material', 'playa'])
-        ->where('playa_id', $this->playa->id)
-        ->orderBy('fecha', 'desc')
-        ->get();
+            ->where('playa_id', $this->playa->id)
+            ->deTemporada($this->temporada)
+            ->orderBy('fecha', 'desc')
+            ->get();
     }
 
-    public function map($i): array {
+    public function map($i): array
+    {
         return [
             optional($i->fecha)->format('d/m/Y'),
             optional($i->tipo_novedad)->value ?? '—',
@@ -42,7 +47,8 @@ class NovedadesDeMaterialesExport implements FromCollection, WithHeadings, WithT
         ];
     }
 
-    public function headings(): array {
+    public function headings(): array
+    {
         return [
             'Fecha',
             'Novedad',
@@ -52,14 +58,16 @@ class NovedadesDeMaterialesExport implements FromCollection, WithHeadings, WithT
         ];
     }
 
-    public function title(): string {
+    public function title(): string
+    {
         return $this->playa->nombre;
     }
 
-    public function styles(Worksheet $sheet) {
+    public function styles(Worksheet $sheet)
+    {
         // Negrita para la fila 1 (encabezados)
         $highestColumn = $sheet->getHighestColumn();
-        $headerRange = 'A1:' . $highestColumn .'1';
+        $headerRange = 'A1:'.$highestColumn.'1';
         $sheet->getStyle($headerRange)->getFont()->setBold(true);
 
         // Color de fondo azul claro en encabezados

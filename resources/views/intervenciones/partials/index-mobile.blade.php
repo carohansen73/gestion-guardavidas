@@ -137,7 +137,7 @@
 
                                     {{-- BOTONES GROUP --}}
                                     <div class="inline-flex rounded-md shadow-xs" role="group">
-                                        @can('editar_intervencion')
+                                        @if (auth()->user()->can('editar_intervencion') && $intervencion->modificablePor(auth()->user()))
                                             <a  href="{{ route('intervencion.edit', $intervencion->id) }}"
                                                 class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
                                                 <svg xmlns="http://www.w3.org/2000/svg"
@@ -156,8 +156,8 @@
                                                 </svg>
                                                 Editar
                                             </a>
-                                        @endcan
-                                        @can('eliminar_intervencion')
+                                        @endif
+                                        @if (auth()->user()->can('eliminar_intervencion') && $intervencion->modificablePor(auth()->user()))
                                             <form action="{{ route('intervencion.destroy', $intervencion) }}" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar esta intervención?');">
                                                 @csrf
                                                 @method('DELETE')
@@ -185,7 +185,7 @@
                                                 </svg>
                                                 Eliminar
                                             </button>
-                                        @endcan
+                                        @endif
                                     </div>
                                     {{-- FIN --}}
                                 </div> <!--flex-->

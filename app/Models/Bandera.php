@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\TieneTemporada;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -9,9 +10,9 @@ use Illuminate\Database\Eloquent\Model;
 class Bandera extends Model
 {
     /** @use HasFactory<\Database\Factories\BanderaFactory> */
-    use HasFactory;
+    use HasFactory, TieneTemporada;
 
-     protected $fillable = [
+    protected $fillable = [
         'fecha',
         'turno',
         'bandera_id',
@@ -47,7 +48,6 @@ class Bandera extends Model
         return $this->belongsTo(Puesto::class);
     }
 
-
     public static function boot()
     {
         parent::boot();
@@ -66,4 +66,3 @@ class Bandera extends Model
         });
     }
 }
-

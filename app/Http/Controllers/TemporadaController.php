@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreTemporadaRequest;
 use App\Http\Requests\UpdateTemporadaRequest;
 use App\Models\Temporada;
+use App\Services\ReasignadorTemporadas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -44,7 +45,10 @@ class TemporadaController extends Controller
         $temporada = Temporada::create($this->datos($request));
         $this->guardarModelo($request, $temporada);
 
-        return redirect()->route('temporada.index')->with('success', 'Temporada creada correctamente.');
+        // Una temporada nueva puede quedarse con registros que hoy figuran en otra (los posteriores a su inicio).
+        $movidos = array_sum(app(ReasignadorTemporadas::class)->reasignar());
+
+        return redirect()->route('temporada.index')->with('success', 'Temporada creada correctamente.'.$this->avisoReasignados($movidos));
     }
 
     /**
@@ -63,7 +67,10 @@ class TemporadaController extends Controller
         $temporada->update($this->datos($request));
         $this->guardarModelo($request, $temporada);
 
-        return redirect()->route('temporada.index')->with('success', 'Temporada actualizada correctamente.');
+        // Cambiar el inicio de una temporada mueve los registros que quedan a uno u otro lado de esa fecha.
+        $movidos = $temporada->wasChanged('fecha_inicio') ? array_sum(app(ReasignadorTemporadas::class)->reasignar()) : 0;
+
+        return redirect()->route('temporada.index')->with('success', 'Temporada actualizada correctamente.'.$this->avisoReasignados($movidos));
     }
 
     /**
@@ -78,10 +85,35 @@ class TemporadaController extends Controller
                 ->with('error', 'No se puede eliminar una temporada que ya tiene postulaciones.');
         }
 
+        // Idem para los registros operativos (intervenciones, banderas, licencias, fichajes...).
+        if (array_sum($temporada->registrosAsociados()) > 0) {
+            return redirect()->route('temporada.index')
+                ->with('error', 'No se puede eliminar una temporada que ya tiene registros (intervenciones, banderas, licencias, asistencias, etc.).');
+        }
+
         $temporada->delete();
         Storage::disk('local')->deleteDirectory("temporadas/{$temporada->id}");
 
         return redirect()->route('temporada.index')->with('success', 'Temporada eliminada correctamente.');
+    }
+
+    /**
+     * Recalcula la temporada de todos los registros a partir de su fecha. Red de seguridad por si algún
+     * dato quedó mal asignado (p. ej. cargado por fuera de la aplicación).
+     */
+    public function reasignar()
+    {
+        abort_unless(auth()->user()->can('editar_temporada'), 403);
+
+        $movidos = array_sum(app(ReasignadorTemporadas::class)->reasignar());
+
+        return redirect()->route('temporada.index')
+            ->with('success', $movidos > 0 ? "Se corrigió la temporada de {$movidos} registros." : 'Todos los registros ya estaban en la temporada que les corresponde.');
+    }
+
+    private function avisoReasignados(int $movidos): string
+    {
+        return $movidos > 0 ? " Se reasignaron {$movidos} registros según su fecha." : '';
     }
 
     /** Un admin ve/descarga el modelo de declaración jurada de la temporada. */

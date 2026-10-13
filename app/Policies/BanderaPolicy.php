@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\Bandera;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class BanderaPolicy
 {
@@ -22,7 +21,7 @@ class BanderaPolicy
      */
     public function view(User $user, Bandera $bandera): bool
     {
-        if (!$user->can('ver_bandera')) {
+        if (! $user->can('ver_bandera')) {
             return false;
         }
 
@@ -46,7 +45,8 @@ class BanderaPolicy
      */
     public function update(User $user, Bandera $bandera): bool
     {
-        return $user->id === $bandera->user_id || $user->hasAnyRole(['encargado', 'admin']);
+        // Las temporadas cerradas solo las modifica un admin (ver TieneTemporada::modificablePor).
+        return $bandera->modificablePor($user) && ($user->id === $bandera->user_id || $user->hasAnyRole(['encargado', 'admin']));
     }
 
     /**
@@ -54,7 +54,8 @@ class BanderaPolicy
      */
     public function delete(User $user, Bandera $bandera): bool
     {
-        return $user->id === $bandera->user_id || $user->hasAnyRole(['encargado', 'admin']);
+        // Las temporadas cerradas solo las modifica un admin (ver TieneTemporada::modificablePor).
+        return $bandera->modificablePor($user) && ($user->id === $bandera->user_id || $user->hasAnyRole(['encargado', 'admin']));
     }
 
     /**

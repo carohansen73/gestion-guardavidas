@@ -4,6 +4,17 @@
 <div class="text-gray-600 dark:text-gray-100 body-font sm:px-4">
     <div class="flex justify-between align-center mb-4 sm:mt-4">
         <h2 class="text-gray-700 dark:text-white text-2xl font-bold tracking-tight text-heading md:text-3xl lg:text-4xl">Temporadas</h2>
+        <div class="flex items-center gap-3">
+        @can('editar_temporada')
+            <form action="{{ route('temporada.reasignar') }}" method="POST"
+                onsubmit="return confirm('Recalcula la temporada de todos los registros (intervenciones, banderas, licencias, asistencias, etc.) según su fecha. ¿Seguro?')">
+                @csrf
+                <button type="submit" title="Vuelve a asignar cada registro a la temporada que le corresponde por su fecha"
+                    class="hidden sm:inline-flex rounded-full px-3 py-2 text-sm text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 shadow">
+                    Recalcular registros
+                </button>
+            </form>
+        @endcan
         @can('agregar_temporada')
             <a href="{{ route('temporada.create') }}" class="btn hidden sm:flex align-center bg-sky-500 dark:bg-sky-700 hover:bg-sky-400 dark:hover:bg-sky-600 rounded-full px-3 py-2 shadow-md hover:shadow-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
@@ -13,6 +24,7 @@
                 <span class="text-gray-100 dark:text-gray-200">Agregar</span>
             </a>
         @endcan
+        </div>
     </div>
 
     @if (session('success'))
@@ -30,6 +42,7 @@
             <th class="px-4 py-2 text-left">Postulación</th>
             <th class="px-4 py-2 text-left">Temporada</th>
             <th class="px-4 py-2 text-left">Estado</th>
+            <th class="px-4 py-2 text-left">Registros</th>
             <th class="px-4 py-2 text-left">Declaración jurada</th>
             <th class="px-4 py-2 text-left">Acciones</th>
         </tr>
@@ -48,6 +61,9 @@
                     @else
                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300">Fuera de fecha</span>
                     @endif
+                </td>
+                <td class="px-4 py-2" title="Intervenciones, banderas, novedades de material, licencias, cambios de turno y asistencias asociados">
+                    {{ number_format(collect($temporada->registrosAsociados())->except("novedades")->sum(), 0, ',', '.') }}
                 </td>
                 <td class="px-4 py-2">
                     @if ($temporada->declaracion_jurada_modelo)
@@ -84,7 +100,7 @@
             </tr>
         @empty
             <tr>
-                <td colspan="6" class="px-4 py-6 text-center text-gray-500 dark:text-gray-400">No hay temporadas cargadas todavía.</td>
+                <td colspan="7" class="px-4 py-6 text-center text-gray-500 dark:text-gray-400">No hay temporadas cargadas todavía.</td>
             </tr>
         @endforelse
     </tbody>

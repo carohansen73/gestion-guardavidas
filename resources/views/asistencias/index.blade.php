@@ -40,13 +40,24 @@
                     </div>
 
                     <div>
+                        <label for="temporada" class="text-sm text-gray-700 dark:text-gray-200">Temporada:</label>
+                        <select name="temporada" id="temporada" class="border rounded p-1 dark:bg-gray-700 dark:text-gray-200"
+                            onchange="document.getElementById('inicio').value = ''; document.getElementById('fin').value = ''; this.form.submit()">
+                            <option value="">Elegir…</option>
+                            @foreach (($temporadas ?? []) as $t)
+                                <option value="{{ $t->id }}" @selected(($temporadaElegida?->id) === $t->id)>{{ $t->nombre }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
                         <label for="inicio" class="text-sm text-gray-700 dark:text-gray-200">Desde:</label>
-                        <input type="date" name="inicio" id="inicio" value="{{ $inicio->toDateString() }}" class="border rounded p-1">
+                        <input type="date" name="inicio" id="inicio" oninput="document.getElementById('temporada').value = ''" value="{{ $inicio->toDateString() }}" class="border rounded p-1">
                     </div>
 
                     <div>
                         <label for="fin" class="text-sm text-gray-700 dark:text-gray-200">Hasta:</label>
-                        <input type="date" name="fin" id="fin" value="{{ $fin->toDateString() }}" class="border rounded p-1">
+                        <input type="date" name="fin" id="fin" oninput="document.getElementById('temporada').value = ''" value="{{ $fin->toDateString() }}" class="border rounded p-1">
                     </div>
 
                     <button class="bg-sky-600 hover:bg-sky-500 text-white px-4 py-1 rounded">

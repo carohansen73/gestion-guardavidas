@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\Intervencion;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class IntervencionPolicy
 {
@@ -13,18 +12,17 @@ class IntervencionPolicy
      */
     public function viewAny(User $user): bool
     {
-         return $user->can('ver_intervencion');
+        return $user->can('ver_intervencion');
     }
 
     /**
-     *
      * Determine whether the user can view the model.
      */
     public function view(User $user, Intervencion $intervencion): bool
     {
-       //TODO ver roles y permisos!
-    //    return $user->role === 'admin' || $user->role === 'guardavida'  || $user->role === 'timonel';
-       return $user->can('ver_intervencion');
+        // TODO ver roles y permisos!
+        //    return $user->role === 'admin' || $user->role === 'guardavida'  || $user->role === 'timonel';
+        return $user->can('ver_intervencion');
     }
 
     /**
@@ -32,8 +30,8 @@ class IntervencionPolicy
      */
     public function create(User $user): bool
     {
-        //TODO ver roles y permisos!
-        //return $user->role === 'admin' || $user->role === 'guardavida'  || $user->role === 'timonel';
+        // TODO ver roles y permisos!
+        // return $user->role === 'admin' || $user->role === 'guardavida'  || $user->role === 'timonel';
         return $user->can('agregar_intervencion');
     }
 
@@ -42,7 +40,8 @@ class IntervencionPolicy
      */
     public function update(User $user, Intervencion $intervencion): bool
     {
-         return $user->can('editar_intervencion');
+        // Las temporadas cerradas solo las modifica un admin (ver TieneTemporada::modificablePor).
+        return $intervencion->modificablePor($user) && ($user->can('editar_intervencion'));
     }
 
     /**
@@ -53,7 +52,8 @@ class IntervencionPolicy
         // return $user->id === $intervencion->user_id || $user->rol === 'encargado' || $user->rol === 'jefePlaya'
         // || $user->role === 'admin' ;
 
-        return $user->can('eliminar_intervencion');
+        // Las temporadas cerradas solo las modifica un admin (ver TieneTemporada::modificablePor).
+        return $intervencion->modificablePor($user) && ($user->can('eliminar_intervencion'));
     }
 
     /**

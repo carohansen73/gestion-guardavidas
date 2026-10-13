@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\CambioDeTurno;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class CambioDeTurnoPolicy
 {
@@ -37,7 +36,8 @@ class CambioDeTurnoPolicy
      */
     public function update(User $user, CambioDeTurno $cambioDeTurno): bool
     {
-        return $user->can('editar_cambio_turno');
+        // Las temporadas cerradas solo las modifica un admin (ver TieneTemporada::modificablePor).
+        return $cambioDeTurno->modificablePor($user) && ($user->can('editar_cambio_turno'));
     }
 
     /**
@@ -45,7 +45,8 @@ class CambioDeTurnoPolicy
      */
     public function delete(User $user, CambioDeTurno $cambioDeTurno): bool
     {
-        return $user->can('eliminar_cambio_turno');
+        // Las temporadas cerradas solo las modifica un admin (ver TieneTemporada::modificablePor).
+        return $cambioDeTurno->modificablePor($user) && ($user->can('eliminar_cambio_turno'));
     }
 
     /**

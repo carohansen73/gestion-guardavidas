@@ -17,7 +17,7 @@
         @endcan
     </div>
 
-    <x-filtros-de-busqueda :playas="$playas" tipo="licencias" />
+    <x-filtros-de-busqueda :playas="$playas" :temporadas="$temporadas" :temporada="$temporada" tipo="licencias" />
 
     @if (session('success'))
         <div class="bg-green-100 text-green-700 p-3 rounded my-2 dark:bg-green-900/40 dark:text-green-300">

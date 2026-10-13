@@ -10,37 +10,45 @@ use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class LicenciasExport implements FromCollection, WithHeadings, WithTitle, WithMapping, WithStyles
+class LicenciasExport implements FromCollection, WithHeadings, WithMapping, WithStyles, WithTitle
 {
     protected $playa;
 
-    public function __construct($playa)
+    protected $temporada;
+
+    /** @param \App\Models\Temporada|null $temporada null = todas */
+    public function __construct($playa, $temporada = null)
     {
         $this->playa = $playa;
+        $this->temporada = $temporada;
     }
 
     /**
-    * @return \Illuminate\Support\Collection
-    */
-    public function collection() {
+     * @return \Illuminate\Support\Collection
+     */
+    public function collection()
+    {
 
-       // apellido/nombre ya no viven en guardavidas - join a users.
-       return Licencia::select(['licencias.*'])
-        ->join('guardavidas', 'licencias.guardavida_id', '=', 'guardavidas.id')
-        ->join('users', 'users.id', '=', 'guardavidas.user_id')
-        ->orderBy('licencias.playa_id')
-        ->orderBy('users.lastname')
-        ->orderBy('users.name')
-        ->with(['guardavida.user', 'playa', 'puesto'])
-        ->get();
+        // apellido/nombre ya no viven en guardavidas - join a users.
+        return Licencia::select(['licencias.*'])
+            ->join('guardavidas', 'licencias.guardavida_id', '=', 'guardavidas.id')
+            ->join('users', 'users.id', '=', 'guardavidas.user_id')
+            ->where('licencias.playa_id', $this->playa->id)
+            ->deTemporada($this->temporada)
+            ->orderBy('licencias.playa_id')
+            ->orderBy('users.lastname')
+            ->orderBy('users.name')
+            ->with(['guardavida.user', 'playa', 'puesto'])
+            ->get();
     }
 
-    public function map($i): array {
+    public function map($i): array
+    {
         return [
             optional($i->fecha_inicio)->format('d/m/Y'),
             optional($i->fecha_fin)->format('d/m/Y'),
             $i->tipo_licencia,
-            optional($i->guardavida)->apellido . ' ' . optional($i->guardavida)->nombre ?? '—',
+            optional($i->guardavida)->apellido.' '.optional($i->guardavida)->nombre ?? '—',
             $i->en_tiempo ? 'Sí' : 'No',
             $i->turno,
             optional($i->playa)->nombre ?? '—',
@@ -49,7 +57,8 @@ class LicenciasExport implements FromCollection, WithHeadings, WithTitle, WithMa
         ];
     }
 
-    public function headings(): array {
+    public function headings(): array
+    {
         return [
             'Fecha inicio',
             'Fecha fin',
@@ -63,14 +72,16 @@ class LicenciasExport implements FromCollection, WithHeadings, WithTitle, WithMa
         ];
     }
 
-    public function title(): string {
+    public function title(): string
+    {
         return $this->playa->nombre;
     }
 
-    public function styles(Worksheet $sheet) {
+    public function styles(Worksheet $sheet)
+    {
         // Negrita para la fila 1 (encabezados)
         $highestColumn = $sheet->getHighestColumn();
-        $headerRange = 'A1:' . $highestColumn .'1';
+        $headerRange = 'A1:'.$highestColumn.'1';
         $sheet->getStyle($headerRange)->getFont()->setBold(true);
 
         // Color de fondo azul claro en encabezados
@@ -78,15 +89,4 @@ class LicenciasExport implements FromCollection, WithHeadings, WithTitle, WithMa
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB('FFB3C6E5');
     }
-
 }
-
-
-
-
-
-
-
-
-
-

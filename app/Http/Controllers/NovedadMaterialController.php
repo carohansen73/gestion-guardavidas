@@ -3,22 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Enums\TipoNovedad;
-use App\Models\NovedadMaterial;
 use App\Http\Requests\StoreNovedadMaterialRequest;
 use App\Http\Requests\UpdateNovedadMaterialRequest;
 use App\Models\Material;
+use App\Models\NovedadMaterial;
 use App\Models\Playa;
+use App\Models\Temporada;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class NovedadMaterialController extends Controller
 {
-
-/**
- * authorizeResource() aplica automáticamente los permisos de la Policy
- * a cada método del controller. Laravel verifica el permiso antes de
- * ejecutar cada acción y devuelve un 403 si el usuario no está autorizado.
- */
+    /**
+     * authorizeResource() aplica automáticamente los permisos de la Policy
+     * a cada método del controller. Laravel verifica el permiso antes de
+     * ejecutar cada acción y devuelve un 403 si el usuario no está autorizado.
+     */
     public function __construct()
     {
         $this->authorizeResource(NovedadMaterial::class, 'novedad_de_material');
@@ -27,20 +28,24 @@ class NovedadMaterialController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
+        [$temporadas, $temporada] = Temporada::seleccionada($request->query('temporada'));
 
-        $novedades = NovedadMaterial::with(['material', 'playa'])
-        ->latest()
-        ->get();
+        $novedades = NovedadMaterial::deTemporada($temporada)
+            ->with(['material', 'playa'])
+            ->latest()
+            ->get();
 
         $playas = Playa::all();
 
         return view('novedades-materiales.index')
-        ->with('registros', $novedades)
-        ->with('playas', $playas)
-        ->with('user', $user);
+            ->with('registros', $novedades)
+            ->with('playas', $playas)
+            ->with('temporadas', $temporadas)
+            ->with('temporada', $temporada)
+            ->with('user', $user);
     }
 
     /**
@@ -51,14 +56,14 @@ class NovedadMaterialController extends Controller
         $user = Auth::user();
         $guardavidaAuth = $user->guardavida;
 
-        if ($user->hasAnyRole(['guardavida', 'encargado']) && $guardavidaAuth){
+        if ($user->hasAnyRole(['guardavida', 'encargado']) && $guardavidaAuth) {
             $playas = Playa::where('id', $guardavidaAuth->playa_id)->get();
         } else {
             $playas = Playa::all();
         }
 
         $materiales = Material::all();
-        //Enums
+        // Enums
         $tipoNovedad = TipoNovedad::values();
 
         return view('novedades-materiales.fields', compact(
@@ -74,9 +79,9 @@ class NovedadMaterialController extends Controller
         $validated = $request->validated();
 
         DB::transaction(function () use (&$validated) {
-            //Inserta en caso de ser un nuevo material
+            // Inserta en caso de ser un nuevo material
             if ($validated['material_id'] === 'otro') {
-                $material =  Material::create([
+                $material = Material::create([
                     'nombre' => $validated['nuevo_material_nombre'],
                     'detalle' => $validated['nuevo_material_detalle'] ?? null,
                 ]);
@@ -101,7 +106,7 @@ class NovedadMaterialController extends Controller
      */
     public function show(NovedadMaterial $novedadDeMaterial)
     {
-        //si no me toma el binding automatico: pasar el parametro a ($id) y buscar el registro:
+        // si no me toma el binding automatico: pasar el parametro a ($id) y buscar el registro:
         // $novedadMaterial = NovedadMaterial::findOrFail($id);
         // dd($novedadMaterial);
         return view('novedades-materiales.show-fields', compact(
@@ -116,7 +121,7 @@ class NovedadMaterialController extends Controller
         $user = Auth::user();
         $guardavidaAuth = $user->guardavida;
 
-        if ($user->hasAnyRole(['guardavida', 'encargado']) && $guardavidaAuth){
+        if ($user->hasAnyRole(['guardavida', 'encargado']) && $guardavidaAuth) {
             $playas = Playa::where('id', $guardavidaAuth->playa_id)->get();
         } else {
             $playas = Playa::all();
@@ -135,11 +140,11 @@ class NovedadMaterialController extends Controller
      */
     public function update(UpdateNovedadMaterialRequest $request, NovedadMaterial $novedadDeMaterial)
     {
-       $validated = $request->validated();
+        $validated = $request->validated();
 
-        //Si es un nuevo material lo inserta
+        // Si es un nuevo material lo inserta
         if ($validated['material_id'] === 'otro') {
-            $material =  Material::create([
+            $material = Material::create([
                 'nombre' => $validated['nuevo_material_nombre'],
                 'detalle' => $validated['nuevo_material_detalle'] ?? null,
             ]);
@@ -163,4 +168,3 @@ class NovedadMaterialController extends Controller
             ->with('success', 'Registro de novedad eliminada');
     }
 }
-

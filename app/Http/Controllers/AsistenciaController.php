@@ -6,6 +6,7 @@ use App\Models\Asistencia;
 use App\Models\Guardavida;
 use App\Models\Playa;
 use App\Models\Puesto;
+use App\Models\Temporada;
 use App\Services\HistorialAsistenciaService;
 use App\Services\ResumenAsistenciaService;
 use Carbon\Carbon;
@@ -128,14 +129,18 @@ class AsistenciaController extends Controller
         // (admin/superadmin y, por defecto, encargado).
         abort_unless(auth()->user()->can('ver_asistencia'), 403);
 
-        // Panel de presentismo: por defecto, mes en curso.
+        // Panel de presentismo: por defecto, mes en curso. Con ?temporada=ID (y sin fechas a mano) el rango
+        // pasa a ser el de esa temporada, hasta hoy como máximo si todavía no terminó.
+        $temporadas = Temporada::orderByDesc('fecha_inicio')->get();
+        $temporadaElegida = $request->filled('temporada') ? $temporadas->firstWhere('id', (int) $request->input('temporada')) : null;
+
         $inicio = $request->filled('inicio')
             ? Carbon::parse($request->input('inicio'))->startOfDay()
-            : Carbon::now()->startOfMonth();
+            : ($temporadaElegida ? $temporadaElegida->fecha_inicio->copy()->startOfDay() : Carbon::now()->startOfMonth());
 
         $fin = $request->filled('fin')
             ? Carbon::parse($request->input('fin'))->endOfDay()
-            : Carbon::now()->endOfDay();
+            : ($temporadaElegida ? $temporadaElegida->fecha_fin->copy()->endOfDay()->min(Carbon::now()->endOfDay()) : Carbon::now()->endOfDay());
 
         // Filtros de playa y búsqueda. nombre/apellido ya no viven en
         // guardavidas -> join a users para buscar/ordenar.
@@ -170,9 +175,9 @@ class AsistenciaController extends Controller
         $agent = new Agent;
 
         if ($agent->isMobile()) {
-            return view('asistencias.index', compact('guardavidas', 'playas', 'resumen', 'inicio', 'fin'));
+            return view('asistencias.index', compact('guardavidas', 'playas', 'resumen', 'inicio', 'fin', 'temporadas', 'temporadaElegida'));
         } else {
-            return view('asistencias.index-desktop', compact('guardavidas', 'playas', 'resumen', 'inicio', 'fin'));
+            return view('asistencias.index-desktop', compact('guardavidas', 'playas', 'resumen', 'inicio', 'fin', 'temporadas', 'temporadaElegida'));
         }
 
     }

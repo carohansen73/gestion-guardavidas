@@ -85,7 +85,7 @@
                                         </svg>
                                         Editar
                                     </a>
-                                    @if(auth()->id() === $registro->user_id || auth()->user()->hasAnyRole(['encargado', 'admin']))
+                                    @if((auth()->id() === $registro->user_id || auth()->user()->hasAnyRole(['encargado', 'admin'])) && $registro->modificablePor(auth()->user()))
                                         <form action="{{ route('bandera.destroy', $registro) }}" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar esta intervención?');">
                                             @csrf
                                             @method('DELETE')

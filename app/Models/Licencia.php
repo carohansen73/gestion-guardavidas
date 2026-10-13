@@ -2,22 +2,26 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\TieneTemporada;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Licencia extends Model
 {
     /** @use HasFactory<\Database\Factories\LicenciaFactory> */
-    use HasFactory;
+    use HasFactory, TieneTemporada;
 
-     protected $fillable = [
+    /** Fecha que determina la temporada del registro. */
+    protected string $campoFechaTemporada = 'fecha_inicio';
+
+    protected $fillable = [
         'fecha_inicio',
-        'fecha_fin' ,
-        'tipo_licencia' ,
-        'en_tiempo' ,
+        'fecha_fin',
+        'tipo_licencia',
+        'en_tiempo',
         'turno',
         'guardavida_id',
-        'playa_id' ,
+        'playa_id',
         'puesto_id',
         'detalle',
         'archivo',
@@ -46,6 +50,6 @@ class Licencia extends Model
 
     public function getArchivoUrlAttribute()
     {
-        return $this->archivo ? asset('storage/' . $this->archivo) : null;
+        return $this->archivo ? asset('storage/'.$this->archivo) : null;
     }
 }

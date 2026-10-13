@@ -2,15 +2,16 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\TieneTemporada;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Intervencion extends Model
 {
     /** @use HasFactory<\Database\Factories\IntervencionFactory> */
-    use HasFactory;
+    use HasFactory, TieneTemporada;
 
-       protected $fillable = [
+    protected $fillable = [
         'fecha',
         'tipo_intervencion',
         'victimas',
@@ -48,12 +49,13 @@ class Intervencion extends Model
         return $this->belongsTo(Bandera::class);
     }
 
-    //many to many
+    // many to many
     public function guardavidas()
     {
         return $this->belongsToMany(Guardavida::class, 'guardavidas_intervenciones', 'intervencion_id', 'guardavida_id');
     }
-    //many to many
+
+    // many to many
     public function fuerzas()
     {
         return $this->belongsToMany(Fuerza::class, 'fuerzas_intervenciones', 'intervencion_id', 'fuerza_id');

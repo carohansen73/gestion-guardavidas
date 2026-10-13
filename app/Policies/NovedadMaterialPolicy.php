@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\NovedadMaterial;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class NovedadMaterialPolicy
 {
@@ -37,7 +36,8 @@ class NovedadMaterialPolicy
      */
     public function update(User $user, NovedadMaterial $novedadMaterial): bool
     {
-        return $user->can('editar_novedad_material');
+        // Las temporadas cerradas solo las modifica un admin (ver TieneTemporada::modificablePor).
+        return $novedadMaterial->modificablePor($user) && ($user->can('editar_novedad_material'));
     }
 
     /**
@@ -45,7 +45,8 @@ class NovedadMaterialPolicy
      */
     public function delete(User $user, NovedadMaterial $novedadMaterial): bool
     {
-        return $user->can('eliminar_novedad_material');
+        // Las temporadas cerradas solo las modifica un admin (ver TieneTemporada::modificablePor).
+        return $novedadMaterial->modificablePor($user) && ($user->can('eliminar_novedad_material'));
     }
 
     /**

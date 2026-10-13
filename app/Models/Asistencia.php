@@ -2,11 +2,18 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\TieneTemporada;
 use Illuminate\Database\Eloquent\Model;
 
 class Asistencia extends Model
 {
+    use TieneTemporada;
+
+    /** Fecha que determina la temporada del registro. */
+    protected string $campoFechaTemporada = 'fecha_hora';
+
     public $timestamps = false;
+
     protected $fillable = [
         'longitud',
         'latitud',
@@ -22,9 +29,8 @@ class Asistencia extends Model
         'fecha_hora' => 'datetime',
     ];
 
-
-
-    public static function nuevaAsistencia($longitud, $latitud, $precision, $puesto_id, $guardavidas_id, $fecha_hora, $estado_validacion = 'valido'){
+    public static function nuevaAsistencia($longitud, $latitud, $precision, $puesto_id, $guardavidas_id, $fecha_hora, $estado_validacion = 'valido')
+    {
         // createOrFirst: intenta crear, y si choca contra el índice único
         // (mismo guardavida + puesto + fecha_hora, típico de un reintento de
         // sincronización offline) devuelve el registro que ya existía en vez
@@ -65,9 +71,6 @@ class Asistencia extends Model
     {
         return $this->belongsTo(Puesto::class);
     }
-
-
-
 
     /*
     public static function asistenciaPorPlaya(){

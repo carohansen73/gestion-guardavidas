@@ -94,6 +94,60 @@ class Temporada extends Model
     }
 
     /**
+     * La temporada a la que pertenece un registro operativo (intervención, bandera, licencia, fichaje...)
+     * según SU fecha: la última que ya había empezado ese día. Si la fecha es anterior a todas, la
+     * primera. Así un registro cargado entre dos temporadas queda en la que acaba de terminar y nunca
+     * queda "sin temporada" (solo es null si no hay ninguna cargada).
+     * Es distinta de paraFecha(), que incluye la inscripción y se usa para las altas del plantel.
+     */
+    public static function paraDato($fecha): ?self
+    {
+        $fecha = Carbon::parse($fecha)->toDateString();
+
+        return static::whereDate('fecha_inicio', '<=', $fecha)->orderByDesc('fecha_inicio')->first()
+            ?? static::orderBy('fecha_inicio')->first();
+    }
+
+    /**
+     * La temporada que muestran por defecto el panel y los listados: la activa; si todavía no empezó
+     * la nueva (o ya terminó la anterior), la última que empezó; si ninguna empezó, la primera.
+     */
+    public static function paraListados(): ?self
+    {
+        return static::activa()
+            ?? static::whereDate('fecha_inicio', '<=', Carbon::today())->orderByDesc('fecha_inicio')->first()
+            ?? static::orderBy('fecha_inicio')->first();
+    }
+
+    /**
+     * La temporada elegida con `?temporada=` en un listado: un id, "todas" (null) o, sin parámetro,
+     * la de paraListados(). Un id inexistente cae en el valor por defecto.
+     *
+     * @return array{0: \Illuminate\Support\Collection, 1: ?self} [todas las temporadas (más nueva primero), elegida (null = todas)]
+     */
+    public static function seleccionada(?string $parametro): array
+    {
+        $temporadas = static::orderByDesc('fecha_inicio')->get();
+
+        if ($parametro === 'todas') {
+            return [$temporadas, null];
+        }
+
+        return [$temporadas, $temporadas->firstWhere('id', (int) $parametro) ?? static::paraListados()];
+    }
+
+    /** Cantidad de registros operativos asociados, por tabla (para el borrado y la pantalla de Temporadas). */
+    public function registrosAsociados(): array
+    {
+        $conteo = [];
+        foreach (\App\Services\ReasignadorTemporadas::TABLAS as $tabla => $columna) {
+            $conteo[$tabla] = \Illuminate\Support\Facades\DB::table($tabla)->where('temporada_id', $this->id)->count();
+        }
+
+        return $conteo;
+    }
+
+    /**
      * La temporada cuya ventana OPERATIVA (fecha_inicio/fecha_fin) incluye
      * hoy. Es la que rige para cargar intervenciones/banderas/etc. y para
      * la restricción de escritura de guardavida/encargado fuera de

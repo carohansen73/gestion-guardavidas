@@ -12,8 +12,10 @@ use App\Exports\LicenciasExport;
 use App\Exports\NovedadesDeMaterialesExport;
 use App\Exports\PlayaMultiSheetExport;
 use App\Models\Guardavida;
+use App\Models\Temporada;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ExportController extends Controller
@@ -69,31 +71,36 @@ class ExportController extends Controller
             abort_unless($request->user()->can($permisoPorTipo[$tipo]), 403, 'No tenés permiso para exportar esto.');
         }
 
+        // Temporada del Excel: `?temporada=ID`, `todas` o, sin parámetro, la vigente (la misma que
+        // muestran los listados por defecto). El nombre del archivo la incluye.
+        [, $temporada] = Temporada::seleccionada($request->query('temporada'));
+        $sufijoTemporada = '-'.($temporada ? Str::slug($temporada->nombre) : 'todas-las-temporadas');
+
         switch ($tipo) {
             case 'intervenciones':
                 $exportClass = IntervencionesExport::class;
-                $nombreArchivo = 'intervenciones.xlsx';
+                $nombreArchivo = "intervenciones{$sufijoTemporada}.xlsx";
 
                 return Excel::download(
-                    new PlayaMultiSheetExport($exportClass),
+                    new PlayaMultiSheetExport($exportClass, [$temporada]),
                     $nombreArchivo
                 );
 
             case 'banderas':
                 $exportClass = BanderasExport::class;
-                $nombreArchivo = 'banderas.xlsx';
+                $nombreArchivo = "banderas{$sufijoTemporada}.xlsx";
 
                 return Excel::download(
-                    new PlayaMultiSheetExport($exportClass),
+                    new PlayaMultiSheetExport($exportClass, [$temporada]),
                     $nombreArchivo
                 );
 
             case 'novedad-material':
                 $exportClass = NovedadesDeMaterialesExport::class;
-                $nombreArchivo = 'novedades-de-materiales.xlsx';
+                $nombreArchivo = "novedades-de-materiales{$sufijoTemporada}.xlsx";
 
                 return Excel::download(
-                    new PlayaMultiSheetExport($exportClass),
+                    new PlayaMultiSheetExport($exportClass, [$temporada]),
                     $nombreArchivo
                 );
 
@@ -106,19 +113,19 @@ class ExportController extends Controller
                 );
 
             case 'cambio-de-turno':
-                $nombreArchivo = 'cambios-de-turno.xlsx';
+                $nombreArchivo = "cambios-de-turno{$sufijoTemporada}.xlsx";
 
                 return Excel::download(
-                    new CambiosDeTurnoExport, // 👈 se exporta todo junto
+                    new CambiosDeTurnoExport($temporada), // 👈 se exporta todo junto
                     $nombreArchivo
                 );
 
             case 'licencias':
                 $exportClass = LicenciasExport::class;
-                $nombreArchivo = 'licencias.xlsx';
+                $nombreArchivo = "licencias{$sufijoTemporada}.xlsx";
 
                 return Excel::download(
-                    new PlayaMultiSheetExport($exportClass),
+                    new PlayaMultiSheetExport($exportClass, [$temporada]),
                     $nombreArchivo
                 );
 

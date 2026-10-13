@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateCambioDeTurnoRequest;
 use App\Models\CambioDeTurno;
 use App\Models\Guardavida;
 use App\Models\Playa;
+use App\Models\Temporada;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -27,11 +28,13 @@ class CambioDeTurnoController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
+        [$temporadas, $temporada] = Temporada::seleccionada($request->query('temporada'));
 
-        $cambiosDeTurno = CambioDeTurno::with(['guardavida', 'playa', 'puesto'])
+        $cambiosDeTurno = CambioDeTurno::deTemporada($temporada)
+            ->with(['guardavida', 'playa', 'puesto'])
             ->latest()
             ->get();
 
@@ -40,6 +43,8 @@ class CambioDeTurnoController extends Controller
         return view('cambios-de-turno.index')
             ->with('registros', $cambiosDeTurno)
             ->with('playas', $playas)
+            ->with('temporadas', $temporadas)
+            ->with('temporada', $temporada)
             ->with('user', $user);
     }
 
@@ -56,7 +61,10 @@ class CambioDeTurnoController extends Controller
     {
         $this->authorize('viewAny', CambioDeTurno::class);
 
-        $query = CambioDeTurno::with(['guardavida', 'playa', 'puesto'])
+        [$temporadas, $temporada] = Temporada::seleccionada($request->query('temporada'));
+
+        $query = CambioDeTurno::deTemporada($temporada)
+            ->with(['guardavida', 'playa', 'puesto'])
             ->orderBy('fecha', 'desc');
 
         if ($request->filled('playa_id')) {
@@ -70,7 +78,7 @@ class CambioDeTurnoController extends Controller
         $registros = $query->paginate(10)->withQueryString();
         $playas = Playa::all();
 
-        return view('cambios-de-turno.listado', compact('registros', 'playas'));
+        return view('cambios-de-turno.listado', compact('registros', 'playas', 'temporadas', 'temporada'));
     }
 
     /**

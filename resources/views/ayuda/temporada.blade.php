@@ -157,6 +157,16 @@
                     <li>Si la fecha cae fuera de toda temporada, se lo incluye en la más cercana.</li>
                     <li>Sus datos y documentos son opcionales: podés cargarlos después desde <strong>Postulaciones → su inscripción → Completar datos y documentos</strong>.</li>
                 </ul>
+
+                <p class="text-sm font-semibold pt-2">Temporada de los registros (intervenciones, banderas, licencias, asistencias…)</p>
+                <ul class="{{ $lista }}">
+                    <li>Cada registro pertenece a una temporada, que el sistema calcula <strong>por la fecha del propio registro</strong>: la última temporada que ya había empezado ese día. Nadie la elige a mano.</li>
+                    <li>Los listados muestran por defecto la <strong>temporada en curso</strong> (o la última, si la nueva todavía no empezó). El selector <em>Temporada</em> permite ver otra o <em>Todas</em>. Los Excel exportan la temporada que estás viendo.</li>
+                    <li>El panel de inicio resume la temporada en curso.</li>
+                    <li>Las temporadas cerradas son historial: <strong>solo un admin</strong> puede editar o borrar sus registros. Guardavidas y encargados cargan únicamente con fechas de la temporada en curso.</li>
+                    <li>Si creás una temporada o cambiás su <strong>fecha de inicio</strong>, los registros se reasignan solos según su fecha. Hay un botón <em>Recalcular registros</em> en Temporadas por si algo quedó mal.</li>
+                    <li>No se puede eliminar una temporada que ya tiene registros.</li>
+                </ul>
             </x-form-seccion>
         </div>
 

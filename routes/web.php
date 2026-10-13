@@ -116,6 +116,7 @@ Route::middleware(['auth', 'force.password', 'postulante.redirect'])->group(func
     Route::resource('cambio-de-turno', App\Http\Controllers\CambioDeTurnoController::class)
         ->middlewareFor(['store', 'update', 'destroy'], 'temporada.activa');
 
+    Route::post('temporada/reasignar', [App\Http\Controllers\TemporadaController::class, 'reasignar'])->name('temporada.reasignar');
     Route::resource('temporada', App\Http\Controllers\TemporadaController::class)->except('show');
     Route::get('temporada/{temporada}/modelo-declaracion', [App\Http\Controllers\TemporadaController::class, 'modeloDeclaracion'])->name('temporada.modelo-declaracion');
 

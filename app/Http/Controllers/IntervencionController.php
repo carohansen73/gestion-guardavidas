@@ -11,8 +11,10 @@ use App\Models\Guardavida;
 use App\Models\Intervencion;
 use App\Models\Playa;
 use App\Models\Puesto;
+use App\Models\Temporada;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class IntervencionController extends Controller
@@ -25,17 +27,20 @@ class IntervencionController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         // TODO ver que rol puede ver en tdas las playas o solo algunas
         $user = Auth::user();
+        [$temporadas, $temporada] = Temporada::seleccionada($request->query('temporada'));
         if ($user->hasRole('guardavida')) {
             $intervenciones = Intervencion::where('playa_id', $user->guardavida->playa_id)
+                ->deTemporada($temporada)
                 ->with(['guardavidas', 'fuerzas', 'puesto', 'playa'])
                 ->latest()
                 ->get();
         } elseif ($user->hasAnyRole(['admin', 'encargado'])) {
-            $intervenciones = Intervencion::with(['guardavidas', 'fuerzas', 'puesto', 'playa'])
+            $intervenciones = Intervencion::deTemporada($temporada)
+                ->with(['guardavidas', 'fuerzas', 'puesto', 'playa'])
                 ->latest()
                 ->get();
         } else {
@@ -47,6 +52,8 @@ class IntervencionController extends Controller
         return view('intervenciones.index')
             ->with('intervenciones', $intervenciones)
             ->with('playas', $playas)
+            ->with('temporadas', $temporadas)
+            ->with('temporada', $temporada)
             ->with('user', $user);
     }
 

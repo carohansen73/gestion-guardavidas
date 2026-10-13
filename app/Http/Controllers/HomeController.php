@@ -34,6 +34,10 @@ class HomeController extends Controller
 
         // bandera segun user->playa
         $user = Auth::user();
+
+        // Los resúmenes del panel son de la temporada en curso (o, si todavía no empezó la nueva, de la
+        // última). Los contadores "de hoy" y el total de guardavidas no dependen de la temporada.
+        $temporadaPanel = Temporada::paraListados();
         $bandera = $this->buscarBanderaActual($user);
 
         $totales = [
@@ -110,8 +114,8 @@ class HomeController extends Controller
 
         // Intervenciones, novedades y guardavidas activos según el alcance del usuario.
         // $totales se reserva para el conteo global de guardavidas registrados..
-        $panelIntervenciones = Intervencion::when(! $esAdmin, fn ($q) => $q->where('playa_id', $playaIdUsuario))->count();
-        $panelNovedadesMateriales = NovedadMaterial::when(! $esAdmin, fn ($q) => $q->where('playa_id', $playaIdUsuario))->count();
+        $panelIntervenciones = Intervencion::deTemporada($temporadaPanel)->when(! $esAdmin, fn ($q) => $q->where('playa_id', $playaIdUsuario))->count();
+        $panelNovedadesMateriales = NovedadMaterial::deTemporada($temporadaPanel)->when(! $esAdmin, fn ($q) => $q->where('playa_id', $playaIdUsuario))->count();
         $panelGuardavidasActivos = Guardavida::activos()->whereHas('user', fn ($q) => $q->where('enabled', true))
             ->when(! $esAdmin, fn ($q) => $q->where('playa_id', $playaIdUsuario))
             ->count();
@@ -130,7 +134,8 @@ class HomeController extends Controller
             NovedadMaterial::class => 'ver_novedad_material',
         ])->filter(fn ($permiso) => $user->can($permiso))->keys();
 
-        $novedades = Novedad::orderBy('fecha', 'desc')
+        $novedades = Novedad::deTemporada($temporadaPanel)
+            ->orderBy('fecha', 'desc')
             ->whereIn('referencia_modelo', $modelosPermitidos)
             ->when(! $esAdmin, fn ($q) => $q->where('playa_id', $playaIdUsuario))
             ->with(['referencia' => function ($morphTo) {
@@ -160,7 +165,7 @@ class HomeController extends Controller
             'isMobile', 'isTablet', 'bandera', 'totales', 'novedades', 'esAdmin',
             'playas', 'guardavidasPorPlaya', 'asistenciasHoy', 'fueraDeRango30d', 'licenciasActivasHoy',
             'panelIntervenciones', 'panelNovedadesMateriales', 'panelGuardavidasActivos', 'novedadesMaterialesHoy',
-            'esGuardavidaOEncargado', 'asistenciasHoyPropias'
+            'esGuardavidaOEncargado', 'asistenciasHoyPropias', 'temporadaPanel'
         );
 
         return $agent->isMobile()
@@ -233,13 +238,15 @@ class HomeController extends Controller
         $esAdmin = $user->hasRole('admin');
         $playaIdUsuario = $user->guardavida->playa_id ?? null;
         $playaId = $esAdmin ? $request->get('playa') : $playaIdUsuario;
+        $temporadaPanel = Temporada::paraListados();
 
         $response = [];
 
         if ($user->can('ver_intervencion')) {
-            $totalIntervencionesGlobal = Intervencion::when(! $esAdmin, fn ($q) => $q->where('playa_id', $playaIdUsuario))->count();
+            $totalIntervencionesGlobal = Intervencion::deTemporada($temporadaPanel)->when(! $esAdmin, fn ($q) => $q->where('playa_id', $playaIdUsuario))->count();
 
             $intervencionesPorPlaya = Intervencion::select('playa_id')
+                ->deTemporada($temporadaPanel)
                 ->selectRaw('COUNT(*) as total')
                 ->when($playaId, fn ($q) => $q->where('playa_id', $playaId))
                 ->groupBy('playa_id')
@@ -250,14 +257,15 @@ class HomeController extends Controller
                     $item->sigla = Str::substr($item->playa->nombre, 0, 3);
                 });
 
-            $response['totalIntervenciones'] = Intervencion::when($playaId, fn ($q) => $q->where('playa_id', $playaId))->count();
+            $response['totalIntervenciones'] = Intervencion::deTemporada($temporadaPanel)->when($playaId, fn ($q) => $q->where('playa_id', $playaId))->count();
             $response['intervencionesPorPlaya'] = $intervencionesPorPlaya;
         }
 
         if ($user->can('ver_novedad_material')) {
-            $totalNovedadesGlobal = NovedadMaterial::when(! $esAdmin, fn ($q) => $q->where('playa_id', $playaIdUsuario))->count();
+            $totalNovedadesGlobal = NovedadMaterial::deTemporada($temporadaPanel)->when(! $esAdmin, fn ($q) => $q->where('playa_id', $playaIdUsuario))->count();
 
             $novedadesMaterialesPorPlaya = NovedadMaterial::select('playa_id')
+                ->deTemporada($temporadaPanel)
                 ->selectRaw('COUNT(*) as total')
                 ->when($playaId, fn ($q) => $q->where('playa_id', $playaId))
                 ->groupBy('playa_id')
@@ -268,7 +276,7 @@ class HomeController extends Controller
                     $item->sigla = Str::substr($item->playa->nombre, 0, 3);
                 });
 
-            $response['totalNovedadesMateriales'] = NovedadMaterial::when($playaId, fn ($q) => $q->where('playa_id', $playaId))->count();
+            $response['totalNovedadesMateriales'] = NovedadMaterial::deTemporada($temporadaPanel)->when($playaId, fn ($q) => $q->where('playa_id', $playaId))->count();
             $response['novedadesMaterialesPorPlaya'] = $novedadesMaterialesPorPlaya;
         }
 
@@ -305,7 +313,8 @@ class HomeController extends Controller
         }
 
         if ($user->can('ver_bandera')) {
-            $response['banderas'] = Bandera::when($playaId, fn ($q) => $q->where('playa_id', $playaId))
+            $response['banderas'] = Bandera::deTemporada($temporadaPanel)
+                ->when($playaId, fn ($q) => $q->where('playa_id', $playaId))
                 ->join('bandera_tipos', 'bandera_tipos.id', '=', 'banderas.bandera_id')
                 ->select(
                     'bandera_tipos.codigo as codigo',

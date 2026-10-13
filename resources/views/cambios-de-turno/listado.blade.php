@@ -8,6 +8,16 @@
         {{-- FILTROS manejados desde laravel sin js (desde el contorller del metodo indexAdmin) --}}
         <form method="GET" action="{{ route('cambio-de-turno.index') }}" class="mb-4 flex flex-wrap gap-4 items-end">
             <div class="flex flex-col">
+                <label for="temporada" class="text-gray-700 dark:text-gray-300">Temporada:</label>
+                <select name="temporada" id="temporada" class="border rounded px-2 py-1 dark:bg-gray-700 dark:text-gray-200">
+                    @foreach ($temporadas as $t)
+                        <option value="{{ $t->id }}" @selected($temporada?->id === $t->id)>{{ $t->nombre }}</option>
+                    @endforeach
+                    <option value="todas" @selected(! $temporada)>Todas</option>
+                </select>
+            </div>
+
+            <div class="flex flex-col">
                 <label for="playa_id" class="text-gray-700 dark:text-gray-300">Playa:</label>
                 <select name="playa_id" id="playa_id" class="border rounded px-2 py-1 dark:bg-gray-700 dark:text-gray-200">
                     <option value="">Todas</option>

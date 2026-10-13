@@ -18,7 +18,7 @@
 
     {{-- <div x-data="{ selectedId: null }"> --}}
 
-        <x-filtros-de-busqueda :playas="$playas" tipo="intervenciones" />
+        <x-filtros-de-busqueda :playas="$playas" :temporadas="$temporadas" :temporada="$temporada" tipo="intervenciones" />
 
         @if (session('success'))
             <div class="bg-green-100 text-green-700 p-3 rounded my-2 dark:bg-green-900/40 dark:text-green-300">

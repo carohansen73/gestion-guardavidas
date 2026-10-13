@@ -7,6 +7,8 @@ use App\Http\Requests\UpdateLicenciaRequest;
 use App\Models\Guardavida;
 use App\Models\Licencia;
 use App\Models\Playa;
+use App\Models\Temporada;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
@@ -27,11 +29,13 @@ class LicenciaController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
+        [$temporadas, $temporada] = Temporada::seleccionada($request->query('temporada'));
 
-        $licencias = Licencia::with(['guardavida', 'playa', 'puesto'])
+        $licencias = Licencia::deTemporada($temporada)
+            ->with(['guardavida', 'playa', 'puesto'])
             ->latest()
             ->get();
 
@@ -40,6 +44,8 @@ class LicenciaController extends Controller
         return view('licencias.index')
             ->with('registros', $licencias)
             ->with('playas', $playas)
+            ->with('temporadas', $temporadas)
+            ->with('temporada', $temporada)
             ->with('user', $user);
     }
 

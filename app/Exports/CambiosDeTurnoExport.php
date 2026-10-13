@@ -10,26 +10,30 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class CambiosDeTurnoExport implements FromCollection, WithHeadings, WithStyles
 {
+    /** @param \App\Models\Temporada|null $temporada null = todas */
+    public function __construct(protected $temporada = null) {}
+
     /**
-    * @return \Illuminate\Support\Collection
-    */
+     * @return \Illuminate\Support\Collection
+     */
     public function collection()
     {
 
         // apellido/nombre ya no viven en guardavidas —
         // join a users para poder ordenar.
         $CambioDeTurno = CambioDeTurno::select(['cambio_de_turnos.*'])
-        ->join('guardavidas', 'cambio_de_turnos.guardavida_id', '=', 'guardavidas.id')
-        ->join('users', 'users.id', '=', 'guardavidas.user_id')
-        ->orderBy('cambio_de_turnos.playa_id')
-        ->orderBy('users.lastname')
-        ->orderBy('users.name')
-        ->with(['guardavida.user', 'playa', 'puesto'])
-        ->get();
+            ->join('guardavidas', 'cambio_de_turnos.guardavida_id', '=', 'guardavidas.id')
+            ->join('users', 'users.id', '=', 'guardavidas.user_id')
+            ->deTemporada($this->temporada)
+            ->orderBy('cambio_de_turnos.playa_id')
+            ->orderBy('users.lastname')
+            ->orderBy('users.name')
+            ->with(['guardavida.user', 'playa', 'puesto'])
+            ->get();
 
         return $CambioDeTurno->map(function ($ct) {
             return [
-                'fecha' =>  optional($ct->fecha)->format('d/m/Y'),
+                'fecha' => optional($ct->fecha)->format('d/m/Y'),
                 'nombre' => $ct->guardavida->nombre,
                 'apellido' => $ct->guardavida->apellido,
                 'funcion' => $ct->funcion,
@@ -40,12 +44,10 @@ class CambiosDeTurnoExport implements FromCollection, WithHeadings, WithStyles
         });
     }
 
-     /**
+    /**
      * Agrega cabeceras al excel de cambio de turno
-     *
-     * @return array
      */
-     public function headings(): array
+    public function headings(): array
     {
         return [
             'Fecha',
@@ -62,7 +64,7 @@ class CambiosDeTurnoExport implements FromCollection, WithHeadings, WithStyles
     {
         // Negrita para la fila 1 (encabezados)
         $highestColumn = $sheet->getHighestColumn();
-        $headerRange = 'A1:' . $highestColumn .'1';
+        $headerRange = 'A1:'.$highestColumn.'1';
         $sheet->getStyle($headerRange)->getFont()->setBold(true);
 
         // Color de fondo azul claro en encabezados
@@ -71,19 +73,4 @@ class CambiosDeTurnoExport implements FromCollection, WithHeadings, WithStyles
             ->getStartColor()->setARGB('FFB3C6E5');
 
     }
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

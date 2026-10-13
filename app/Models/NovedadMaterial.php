@@ -3,17 +3,18 @@
 namespace App\Models;
 
 use App\Enums\TipoNovedad;
+use App\Models\Concerns\TieneTemporada;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class NovedadMaterial extends Model
 {
     /** @use HasFactory<\Database\Factories\NovedadMaterialFactory> */
-    use HasFactory;
+    use HasFactory, TieneTemporada;
 
     protected $table = 'novedad_materials';
 
-      protected $fillable = [
+    protected $fillable = [
         'tipo_novedad',
         'material_id',
         'fecha',
@@ -31,7 +32,7 @@ class NovedadMaterial extends Model
         return $this->belongsTo(Material::class);
     }
 
-     public function playa()
+    public function playa()
     {
         return $this->belongsTo(Playa::class);
     }

@@ -5,30 +5,34 @@ namespace App\Exports;
 use App\Models\Intervencion;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Maatwebsite\Excel\Concerns\WithStyles;
+use Maatwebsite\Excel\Concerns\WithTitle;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class IntervencionesExport implements FromCollection, WithHeadings, WithTitle, WithMapping, WithStyles
+class IntervencionesExport implements FromCollection, WithHeadings, WithMapping, WithStyles, WithTitle
 {
-
     protected $playa;
 
-    public function __construct($playa)
+    protected $temporada;
+
+    /** @param \App\Models\Temporada|null $temporada null = todas */
+    public function __construct($playa, $temporada = null)
     {
         $this->playa = $playa;
+        $this->temporada = $temporada;
     }
 
     /**
-    * @return \Illuminate\Support\Collection
-    */
+     * @return \Illuminate\Support\Collection
+     */
     public function collection()
     {
         return Intervencion::with(['puesto', 'bandera', 'user', 'guardavidas.user', 'fuerzas'])
-        ->where('playa_id', $this->playa->id)
-        ->orderBy('fecha', 'desc')
-        ->get();
+            ->where('playa_id', $this->playa->id)
+            ->deTemporada($this->temporada)
+            ->orderBy('fecha', 'desc')
+            ->get();
     }
 
     public function map($i): array
@@ -47,15 +51,14 @@ class IntervencionesExport implements FromCollection, WithHeadings, WithTitle, W
                     ['user.lastname', 'asc'],
                     ['user.name', 'asc'],
                 ], SORT_FLAG_CASE | SORT_NATURAL)
-                ->map(fn($g) => "{$g->apellido}, {$g->nombre}")
+                ->map(fn ($g) => "{$g->apellido}, {$g->nombre}")
                 ->implode(', '),
             $i->fuerzas->pluck('nombre')->implode(', '),
             optional($i->user)->name ?? '—',
         ];
     }
 
-
-      public function headings(): array
+    public function headings(): array
     {
         return [
             'Fecha',
@@ -72,16 +75,16 @@ class IntervencionesExport implements FromCollection, WithHeadings, WithTitle, W
         ];
     }
 
-     public function title(): string
+    public function title(): string
     {
         return $this->playa->nombre;
     }
 
-     public function styles(Worksheet $sheet)
+    public function styles(Worksheet $sheet)
     {
         // Negrita para la fila 1 (encabezados)
         $highestColumn = $sheet->getHighestColumn();
-        $headerRange = 'A1:' . $highestColumn .'1';
+        $headerRange = 'A1:'.$highestColumn.'1';
         $sheet->getStyle($headerRange)->getFont()->setBold(true);
 
         // Color de fondo azul claro en encabezados

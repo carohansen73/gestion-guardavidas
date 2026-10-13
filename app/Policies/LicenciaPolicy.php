@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\Licencia;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class LicenciaPolicy
 {
@@ -37,7 +36,8 @@ class LicenciaPolicy
      */
     public function update(User $user, Licencia $licencia): bool
     {
-        return $user->can('editar_licencia');
+        // Las temporadas cerradas solo las modifica un admin (ver TieneTemporada::modificablePor).
+        return $licencia->modificablePor($user) && ($user->can('editar_licencia'));
     }
 
     /**
@@ -45,7 +45,8 @@ class LicenciaPolicy
      */
     public function delete(User $user, Licencia $licencia): bool
     {
-        return $user->can('eliminar_licencia');
+        // Las temporadas cerradas solo las modifica un admin (ver TieneTemporada::modificablePor).
+        return $licencia->modificablePor($user) && ($user->can('eliminar_licencia'));
     }
 
     /**

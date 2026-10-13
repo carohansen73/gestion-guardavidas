@@ -17,7 +17,7 @@
         @endcan
     </div>
 
-    <x-filtros-de-busqueda :playas="$playas" tipo="cambio-de-turno" />
+    <x-filtros-de-busqueda :playas="$playas" :temporadas="$temporadas" :temporada="$temporada" tipo="cambio-de-turno" />
 
     <x-session-alerts/>
 

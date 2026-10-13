@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\TieneTemporada;
 use Illuminate\Database\Eloquent\Model;
 
 class Novedad extends Model
 {
+    use TieneTemporada;
+
     protected $table = 'novedades';
 
-
-     protected $fillable = [
+    protected $fillable = [
         'fecha',
         'tipo',
         'titulo',
@@ -25,11 +27,13 @@ class Novedad extends Model
         'fecha' => 'datetime',  // 👈 convierte automáticamente a Carbon
     ];
 
-     public function playa() {
+    public function playa()
+    {
         return $this->belongsTo(Playa::class);
     }
 
-    public function referencia() {
+    public function referencia()
+    {
         return $this->morphTo(null, 'referencia_modelo', 'referencia_id');
     }
 }

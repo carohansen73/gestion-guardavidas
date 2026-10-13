@@ -5,32 +5,35 @@ namespace App\Exports;
 use App\Models\Bandera;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Maatwebsite\Excel\Concerns\WithStyles;
+use Maatwebsite\Excel\Concerns\WithTitle;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class BanderasExport implements FromCollection, WithHeadings, WithTitle, WithMapping, WithStyles
+class BanderasExport implements FromCollection, WithHeadings, WithMapping, WithStyles, WithTitle
 {
-
     protected $playa;
 
-    public function __construct($playa)
+    protected $temporada;
+
+    /** @param \App\Models\Temporada|null $temporada null = todas */
+    public function __construct($playa, $temporada = null)
     {
         $this->playa = $playa;
+        $this->temporada = $temporada;
     }
 
     /**
-    * @return \Illuminate\Support\Collection
-    */
+     * @return \Illuminate\Support\Collection
+     */
     public function collection()
     {
-         return Bandera::with(['user', 'playa', 'bandera'])
-        ->where('playa_id', $this->playa->id)
-        ->orderBy('fecha', 'desc')
-        ->get();
+        return Bandera::with(['user', 'playa', 'bandera'])
+            ->where('playa_id', $this->playa->id)
+            ->deTemporada($this->temporada)
+            ->orderBy('fecha', 'desc')
+            ->get();
     }
-
 
     public function map($i): array
     {
@@ -42,7 +45,7 @@ class BanderasExport implements FromCollection, WithHeadings, WithTitle, WithMap
             $i->viento_intensidad,
             $i->temperatura,
             $i->detalles,
-            optional($i->user)->lastname . ' ' . optional($i->user)->name ?? '—'
+            optional($i->user)->lastname.' '.optional($i->user)->name ?? '—',
         ];
     }
 
@@ -69,7 +72,7 @@ class BanderasExport implements FromCollection, WithHeadings, WithTitle, WithMap
     {
         // Negrita para la fila 1 (encabezados)
         $highestColumn = $sheet->getHighestColumn();
-        $headerRange = 'A1:' . $highestColumn .'1';
+        $headerRange = 'A1:'.$highestColumn.'1';
         $sheet->getStyle($headerRange)->getFont()->setBold(true);
 
         // Color de fondo azul claro en encabezados
