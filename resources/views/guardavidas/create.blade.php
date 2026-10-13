@@ -77,6 +77,7 @@
                                 <option class="w-auto" value="">Seleccione</option>
                                 <option value="guardavida" {{ old('rol', $rol ?? '' ) == 'guardavida' ? 'selected' : '' }}>Guardavida</option>
                                 <option value="encargado" {{ old('rol', $rol ?? '' ) == 'encargado' ? 'selected' : '' }}>Encargado</option>
+                                <option value="personal" {{ old('rol', $rol ?? '' ) == 'personal' ? 'selected' : '' }}>Personal (solo ficha, sin temporada)</option>
                                 <option value="admin" {{ old('rol', $rol ?? '' ) == 'admin' ? 'selected' : '' }}>Administrador</option>
                             </select>
                     </div>
@@ -326,7 +327,7 @@
         const guardavidaFields = document.getElementById('guardavida-fields');
 
         function toggleGuardavidaFields(){
-            const isGuardavida = rolSelect.value === 'guardavida' || rolSelect.value === 'encargado';
+            const isGuardavida = ['guardavida', 'encargado', 'personal'].includes(rolSelect.value);
             guardavidaFields.style.display = isGuardavida ? 'grid' : 'none';
         }
 

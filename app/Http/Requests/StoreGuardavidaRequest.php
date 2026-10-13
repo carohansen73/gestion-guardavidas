@@ -22,7 +22,7 @@ class StoreGuardavidaRequest extends FormRequest
      */
     public function rules(): array
     {
-        $esGuardavidaOEncargado = in_array($this->input('rol'), ['guardavida', 'encargado']);
+        $esGuardavidaOEncargado = in_array($this->input('rol'), ['guardavida', 'encargado', 'personal']);
 
         // verifico datos primero para usuario, luego, si es guardavida para guardavidas.
         $rules = [
@@ -40,7 +40,7 @@ class StoreGuardavidaRequest extends FormRequest
                 'unique:users,dni',
             ]),
             'email' => 'required|email|unique:users,email',
-            'rol' => 'required|string|in:guardavida,encargado,admin',
+            'rol' => 'required|string|in:guardavida,encargado,personal,admin',
         ];
         if ($esGuardavidaOEncargado) {
             $rules = array_merge($rules, [

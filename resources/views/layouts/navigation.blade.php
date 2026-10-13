@@ -9,6 +9,8 @@
     $conSidebar = $conSidebar ?? true;
     // Un postulante solo puede ir a su postulación (ver RedirectPostulante): no se le muestran los enlaces del sistema.
     $esPostulante = Auth::user()->hasRole('postulante');
+    // El personal fijo (rol `personal`) no tiene franco intercambiable.
+    $esPersonal = Auth::user()->hasRole('personal');
 @endphp
 
 {{-- Barra superior. Escritorio (sm+): modo oscuro + desplegable de usuario a la derecha.
@@ -100,14 +102,16 @@
                                 {{ __('Mis Asistencias') }}
                             </x-dropdown-link>
 
-                            <x-dropdown-link :href="route('franco-intercambio.index')">
-                                {{ __('Cambios de Franco') }}
-                                @if ($notificacionesFrancoSinLeer > 0)
-                                    <span class="ml-1 inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-xs font-bold bg-red-500 text-white">
-                                        {{ $notificacionesFrancoSinLeer }}
-                                    </span>
-                                @endif
-                            </x-dropdown-link>
+                            @unless ($esPersonal)
+                                <x-dropdown-link :href="route('franco-intercambio.index')">
+                                    {{ __('Cambios de Franco') }}
+                                    @if ($notificacionesFrancoSinLeer > 0)
+                                        <span class="ml-1 inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-xs font-bold bg-red-500 text-white">
+                                            {{ $notificacionesFrancoSinLeer }}
+                                        </span>
+                                    @endif
+                                </x-dropdown-link>
+                            @endunless
                         @endif
 
                         <form method="POST" action="{{ route('logout') }}">
@@ -263,14 +267,16 @@
                     <x-responsive-nav-link :href="route('guardavida.misAsistencias')">
                         {{ __('Mis Asistencias') }}
                     </x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('franco-intercambio.index')">
-                        {{ __('Cambios de Franco') }}
-                        @if ($notificacionesFrancoSinLeer > 0)
-                            <span class="ml-1 inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-xs font-bold bg-red-500 text-white">
-                                {{ $notificacionesFrancoSinLeer }}
-                            </span>
-                        @endif
-                    </x-responsive-nav-link>
+                    @unless ($esPersonal)
+                        <x-responsive-nav-link :href="route('franco-intercambio.index')">
+                            {{ __('Cambios de Franco') }}
+                            @if ($notificacionesFrancoSinLeer > 0)
+                                <span class="ml-1 inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-xs font-bold bg-red-500 text-white">
+                                    {{ $notificacionesFrancoSinLeer }}
+                                </span>
+                            @endif
+                        </x-responsive-nav-link>
+                    @endunless
                 @endif
 
                 <!-- Modo oscuro (en celular vive acá adentro; en escritorio es el botón de la barra) -->

@@ -101,11 +101,14 @@ Route::middleware(['auth', 'force.password', 'postulante.redirect'])->group(func
     Route::resource('novedad-de-material', App\Http\Controllers\NovedadMaterialController::class)
         ->middlewareFor(['store', 'update', 'destroy'], 'temporada.activa');
 
-    Route::post('guardavida/{guardavida}/baja', [GuardavidaController::class, 'baja'])->name('guardavida.baja');
-    Route::post('guardavida/{guardavida}/reincorporar', [GuardavidaController::class, 'reincorporar'])->name('guardavida.reincorporar');
-    Route::get('guardavidas-dados-de-baja', [GuardavidaController::class, 'bajas'])->name('guardavidas.bajas');
-    Route::resource('guardavida', App\Http\Controllers\GuardavidaController::class);
-    Route::get('/get-all-guardavidas', [GuardavidaController::class, 'getAll']);
+    // Gestión de guardavidas: el rol `personal` (solo ficha) no entra (ver EnsureNoPersonal).
+    Route::middleware('no.personal')->group(function () {
+        Route::post('guardavida/{guardavida}/baja', [GuardavidaController::class, 'baja'])->name('guardavida.baja');
+        Route::post('guardavida/{guardavida}/reincorporar', [GuardavidaController::class, 'reincorporar'])->name('guardavida.reincorporar');
+        Route::get('guardavidas-dados-de-baja', [GuardavidaController::class, 'bajas'])->name('guardavidas.bajas');
+        Route::resource('guardavida', App\Http\Controllers\GuardavidaController::class);
+        Route::get('/get-all-guardavidas', [GuardavidaController::class, 'getAll']);
+    });
 
     Route::resource('licencia', App\Http\Controllers\LicenciaController::class)
         ->parameters(['licencia' => 'licencia'])
@@ -119,9 +122,9 @@ Route::middleware(['auth', 'force.password', 'postulante.redirect'])->group(func
     // Excel
     Route::get('/guardavidas/export', function () {
         return Excel::download(new GuardavidasExport, 'guardavidas.xlsx');
-    })->name('guardavidas.export');
+    })->middleware('can:ver_guardavida')->name('guardavidas.export');
     Route::get('/export/playas', [ExportController::class, 'exportPorPlaya'])
-        ->name('export.playas');
+        ->name('export.playas'); // cada tipo de Excel valida el permiso de su vista (ExportController)
 
     /* Nuevas rutas */
     Route::get('/my-profile', [GuardavidaController::class, 'myProfile'])->name('guardavida.myProfile');

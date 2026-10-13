@@ -125,13 +125,12 @@
                     Se conserva su ficha y todo su historial; solo dejan de aparecer en listados y asistencias.
                 </p>
                 <ul class="{{ $lista }}">
-                    <li>Te muestra la lista; <strong>destildá a quien no quieras dar de baja</strong>, por ejemplo el <strong>personal del aeródromo</strong> u otro personal que no pasa por la inscripción.</li>
+                    <li>Te muestra la lista; <strong>destildá a quien no quieras dar de baja</strong>. El personal con rol <em>Personal</em> (por ejemplo el del aeródromo) nunca aparece acá: no se toca.</li>
                     <li>Pedís una <strong>fecha de baja</strong> y confirmás con la casilla.</li>
                     <li>El sistema no deja cerrar si todavía no seleccionaste a nadie.</li>
                 </ul>
                 <div class="{{ $alerta }}">
                     <strong>No cierres entre tandas.</strong> Cerrá recién cuando terminaste de seleccionar a todos; si no, dejás afuera a quienes aún no elegiste.
-                    <br><strong>Antes de confirmar el cierre, revisá la lista y destildá al personal del aeródromo.</strong>
                 </div>
             </x-form-seccion>
         </div>
@@ -154,6 +153,7 @@
                 <p class="text-sm font-semibold pt-2">Alta fuera de la inscripción</p>
                 <ul class="{{ $lista }}">
                     <li>Se puede crear manualmente desde <strong>Guardavidas → Agregar</strong>. Queda <strong>seleccionado</strong> en la temporada que corresponde a la fecha de alta, igual que el resto: el cierre no lo da de baja.</li>
+                        <li>Para empleados fijos que solo fichan (por ejemplo el aeródromo) elegí el rol <strong>Personal</strong>: no se postulan, no dependen de la temporada y el cierre nunca los toca.</li>
                     <li>Si la fecha cae fuera de toda temporada, se lo incluye en la más cercana.</li>
                     <li>Sus datos y documentos son opcionales: podés cargarlos después desde <strong>Postulaciones → su inscripción → Completar datos y documentos</strong>.</li>
                 </ul>

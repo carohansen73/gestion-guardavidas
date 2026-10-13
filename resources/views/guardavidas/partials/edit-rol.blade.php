@@ -17,6 +17,7 @@
                         <option class="w-auto" value="">Seleccione</option>
                         <option value="guardavida" {{ old('rol', $rol ) == 'guardavida' ? 'selected' : '' }}>Guardavida</option>
                         <option value="encargado" {{ old('rol', $rol ) == 'encargado' ? 'selected' : '' }}>Encargado</option>
+                        <option value="personal" {{ old('rol', $rol ) == 'personal' ? 'selected' : '' }}>Personal (solo ficha, sin temporada)</option>
                         <option value="admin" {{ old('rol', $rol ) == 'admin' ? 'selected' : '' }}>Administrador</option>
                     </select>
                 </div>
@@ -32,7 +33,8 @@
 </x-form-tarjeta>
 
 @php
-    $enPlantel = $guardavida->user?->hasAnyRole(['guardavida', 'encargado']) && ! $guardavida->user?->hasAnyRole(['admin', 'superadmin']);
+    $enPlantel = $guardavida->estaEnPlantel() && ! $guardavida->user?->hasAnyRole(['admin', 'superadmin']);
+    $esPersonal = $guardavida->user?->hasRole('personal');
     $periodos = $guardavida->periodos()->with('temporada')->get();
 @endphp
 
@@ -75,7 +77,11 @@
 
         <x-form-encabezado titulo="Dar de baja" icono="shield-check">
             Deja de aparecer en listados, selectores y asistencias a partir de esa fecha, y se le cierra el acceso a la operación.
-            Conserva todo su historial y puede volver a postularse la próxima temporada.
+            @if ($esPersonal)
+                Su usuario queda deshabilitado (conserva el rol y todo su historial) y se lo puede volver a dar de alta desde "Dados de baja".
+            @else
+                Conserva todo su historial y puede volver a postularse la próxima temporada.
+            @endif
         </x-form-encabezado>
 
         <div class="flex flex-wrap items-end gap-4">

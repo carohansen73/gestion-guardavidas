@@ -4,17 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Exports\AsistenciaGeneralExport;
 use App\Exports\AsistenciaPorGuardavidaExport;
-use Illuminate\Http\Request;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\PlayaMultiSheetExport;
-use App\Exports\IntervencionesExport;
- use App\Exports\BanderasExport;
+use App\Exports\BanderasExport;
 use App\Exports\CambiosDeTurnoExport;
 use App\Exports\GuardavidasExport;
+use App\Exports\IntervencionesExport;
 use App\Exports\LicenciasExport;
 use App\Exports\NovedadesDeMaterialesExport;
-use Carbon\Carbon;
+use App\Exports\PlayaMultiSheetExport;
 use App\Models\Guardavida;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ExportController extends Controller
 {
@@ -53,10 +53,27 @@ class ExportController extends Controller
 
         $tipo = $request->get('tipo');
 
+        // Cada Excel exige el permiso de la vista de la que sale: quien puede ver el listado
+        // puede exportarlo, y quien no, no. Un tipo desconocido cae en el 404 de abajo.
+        $permisoPorTipo = [
+            'intervenciones' => 'ver_intervencion',
+            'banderas' => 'ver_bandera',
+            'novedad-material' => 'ver_novedad_material',
+            'guardavidas' => 'ver_guardavida',
+            'cambio-de-turno' => 'ver_cambio_turno',
+            'licencias' => 'ver_licencia',
+            'asistencia-general' => 'ver_asistencia',
+            'asistencia-guardavida' => 'ver_asistencia',
+        ];
+        if (isset($permisoPorTipo[$tipo])) {
+            abort_unless($request->user()->can($permisoPorTipo[$tipo]), 403, 'No tenés permiso para exportar esto.');
+        }
+
         switch ($tipo) {
             case 'intervenciones':
                 $exportClass = IntervencionesExport::class;
                 $nombreArchivo = 'intervenciones.xlsx';
+
                 return Excel::download(
                     new PlayaMultiSheetExport($exportClass),
                     $nombreArchivo
@@ -65,6 +82,7 @@ class ExportController extends Controller
             case 'banderas':
                 $exportClass = BanderasExport::class;
                 $nombreArchivo = 'banderas.xlsx';
+
                 return Excel::download(
                     new PlayaMultiSheetExport($exportClass),
                     $nombreArchivo
@@ -73,6 +91,7 @@ class ExportController extends Controller
             case 'novedad-material':
                 $exportClass = NovedadesDeMaterialesExport::class;
                 $nombreArchivo = 'novedades-de-materiales.xlsx';
+
                 return Excel::download(
                     new PlayaMultiSheetExport($exportClass),
                     $nombreArchivo
@@ -80,50 +99,54 @@ class ExportController extends Controller
 
             case 'guardavidas':
                 $nombreArchivo = 'guardavidas.xlsx';
+
                 return Excel::download(
-                    new GuardavidasExport(), // 👈 se exporta todo junto
+                    new GuardavidasExport, // 👈 se exporta todo junto
                     $nombreArchivo
                 );
 
             case 'cambio-de-turno':
                 $nombreArchivo = 'cambios-de-turno.xlsx';
+
                 return Excel::download(
-                    new CambiosDeTurnoExport(), // 👈 se exporta todo junto
+                    new CambiosDeTurnoExport, // 👈 se exporta todo junto
                     $nombreArchivo
                 );
 
             case 'licencias':
                 $exportClass = LicenciasExport::class;
                 $nombreArchivo = 'licencias.xlsx';
+
                 return Excel::download(
                     new PlayaMultiSheetExport($exportClass),
                     $nombreArchivo
                 );
 
             case 'asistencia-general':
-                //Obtiene filtros de fechas por request
+                // Obtiene filtros de fechas por request
                 $inicio = $request->inicio ? Carbon::parse($request->inicio)->startOfDay() : Carbon::now()->subDays(30)->startOfDay();
                 $fin = $request->fin ? Carbon::parse($request->fin)->endOfDay() : Carbon::now()->endOfDay();
 
-
-                //Genera excel separado por playa, de todos los guardavidas
+                // Genera excel separado por playa, de todos los guardavidas
                 $exportClass = AsistenciaGeneralExport::class;
-                $nombreArchivo = 'Asistencia-general-' . now()->format('Y-m-d') . '.xlsx';
+                $nombreArchivo = 'Asistencia-general-'.now()->format('Y-m-d').'.xlsx';
+
                 return Excel::download(
                     new PlayaMultiSheetExport($exportClass, [$inicio, $fin]),
                     $nombreArchivo
                 );
 
             case 'asistencia-guardavida':
-                 //Obtiene filtros de fechas y guardavida por request
+                // Obtiene filtros de fechas y guardavida por request
                 $guardavidaId = $request->guardavida_id;
                 $guardavida = Guardavida::findOrFail($guardavidaId);
 
                 $inicio = $request->inicio ? Carbon::parse($request->inicio)->startOfDay() : Carbon::now()->subDays(30)->startOfDay();
                 $fin = $request->fin ? Carbon::parse($request->fin)->endOfDay() : Carbon::now()->endOfDay();
 
-                //Genera excel de un único guardavida.
-                $nombreArchivo = 'Asistencia-'.$guardavida->apellido . ', ' . $guardavida->nombre . now()->format('Y-m-d_His') . '.xlsx';
+                // Genera excel de un único guardavida.
+                $nombreArchivo = 'Asistencia-'.$guardavida->apellido.', '.$guardavida->nombre.now()->format('Y-m-d_His').'.xlsx';
+
                 return Excel::download(
                     new AsistenciaPorGuardavidaExport($guardavidaId, $inicio, $fin),
                     $nombreArchivo
@@ -133,7 +156,5 @@ class ExportController extends Controller
                 abort(404, 'Tipo de export no válido');
         }
 
-
     }
-
 }

@@ -23,6 +23,9 @@ class GuardavidaController extends Controller
      */
     public function index(Request $request)
     {
+        // Sin este permiso (guardavida, personal) no se ve el listado del plantel.
+        abort_unless(auth()->user()->can('ver_guardavida'), 403);
+
         $user = Auth::user();
         $playas = Playa::all();
         // Encargados solo de su playa? ->los de  claro/Dunamar pueden verse?
@@ -148,7 +151,7 @@ class GuardavidaController extends Controller
             $user->assignRole($validated['rol']);
 
             // 3 Si es guardavida o encargado → creo registro en tabla guardavidas
-            if (in_array($validated['rol'], ['guardavida', 'encargado'])) {
+            if (in_array($validated['rol'], ['guardavida', 'encargado', 'personal'])) {
                 // nombre/apellido/dni NO se guardan acá — ya quedaron en
                 // $user arriba, y Guardavida::nombre/apellido/dni son
                 // accessors que leen de ahí (ver Guardavida model, Fase 3b).
@@ -169,7 +172,10 @@ class GuardavidaController extends Controller
                 // cae fuera de todas, la más cercana) y queda como seleccionado/a en ella, igual que el resto
                 // del plantel: así el cierre de la selección no lo da de baja.
                 $fechaAlta = Carbon::parse($validated['fecha_alta'] ?? now());
-                $temporadaAlta = Temporada::paraFecha($fechaAlta);
+                // El personal fijo (rol `personal`) no trabaja por temporada: su período queda sin
+                // temporada y no se le crea postulación.
+                $esPersonal = $validated['rol'] === 'personal';
+                $temporadaAlta = $esPersonal ? null : Temporada::paraFecha($fechaAlta);
                 $guardavida->darDeAlta($fechaAlta, $temporadaAlta?->id, 'Alta manual', true);
                 if ($temporadaAlta) {
                     app(SeleccionPostulantes::class)->incluirEnTemporada($guardavida, $temporadaAlta);
@@ -188,9 +194,11 @@ class GuardavidaController extends Controller
 
         return redirect()
             ->route('guardavida.index')
-            ->with('success', in_array($validated['rol'], ['guardavida', 'encargado'])
+            ->with('success', $validated['rol'] === 'personal'
+                ? 'Personal creado correctamente. Ficha como el resto, no pasa por postulaciones ni por el cierre de temporada.'
+                : (in_array($validated['rol'], ['guardavida', 'encargado'])
                 ? 'Guardavida creado correctamente. Quedó incluido en la temporada como seleccionado; si querés cargar sus datos de inscripción y documentos, hacelo desde Postulaciones → su inscripción → "Completar datos y documentos".'
-                : 'Usuario creado correctamente.');
+                : 'Usuario creado correctamente.'));
     }
 
     /**
@@ -282,14 +290,18 @@ class GuardavidaController extends Controller
 
         $user = $guardavida->user;
 
-        if (! $user || ! $user->hasAnyRole(['guardavida', 'encargado']) || $user->hasAnyRole(['admin', 'superadmin'])) {
-            return back()->withErrors('Solo se puede dar de baja a un guardavida o encargado del plantel actual.');
+        if (! $user || ! $guardavida->estaEnPlantel() || $user->hasAnyRole(['admin', 'superadmin'])) {
+            return back()->withErrors('Solo se puede dar de baja a una persona del plantel actual.');
         }
 
         $seleccion->darDeBaja($guardavida, Carbon::parse($datos['fecha']), $datos['motivo'] ?? null);
 
+        $fecha = Carbon::parse($datos['fecha'])->format('d/m/Y');
+
         return redirect()->route('guardavida.index')
-            ->with('success', "{$user->lastname}, {$user->name} fue dado de baja el ".Carbon::parse($datos['fecha'])->format('d/m/Y').'. Ya no aparece en los listados y puede volver a postularse.');
+            ->with('success', $user->hasRole('personal')
+                ? "{$user->lastname}, {$user->name} fue dado de baja el {$fecha}. Ya no aparece en los listados y su usuario quedó deshabilitado."
+                : "{$user->lastname}, {$user->name} fue dado de baja el {$fecha}. Ya no aparece en los listados y puede volver a postularse.");
     }
 
     /** Personas con fila de guardavida que hoy están fuera del plantel (bajas y no seleccionados). */
@@ -299,7 +311,7 @@ class GuardavidaController extends Controller
 
         $buscar = trim((string) $request->input('buscar'));
 
-        $guardavidas = Guardavida::whereDoesntHave('user', fn ($u) => $u->role(['guardavida', 'encargado', 'admin', 'superadmin']))
+        $guardavidas = Guardavida::whereDoesntHave('user', fn ($u) => Guardavida::condicionPlantel($u, ['admin', 'superadmin']))
             ->join('users', 'users.id', '=', 'guardavidas.user_id')
             ->select('guardavidas.*')
             ->when($buscar !== '', fn ($q) => $q->where(function ($w) use ($buscar) {
@@ -322,7 +334,7 @@ class GuardavidaController extends Controller
 
         $datos = $request->validate(['fecha' => 'required|date']);
 
-        if ($guardavida->user?->hasAnyRole(['guardavida', 'encargado'])) {
+        if ($guardavida->estaEnPlantel()) {
             return back()->withErrors('Esta persona ya está en el plantel.');
         }
 
@@ -465,6 +477,8 @@ class GuardavidaController extends Controller
 
     public function getAll()
     {
+        abort_unless(auth()->user()->can('ver_guardavida'), 403);
+
         // user_id es necesario para que los accessors nombre/apellido
         // (Fase 3b) puedan resolver la relación — sin él devolverían null.
         $guardavidas = Guardavida::activos()->with('user:id,name,lastname')

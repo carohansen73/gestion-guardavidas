@@ -23,11 +23,12 @@ use Illuminate\Support\Facades\DB;
  *   seleccionados en la temporada vuelven a rol `postulante` (se conserva su
  *   fila de `guardavidas` y todo su historial: asistencias, licencias, etc.).
  *
- * Los usuarios con rol admin/superadmin nunca se tocan.
+ * Los usuarios con rol admin/superadmin o `personal` (empleados fijos que solo fichan, sin temporada)
+ * nunca se tocan.
  */
 class SeleccionPostulantes
 {
-    private const ROLES_INTOCABLES = ['admin', 'superadmin'];
+    private const ROLES_INTOCABLES = ['admin', 'superadmin', 'personal'];
 
     /**
      * @param  array<int,array{postulacion:Postulacion,playa_id:int,puesto_id:?int,turno:?string,encargado:bool}>  $filas
@@ -46,7 +47,7 @@ class SeleccionPostulantes
                 $user = $postulacion->user;
 
                 if ($user->hasAnyRole(self::ROLES_INTOCABLES)) {
-                    throw new \DomainException("{$user->lastname}, {$user->name} tiene rol de administrador y no puede pasar a guardavida desde acá.");
+                    throw new \DomainException("{$user->lastname}, {$user->name} tiene rol de administrador o de personal y no puede pasar a guardavida desde acá.");
                 }
 
                 // El puesto es opcional: si no se define, el propio guardavida lo elige al ingresar por primera vez.
@@ -166,6 +167,15 @@ class SeleccionPostulantes
     {
         DB::transaction(function () use ($guardavida, $hasta, $motivo) {
             $guardavida->darDeBajaDelPeriodo($hasta, $motivo);
+
+            // El personal fijo (rol `personal`) no vuelve a postulante: conserva su rol y se lo deshabilita.
+            if ($guardavida->user->hasRole('personal')) {
+                $guardavida->user->update(['enabled' => false]);
+                $guardavida->user->tokens()->delete(); // un celular con la sesión offline guardada no puede seguir fichando
+
+                return;
+            }
+
             $this->volverAPostulante($guardavida->user);
         });
     }
@@ -179,8 +189,18 @@ class SeleccionPostulantes
     {
         $user = $guardavida->user;
 
+        // Personal fijo dado de baja: se vuelve a habilitar con un período nuevo; no pasa por la temporada.
+        if ($user->hasRole('personal') && ! $user->hasAnyRole(['admin', 'superadmin'])) {
+            DB::transaction(function () use ($guardavida, $user, $desde) {
+                $guardavida->darDeAlta($desde, null, 'Reincorporación');
+                $user->update(['enabled' => true]);
+            });
+
+            return;
+        }
+
         if ($user->hasAnyRole(self::ROLES_INTOCABLES)) {
-            throw new \DomainException('Un administrador no puede darse de alta como guardavida desde acá.');
+            throw new \DomainException('Un administrador o un empleado de personal no puede darse de alta como guardavida desde acá.');
         }
 
         DB::transaction(function () use ($guardavida, $user, $desde) {

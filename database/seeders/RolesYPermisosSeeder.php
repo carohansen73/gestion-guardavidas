@@ -18,6 +18,8 @@ class RolesYPermisosSeeder extends Seeder
         // --- Roles ---
         $guardavida = Role::firstOrCreate(['name' => 'guardavida']);
         $encargado = Role::firstOrCreate(['name' => 'encargado']);
+        // Empleados fijos que solo usan el sistema para fichar (p. ej. aeródromo): sin postulación ni temporada.
+        $personal = Role::firstOrCreate(['name' => 'personal']);
         $admin = Role::firstOrCreate(['name' => 'admin']);
         // superadmin: rol adicional (no reemplaza a admin). Un usuario superadmin
         // tiene AMBOS roles asignados (admin + superadmin), así que todo chequeo
@@ -100,6 +102,8 @@ class RolesYPermisosSeeder extends Seeder
             'ver_bandera',
             'ver_asistencia_propia',
         ]);
+
+        $personal->givePermissionTo(['ver_asistencia_propia']);
 
         $encargado->givePermissionTo([
             'agregar_bandera',

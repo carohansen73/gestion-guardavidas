@@ -14,6 +14,13 @@ class Guardavida extends Model
 
     protected $perPage = 10;
 
+    /**
+     * Roles que cuentan como "plantel" (tienen fila de guardavidas y fichan). `personal` = empleados
+     * fijos que usan el sistema solo para fichar (p. ej. el aeródromo): no se postulan ni pasan por
+     * la selección de temporada.
+     */
+    public const ROLES_PLANTEL = ['guardavida', 'encargado', 'personal'];
+
     /** Datos personales que viven en `perfiles` (ver más abajo). */
     public const DATOS_PERSONALES = ['telefono', 'direccion', 'numero', 'piso_dpto'];
 
@@ -191,14 +198,14 @@ class Guardavida extends Model
      * ¿Estaba en el plantel ese día? Es lo que usa el presentismo para no
      * contar faltas fuera de las fechas de trabajo. Sin ningún período
      * registrado (guardavidas anteriores a este registro) se mantiene el
-     * comportamiento de siempre: cuenta si hoy tiene rol de guardavida o encargado.
+     * comportamiento de siempre: cuenta si hoy tiene rol de guardavida, encargado o personal.
      */
     public function enPlantelEl($fecha): bool
     {
         $periodos = $this->periodosCargados();
 
         if ($periodos->isEmpty()) {
-            return (bool) $this->user?->hasAnyRole(['guardavida', 'encargado']);
+            return $this->estaEnPlantel();
         }
 
         return $periodos->contains(fn (GuardavidaPeriodo $p) => $p->cubre($fecha));
@@ -253,6 +260,28 @@ class Guardavida extends Model
     }
 
     // ******************** Plantel activo (por rol) ******************************
+
+    /**
+     * Quién está hoy en el plantel, para aplicar sobre una consulta de `users`: guardavida/encargado por
+     * rol (más `$extraRoles`, p. ej. admin cuando se arma "los que no están fuera") y `personal` mientras
+     * su usuario siga habilitado. La baja del personal no le cambia el rol: lo deshabilita.
+     */
+    public static function condicionPlantel($usuarios, array $extraRoles = [])
+    {
+        return $usuarios->where(function ($w) use ($extraRoles) {
+            $w->role(array_merge(['guardavida', 'encargado'], $extraRoles))
+                ->orWhere(fn ($p) => $p->role('personal')->where('users.enabled', true));
+        });
+    }
+
+    /** ¿Está hoy en el plantel? (mismo criterio que condicionPlantel, para una fila ya cargada). */
+    public function estaEnPlantel(): bool
+    {
+        $user = $this->user;
+
+        return (bool) ($user && ($user->hasAnyRole(['guardavida', 'encargado']) || ($user->hasRole('personal') && $user->enabled)));
+    }
+
     /**
      * Guardavidas del plantel actual: su usuario tiene rol `guardavida` o
      * `encargado`. Quien no fue seleccionado en la temporada vuelve a rol
@@ -265,7 +294,7 @@ class Guardavida extends Model
     public function scopeActivos($query, array $incluirIds = [])
     {
         return $query->where(function ($q) use ($incluirIds) {
-            $q->whereHas('user', fn ($u) => $u->role(['guardavida', 'encargado']));
+            $q->whereHas('user', fn ($u) => self::condicionPlantel($u));
 
             if ($incluirIds !== []) {
                 $q->orWhereIn('guardavidas.id', $incluirIds);
@@ -284,7 +313,7 @@ class Guardavida extends Model
     public function scopeActivosOConAsistenciaEn($query, $inicio, $fin)
     {
         return $query->where(function ($q) use ($inicio, $fin) {
-            $q->whereHas('user', fn ($u) => $u->role(['guardavida', 'encargado']))
+            $q->whereHas('user', fn ($u) => self::condicionPlantel($u))
                 ->orWhereHas('asistencias', fn ($a) => $a->whereBetween('fecha_hora', [$inicio, $fin]))
                 // ...o que algún período de alta/baja se solape con el rango pedido.
                 ->orWhereHas('periodos', fn ($p) => $p

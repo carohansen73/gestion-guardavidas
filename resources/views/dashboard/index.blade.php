@@ -83,13 +83,16 @@
 <section class="grid grid-cols-2 gap-3 lg:grid-cols-4 mb-3">
 
     {{-- Bandera del día (o carrusel de banderas por playa si es admin) --}}
-    @if($esGuardavidaOEncargado)
-        <div class="col-span-2 lg:row-span-2">
+    {{-- Quien no tiene ver_bandera (rol personal) no ve la bandera. --}}
+    @can('ver_bandera')
+        @if($esGuardavidaOEncargado)
+            <div class="col-span-2 lg:row-span-2">
+                @include('dashboard.partials.bandera')
+            </div>
+        @else
             @include('dashboard.partials.bandera')
-        </div>
-    @else
-        @include('dashboard.partials.bandera')
-    @endif
+        @endif
+    @endcan
 
     {{-- "Mi turno": guardavida y encargado (no admin) — los dos fichan.
          Ocupa el ancho que le sobra al lado de la bandera en desktop/tablet

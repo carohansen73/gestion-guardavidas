@@ -4,19 +4,22 @@ namespace App\Enums;
 
 use App\Models\User;
 
+// Rol Personal para personal permanente q usa el sistema para registrar asistencia (ej: aeródromo)
+
 enum RolUsuario: string
 {
     case Superadmin = 'superadmin';
     case Admin = 'admin';
     case Encargado = 'encargado';
     case Guardavida = 'guardavida';
+    case Personal = 'personal';
     case Postulante = 'postulante';
 
     /**
      * Rol "principal" a mostrar en la UI para un usuario que puede tener más
      * de un rol asignado (ej. admin + superadmin, agregado a mano por SQL).
      * El orden de los cases() define la prioridad: superadmin > admin >
-     * encargado > guardavida.
+     * encargado > guardavida > personal.
      */
     public static function principal(User $user): self
     {
@@ -36,6 +39,7 @@ enum RolUsuario: string
             self::Admin => 'Admin',
             self::Encargado => 'Encargado',
             self::Guardavida => 'Guardavida',
+            self::Personal => 'Personal',
             self::Postulante => 'Postulante',
         };
     }
@@ -47,6 +51,7 @@ enum RolUsuario: string
             self::Admin => 'text-sky-600 dark:text-sky-400',
             self::Encargado => 'text-amber-600 dark:text-amber-400',
             self::Guardavida => 'text-emerald-600 dark:text-emerald-400',
+            self::Personal => 'text-violet-600 dark:text-violet-400',
             self::Postulante => 'text-slate-600 dark:text-slate-300',
         };
     }
@@ -58,6 +63,7 @@ enum RolUsuario: string
             self::Admin => 'bg-sky-100 dark:bg-sky-900/40',
             self::Encargado => 'bg-amber-100 dark:bg-amber-900/40',
             self::Guardavida => 'bg-emerald-100 dark:bg-emerald-900/40',
+            self::Personal => 'bg-violet-100 dark:bg-violet-900/40',
             self::Postulante => 'bg-slate-100 dark:bg-slate-700/60',
         };
     }
@@ -73,6 +79,7 @@ enum RolUsuario: string
             self::Admin => 'shield-check',
             self::Encargado => 'star',
             self::Guardavida => 'lifebuoy',
+            self::Personal => 'user',
             self::Postulante => 'user',
         };
     }

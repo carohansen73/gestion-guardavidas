@@ -57,17 +57,13 @@ class HomeController extends Controller
             session(['show_franco_setup' => true]);
         }
 
-        // Card "Mi turno": guardavida y encargado, no admin — ambos fichan
-        // (tienen Guardavida propio), y es además el único acceso a Fichar
-        // ahora que se sacó del bloque de Atajos rápidos para no duplicarlo.
+        // Card "Mi turno" (Fichar): guardavida, encargado y personal permanente, no admin.
         //
-        // No existe un campo "tipo" (ingreso/egreso) en asistencias — cada
-        // fichaje es solo un evento de escaneo con su fecha_hora. Para
-        // mostrar "pendiente de egreso" sin agregar una columna nueva, se
+        // No existe un tipo de fichaje (ingreso/egreso). Se
         // infiere por cantidad de fichajes de hoy: 0 = falta el ingreso,
         // 1 = ya fichó ingreso y falta el egreso, 2+ = turno completo (se
-        // muestra el primero y el último).
-        $esGuardavidaOEncargado = $user->hasRole('guardavida') || $user->hasRole('encargado');
+        // muestra el primer y el último fichaje).
+        $esGuardavidaOEncargado = $user->hasAnyRole(Guardavida::ROLES_PLANTEL);
         $asistenciasHoyPropias = collect();
         if ($esGuardavidaOEncargado) {
             $asistenciasHoyPropias = Asistencia::where('guardavidas_id', $user->guardavida->id)
@@ -79,13 +75,10 @@ class HomeController extends Controller
 
         $novedades = Novedad::orderBy('fecha', 'desc')->take(10)->get();
 
-        // El panel de estadísticas (antes era la vista /dashboard aparte,
-        // ver ui/partials/panel-admin.blade.php) ahora lo ve cualquier
-        // usuario autenticado, pero cada uno solo ve lo suyo: admin/
-        // superadmin ven todas las playas (con filtro); encargado/guardavida
-        // quedan limitados a la propia, y qué cards/secciones se muestran
-        // depende de sus permisos (@can en la vista) — nada hardcodeado por
-        // rol acá, así que basta con tocar los permisos para habilitar algo.
+        // El panel de estadísticas: cada usuario solo ve lo suyo:
+
+        // Admin/superadmin pueden filtrar por playa; las secciones se controlan
+        // con @can.
         $esAdmin = $user->hasRole('admin');
         $playaIdUsuario = $user->guardavida->playa_id ?? null;
 
@@ -115,10 +108,8 @@ class HomeController extends Controller
             ->when(! $esAdmin, fn ($q) => $q->where('playa_id', $playaIdUsuario))
             ->count();
 
-        // Intervenciones/novedades materiales/guardavidas activos del panel:
-        // total global para admin, acotado a la propia playa para el resto.
-        // Variables propias (no $totales, que ya se usa en otro lado con el
-        // conteo 100% global — ver aside "Guardavidas registrados").
+        // Intervenciones, novedades y guardavidas activos según el alcance del usuario.
+        // $totales se reserva para el conteo global de guardavidas registrados..
         $panelIntervenciones = Intervencion::when(! $esAdmin, fn ($q) => $q->where('playa_id', $playaIdUsuario))->count();
         $panelNovedadesMateriales = NovedadMaterial::when(! $esAdmin, fn ($q) => $q->where('playa_id', $playaIdUsuario))->count();
         $panelGuardavidasActivos = Guardavida::activos()->whereHas('user', fn ($q) => $q->where('enabled', true))
@@ -157,7 +148,7 @@ class HomeController extends Controller
         // Guardavidas y encargados también se postulan cada temporada: si la ventana está abierta,
         // se les muestra el acceso (y el estado de su inscripción, si ya la empezaron).
         $postularme = null;
-        if ($esGuardavidaOEncargado && $temporadaAbierta = Temporada::conPostulacionAbierta()) {
+        if ($esGuardavidaOEncargado && ! $user->hasRole('personal') && $temporadaAbierta = Temporada::conPostulacionAbierta()) {
             $postularme = [
                 'temporada' => $temporadaAbierta,
                 'postulacion' => Postulacion::with(['temporada', 'perfil', 'documentos'])->where('user_id', $user->id)->where('temporada_id', $temporadaAbierta->id)->first(),

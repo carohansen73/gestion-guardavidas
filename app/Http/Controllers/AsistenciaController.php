@@ -124,15 +124,9 @@ class AsistenciaController extends Controller
      */
     public function index(Request $request)
     {
-        if (! auth()->user()->hasAnyRole(['admin', 'encargado'])) {
-            // Si no tiene permiso, devolvemos vista vacía o redirige (eso no me acuerdo como se veia en la interfaz)
-            return view('asistencias.index', [
-                'guardavidas' => collect(),
-                'playas' => collect(),
-                'inicio' => Carbon::now()->startOfMonth(),
-                'fin' => Carbon::now()->endOfDay(),
-            ]);
-        }
+        // Las asistencias de otras personas las ve solo quien tiene el permiso ver_asistencia
+        // (admin/superadmin y, por defecto, encargado).
+        abort_unless(auth()->user()->can('ver_asistencia'), 403);
 
         // Panel de presentismo: por defecto, mes en curso.
         $inicio = $request->filled('inicio')
@@ -191,6 +185,9 @@ class AsistenciaController extends Controller
     public function asistenciasPorGuardavida(Request $request, $id)
     {
         $guardavida = Guardavida::with(['puesto.playa', 'asistencias.puesto.playa'])->findOrFail($id);
+
+        // Esta pantalla es de gestión (necesita ver_asistencia). Cada uno ve las propias en "Mis asistencias".
+        abort_unless(auth()->user()->can('ver_asistencia'), 403);
 
         $esAdmin = auth()->user()->hasAnyRole(['admin', 'encargado']);
 
