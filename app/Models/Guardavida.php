@@ -41,6 +41,18 @@ class Guardavida extends Model
     protected $appends = ['asistencias_count', 'intervenciones_count', 'licencias_count'];
 
     // //------------------------------------------ Relaciones -------------------------------------------------------
+    /**
+     * Foto personal más reciente que subió la persona en alguna postulación (documento privado, se sirve
+     * por `guardavida.foto`). Null si nunca subió una (altas manuales sin documentación, personal fijo).
+     */
+    public function fotoPersonal(): ?PostulacionDocumento
+    {
+        return PostulacionDocumento::where('tipo', 'foto_personal')
+            ->whereHas('postulacion', fn ($q) => $q->where('user_id', $this->user_id))
+            ->latest('id')
+            ->first();
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

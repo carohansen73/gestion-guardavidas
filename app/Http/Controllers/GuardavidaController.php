@@ -15,6 +15,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class GuardavidaController extends Controller
 {
@@ -527,6 +528,22 @@ class GuardavidaController extends Controller
             'puestos',
             'turnos'
         ));
+    }
+
+    /** Sirve la foto personal para el perfil. Mismo criterio de acceso que showProfile(). */
+    public function foto(Guardavida $guardavida)
+    {
+        $user = Auth::user();
+        $esPropietario = $user->guardavida && $user->guardavida->id === $guardavida->id;
+
+        abort_unless($esPropietario || $user->hasAnyRole(['admin', 'superadmin', 'encargado']), 403);
+
+        $documento = $guardavida->fotoPersonal();
+        abort_unless($documento && Storage::disk('local')->exists($documento->ruta), 404);
+
+        return Storage::disk('local')->response($documento->ruta, $documento->nombre_original, [
+            'Cache-Control' => 'private, max-age=3600',
+        ]);
     }
 
     /**

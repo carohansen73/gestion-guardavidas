@@ -144,6 +144,9 @@ Route::middleware(['auth', 'force.password', 'postulante.redirect'])->group(func
 
     Route::put('/profile/{guardavida}', [GuardavidaController::class, 'updateProfile'])->name('guardavida.updateProfile');
 
+    // Foto personal del guardavida para el perfil (la ve él mismo, el admin o el encargado).
+    Route::get('/guardavida/{guardavida}/foto', [GuardavidaController::class, 'foto'])->name('guardavida.foto');
+
     // listado de cambios de turno
     Route::get('turnos', [CambioDeTurnoController::class, 'indexAdmin'])->name('cambio-de-turno.index');
 

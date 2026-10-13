@@ -69,17 +69,6 @@
     @endif
     {{-- END POSTULACION --}}
 
-
-    {{-- FILTRAR DATOS POR PLAYA --}}
-    <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">
-        Mostrando datos de
-        <span class="tituloPlayaSeleccionada font-medium text-sky-600 dark:text-sky-400">{{ $esAdmin ? 'todas las playas' : (Auth::user()->guardavida->playa->nombre ?? 'tu playa') }}</span>
-        @if ($temporadaPanel)
-            <span class="text-gray-500 dark:text-gray-400">· temporada {{ $temporadaPanel->nombre }}</span>
-        @endif
-    </p>
-
-
 </div>
 
  {{-- END FILTRAR POR PLAYA --}}

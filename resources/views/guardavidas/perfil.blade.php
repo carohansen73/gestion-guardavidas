@@ -31,8 +31,15 @@
                     md:flex-row md:items-center md:text-left md:justify-start rounded-t-lg">
 
                     <!-- Avatar -->
-                    <div class="profile-avatar text-6xl md:w-1/4 md:flex md:justify-center">
-                        <i class="fas fa-user"></i>
+                    @php $fotoPerfil = $guardavida?->fotoPersonal(); @endphp
+                    <div class="profile-avatar text-6xl md:w-1/4 md:flex md:justify-center overflow-hidden">
+                        @if ($fotoPerfil)
+                            <img src="{{ route('guardavida.foto', $guardavida) }}?v={{ $fotoPerfil->id }}"
+                                alt="Foto de {{ $guardavida->nombre }} {{ $guardavida->apellido }}"
+                                class="w-full h-full object-cover rounded-full">
+                        @else
+                            <i class="fas fa-user"></i>
+                        @endif
                     </div>
 
                     <!-- Info -->
