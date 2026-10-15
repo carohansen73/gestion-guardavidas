@@ -55,22 +55,12 @@ class Licencia extends Model
         return $this->archivo ? route('licencia.constancia', $this) : null;
     }
 
-    /**
-     * Disco donde está la constancia. Las nuevas se guardan en `local` (privado); las anteriores pueden seguir
-     * en `public` hasta que se mueva la carpeta `licencias` a `storage/app/private`. Null si el archivo no está.
-     */
-    public function discoDeLaConstancia(): ?string
+    /** Disco privado (`storage/app/private`) donde se guardan las constancias: no tiene URL pública. */
+    public const DISCO_CONSTANCIAS = 'local';
+
+    /** ¿Tiene constancia y el archivo está en el disco? */
+    public function constanciaDisponible(): bool
     {
-        if (! $this->archivo) {
-            return null;
-        }
-
-        foreach (['local', 'public'] as $disco) {
-            if (Storage::disk($disco)->exists($this->archivo)) {
-                return $disco;
-            }
-        }
-
-        return null;
+        return $this->archivo && Storage::disk(self::DISCO_CONSTANCIAS)->exists($this->archivo);
     }
 }

@@ -67,16 +67,16 @@ class ConstanciaLicenciaTest extends TestCase
         }
     }
 
-    public function test_las_constancias_viejas_siguen_abriendose_desde_el_disco_publico(): void
+    public function test_solo_se_sirve_desde_el_disco_privado(): void
     {
+        // Un archivo que quedó en el disco público (con URL abierta) no se sirve: hay que moverlo al privado.
         Storage::disk('public')->put('licencias/constancia.pdf', 'contenido');
 
-        $this->actingAs($this->usuario('20000001', 'admin'))->get(route('licencia.constancia', $this->licencia))->assertOk();
-        $this->assertSame('public', $this->licencia->discoDeLaConstancia());
+        $this->assertFalse($this->licencia->constanciaDisponible());
+        $this->actingAs($this->usuario('20000001', 'admin'))->get(route('licencia.constancia', $this->licencia))->assertNotFound();
 
-        // Si además está en el privado (ya se movió), se prefiere ese.
         Storage::disk('local')->put('licencias/constancia.pdf', 'contenido');
-        $this->assertSame('local', $this->licencia->discoDeLaConstancia());
+        $this->assertTrue($this->licencia->fresh()->constanciaDisponible());
     }
 
     public function test_el_guardavida_ve_la_suya_pero_no_la_de_otro(): void
