@@ -62,7 +62,8 @@ class AccesoListadosYExportesTest extends TestCase
 
     public function test_el_listado_de_guardavidas_sigue_abierto_para_encargado_y_admin(): void
     {
-        $this->actingAs($this->usuario('30000002', 'encargado'))->get(route('guardavida.index'))->assertOk();
+        $this->actingAs($this->usuario('30000002', 'encargado'))->get(route('guardavida.index'))
+            ->assertOk()->assertSee('Más acciones de', false)->assertSee('mailto:u30000002@test.com', false);
         $this->actingAs($this->usuario('20000001', 'admin', false))->get(route('guardavida.index'))->assertOk();
     }
 

@@ -88,13 +88,16 @@
 
 </div>
 
-<div x-data="{ selectedId: null, baja: null }">
+<div x-data="{ baja: null, menu: null }" @menu-accion.window="if ($event.detail.evento === 'baja') baja = $event.detail.datos">
 
     {{-- Lista para Mobile --}}
     @include('guardavidas.partials.index-mobile')
 
     {{-- Tabla para Desktop --}}
     @include('guardavidas.partials.index-desktop')
+
+    {{-- Menú inferior de acciones (lo abren los tres puntos de cada tarjeta) --}}
+    <x-menu-inferior />
 
 
 {{-- Modal de baja: lo abre el interruptor / botón "Dar de baja" de cada guardavida --}}

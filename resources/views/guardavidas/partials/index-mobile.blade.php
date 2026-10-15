@@ -1,138 +1,69 @@
+@php
+    $puedeEditar = auth()->user()->can('editar_guardavida');
+    $puedeDarDeBaja = auth()->user()->can('eliminar_guardavida');
+@endphp
+
+{{-- Listado para celular: tocar la tarjeta abre la ficha; el botón de tres puntos abre el menú inferior
+     (<x-menu-inferior/>, en index.blade.php). La baja la resuelve el modal de index.blade.php vía el evento `menu-accion`. --}}
 <div class="space-y-4 sm:hidden">
     <section class="text-gray-600 dark:text-gray-100 body-font pt-4">
-        <div id="accordion-collapse" data-accordion="collapse" class="bg-white dark:bg-gray-600">
-            @foreach ($guardavidasHabilitados as $registro)
-                <div class="registro-item-lista rounded "
-                    data-playa="{{ $registro->playa->id ?? '' }}">
-                    <h2 id="accordion-collapse-heading-{{$registro->id}}">
-                        <button type="button" class="flex items-center justify-between w-full px-4 py-2 font-medium text-left text-gray-500 border border-b-0 border-gray-200 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 gap-3"
-                            data-accordion-target="#accordion-collapse-body-{{$registro->id}}" aria-expanded="true" aria-controls="accordion-collapse-body-1">
-                            {{-- <a href="{{ route('intervencion.show', $intervencion) }}"> --}}
-                                <div>
-                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                                    {{ $registro->apellido }} {{ $registro->nombre }}
-                                </h3>
-                                 <p class="text-sm text-gray-600 dark:text-gray-200">
-                                    {{ str_replace('_', ' ', $registro->funcion) }} - T.{{ $registro->turno }}.
-                                 </p>
-                                    <span class="text-sm text-gray-500 dark:text-gray-300">
-                                    {{ $registro->playa->nombre }}{{ $registro->puesto ? "-{$registro->puesto->nombre}" : " (sin puesto)" }}
-                                    </span>
+        <div class="space-y-3">
+            @forelse ($guardavidasHabilitados as $registro)
+                @php
+                    $nombreCompleto = $registro->apellido.' '.$registro->nombre;
+                    $acciones = array_values(array_filter([
+                        ['texto' => 'Ver ficha', 'icono' => 'fa-eye', 'href' => route('guardavida.show', $registro)],
+                        $puedeEditar ? ['texto' => 'Editar', 'icono' => 'fa-pen', 'href' => route('guardavida.edit', $registro)] : null,
+                        $puedeDarDeBaja ? [
+                            'texto' => 'Dar de baja', 'icono' => 'fa-ban', 'peligro' => true, 'evento' => 'baja',
+                            'datos' => ['url' => route('guardavida.baja', $registro), 'nombre' => $registro->user->lastname.', '.$registro->user->name],
+                        ] : null,
+                    ]));
+                @endphp
 
-                                <p class="text-sm text-gray-700 dark:text-gray-400 mt-1 line-clamp-2">
-                                    {{ Str::limit($registro->detalles, 80) }}
-                                </p>
-                                </div>
-                            {{-- </a> --}}
-                            <svg data-accordion-icon class="w-3 h-3 rotate-180 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 5 1 1 5"/>
-                            </svg>
-                        </button>
-                    </h2>
+                <x-tarjeta-listado :href="route('guardavida.show', $registro)" :titulo="$nombreCompleto" :acciones="$acciones" :playa="$registro->playa->id ?? ''">
+                    <x-slot:lead>
+                        <x-avatar-guardavida :guardavida="$registro" size="w-12 h-12" icono="text-xl" />
+                    </x-slot:lead>
 
-                    <div id="accordion-collapse-body-{{$registro->id}}" class="hidden" aria-labelledby="accordion-collapse-heading-{{$registro->id}}">
-                        <div class="px-4 py-2 border border-b-0 border-gray-200 dark:border-gray-700 dark:bg-gray-900">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <h3 class="truncate text-base font-semibold text-gray-900 dark:text-white">{{ $nombreCompleto }}</h3>
+                        <x-role-badge :rol="\App\Enums\RolUsuario::principal($registro->user)" :label="false" size="w-3.5 h-3.5" class="shrink-0" />
+                    </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-200">
+                        {{ str_replace('_', ' ', $registro->funcion) }}@if ($registro->turno) - T.{{ $registro->turno }}@endif
+                    </p>
+                    <p class="truncate text-sm text-gray-500 dark:text-gray-300">
+                        {{ $registro->playa?->nombre ?? '-' }}{{ $registro->puesto ? " - {$registro->puesto->nombre}" : ' (sin puesto)' }}
+                    </p>
 
-                            {{-- Menu opciones edit-eliminar icono tres puntos --}}
-                            {{-- <div class="w-full flex justify-end">
-                                <button class=""
-                                type="button"
-                                data-drawer-target="drawer-bottom-example"
-                                data-drawer-show="drawer-bottom-example"
-                                data-drawer-placement="bottom"
-                                aria-controls="drawer-bottom-example"
-                                    @click="selectedId = {{ $registro->id }}">
-
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor"
-                                    class="bi bi-three-dots-vertical w-6 h-6" viewBox="0 0 16 16">
-                                    <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
-                                    </svg>
-                                </button>
-                            </div> --}}
-                            <p class="text-sm text-gray-800 dark:text-gray-400 font-medium mt-1 line-clamp-2">
-                                DNI
-                                <span class="text-sm text-gray-500 dark:text-gray-300">
-                                    {!!$registro->dni !!}
-                                </span>
-                            </p>
-                            <p class="text-sm text-gray-800 dark:text-gray-400 font-medium mt-1 line-clamp-2">
-                                Telefono
-                                <span class="text-sm text-gray-500 dark:text-gray-300">
-                                    {!!$registro->telefono !!}
-                                </span>
-                            </p>
-                             <p class="text-sm text-gray-800 dark:text-gray-400 font-medium mt-1 line-clamp-2">
-                                Dirección
-                                <span class="text-sm text-gray-500 dark:text-gray-300">
-                                    {!!$registro->direccion !!} {!!$registro->numero !!} {!!$registro->piso_dpto !!}
-                                </span>
-                            </p>
-                            <p class="text-sm text-gray-800 dark:text-gray-400 font-medium mt-1 line-clamp-2">
-                                Usuario
-                                <span class="text-sm text-gray-500 dark:text-gray-300">
-                                    {!!$registro->user->email !!}
-                                </span>
-                            </p>
-
-                            {{-- BOTONES GROUP --}}
-                            <div class="flex justify-center py-3">
-                                <div class="inline-flex rounded-md shadow-xs" role="group">
-                                    <a  href="{{ route('guardavida.edit', $registro) }}"
-                                        class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-200 hover:text-sky-600 focus:z-10 focus:ring-2 focus:ring-sky-600 focus:text-sky-600 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-sky-500 dark:focus:text-white">
-                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 20 20"
-                                            stroke-width="1.5" stroke="currentColor"
-                                            class="w-3 h-3 me-2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-                                        </svg>
-                                        Editar
-                                    </a>
-                                   @can('eliminar_guardavida')
-                                        <div class="inline">
-                                            <button type="button" @click="baja = { url: @js(route('guardavida.baja', $registro)), nombre: @js($registro->user->lastname.', '.$registro->user->name) }"
-                                            class="inline-flex items-center px-4 py-2 text-sm font-medium text-red-700 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-red-300 dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
-                                                <svg xmlns="http://www.w3.org/2000/svg"
-                                                    fill="none"
-                                                    viewBox="0 0 20 20"
-                                                    stroke-width="1.5"
-                                                    stroke="currentColor"
-                                                    class="w-3 h-3 me-2">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
-                                                </svg>
-                                                Dar de baja
-                                            </button>
-                                        </div>
-                                    @else
-                                        <button disabled class="inline-flex items-center px-4 py-2 text-sm font-medium bg-gray-100 border border-gray-200 rounded-e-lg hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 ">
-                                             <svg xmlns="http://www.w3.org/2000/svg"
-                                                    fill="none"
-                                                    viewBox="0 0 20 20"
-                                                    stroke-width="1.5"
-                                                    stroke="currentColor"
-                                                    class="w-3 h-3 me-2"
-                                                    disabled>
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
-                                                </svg>
-                                            Bloquear
-                                        </button>
-                                    @endcan
-                                </div>
-                            </div> <!--flex-->
-                            {{-- FIN BOTONES GROUP--}}
-                        </div><!--px-4-->
-                    </div><!--accordion-->
-
-                </div>
-            @endforeach
+                    {{-- Contacto a mano (links aparte de la tarjeta: no se pueden anidar <a>). Alineado con el texto: 1rem + 3rem + 0.75rem. --}}
+                    <x-slot:pie>
+                        <div class="flex flex-col gap-0.5 pb-3 pl-[4.75rem] pr-4 text-sm">
+                            @if (filled($registro->telefono))
+                                <a href="tel:{{ preg_replace('/[^\d+]/', '', $registro->telefono) }}"
+                                    class="inline-flex w-fit items-center gap-2 py-0.5 text-sky-600 hover:underline dark:text-sky-300">
+                                    <i class="fas fa-phone w-4 text-center text-xs" aria-hidden="true"></i>{{ $registro->telefono }}
+                                </a>
+                            @endif
+                            <a href="mailto:{{ $registro->user->email }}"
+                                class="inline-flex min-w-0 items-center gap-2 py-0.5 text-gray-600 hover:underline dark:text-gray-300">
+                                <i class="fas fa-envelope w-4 text-center text-xs" aria-hidden="true"></i><span class="truncate">{{ $registro->user->email }}</span>
+                            </a>
+                        </div>
+                    </x-slot:pie>
+                </x-tarjeta-listado>
+            @empty
+                <p class="rounded-xl border border-gray-200 bg-white px-4 py-6 text-center text-sm text-gray-500 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">No hay guardavidas para mostrar.</p>
+            @endforelse
         </div>
 
         <div class="mt-4">
             {{ $guardavidasHabilitados->links() }}
         </div>
 
-
     </section>
+
     @can('agregar_guardavida')
         <a href="{{ route('guardavida.create') }}" class="btn fixed z-40 flex items-center bg-sky-500 dark:bg-sky-500 bottom-24 right-8 rounded-full px-3 py-3 shadow">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"

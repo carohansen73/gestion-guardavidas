@@ -298,6 +298,24 @@ class TemporadaEnRegistrosTest extends TestCase
 
     // -------------------------------------------------------------------------------------- listados
 
+    public function test_los_listados_del_celular_muestran_cada_registro_como_tarjeta_con_su_menu(): void
+    {
+        Carbon::setTestNow('2026-12-15');
+        $this->intervencion('2026-12-10 12:00:00')->update(['traslado' => true]);
+        $this->bandera('2026-12-10 09:00:00');
+        $this->novedadMaterial('2026-12-10 12:00:00');
+        $this->licencia('2026-12-10');
+        $this->cambioDeTurno('2026-12-10');
+
+        foreach (['intervencion.index', 'bandera.index', 'novedad-de-material.index', 'licencia.index', 'cambio-de-turno.index'] as $ruta) {
+            $this->actingAs($this->admin)->get(route($ruta))->assertOk()
+                ->assertSee('Más acciones de', false)->assertSee('x-ref="formMenu"', false) // los tres puntos y el menú inferior compartido
+                ->assertDontSee('drawer-bottom-example', false);
+        }
+
+        $this->actingAs($this->admin)->get(route('intervencion.index'))->assertSee('Hubo traslado');
+    }
+
     public function test_los_listados_filtran_por_temporada_con_la_actual_por_defecto(): void
     {
         Carbon::setTestNow('2026-12-15');

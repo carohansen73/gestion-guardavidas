@@ -82,6 +82,31 @@ class FotoPerfilTest extends TestCase
         $this->actingAs($admin)->get(route('guardavida.foto', $this->guardavida))->assertOk();
     }
 
+    public function test_el_listado_muestra_la_foto_de_cada_uno_o_el_icono(): void
+    {
+        $admin = $this->usuario('30777666', 'admin');
+
+        $this->actingAs($admin)->get(route('guardavida.index'))
+            ->assertOk()->assertDontSee(route('guardavida.foto', $this->guardavida), false);
+
+        $this->conFoto();
+
+        $this->actingAs($admin)->get(route('guardavida.index'))
+            ->assertOk()->assertSee(route('guardavida.foto', $this->guardavida), false);
+    }
+
+    public function test_las_fotos_del_listado_se_buscan_en_una_sola_consulta(): void
+    {
+        $this->conFoto();
+        $otro = Guardavida::forceCreate(['funcion' => 'Guardavida', 'playa_id' => $this->guardavida->playa_id, 'user_id' => $this->usuario('30999111', 'guardavida')->id]);
+
+        \DB::enableQueryLog();
+        $fotos = Guardavida::fotosPersonalesDe([$this->guardavida->user_id, $otro->user_id]);
+
+        $this->assertCount(1, \DB::getQueryLog());
+        $this->assertSame([$this->guardavida->user_id], array_keys($fotos), 'quien no tiene foto no figura');
+    }
+
     public function test_sin_foto_la_ruta_responde_404(): void
     {
         $this->actingAs($this->guardavida->user)->get(route('guardavida.foto', $this->guardavida))->assertNotFound();

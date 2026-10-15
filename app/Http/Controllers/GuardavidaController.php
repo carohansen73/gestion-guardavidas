@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreGuardavidaRequest;
 use App\Http\Requests\UpdateGuardavidaRequest;
-use App\Models\CambioDeTurno;
 use App\Models\Guardavida;
 use App\Models\Playa;
 use App\Models\Puesto;
@@ -16,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class GuardavidaController extends Controller
 {
@@ -55,7 +55,7 @@ class GuardavidaController extends Controller
             ->join('playas', 'playas.id', '=', 'guardavidas.playa_id')
             ->leftJoin('puestos', 'puestos.id', '=', 'guardavidas.puesto_id')
             ->join('users', 'users.id', '=', 'guardavidas.user_id')
-            ->with(['playa', 'puesto', 'user.perfil']);
+            ->with(['playa', 'puesto', 'user.perfil', 'user.roles']);
 
         // FILTRO SOLO PARA HABILITADOS
         if ($enabledOnly) {
@@ -101,6 +101,12 @@ class GuardavidaController extends Controller
             'playa_id' => $playaId,
             'sort' => $sortOrder,
         ]);
+
+        // Fotos de toda la página en una sola consulta (las vistas las leen de `foto_personal_id`).
+        $fotos = Guardavida::fotosPersonalesDe($registros->pluck('user_id'));
+        foreach ($registros as $registro) {
+            $registro->foto_personal_id = $fotos[$registro->user_id] ?? null;
+        }
 
         return $registros;
     }
@@ -242,22 +248,7 @@ class GuardavidaController extends Controller
             ? \App\Models\Postulacion::with('temporada')->where('user_id', $guardavida->user_id)->latest('id')->first()
             : null;
 
-        // Estadísticas: total histórico y de la temporada que muestran los listados (la activa o la última).
-        $temporadaStats = \App\Models\Temporada::paraListados();
-        $estadisticas = [
-            'asistencias' => [
-                'total' => $guardavida->asistencias()->count(),
-                'temporada' => $temporadaStats ? $guardavida->asistencias()->deTemporada($temporadaStats->id)->count() : 0,
-            ],
-            'intervenciones' => [
-                'total' => $guardavida->intervenciones()->count(),
-                'temporada' => $temporadaStats ? $guardavida->intervenciones()->where('intervencions.temporada_id', $temporadaStats->id)->count() : 0,
-            ],
-            'licencias' => [
-                'total' => $guardavida->licencias()->count(),
-                'temporada' => $temporadaStats ? $guardavida->licencias()->deTemporada($temporadaStats->id)->count() : 0,
-            ],
-        ];
+        [$estadisticas, $temporadaStats] = $this->estadisticasDe($guardavida);
 
         // Franco fijo vigente hoy ("Sábado, Domingo").
         $francoTexto = $guardavida->dias_franco_nombres;
@@ -579,42 +570,55 @@ class GuardavidaController extends Controller
     }
 
     /**
-     * Mi perfil (usuario logueado). Los admin/encargado que no tienen una
-     * ficha de guardavida asociada también entran acá (para poder cambiar
-     * su email/contraseña), así que la vista debe funcionar con
-     * $guardavida en null.
+     * Estadísticas de un guardavidas: total histórico y de la temporada que muestran
+     * los listados (la activa o la última). Devuelve [$estadisticas, $temporadaStats].
+     */
+    private function estadisticasDe(Guardavida $guardavida): array
+    {
+        $temporadaStats = Temporada::paraListados();
+
+        $estadisticas = [
+            'asistencias' => [
+                'total' => $guardavida->asistencias()->count(),
+                'temporada' => $temporadaStats ? $guardavida->asistencias()->deTemporada($temporadaStats->id)->count() : 0,
+            ],
+            'intervenciones' => [
+                'total' => $guardavida->intervenciones()->count(),
+                'temporada' => $temporadaStats ? $guardavida->intervenciones()->where('intervencions.temporada_id', $temporadaStats->id)->count() : 0,
+            ],
+            'licencias' => [
+                'total' => $guardavida->licencias()->count(),
+                'temporada' => $temporadaStats ? $guardavida->licencias()->deTemporada($temporadaStats->id)->count() : 0,
+            ],
+        ];
+
+        return [$estadisticas, $temporadaStats];
+    }
+
+    /**
+     * Mi perfil (usuario logueado): siempre el propio, para editarlo. Los admin
+     * que no tienen una ficha de guardavida asociada también entran acá (para
+     * poder cambiar su email/contraseña), así que la vista debe funcionar con
+     * $guardavida en null. Editar a otro es por guardavida.edit.
      */
     public function myProfile()
     {
         $user = Auth::user();
+        $guardavida = $user->guardavida?->load(['playa', 'puesto', 'user']);
 
-        $esAdminOEncargado = $user->hasRole('admin') || $user->hasRole('encargado');
-
-        if (! $user->guardavida) {
-            return view('guardavidas.perfil', [
-                'guardavida' => null,
-                'puedeEditar' => true,
-                'esAdminOEncargado' => $esAdminOEncargado,
-                'esPropietario' => true,
-                'playas' => null,
-                'puestos' => null,
-                'turnos' => null,
-            ]);
+        if (! $guardavida) {
+            return view('guardavidas.perfil', ['guardavida' => null]);
         }
 
-        $guardavida = $user->guardavida->load(['playa', 'puesto', 'user']);
+        [$estadisticas, $temporadaStats] = $this->estadisticasDe($guardavida);
 
-        // Es siempre el perfil propio: el encargado puede cambiar su playa/puesto/turno,
-        // el resto lo ve y edita solo en los campos personales.
-        return view('guardavidas.perfil', [
-            'guardavida' => $guardavida,
-            'puedeEditar' => true,
-            'esAdminOEncargado' => $esAdminOEncargado,
-            'esPropietario' => true,
-            'playas' => $esAdminOEncargado ? Playa::all() : null,
-            'puestos' => $esAdminOEncargado ? Puesto::all() : null,
-            'turnos' => $esAdminOEncargado ? CambioDeTurno::all() : null,
-        ]);
+        // El encargado puede cambiarse el puesto (de su misma playa) y el turno.
+        $esEncargado = $user->hasRole('encargado');
+        $puestos = $esEncargado && $guardavida->playa_id
+            ? Puesto::where('playa_id', $guardavida->playa_id)->orderBy('nombre')->get()
+            : null;
+
+        return view('guardavidas.perfil', compact('guardavida', 'esEncargado', 'puestos', 'estadisticas', 'temporadaStats'));
     }
 
     /**
@@ -628,14 +632,13 @@ class GuardavidaController extends Controller
         // etc.) se hace desde la vista de admin con tabs (guardavida.edit),
         // no desde acá — esta ruta es autoservicio, solo el dueño del
         // perfil puede usarla.
-        $esAdminOEncargado = $user->hasRole('admin') || $user->hasRole('encargado');
+        $esEncargado = $user->hasRole('encargado');
         $esPropietario = $user->guardavida && $user->guardavida->id === $guardavida->id;
 
         if (! $esPropietario) {
             abort(403, 'No tenés permisos para editar este perfil.');
         }
 
-        // Validación
         // Validación base (lo que puede editar cualquier usuario)
         $rules = [
             'nombre' => 'required|string|max:100',
@@ -646,22 +649,18 @@ class GuardavidaController extends Controller
             'numero' => 'nullable|string|max:10',
             'piso_dpto' => 'nullable|string|max:10',
         ];
-        // Solo admin puede cambiar playa/puesto/función/turno
-        if ($esAdminOEncargado) {
-            $rules['playa_id'] = 'required|exists:playas,id';
-            $rules['puesto_id'] = 'required|exists:puestos,id';
-
-            // agregar cuando haya tabla de funciones $rules['funcion'] = 'nullable|string';
+        // El encargado también puede cambiarse el puesto (siempre dentro de su playa,
+        // que no puede cambiar) y el turno. Playa y función los define el admin.
+        if ($esEncargado) {
+            if ($guardavida->playa_id) {
+                $rules['puesto_id'] = ['required', Rule::exists('puestos', 'id')->where('playa_id', $guardavida->playa_id)];
+            }
+            $rules['turno'] = 'required|in:M,T';
         }
 
+        // validate() devuelve solo las claves de $rules: el resto del request se descarta.
         $validated = $request->validate($rules);
-        // Si no es admin, remover campos que no puede editar
-        if (! $esAdminOEncargado) {
 
-            unset($validated['playa_id'],
-                $validated['puesto_id']);
-
-        }
         // nombre/apellido/dni ya no se guardan en "guardavidas" (Fase 3b) —
         // viven únicamente en "users" (accessors en el modelo Guardavida).
         // Teléfono/domicilio viven en `perfiles`, se guardan aparte.

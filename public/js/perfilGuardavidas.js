@@ -2,13 +2,9 @@
 const csrfToken = document
     .querySelector('meta[name="csrf-token"]')
     .getAttribute("content");
-// En el perfil de un admin/encargado sin ficha de guardavida asociada, este
-// form no existe (solo se muestra la card de "Datos de Usuario"), así que
-// todo lo que depende de él se guarda condicionado a que exista.
+// Un admin sin ficha de guardavida no tiene este form (solo ve la card de
+// "Datos de Usuario"), así que todo lo que depende de él se condiciona a que exista.
 const form = document.querySelector(".profile-body");
-const guardavidaId = form ? parseInt(form.dataset.guardavidaId) : null; // Esto te da el ID
-
-let puedeEditar =  window.puedeEditar === true;
 
 // Función para mostrar alertas
 function mostrarAlerta(tipo, titulo, mensaje) {
@@ -31,105 +27,64 @@ function mostrarAlerta(tipo, titulo, mensaje) {
     // Scroll suave hacia arriba
     window.scrollTo({ top: 0, behavior: "smooth" });
 
-    // Auto-ocultar después de 5 segundos
+    // Auto-ocultar después de 10 segundos
     setTimeout(() => {
         alertContainer.innerHTML = "";
     }, 10000);
 }
 
-console.log(puedeEditar);
-
 // Manejar envío del formulario
-if (puedeEditar && form) {
+if (form) {
     form.addEventListener("submit", async function(e) {
-            e.preventDefault();
+        e.preventDefault();
 
-            // VALIDACIÓN: si cambió la playa y NO eligió puesto → detener envío
-            const puestoSelect = document.getElementById("selectPuesto");
+        const btnGuardar = document.getElementById("btnGuardar");
+        const textoOriginal = btnGuardar.innerHTML;
 
-           console.log("EXISTE SELECT?", document.getElementById("selectPuesto"));
+        btnGuardar.innerHTML = '<span class="spinner"></span> Guardando...';
+        btnGuardar.disabled = true;
 
-            if (puestoSelect.dataset.requiereNuevo === "1" && puestoSelect.value === "") {
-                mostrarAlerta(
-                    "error",
-                    "Puesto obligatorio",
-                    "Debe seleccionar un puesto correspondiente a la nueva playa elegida."
-                );
-                return; // ← Bloquea el envío
-            }
-
-            const btnGuardar = document.getElementById("btnGuardar");
-            const textoOriginal = btnGuardar.innerHTML;
-
-            btnGuardar.innerHTML = '<span class="spinner"></span> Guardando...';
-            btnGuardar.disabled = true;
-
-            try {
-                const formData = new FormData(this);
-                formData.append("_method", "PUT"); // necesario para Laravel PUT
-
-                const response = await fetch(this.action, {
-                    method: "POST", // Laravel interpreta _method como PUT
-                    headers: {
-                        "X-CSRF-TOKEN": csrfToken,
-                        "X-Requested-With": "XMLHttpRequest",
-                    },
-                    body: formData,
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    mostrarAlerta("success", result.titulo, result.detalle);
-                    setTimeout(() => location.reload(), 2000);
-                } else {
-                    mostrarAlerta("error", result.titulo, result.detalle);
-                }
-            } catch (error) {
-                console.error("Error:", error);
-                mostrarAlerta(
-                    "error",
-                    "¡Error!",
-                    "Ocurrió un error al actualizar el perfil. Por favor, intente nuevamente."
-                );
-            } finally {
-                btnGuardar.innerHTML = textoOriginal;
-                btnGuardar.disabled = false;
-            }
-        });
-}
-
-const selectPlaya = document.getElementById("selectPlaya");
-if (selectPlaya) {
-    selectPlaya.addEventListener("change", function() {
-        let playaId = this.value;
-        let puestoSelect = document.getElementById("selectPuesto");
-        puestoSelect.innerHTML = '<option value="">Cargando...</option>';
-
-        puestoSelect.dataset.requiereNuevo = "1";
-
-        if (!playaId) {
-            puestoSelect.innerHTML = '<option value="">Seleccionar puesto</option>';
-            return;
-        }
-
-        fetch(`/puestos-por-playa/${playaId}`)
-            .then((response) => response.json())
-            .then((data) => {
-                puestoSelect.innerHTML =
-                    '<option value="">Seleccionar puesto</option>';
-
-                data.forEach((puesto) => {
-                    let option = document.createElement("option");
-                    option.value = puesto.id;
-                    option.textContent = puesto.nombre;
-                    puestoSelect.appendChild(option);
-                });
-            })
-            .catch((error) => {
-                console.error("Error cargando puestos:", error);
-                puestoSelect.innerHTML =
-                    '<option value="">Error al cargar</option>';
+        try {
+            // El _method=PUT ya viene en el form (@method('PUT'))
+            const response = await fetch(this.action, {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": csrfToken,
+                    "X-Requested-With": "XMLHttpRequest",
+                    Accept: "application/json",
+                },
+                body: new FormData(this),
             });
+
+            const result = await response.json();
+
+            if (result.success) {
+                mostrarAlerta("success", result.titulo, result.detalle);
+                setTimeout(() => location.reload(), 2000);
+            } else if (response.status === 422 && result.errors) {
+                // Errores de validación de Laravel: { message, errors: { campo: [msg] } }
+                mostrarAlerta(
+                    "error",
+                    "Revisá los datos",
+                    Object.values(result.errors).flat().join("<br>")
+                );
+            } else {
+                mostrarAlerta(
+                    "error",
+                    result.titulo ?? "¡Error!",
+                    result.detalle ?? result.message ?? "No se pudo actualizar el perfil."
+                );
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            mostrarAlerta(
+                "error",
+                "¡Error!",
+                "Ocurrió un error al actualizar el perfil. Por favor, intente nuevamente."
+            );
+        } finally {
+            btnGuardar.innerHTML = textoOriginal;
+            btnGuardar.disabled = false;
+        }
     });
 }

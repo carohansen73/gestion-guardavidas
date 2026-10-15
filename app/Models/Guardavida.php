@@ -53,6 +53,31 @@ class Guardavida extends Model
             ->first();
     }
 
+    /**
+     * Id de la foto personal más reciente de varias personas en UNA sola consulta (para listados;
+     * `fotoPersonal()` haría una por fila). Devuelve [user_id => id del documento]; quien no tiene foto no figura.
+     *
+     * @param  iterable<int>  $userIds
+     * @return array<int,int>
+     */
+    public static function fotosPersonalesDe(iterable $userIds): array
+    {
+        $ids = collect($userIds)->filter()->unique()->values();
+
+        if ($ids->isEmpty()) {
+            return [];
+        }
+
+        return PostulacionDocumento::where('tipo', 'foto_personal')
+            ->join('postulaciones', 'postulaciones.id', '=', 'postulacion_documentos.postulacion_id')
+            ->whereIn('postulaciones.user_id', $ids)
+            ->orderByDesc('postulacion_documentos.id')
+            ->get(['postulacion_documentos.id', 'postulaciones.user_id'])
+            ->unique('user_id')
+            ->pluck('id', 'user_id')
+            ->all();
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

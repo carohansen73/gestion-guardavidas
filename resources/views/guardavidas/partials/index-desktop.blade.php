@@ -16,22 +16,30 @@
                         data-playa="{{ $registro->playa->id ?? '' }}">
 
                         <td class="px-4 py-2">
-                            <a href="{{ route('guardavida.show', $registro) }}" class="{{ !$registro->user->enabled ? 'text-gray-600 hover:text-gray-400 dark:text-gray-200 dark:hover:text-gray-100' : 'text-sky-600 hover:text-sky-500 dark:text-sky-300 hover:dark:text-sky-200' }}">
-                                {{ $registro->apellido }} {{ $registro->nombre }}
-                            </a>
+                            <div class="flex items-center gap-3">
+                                {{-- Con foto, se agranda un poco al pasar el mouse. 1.4x como máximo: crece dentro del
+                                     padding de la fila, porque el contenedor de la tabla (overflow-x-auto) recortaría más. --}}
+                                <x-avatar-guardavida :guardavida="$registro" size="w-9 h-9" icono="text-sm"
+                                    :class="$registro->foto_personal_id ? 'relative transition-transform duration-200 ease-out hover:z-10 hover:scale-[1.4] hover:shadow-lg' : ''" />
+                                <a href="{{ route('guardavida.show', $registro) }}" class="{{ !$registro->user->enabled ? 'text-gray-600 hover:text-gray-400 dark:text-gray-200 dark:hover:text-gray-100' : 'text-sky-600 hover:text-sky-500 dark:text-sky-300 hover:dark:text-sky-200' }}">
+                                    {{ $registro->apellido }} {{ $registro->nombre }}
+                                </a>
+                            </div>
                         </td>
                         @php
                             $color = match($registro->funcion) {
                                 'Encargado' => 'text-red-600 dark:text-red-400',
                                 'Jefe_de_playa' => 'text-orange-600 dark:text-orange-400',
-                                'Guardavida' => 'text-sky-600 dark:text-sky-400',
+                                'Guardavida' => 'text-gray-600 dark:text-gray-400',
                                 'Timonel' => 'text-teal-600 dark:text-teal-400',
                                 default => 'text-gray-600 dark:text-gray-400'
                             };
                         @endphp
                         <td class="px-4 py-2 {{ $color }}">{{ str_replace('_', ' ', $registro->funcion) }}</td>
 
-                        <td class="px-4 py-2">{{ $registro->user->getRoleNames()->first() }} </td>
+                        <td class="px-4 py-2">
+                            <x-role-badge :rol="\App\Enums\RolUsuario::principal($registro->user)" :label="false" />
+                        </td>
                         <td class="px-4 py-2">{{ $registro->playa->nombre ?? '-' }} - {{ $registro->puesto->nombre ?? '-' }}</td>
                         <td class="px-4 py-2">
                             <div class="flex space-x-2">
