@@ -203,12 +203,85 @@ class GuardavidaController extends Controller
     }
 
     /**
-     * Display the specified resource (reusa la vista de "mi perfil": es
-     * de solo lectura salvo que sea el propio guardavida el que la mira).
+     * Ficha de un guardavidas, de solo lectura, para admin y encargado.
+     * El propio guardavidas edita sus datos desde myProfile() (/profile).
      */
     public function show(Guardavida $guardavida)
     {
-        return $this->showProfile($guardavida);
+        $user = Auth::user();
+
+        abort_unless($user->hasAnyRole(['admin', 'superadmin', 'encargado']), 403, 'No tenés permisos para ver este perfil.');
+
+        $guardavida->load(['playa', 'puesto', 'user']);
+
+        // Datos fijos que la persona carga en la postulación (viven en `perfiles`, no en `guardavidas`).
+        $perfil = $guardavida->user?->perfil;
+
+        // Documentos de la postulación: el más reciente de cada tipo (DNI, libreta, antecedentes…).
+        // Se abren por la ruta `postulaciones.documento`, que exige el permiso `ver_postulacion`.
+        $puedeVerDocumentos = $user->can('ver_postulacion');
+        $documentos = collect();
+        if ($puedeVerDocumentos && $guardavida->user_id) {
+            $documentos = \App\Models\PostulacionDocumento::with('postulacion.temporada')
+                ->whereHas('postulacion', fn ($q) => $q->where('user_id', $guardavida->user_id))
+                ->orderByDesc('id')
+                ->get()
+                ->unique('tipo')
+                ->sortBy(fn ($d) => array_search($d->tipo, array_keys(\App\Models\PostulacionDocumento::TIPOS)))
+                ->values();
+        }
+
+        // Postulación más reciente con documentos: su temporada se muestra una vez en la card, y solo se
+        // aclara la temporada en los documentos que vienen de otra postulación (no se renovaron).
+        $ultimaPostulacionDocs = $documentos->max('postulacion_id');
+        $postulacionDocs = $documentos->firstWhere('postulacion_id', $ultimaPostulacionDocs)?->postulacion;
+
+        // Última postulación (la más reciente): trae la disponibilidad desde/hasta y el estado.
+        // Es null si nunca se postuló (altas manuales, personal).
+        $ultimaPostulacion = $guardavida->user_id
+            ? \App\Models\Postulacion::with('temporada')->where('user_id', $guardavida->user_id)->latest('id')->first()
+            : null;
+
+        // Estadísticas: total histórico y de la temporada que muestran los listados (la activa o la última).
+        $temporadaStats = \App\Models\Temporada::paraListados();
+        $estadisticas = [
+            'asistencias' => [
+                'total' => $guardavida->asistencias()->count(),
+                'temporada' => $temporadaStats ? $guardavida->asistencias()->deTemporada($temporadaStats->id)->count() : 0,
+            ],
+            'intervenciones' => [
+                'total' => $guardavida->intervenciones()->count(),
+                'temporada' => $temporadaStats ? $guardavida->intervenciones()->where('intervencions.temporada_id', $temporadaStats->id)->count() : 0,
+            ],
+            'licencias' => [
+                'total' => $guardavida->licencias()->count(),
+                'temporada' => $temporadaStats ? $guardavida->licencias()->deTemporada($temporadaStats->id)->count() : 0,
+            ],
+        ];
+
+        // Franco fijo vigente hoy ("Sábado, Domingo").
+        $francoTexto = $guardavida->dias_franco_nombres;
+
+        // Ingreso al servicio: períodos alta->baja en el plantel (el primero es el ingreso original).
+        $periodos = $guardavida->periodos()->with('temporada')->get();
+        $ingresoAlServicio = $periodos->first()?->desde;
+        $periodoActual = $periodos->first(fn ($p) => $p->hasta === null);
+
+        return view('guardavidas.show', compact(
+            'guardavida',
+            'perfil',
+            'ultimaPostulacion',
+            'estadisticas',
+            'temporadaStats',
+            'documentos',
+            'puedeVerDocumentos',
+            'ultimaPostulacionDocs',
+            'postulacionDocs',
+            'francoTexto',
+            'periodos',
+            'ingresoAlServicio',
+            'periodoActual'
+        ));
     }
 
     /**
@@ -489,48 +562,7 @@ class GuardavidaController extends Controller
         return response()->json($guardavidas);
     }
 
-    /**
-     * Ver perfil de un guardavidas específico
-     * Puede ser visto  por el propio guardavidas (loguarse como guardavidas)
-     */
-    public function showProfile(Guardavida $guardavida)
-    {
-        $user = Auth::user();
-
-        // Verificar permisos
-        $esAdminOEncargado = $user->hasRole('admin') || $user->hasRole('encargado');
-        $esPropietario = $user->guardavida && $user->guardavida->id === $guardavida->id;
-
-        if (! $esAdminOEncargado && ! $esPropietario) {
-            abort(403, 'No tenés permisos para ver este perfil.');
-        }
-
-        $puedeEditar = $esAdminOEncargado || $esPropietario;
-
-        /*
-                // Cargar relaciones necesarias
-                $guardavida->load(['playa', 'puesto', 'turnos', 'funciones', 'user']);
-        */
-        // Cargar relaciones necesarias
-        $guardavida->load(['playa', 'puesto', 'user']);
-        // Obtener listas para los selects (solo si es admin editando su
-        // propio perfil; viendo el de otro queda todo de solo lectura)
-        $playas = $esAdminOEncargado && $esPropietario ? Playa::all() : null;
-        $puestos = $esAdminOEncargado && $esPropietario ? Puesto::all() : null;
-        $turnos = $esAdminOEncargado && $esPropietario ? CambioDeTurno::all() : null;
-
-        return view('guardavidas.perfil', compact(
-            'guardavida',
-            'puedeEditar',
-            'esAdminOEncargado',
-            'esPropietario',
-            'playas',
-            'puestos',
-            'turnos'
-        ));
-    }
-
-    /** Sirve la foto personal para el perfil. Mismo criterio de acceso que showProfile(). */
+    /** Sirve la foto personal para el perfil. La ve el propio guardavida, el admin o el encargado. */
     public function foto(Guardavida $guardavida)
     {
         $user = Auth::user();
@@ -556,18 +588,32 @@ class GuardavidaController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->guardavida) {
-            return $this->showProfile($user->guardavida);
+        $esAdminOEncargado = $user->hasRole('admin') || $user->hasRole('encargado');
+
+        if (! $user->guardavida) {
+            return view('guardavidas.perfil', [
+                'guardavida' => null,
+                'puedeEditar' => true,
+                'esAdminOEncargado' => $esAdminOEncargado,
+                'esPropietario' => true,
+                'playas' => null,
+                'puestos' => null,
+                'turnos' => null,
+            ]);
         }
 
+        $guardavida = $user->guardavida->load(['playa', 'puesto', 'user']);
+
+        // Es siempre el perfil propio: el encargado puede cambiar su playa/puesto/turno,
+        // el resto lo ve y edita solo en los campos personales.
         return view('guardavidas.perfil', [
-            'guardavida' => null,
+            'guardavida' => $guardavida,
             'puedeEditar' => true,
-            'esAdminOEncargado' => $user->hasRole('admin') || $user->hasRole('encargado'),
+            'esAdminOEncargado' => $esAdminOEncargado,
             'esPropietario' => true,
-            'playas' => null,
-            'puestos' => null,
-            'turnos' => null,
+            'playas' => $esAdminOEncargado ? Playa::all() : null,
+            'puestos' => $esAdminOEncargado ? Puesto::all() : null,
+            'turnos' => $esAdminOEncargado ? CambioDeTurno::all() : null,
         ]);
     }
 
