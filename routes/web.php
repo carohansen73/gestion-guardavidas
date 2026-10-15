@@ -110,6 +110,8 @@ Route::middleware(['auth', 'force.password', 'postulante.redirect'])->group(func
         Route::get('/get-all-guardavidas', [GuardavidaController::class, 'getAll']);
     });
 
+    // Constancia médica de una licencia: la sirve la app (login + permiso), no una URL pública de storage.
+    Route::get('licencia/{licencia}/constancia', [App\Http\Controllers\LicenciaController::class, 'constancia'])->name('licencia.constancia');
     Route::resource('licencia', App\Http\Controllers\LicenciaController::class)
         ->parameters(['licencia' => 'licencia'])
         ->middlewareFor(['store', 'update', 'destroy'], 'temporada.activa');

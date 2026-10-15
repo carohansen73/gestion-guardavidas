@@ -96,7 +96,8 @@ class LicenciaController extends Controller
         $licencia->detalle = $request->detalle;
 
         if ($request->hasFile('archivo')) {
-            $path = $request->file('archivo')->store('licencias', 'public');
+            // Disco privado: la constancia es un dato de salud, solo se abre por licencia.constancia.
+            $path = $request->file('archivo')->store('licencias', 'local');
             $licencia->archivo = $path;
         }
         $licencia->save();
@@ -113,6 +114,30 @@ class LicenciaController extends Controller
     {
         return view('licencias.show-fields', compact(
             'licencia'));
+    }
+
+    /**
+     * Abre la constancia (foto o PDF) de una licencia. Es un dato de salud: solo la ve quien tiene el permiso
+     * `ver_licencia` (admin, encargado) o el propio guardavida de la licencia, siempre con la sesión iniciada.
+     */
+    public function constancia(Licencia $licencia)
+    {
+        $user = Auth::user();
+
+        abort_unless(
+            $user->can('ver_licencia') || ($licencia->guardavida && $licencia->guardavida->user_id === $user->id),
+            403
+        );
+
+        $disco = $licencia->discoDeLaConstancia();
+        abort_unless($disco, 404, 'La constancia no está disponible.');
+
+        $extension = pathinfo($licencia->archivo, PATHINFO_EXTENSION);
+
+        return Storage::disk($disco)->response($licencia->archivo, "constancia-licencia-{$licencia->id}.{$extension}", [
+            'Cache-Control' => 'private, max-age=3600',
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
     }
 
     /**
@@ -145,12 +170,12 @@ class LicenciaController extends Controller
         $licencia->update($request->except('archivo'));
 
         if ($request->hasFile('archivo')) {
-            // Eliminar archivo anterior si existe
-            if ($licencia->archivo && Storage::disk('public')->exists($licencia->archivo)) {
-                Storage::disk('public')->delete($licencia->archivo);
+            // Eliminar archivo anterior si existe (esté en el disco privado o en el público de antes)
+            if ($disco = $licencia->discoDeLaConstancia()) {
+                Storage::disk($disco)->delete($licencia->archivo);
             }
 
-            $path = $request->file('archivo')->store('licencias', 'public');
+            $path = $request->file('archivo')->store('licencias', 'local');
             $licencia->archivo = $path;
             $licencia->save();
         }
@@ -165,8 +190,8 @@ class LicenciaController extends Controller
     {
 
         // Elimina archivo si existe
-        if ($licencia->archivo && Storage::disk('public')->exists($licencia->archivo)) {
-            Storage::disk('public')->delete($licencia->archivo);
+        if ($disco = $licencia->discoDeLaConstancia()) {
+            Storage::disk($disco)->delete($licencia->archivo);
         }
 
         // Elimina el registro

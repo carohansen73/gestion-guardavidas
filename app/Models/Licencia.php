@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Concerns\TieneTemporada;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Licencia extends Model
 {
@@ -48,8 +49,28 @@ class Licencia extends Model
         return $this->belongsTo(Puesto::class);
     }
 
+    /** Link a la constancia: pasa por la aplicación (login + permiso), no por una URL pública del disco. */
     public function getArchivoUrlAttribute()
     {
-        return $this->archivo ? asset('storage/'.$this->archivo) : null;
+        return $this->archivo ? route('licencia.constancia', $this) : null;
+    }
+
+    /**
+     * Disco donde está la constancia. Las nuevas se guardan en `local` (privado); las anteriores pueden seguir
+     * en `public` hasta que se mueva la carpeta `licencias` a `storage/app/private`. Null si el archivo no está.
+     */
+    public function discoDeLaConstancia(): ?string
+    {
+        if (! $this->archivo) {
+            return null;
+        }
+
+        foreach (['local', 'public'] as $disco) {
+            if (Storage::disk($disco)->exists($this->archivo)) {
+                return $disco;
+            }
+        }
+
+        return null;
     }
 }

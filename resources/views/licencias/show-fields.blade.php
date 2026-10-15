@@ -52,7 +52,7 @@
                 Constancia:
                 @if($licencia->archivo)
                 <span class="text-sm text-gray-500 dark:text-gray-300">
-                    <a href="{{ asset('storage/' . $licencia->archivo) }}" target="_blank" class="text-indigo-600 underline">Ver archivo</a>
+                    <a href="{{ route('licencia.constancia', $licencia) }}" target="_blank" class="text-indigo-600 underline">Ver archivo</a>
                 </span>
                 @else
                 <span class="text-sm text-gray-400 dark:text-gray-300">

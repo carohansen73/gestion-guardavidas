@@ -159,7 +159,7 @@
 
                     <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
                         Archivo actual:
-                        <a href="{{ asset('storage/' . $licencia->archivo) }}" target="_blank" class="text-indigo-600 underline">Ver archivo</a>
+                        <a href="{{ route('licencia.constancia', $licencia) }}" target="_blank" class="text-indigo-600 underline">Ver archivo</a>
                     </p>
 
                 @endif

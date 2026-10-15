@@ -298,6 +298,22 @@ class TemporadaEnRegistrosTest extends TestCase
 
     // -------------------------------------------------------------------------------------- listados
 
+    public function test_el_superadmin_ve_el_detalle_de_una_licencia_con_su_constancia(): void
+    {
+        Carbon::setTestNow('2026-12-15');
+        $licencia = $this->licencia('2026-12-10');
+        $licencia->update(['archivo' => 'licencias/constancia.pdf']);
+
+        $soloSuperadmin = $this->usuario('20000009', 'superadmin');
+        $adminYSuperadmin = $this->usuario('20000010', 'admin');
+        $adminYSuperadmin->assignRole('superadmin');
+
+        foreach ([$soloSuperadmin, $adminYSuperadmin] as $quien) {
+            $this->actingAs($quien)->get(route('licencia.index'))->assertOk()->assertSee('Ver constancia');
+            $this->actingAs($quien)->get(route('licencia.show', $licencia))->assertOk()->assertSee(route('licencia.constancia', $licencia), false);
+        }
+    }
+
     public function test_los_listados_del_celular_muestran_cada_registro_como_tarjeta_con_su_menu(): void
     {
         Carbon::setTestNow('2026-12-15');
