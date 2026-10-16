@@ -109,7 +109,8 @@ class NovedadMaterialController extends Controller
         // si no me toma el binding automatico: pasar el parametro a ($id) y buscar el registro:
         // $novedadMaterial = NovedadMaterial::findOrFail($id);
         // dd($novedadMaterial);
-        return view('novedades-materiales.show-fields', compact(
+        // Desde el listado se pide por AJAX y va en un modal: solo el contenido. Si no, la página completa.
+        return view(request()->ajax() ? 'novedades-materiales.partials.detalle' : 'novedades-materiales.show-fields', compact(
             'novedadDeMaterial'));
     }
 

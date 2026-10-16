@@ -129,7 +129,8 @@ class CambioDeTurnoController extends Controller
      */
     public function show(CambioDeTurno $cambioDeTurno)
     {
-        return view('cambios-de-turno.show-fields', compact(
+        // Desde el listado se pide por AJAX y va en un modal: solo el contenido. Si no, la página completa.
+        return view(request()->ajax() ? 'cambios-de-turno.partials.detalle' : 'cambios-de-turno.show-fields', compact(
             'cambioDeTurno'));
     }
 

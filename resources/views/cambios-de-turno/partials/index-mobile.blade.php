@@ -8,7 +8,7 @@
                     $guardavida = trim(($registro->guardavida->nombre ?? '').' '.($registro->guardavida->apellido ?? '')) ?: '-';
                     $titulo = "{$guardavida} - turno {$registro->turno_nuevo}";
                     $acciones = array_values(array_filter([
-                        ['texto' => 'Ver detalle', 'icono' => 'fa-eye', 'href' => route('cambio-de-turno.show', $registro)],
+                        ['texto' => 'Ver detalle', 'icono' => 'fa-eye', 'href' => route('cambio-de-turno.show', $registro), 'detalle' => true],
                         auth()->user()->can('editar_cambio_turno') && $puedeModificar ? ['texto' => 'Editar', 'icono' => 'fa-pen', 'href' => route('cambio-de-turno.edit', $registro)] : null,
                         auth()->user()->can('eliminar_cambio_turno') && $puedeModificar ? [
                             'texto' => 'Eliminar', 'icono' => 'fa-trash', 'peligro' => true,
@@ -17,7 +17,7 @@
                     ]));
                 @endphp
 
-                <x-tarjeta-listado :href="route('cambio-de-turno.show', $registro)" :titulo="$titulo" :acciones="$acciones"
+                <x-tarjeta-listado modal :href="route('cambio-de-turno.show', $registro)" :titulo="$titulo" :acciones="$acciones"
                     :playa="$registro->playa->id ?? ''" :fecha="$registro->fecha->format('Y-m-d')">
                     <x-slot:lead>
                         <x-icono-listado icono="fa-right-left" color="teal" />

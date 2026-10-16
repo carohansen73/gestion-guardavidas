@@ -7,7 +7,7 @@
                     $puedeModificar = $intervencion->modificablePor(auth()->user());
                     $titulo = $intervencion->tipo_intervencion.' - '.$intervencion->fecha->format('d/m/Y');
                     $acciones = array_values(array_filter([
-                        ['texto' => 'Ver detalle', 'icono' => 'fa-eye', 'href' => route('intervencion.show', $intervencion)],
+                        ['texto' => 'Ver detalle', 'icono' => 'fa-eye', 'href' => route('intervencion.show', $intervencion), 'detalle' => true],
                         auth()->user()->can('editar_intervencion') && $puedeModificar ? ['texto' => 'Editar', 'icono' => 'fa-pen', 'href' => route('intervencion.edit', $intervencion)] : null,
                         auth()->user()->can('eliminar_intervencion') && $puedeModificar ? [
                             'texto' => 'Eliminar', 'icono' => 'fa-trash', 'peligro' => true,
@@ -16,7 +16,7 @@
                     ]));
                 @endphp
 
-                <x-tarjeta-listado :href="route('intervencion.show', $intervencion)" :titulo="$titulo" :acciones="$acciones"
+                <x-tarjeta-listado modal :href="route('intervencion.show', $intervencion)" :titulo="$titulo" :acciones="$acciones"
                     :playa="$intervencion->playa->id ?? ''" :fecha="$intervencion->fecha->format('Y-m-d')">
                     <x-slot:lead>
                         <x-icono-listado icono="fa-life-ring" color="red" />

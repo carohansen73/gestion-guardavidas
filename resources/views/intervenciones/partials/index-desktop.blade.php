@@ -16,7 +16,7 @@
                     data-fecha="{{ $intervencion->fecha->format('Y-m-d') }}">
                     <td class="px-4 py-2">{{ $intervencion->fecha->format('d/m/Y') }}</td>
                     <td class="px-4 py-2">
-                        <a href="{{ route('intervencion.show', $intervencion) }}" class="text-sky-600 hover:text-sky-400 dark:text-sky-400 hover:dark:text-sky-300">
+                        <a href="{{ route('intervencion.show', $intervencion) }}" data-detalle class="text-sky-600 hover:text-sky-400 dark:text-sky-400 hover:dark:text-sky-300">
                             {{ $intervencion->tipo_intervencion }}
                         </a>
                     </td>

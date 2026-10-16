@@ -16,7 +16,7 @@
                 <td class="px-4 py-2">{{ $registro->fecha->format('d/m/Y') }}</td>
                 <td class="px-4 py-2">{{ $registro->tipo_novedad }}</td>
                 <td class="px-4 py-2">
-                    <a href="{{ route('novedad-de-material.show', $registro) }}" class="text-sky-600 hover:text-sky-500 dark:text-sky-400 hover:dark:text-sky-300">
+                    <a href="{{ route('novedad-de-material.show', $registro) }}" data-detalle class="text-sky-600 hover:text-sky-500 dark:text-sky-400 hover:dark:text-sky-300">
                         {{ $registro->material->nombre }} {{ $registro->material->detalle }}
                     </a>
                 </td>

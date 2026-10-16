@@ -7,7 +7,7 @@
                     $puedeModificar = $registro->modificablePor(auth()->user());
                     $titulo = ($registro->bandera->codigo ?? 'Bandera').' - '.$registro->fecha->format('d/m/Y');
                     $acciones = array_values(array_filter([
-                        ['texto' => 'Ver detalle', 'icono' => 'fa-eye', 'href' => route('bandera.show', $registro)],
+                        ['texto' => 'Ver detalle', 'icono' => 'fa-eye', 'href' => route('bandera.show', $registro), 'detalle' => true],
                         auth()->user()->can('editar_bandera') && $puedeModificar ? ['texto' => 'Editar', 'icono' => 'fa-pen', 'href' => route('bandera.edit', $registro)] : null,
                         auth()->user()->can('eliminar_bandera') && $puedeModificar ? [
                             'texto' => 'Eliminar', 'icono' => 'fa-trash', 'peligro' => true,
@@ -16,7 +16,7 @@
                     ]));
                 @endphp
 
-                <x-tarjeta-listado :href="route('bandera.show', $registro)" :titulo="$titulo" :acciones="$acciones"
+                <x-tarjeta-listado modal :href="route('bandera.show', $registro)" :titulo="$titulo" :acciones="$acciones"
                     :playa="$registro->playa->id ?? ''" :fecha="$registro->fecha->format('Y-m-d')">
                     <x-slot:lead>
                         <x-icono-bandera :bandera="$registro->bandera" />

@@ -15,7 +15,7 @@
                 data-fecha="{{ $registro->fecha_inicio->format('Y-m-d') }}">
                 <td class="px-4 py-2">{{ $registro->fecha_inicio->format('d/m/y') }} - {{ $registro->fecha_fin->format('d/m/y') }}</td>
                 <td class="px-4 py-2">
-                    <a href="{{ route('licencia.show', $registro) }}" class="text-sky-600 hover:text-sky-400 dark:text-sky-400 hover:dark:text-sky-300">
+                    <a href="{{ route('licencia.show', $registro) }}" data-detalle class="text-sky-600 hover:text-sky-400 dark:text-sky-400 hover:dark:text-sky-300">
                         {{ $registro->tipo_licencia }}
                     </a>
                 </td>

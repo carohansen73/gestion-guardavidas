@@ -3,13 +3,13 @@
      Mantiene la clase `registro-item-lista` y los data-* que usa public/js/table-intervenciones.js para filtrar.
      Slots: `lead` (avatar o ícono a la izquierda), el contenido principal (slot por defecto) y `pie` (líneas extra
      debajo, fuera del link, ej. teléfono o email). --}}
-@props(['href', 'titulo', 'acciones' => [], 'playa' => null, 'fecha' => null])
+@props(['href', 'titulo', 'acciones' => [], 'playa' => null, 'fecha' => null, 'modal' => false])
 
 <div {{ $attributes->merge(['class' => 'registro-item-lista overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800']) }}
     data-playa="{{ $playa }}" @if ($fecha) data-fecha="{{ $fecha }}" @endif>
 
     <div class="flex items-center gap-1">
-        <a href="{{ $href }}"
+        <a href="{{ $href }}" @if ($modal) data-detalle @endif
             class="flex min-w-0 flex-1 items-center gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 {{ isset($pie) ? 'pb-1' : '' }}">
             @isset($lead)
                 {{ $lead }}

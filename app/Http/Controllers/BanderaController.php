@@ -115,7 +115,8 @@ class BanderaController extends Controller
      */
     public function show(Bandera $bandera)
     {
-        return view('banderas.show-fields', compact(
+        // Desde el listado se pide por AJAX y va en un modal: solo el contenido. Si no, la página completa.
+        return view(request()->ajax() ? 'banderas.partials.detalle' : 'banderas.show-fields', compact(
             'bandera'
         ));
     }

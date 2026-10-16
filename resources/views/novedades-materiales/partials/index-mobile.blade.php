@@ -8,7 +8,7 @@
                     $material = trim(($registro->material->nombre ?? '').' '.($registro->material->detalle ?? '')) ?: '-';
                     $titulo = "{$registro->tipo_novedad?->value} {$material}";
                     $acciones = array_values(array_filter([
-                        ['texto' => 'Ver detalle', 'icono' => 'fa-eye', 'href' => route('novedad-de-material.show', $registro)],
+                        ['texto' => 'Ver detalle', 'icono' => 'fa-eye', 'href' => route('novedad-de-material.show', $registro), 'detalle' => true],
                         auth()->user()->can('editar_novedad_material') && $puedeModificar ? ['texto' => 'Editar', 'icono' => 'fa-pen', 'href' => route('novedad-de-material.edit', $registro)] : null,
                         auth()->user()->can('eliminar_novedad_material') && $puedeModificar ? [
                             'texto' => 'Eliminar', 'icono' => 'fa-trash', 'peligro' => true,
@@ -17,7 +17,7 @@
                     ]));
                 @endphp
 
-                <x-tarjeta-listado :href="route('novedad-de-material.show', $registro)" :titulo="$titulo" :acciones="$acciones"
+                <x-tarjeta-listado modal :href="route('novedad-de-material.show', $registro)" :titulo="$titulo" :acciones="$acciones"
                     :playa="$registro->playa->id ?? ''" :fecha="$registro->fecha->format('Y-m-d')">
                     <x-slot:lead>
                         <x-icono-listado icono="fa-toolbox" color="amber" />

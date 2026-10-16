@@ -153,7 +153,16 @@ class IntervencionController extends Controller
      */
     public function show(Intervencion $intervencion)
     {
-        return view('intervenciones.show-fields', compact(
+        $intervencion->load(['playa', 'puesto', 'user', 'bandera.bandera', 'guardavidas.user', 'fuerzas']);
+
+        // Fotos de los guardavidas que intervinieron, en una sola consulta (las lee <x-avatar-guardavida>).
+        $fotos = Guardavida::fotosPersonalesDe($intervencion->guardavidas->pluck('user_id'));
+        foreach ($intervencion->guardavidas as $guardavida) {
+            $guardavida->foto_personal_id = $fotos[$guardavida->user_id] ?? null;
+        }
+
+        // Desde el listado se pide por AJAX y va en un modal: solo el contenido. Si no, la página completa.
+        return view(request()->ajax() ? 'intervenciones.partials.detalle' : 'intervenciones.show-fields', compact(
             'intervencion'
         ));
     }

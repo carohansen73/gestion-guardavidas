@@ -314,6 +314,59 @@ class TemporadaEnRegistrosTest extends TestCase
         }
     }
 
+    public function test_el_detalle_de_una_intervencion_muestra_todo_y_escapa_los_detalles(): void
+    {
+        Carbon::setTestNow('2026-12-15');
+        $intervencion = $this->intervencion('2026-12-10 12:30:00');
+        $intervencion->update(['traslado' => true, 'detalles' => '<script>alert(1)</script> Rescate en la rompiente']);
+        $intervencion->guardavidas()->attach($this->guardavida->id);
+        $intervencion->fuerzas()->attach(\App\Models\Fuerza::forceCreate(['nombre' => 'Prefectura'])->id);
+
+        $this->actingAs($this->admin)->get(route('intervencion.show', $intervencion))
+            ->assertOk()
+            ->assertSee('Rescate')
+            ->assertSee('12:30 hs')
+            ->assertSee('fa-truck-medical', false)
+            ->assertSee('Prefectura')
+            ->assertSee('N30000099')
+            ->assertSee('Editar')
+            ->assertSee('&lt;script&gt;', false)
+            ->assertDontSee('<script>alert(1)</script>', false);
+
+        // Sin bandera registrada: lo avisa.
+        $this->actingAs($this->admin)->get(route('intervencion.show', $intervencion))->assertSee('Sin registrar');
+
+        // Con bandera: muestra su código.
+        $intervencion->update(['bandera_id' => $this->bandera('2026-12-10 09:00:00', $this->admin->id)->id]);
+        $this->actingAs($this->admin)->get(route('intervencion.show', $intervencion))->assertOk()->assertDontSee('Sin registrar');
+    }
+
+    public function test_el_detalle_se_abre_en_un_modal_desde_cada_listado_y_por_ajax_trae_solo_el_contenido(): void
+    {
+        Carbon::setTestNow('2026-12-15');
+        $registros = [
+            'intervencion' => $this->intervencion('2026-12-10 12:00:00'),
+            'bandera' => $this->bandera('2026-12-10 09:00:00'),
+            'novedad-de-material' => $this->novedadMaterial('2026-12-10 12:00:00'),
+            'licencia' => $this->licencia('2026-12-10'),
+            'cambio-de-turno' => $this->cambioDeTurno('2026-12-10'),
+        ];
+        $ajax = ['X-Requested-With' => 'XMLHttpRequest'];
+
+        foreach ($registros as $ruta => $registro) {
+            // Listado: el modal está y los links del detalle lo abren (data-detalle).
+            $this->actingAs($this->admin)->get(route("{$ruta}.index"))->assertOk()->assertSee('modalDetalle()', false)->assertSee('data-detalle', false);
+
+            // Por AJAX: solo el contenido (sin el layout), con el botón de editar para el admin.
+            $this->actingAs($this->admin)->withHeaders($ajax)->get(route("{$ruta}.show", $registro))
+                ->assertOk()->assertDontSee('<html', false)->assertSee(route("{$ruta}.edit", $registro), false);
+
+            // Sin AJAX (link abierto en otra pestaña): la página completa de respaldo.
+            $this->flushHeaders();
+            $this->actingAs($this->admin)->get(route("{$ruta}.show", $registro))->assertOk()->assertSee('<html', false)->assertSee('Volver');
+        }
+    }
+
     public function test_los_listados_del_celular_muestran_cada_registro_como_tarjeta_con_su_menu(): void
     {
         Carbon::setTestNow('2026-12-15');

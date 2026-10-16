@@ -16,7 +16,7 @@
                 data-fecha="{{ $registro->fecha->format('Y-m-d') }}">
                 <td class="px-4 py-2">{{ $registro->fecha->format('d/m/y') }} </td>
                 <td class="px-4 py-2">
-                    <a href="{{ route('cambio-de-turno.show', $registro) }}" class="text-sky-600 hover:text-sky-400">
+                    <a href="{{ route('cambio-de-turno.show', $registro) }}" data-detalle class="text-sky-600 hover:text-sky-400">
                         @if($registro->turno_nuevo === "T") Tarde
                         @else Mañana
                         @endif

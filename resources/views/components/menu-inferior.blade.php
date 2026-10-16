@@ -2,7 +2,7 @@
      x-data de la página, que debe tener `menu: null`. Lo abre el botón de tres puntos de <x-tarjeta-listado>
      con `menu = { titulo, acciones: [...] }`. Cada acción es un arreglo con:
        texto, icono (clase de Font Awesome, ej. "fa-pen"),
-       href (+ blank)  -> link
+       href (+ blank)  -> link (con `detalle` => true se abre en el modal <x-modal-detalle/> en vez de navegar)
        form + confirmar -> envía un DELETE a esa URL (pide confirmación si hay `confirmar`)
        evento + datos   -> dispara el evento `menu-accion` en window (lo escucha la página: ej. el modal de baja)
        peligro          -> la pinta en rojo --}}
@@ -25,6 +25,7 @@
                 <div>
                     <template x-if="a.href">
                         <a :href="a.href" :target="a.blank ? '_blank' : null" :rel="a.blank ? 'noopener' : null"
+                            :data-detalle="a.detalle ? '' : null" @click="if (a.detalle) menu = null"
                             class="flex items-center gap-3 px-5 py-3.5 text-gray-800 hover:bg-gray-50 dark:text-gray-100 dark:hover:bg-gray-700">
                             <i class="fas w-5 text-center text-sky-600 dark:text-sky-400" :class="a.icono" aria-hidden="true"></i>
                             <span x-text="a.texto"></span>

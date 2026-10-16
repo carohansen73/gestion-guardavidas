@@ -1,8 +1,8 @@
 <x-index-table :registros="$registros">
     <thead class="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
         <tr>
-            <th class="px-4 py-2 text-left cursor-pointer" onclick="toggleSort()">Fecha</th>
             <th class="px-4 py-2 text-left">Bandera</th>
+            <th class="px-4 py-2 text-left cursor-pointer" onclick="toggleSort()">Fecha</th>
             <th class="px-4 py-2 text-left">Turno</th>
             <th class="px-4 py-2 text-left">Playa</th>
             <th class="px-4 py-2 text-left">Acciones</th>
@@ -13,12 +13,17 @@
             <tr class="registro-item-tabla hover:bg-gray-50 dark:hover:bg-gray-800 "
                 data-playa="{{ $registro->playa->id ?? '' }}"
                 data-fecha="{{ $registro->fecha->format('Y-m-d') }}">
-                <td class="px-4 py-2">{{ $registro->fecha->format('d/m/Y') }}</td>
                 <td class="px-4 py-2">
-                    <a href="{{ route('bandera.show', $registro) }}" class="text-sky-600 hover:text-sky-400 dark:text-sky-400 hover:dark:text-sky-300">
-                     {{ $registro->bandera->codigo }}
-                     </a>
+                    <div class="flex items-center gap-3">
+                        {{-- Círculo con el color de la bandera; se agranda un poco al pasar el mouse (igual que la foto en guardavidas). --}}
+                        <x-icono-bandera :bandera="$registro->bandera" size="w-9 h-9"
+                            class="relative transition-transform duration-200 ease-out hover:z-10 hover:scale-[1.4] hover:shadow-lg [&>i]:!text-sm" />
+                        <a href="{{ route('bandera.show', $registro) }}" data-detalle class="text-sky-600 hover:text-sky-400 dark:text-sky-400 hover:dark:text-sky-300">
+                            {{ $registro->bandera->codigo }}
+                        </a>
+                    </div>
                 </td>
+                <td class="px-4 py-2">{{ $registro->fecha->format('d/m/Y') }}</td>
                 <td class="px-4 py-2">{{ $registro->turno }}</td>
                 <td class="px-4 py-2">{{ $registro->playa->nombre ?? '-' }}</td>
                 <td class="px-4 py-2">

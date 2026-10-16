@@ -43,6 +43,9 @@
     {{-- Menú inferior de acciones (lo abren los tres puntos de cada tarjeta) --}}
     <x-menu-inferior />
 
+    {{-- Detalle de cada registro en un modal --}}
+    <x-modal-detalle />
+
 </div> <!-- selectedId -->
 
 <script src="{{ asset('js/table-intervenciones.js') }}"></script>
