@@ -29,6 +29,14 @@
 
     <x-session-alerts />
 
+    @if ($postulacion->modificada_at && $postulacion->estado === 'pendiente')
+        <div class="rounded-md border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-800 dark:border-sky-800 dark:bg-sky-900/30 dark:text-sky-200">
+            <strong>Inscripción modificada.</strong>
+            El postulante cambió datos o documentos el {{ $postulacion->modificada_at->format('d/m/Y H:i') }}, después de enviarla
+            (enviada el {{ $postulacion->enviada_at?->format('d/m/Y H:i') ?? '—' }}). Revisala de nuevo: el aviso se limpia al guardar la revisión.
+        </div>
+    @endif
+
     @can('revisar', $postulacion)
         <div class="flex justify-end">
             <a href="{{ route('postulaciones.edit', $postulacion) }}"
@@ -124,14 +132,19 @@
                 @csrf
                 @method('PATCH')
                 <div>
-                    <label for="observaciones" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Observaciones <span class="text-gray-400">(las ve el postulante)</span></label>
+                    <label for="observaciones" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Observaciones <span class="text-gray-400">(las ve el postulante; obligatorias al pedir correcciones)</span></label>
                     <textarea name="observaciones" id="observaciones" rows="3" class="{{ $input }}">{{ old('observaciones', $postulacion->observaciones) }}</textarea>
                 </div>
                 <div class="flex flex-wrap gap-2">
                     <button type="submit" name="estado" value="aceptada" class="px-4 py-2 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-sm">Aceptar</button>
                     <button type="submit" name="estado" value="rechazada" class="px-4 py-2 rounded-full bg-red-600 hover:bg-red-500 text-white text-sm">Rechazar</button>
+                    <button type="submit" name="estado" value="incompleta" class="px-4 py-2 rounded-full bg-orange-500 hover:bg-orange-400 text-white text-sm"
+                        title="Devuelve la inscripción al postulante para que corrija lo que indiques en las observaciones">Pedir correcciones</button>
                     <button type="submit" name="estado" value="pendiente" class="px-4 py-2 rounded-full bg-gray-500 hover:bg-gray-400 text-white text-sm">Dejar pendiente</button>
                 </div>
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                    «Pedir correcciones» la devuelve al postulante: puede editarla y reenviarla hasta que empiece la temporada.
+                </p>
             </form>
         @else
             <p class="text-sm">{{ $dato($postulacion->observaciones) }}</p>

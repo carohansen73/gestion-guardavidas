@@ -75,11 +75,16 @@ class PostulacionController extends Controller
             return $redir;
         }
 
-        match ($paso) {
+        $huboCambios = match ($paso) {
             1 => $this->guardarDatosPersonales($request, $temporada),
             2 => $this->guardarInscripcion($request, $postulacion),
             3 => $this->guardarDocumentos($request, $postulacion),
         };
+
+        // Ya enviada y en revisión: si cambió algo, se marca para que el admin lo note.
+        if ($huboCambios && $postulacion?->estado === Postulacion::ESTADO_PENDIENTE) {
+            $postulacion->update(['modificada_at' => now()]);
+        }
 
         return redirect()->route('postulacion.paso', $paso + 1)->with('success', 'Guardado. Podés seguir ahora o continuar más tarde.');
     }
@@ -105,6 +110,7 @@ class PostulacionController extends Controller
             $postulacion->update([
                 'estado' => Postulacion::ESTADO_PENDIENTE,
                 'enviada_at' => now(),
+                'modificada_at' => null,
             ]);
         }
 
@@ -129,7 +135,8 @@ class PostulacionController extends Controller
 
     // ---------------------------------------------------------------------------------------
 
-    private function guardarDatosPersonales(Request $request, Temporada $temporada): void
+    /** Los `guardar*` devuelven si realmente cambió algo (guardar sin tocar nada no cuenta). */
+    private function guardarDatosPersonales(Request $request, Temporada $temporada): bool
     {
         $datos = $request->validate([
             'telefono' => 'required|string|max:30',
@@ -156,17 +163,19 @@ class PostulacionController extends Controller
         }
         unset($datos['tiene_obra_social']);
 
-        DB::transaction(function () use ($datos, $temporada) {
+        return DB::transaction(function () use ($datos, $temporada) {
             $userId = Auth::id();
-            Perfil::updateOrCreate(['user_id' => $userId], $datos);
+            $perfil = Perfil::updateOrCreate(['user_id' => $userId], $datos);
             Postulacion::firstOrCreate(
                 ['user_id' => $userId, 'temporada_id' => $temporada->id],
                 ['estado' => Postulacion::ESTADO_BORRADOR]
             );
+
+            return $perfil->wasRecentlyCreated || $perfil->wasChanged();
         });
     }
 
-    private function guardarInscripcion(Request $request, Postulacion $postulacion): void
+    private function guardarInscripcion(Request $request, Postulacion $postulacion): bool
     {
         $datos = $request->validate([
             'disponible_desde' => 'required|date',
@@ -175,51 +184,62 @@ class PostulacionController extends Controller
             'playa_2' => 'nullable|exists:playas,id|different:playa_1',
         ]);
 
-        DB::transaction(function () use ($postulacion, $datos) {
+        return DB::transaction(function () use ($postulacion, $datos) {
+            $playasAntes = $postulacion->playas()->get()->pluck('id', 'pivot.prioridad')->all();
+
             $postulacion->update([
                 'disponible_desde' => $datos['disponible_desde'],
                 'disponible_hasta' => $datos['disponible_hasta'],
             ]);
+            $cambioFechas = $postulacion->wasChanged(['disponible_desde', 'disponible_hasta']);
 
             app(GuardadoPostulacion::class)->guardarPlayas($postulacion, $datos['playa_1'] ?? null, $datos['playa_2'] ?? null);
+            $playasDespues = $postulacion->playas()->get()->pluck('id', 'pivot.prioridad')->all();
+
+            return $cambioFechas || $playasAntes != $playasDespues;
         });
     }
 
-    private function guardarDocumentos(Request $request, Postulacion $postulacion): void
+    private function guardarDocumentos(Request $request, Postulacion $postulacion): bool
     {
         $request->validate(GuardadoPostulacion::reglasDocumentos());
 
         app(GuardadoPostulacion::class)->guardarDocumentos($request, $postulacion);
+
+        // Solo los archivos que se suben cuentan como cambio.
+        return collect(PostulacionDocumento::TIPOS)->keys()->contains(fn ($tipo) => $request->hasFile("doc_{$tipo}"));
     }
 
     /**
-     * Valida que haya ventana abierta y, desde el paso 2, una inscripción
-     * propia editable. Carga $postulacion y $temporada por referencia;
-     * devuelve un redirect si no se puede seguir.
+     * Valida el acceso a los pasos. Empezar una inscripción nueva solo se puede con la ventana de
+     * postulación abierta; una ya enviada o devuelta por el equipo se puede corregir aunque haya
+     * cerrado, hasta que empiece la temporada (ver Postulacion::editablePorPostulante). Carga
+     * $postulacion y $temporada por referencia; devuelve un redirect si no se puede seguir.
      */
     private function validarAcceso(int $paso, ?Postulacion &$postulacion, ?Temporada &$temporada)
     {
-        $temporada = Temporada::conPostulacionAbierta();
-        if (! $temporada) {
-            return redirect()->route('home')
-                ->with('error', 'Por ahora no hay una inscripción abierta.');
-        }
-
-        $postulacion = Postulacion::with(['temporada', 'perfil', 'playas', 'documentos'])
-            ->where('user_id', Auth::id())
-            ->where('temporada_id', $temporada->id)
-            ->first();
+        $postulacion = Postulacion::vigenteDe(Auth::id());
 
         if (! $postulacion) {
+            $temporada = Temporada::conPostulacionAbierta();
+            if (! $temporada) {
+                return redirect()->route('home')
+                    ->with('error', 'Por ahora no hay una inscripción abierta.');
+            }
+
             // Sin inscripción todavía: solo se puede arrancar por el paso 1.
             return $paso === 1
                 ? null
                 : redirect()->route('postulacion.paso', 1)->with('error', 'Primero completá tus datos personales.');
         }
 
+        $temporada = $postulacion->temporada;
+
         if (! $postulacion->editablePorPostulante()) {
             return redirect()->route('home')
-                ->with('error', 'Tu inscripción ya fue revisada y no se puede modificar.');
+                ->with('error', $postulacion->estado === Postulacion::ESTADO_BORRADOR
+                    ? 'La inscripción ya cerró: no se pueden enviar inscripciones nuevas.'
+                    : 'Tu inscripción ya fue revisada y no se puede modificar.');
         }
 
         // Foto y DNI de la temporada anterior se copian solos (no hace falta volver a subirlos).

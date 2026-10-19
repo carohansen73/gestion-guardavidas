@@ -4,27 +4,32 @@
     $estado = $miPostulacion?->estado;                  // null = todavía no la empezó
     $enviada = $miPostulacion && $estado !== 'borrador';
     $abierta = $tempPost->postulacionAbierta();
-    $enCurso = ! $enviada;                               // sin empezar o borrador: toca hacer algo (naranja + progreso)
+    // La inscripción cerró y esta persona no llegó a enviarla (o ni la empezó): solo se le avisa.
+    $cerradaSinEnviar = ! empty($postularme['cerrada']);
+    $enCurso = ! $enviada && ! $cerradaSinEnviar;        // sin empezar o borrador: toca hacer algo (naranja + progreso)
     $comentario = $enviada ? trim((string) $miPostulacion->observaciones) : '';
+    $hastaInicio = 'Podés corregirla hasta que empiece la temporada (' . $tempPost->fecha_inicio->format('d/m/Y') . ').';
 
     // El color lo da el estado: naranja = tenés que hacer algo; el resto, el resultado.
-    $tema = [
+    $tema = $cerradaSinEnviar ? ['from-slate-600 to-gray-500 dark:from-slate-800 dark:to-gray-700', 'text-slate-700', 'text-slate-100'] : [
         'pendiente' => ['from-sky-600 to-blue-500 dark:from-sky-900 dark:to-blue-800', 'text-sky-700', 'text-sky-100'],
         'incompleta' => ['from-amber-600 to-yellow-500 dark:from-amber-900 dark:to-yellow-700', 'text-amber-700', 'text-amber-100'],
         'aceptada' => ['from-emerald-600 to-green-500 dark:from-emerald-900 dark:to-green-700', 'text-emerald-700', 'text-emerald-100'],
         'rechazada' => ['from-red-600 to-rose-500 dark:from-red-900 dark:to-rose-700', 'text-red-700', 'text-red-100'],
     ][$estado] ?? ['from-orange-600 to-amber-500 dark:from-orange-900 dark:to-amber-700', 'text-orange-700', 'text-amber-100'];
 
-    $titulo = [
+    $titulo = $cerradaSinEnviar ? 'INSCRIPCIÓN CERRADA' : ([
         'pendiente' => 'INSCRIPCIÓN ENVIADA',
         'incompleta' => 'FALTA COMPLETAR TU INSCRIPCIÓN',
         'aceptada' => 'INSCRIPCIÓN ACEPTADA',
         'rechazada' => 'INSCRIPCIÓN NO ACEPTADA',
-    ][$estado] ?? 'INSCRIPCIÓN ABIERTA';
+    ][$estado] ?? 'INSCRIPCIÓN ABIERTA');
 
     $mensaje = match (true) {
-        $estado === 'pendiente' => 'Recibimos tu inscripción. El equipo la está revisando.',
-        $estado === 'incompleta' => 'El equipo te pidió completar o corregir algo de tu inscripción.',
+        $cerradaSinEnviar && $estado === 'borrador' => 'Empezaste tu inscripción pero no llegaste a enviarla antes del cierre (' . $tempPost->fecha_fin_postulacion->format('d/m/Y') . '). Ya no se reciben inscripciones nuevas. La temporada empieza el ' . $tempPost->fecha_inicio->format('d/m/Y') . '.',
+        $cerradaSinEnviar => 'La inscripción a esta temporada cerró el ' . $tempPost->fecha_fin_postulacion->format('d/m/Y') . ' y ya no se reciben inscripciones nuevas. La temporada empieza el ' . $tempPost->fecha_inicio->format('d/m/Y') . '.',
+        $estado === 'pendiente' => 'Recibimos tu inscripción. El equipo la está revisando.' . ($abierta ? '' : ' ' . $hastaInicio),
+        $estado === 'incompleta' => 'El equipo te pidió completar o corregir algo de tu inscripción.' . ($abierta ? '' : ' ' . $hastaInicio),
         $estado === 'aceptada' && $miPostulacion->seleccionado => 'Fuiste seleccionado/a para trabajar esta temporada: ' . $miPostulacion->playaAsignada?->nombre . ($miPostulacion->puestoAsignado ? ' — ' . $miPostulacion->puestoAsignado->nombre : '') . '.',
         $estado === 'aceptada' => 'Tu inscripción fue aceptada. La selección de quienes trabajan la temporada es un paso posterior: te avisamos por acá.',
         $estado === 'rechazada' => 'Tu inscripción no fue aceptada para esta temporada.',

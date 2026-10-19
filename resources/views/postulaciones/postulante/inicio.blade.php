@@ -13,8 +13,11 @@
 
     @if (! empty($postularme))
         @include('dashboard.partials.postulacion')
-    @elseif ($proxima)
-        <section class="rounded-lg bg-white p-6 shadow-md dark:bg-gray-800">
+    @endif
+
+    {{-- Si la inscripción ya cerró y esta persona no se inscribió, igual se le avisa cuándo abre la próxima. --}}
+    @if ((empty($postularme) || ! empty($postularme['cerrada'])) && $proxima)
+        <section class="glass rounded-3xl p-6">
             <div class="flex items-start gap-4">
                 <div class="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300">
                     <i class="fas fa-calendar-days text-xl" aria-hidden="true"></i>
@@ -31,8 +34,8 @@
                 </div>
             </div>
         </section>
-    @else
-        <section class="rounded-lg bg-white p-6 shadow-md dark:bg-gray-800">
+    @elseif (empty($postularme))
+        <section class="glass rounded-3xl p-6">
             <p class="text-gray-700 dark:text-gray-200">
                 Por ahora no hay una inscripción abierta ni una fecha de apertura definida. Cuando se habilite la próxima temporada vas a verlo acá.
             </p>

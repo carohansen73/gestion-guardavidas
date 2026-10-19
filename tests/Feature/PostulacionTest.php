@@ -244,6 +244,85 @@ class PostulacionTest extends TestCase
             ->assertSessionHas('error');
     }
 
+    public function test_cerrada_la_inscripcion_no_se_suman_inscripciones_nuevas(): void
+    {
+        $temporada = $this->temporadaAbierta();
+        $playa = $this->playa('Playa Norte', '#00aaff');
+        $conBorrador = $this->usuario('postulante');
+        $this->completarInscripcion($conBorrador, $playa); // queda en borrador, sin enviar
+        $nuevo = $this->usuario('postulante', '30999888');
+
+        $temporada->update(['fecha_inicio_postulacion' => now()->subDays(30), 'fecha_fin_postulacion' => now()->subDay()]);
+
+        // Un borrador no se puede enviar una vez cerrada la inscripción.
+        $this->actingAs($conBorrador)->post(route('postulacion.enviar'))->assertRedirect(route('home'))->assertSessionHas('error');
+        $this->assertSame('borrador', Postulacion::where('user_id', $conBorrador->id)->value('estado'));
+
+        // Y quien no se había inscripto no puede empezar.
+        $this->actingAs($nuevo)->get(route('postulacion.paso', 1))->assertRedirect(route('home'))->assertSessionHas('error');
+        $this->actingAs($nuevo)->post(route('postulacion.guardar', 1), $this->datosPaso1())->assertRedirect(route('home'));
+        $this->assertSame(0, Postulacion::where('user_id', $nuevo->id)->count());
+    }
+
+    public function test_cerrada_la_inscripcion_se_puede_corregir_lo_enviado_hasta_que_empiece_la_temporada(): void
+    {
+        $temporada = $this->temporadaAbierta();
+        $playa = $this->playa('Playa Norte', '#00aaff');
+        $user = $this->usuario('postulante');
+        $postulacion = $this->completarInscripcion($user, $playa);
+        $this->actingAs($user)->post(route('postulacion.enviar'));
+        $this->assertSame('pendiente', $postulacion->fresh()->estado);
+
+        $temporada->update(['fecha_inicio_postulacion' => now()->subDays(30), 'fecha_fin_postulacion' => now()->subDay()]);
+
+        // Enviada (pendiente) con la inscripción cerrada: puede corregir.
+        $this->actingAs($user)->post(route('postulacion.guardar', 1), $this->datosPaso1(['telefono' => '2262000000']))
+            ->assertRedirect(route('postulacion.paso', 2));
+        $this->assertSame('2262000000', $user->perfil->fresh()->telefono);
+
+        // Devuelta por el equipo (incompleta): corrige y reenvía.
+        $postulacion->update(['estado' => 'incompleta', 'observaciones' => 'Falta algo']);
+        $this->actingAs($user)->get(route('postulacion.paso', 3))->assertOk();
+        $this->actingAs($user)->post(route('postulacion.enviar'))->assertRedirect(route('home'))->assertSessionHas('success');
+        $this->assertSame('pendiente', $postulacion->fresh()->estado);
+
+        // Empezó la temporada: ya no.
+        $temporada->update(['fecha_inicio' => now()->subDay()]);
+        $this->actingAs($user)->post(route('postulacion.guardar', 1), $this->datosPaso1(['telefono' => '1']))
+            ->assertRedirect(route('home'))->assertSessionHas('error');
+    }
+
+    public function test_modificar_una_inscripcion_ya_enviada_le_avisa_al_admin_hasta_que_la_revisa(): void
+    {
+        $this->temporadaAbierta();
+        $playa = $this->playa('Playa Norte', '#00aaff');
+        $user = $this->usuario('postulante');
+        $admin = $this->usuario('admin', '20000001');
+        $postulacion = $this->completarInscripcion($user, $playa);
+
+        // Mientras es borrador no se marca nada; al enviarla tampoco.
+        $this->assertNull($postulacion->fresh()->modificada_at);
+        $this->actingAs($user)->post(route('postulacion.enviar'));
+        $this->assertNull($postulacion->fresh()->modificada_at);
+
+        // Guardar sin cambiar nada no cuenta como modificación.
+        $this->actingAs($user)->post(route('postulacion.guardar', 1), $this->datosPaso1());
+        $this->assertNull($postulacion->fresh()->modificada_at);
+
+        // Cambiar un dato sí.
+        $this->actingAs($user)->post(route('postulacion.guardar', 1), $this->datosPaso1(['telefono' => '2262999999']));
+        $this->assertNotNull($postulacion->fresh()->modificada_at);
+
+        $this->actingAs($admin)->get(route('postulaciones.index'))->assertOk()->assertSee('Modificada');
+        $this->actingAs($admin)->get(route('postulaciones.show', $postulacion))->assertOk()->assertSee('Inscripción modificada');
+
+        // Cuando el admin guarda la revisión, el aviso se limpia.
+        $this->actingAs($admin)->patch(route('postulaciones.revisar', $postulacion), ['estado' => 'pendiente', 'observaciones' => 'Vista'])
+            ->assertRedirect(route('postulaciones.show', $postulacion));
+        $this->assertNull($postulacion->fresh()->modificada_at);
+        $this->actingAs($admin)->get(route('postulaciones.show', $postulacion))->assertDontSee('Inscripción modificada');
+    }
+
     public function test_un_postulante_no_entra_al_listado_de_admin(): void
     {
         $user = $this->usuario('postulante');
@@ -278,6 +357,36 @@ class PostulacionTest extends TestCase
         $this->assertSame('Documentación ok', $postulacion->observaciones);
         $this->assertSame($admin->id, $postulacion->revisado_por_user_id);
         $this->assertNotNull($postulacion->fecha_revision);
+    }
+
+    public function test_el_admin_puede_pedir_correcciones_y_el_postulante_las_reenvia(): void
+    {
+        $this->temporadaAbierta();
+        $playa = $this->playa('Playa Norte', '#00aaff');
+        $user = $this->usuario('postulante');
+        $admin = $this->usuario('admin', '20000001');
+        $postulacion = $this->completarInscripcion($user, $playa);
+        $this->actingAs($user)->post(route('postulacion.enviar'));
+
+        // Sin explicar qué corregir no se puede devolver.
+        $this->actingAs($admin)->patch(route('postulaciones.revisar', $postulacion), ['estado' => 'incompleta'])
+            ->assertSessionHasErrors('observaciones');
+        $this->assertSame('pendiente', $postulacion->fresh()->estado);
+
+        // Con la indicación, queda "incompleta" y sigue figurando entre las pendientes (con su insignia).
+        $this->actingAs($admin)->patch(route('postulaciones.revisar', $postulacion), ['estado' => 'incompleta', 'observaciones' => 'Subí el DNI más nítido'])
+            ->assertRedirect(route('postulaciones.show', $postulacion));
+        $this->assertSame('incompleta', $postulacion->fresh()->estado);
+        $this->actingAs($admin)->get(route('postulaciones.index'))
+            ->assertOk()->assertSee('Pendientes')->assertSee((string) $user->dni)->assertSee('Incompleta')->assertSee('Pendientes <span class="ms-1 text-xs font-normal opacity-70">(1)</span>', false);
+        $this->actingAs($admin)->get(route('postulaciones.show', $postulacion))->assertOk()->assertSee('Pedir correcciones');
+
+        // El postulante ve el pedido (en Home y también en el propio formulario), corrige y vuelve a enviar.
+        $this->actingAs($user)->get(route('home'))->assertOk()->assertSee('FALTA COMPLETAR')->assertSee('Subí el DNI más nítido');
+        $this->actingAs($user)->get(route('postulacion.paso', 1))
+            ->assertOk()->assertSee('Incompleta')->assertSee('Comentario del equipo')->assertSee('Subí el DNI más nítido')->assertDontSee('Borrador');
+        $this->actingAs($user)->post(route('postulacion.enviar'))->assertRedirect(route('home'));
+        $this->assertSame('pendiente', $postulacion->fresh()->estado);
     }
 
     public function test_el_admin_no_puede_revisar_un_borrador(): void

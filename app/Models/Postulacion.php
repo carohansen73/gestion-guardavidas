@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -24,9 +25,10 @@ class Postulacion extends Model
 
     public const ESTADO_INCOMPLETA = 'incompleta';
 
-    /** Estados que puede asignar el admin al revisar (incompleta se suma más adelante). */
+    /** Estados que puede asignar el admin al revisar (incompleta = "pedir correcciones": el postulante puede volver a editarla). */
     public const ESTADOS_REVISION = [
         self::ESTADO_PENDIENTE,
+        self::ESTADO_INCOMPLETA,
         self::ESTADO_ACEPTADA,
         self::ESTADO_RECHAZADA,
     ];
@@ -43,6 +45,7 @@ class Postulacion extends Model
         'temporada_id',
         'estado',
         'enviada_at',
+        'modificada_at',
         'disponible_desde',
         'disponible_hasta',
         'observaciones',
@@ -57,6 +60,7 @@ class Postulacion extends Model
 
     protected $casts = [
         'enviada_at' => 'datetime',
+        'modificada_at' => 'datetime',
         'fecha_revision' => 'datetime',
         'disponible_desde' => 'date',
         'disponible_hasta' => 'date',
@@ -180,7 +184,7 @@ class Postulacion extends Model
      */
     public static function vigenteDe(int $userId): ?self
     {
-        $con = ['temporada', 'perfil', 'documentos', 'playaAsignada', 'puestoAsignado'];
+        $con = ['temporada', 'perfil', 'playas', 'documentos', 'playaAsignada', 'puestoAsignado'];
 
         if ($abierta = Temporada::conPostulacionAbierta()) {
             return static::with($con)->where('user_id', $userId)->where('temporada_id', $abierta->id)->first();
@@ -194,11 +198,25 @@ class Postulacion extends Model
             ->first();
     }
 
-    /** Puede corregirla el postulante: estado editable y ventana de postulación abierta. */
+    /**
+     * Puede completarla o corregirla el postulante.
+     * - Borrador: solo con la ventana de postulación abierta (cerrada, no se suman inscripciones nuevas).
+     * - Ya enviada (pendiente) o devuelta por el equipo (incompleta): también con la ventana cerrada,
+     *   hasta que empiece la temporada, para poder corregir lo que pida el admin.
+     * Aceptada y rechazada ya no se tocan.
+     */
     public function editablePorPostulante(): bool
     {
-        return in_array($this->estado, self::ESTADOS_EDITABLES, true)
-            && $this->temporada->postulacionAbierta();
+        if (! in_array($this->estado, self::ESTADOS_EDITABLES, true)) {
+            return false;
+        }
+
+        if ($this->temporada->postulacionAbierta()) {
+            return true;
+        }
+
+        return $this->estado !== self::ESTADO_BORRADOR
+            && $this->temporada->fecha_inicio->gt(Carbon::today());
     }
 
     /**

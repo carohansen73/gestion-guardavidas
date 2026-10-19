@@ -40,7 +40,9 @@ class PostulacionAdminController extends Controller
 
         $postulaciones = (clone $enviadas)
             ->with(['user', 'playas'])
-            ->when($estado !== 'todas', fn ($q) => $q->where('estado', $estado))
+            // "Pendientes" incluye las devueltas para corregir (incompleta): siguen esperando una decisión.
+            ->when($estado === Postulacion::ESTADO_PENDIENTE, fn ($q) => $q->whereIn('estado', [Postulacion::ESTADO_PENDIENTE, Postulacion::ESTADO_INCOMPLETA]))
+            ->when($estado !== 'todas' && $estado !== Postulacion::ESTADO_PENDIENTE, fn ($q) => $q->where('estado', $estado))
             ->when($playaId, fn ($q) => $q->whereHas('playas', fn ($p) => $p->where('playas.id', $playaId)))
             ->when($buscar !== '', fn ($q) => $q->whereHas('user', function ($u) use ($buscar) {
                 $u->where('name', 'like', "%{$buscar}%")
@@ -76,7 +78,10 @@ class PostulacionAdminController extends Controller
 
         $datos = $request->validate([
             'estado' => ['required', Rule::in(Postulacion::ESTADOS_REVISION)],
-            'observaciones' => 'nullable|string|max:2000',
+            // Al pedir correcciones el comentario es obligatorio: es lo que le dice al postulante qué arreglar.
+            'observaciones' => 'required_if:estado,'.Postulacion::ESTADO_INCOMPLETA.'|nullable|string|max:2000',
+        ], [
+            'observaciones.required_if' => 'Escribí en las observaciones qué tiene que corregir o completar el postulante.',
         ]);
 
         // Una vez seleccionada (Fase 5) tiene un Guardavida asociado: no se
@@ -85,9 +90,11 @@ class PostulacionAdminController extends Controller
             return back()->with('error', 'Esta inscripción ya fue seleccionada: no se puede cambiar su estado.');
         }
 
+        // Al guardar la revisión se da por vista cualquier modificación posterior al envío.
         $postulacion->update($datos + [
             'revisado_por_user_id' => Auth::id(),
             'fecha_revision' => now(),
+            'modificada_at' => null,
         ]);
 
         return redirect()->route('postulaciones.show', $postulacion)->with('success', 'Revisión guardada.');

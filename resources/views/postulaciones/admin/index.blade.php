@@ -28,7 +28,12 @@
     <nav class="flex flex-wrap gap-x-6 gap-y-1 mb-4 border-b border-gray-200 dark:border-gray-700" aria-label="Filtrar por estado">
         @foreach ($solapas as $clave => $titulo)
             @php
-                $total = $clave === 'todas' ? collect($conteosPorEstado)->sum() : ($conteosPorEstado[$clave] ?? 0);
+                // "Pendientes" suma las incompletas (devueltas al postulante, aún sin resolver).
+                $total = match ($clave) {
+                    'todas' => collect($conteosPorEstado)->sum(),
+                    'pendiente' => ($conteosPorEstado['pendiente'] ?? 0) + ($conteosPorEstado['incompleta'] ?? 0),
+                    default => $conteosPorEstado[$clave] ?? 0,
+                };
             @endphp
             <a href="{{ request()->fullUrlWithQuery(['estado' => $clave, 'page' => null]) }}"
                 @if ($estado === $clave) aria-current="page" @endif
@@ -94,6 +99,12 @@
                     </span>
                     @if ($postulacion->seleccionado)
                         <span class="ms-1 text-xs text-sky-600 dark:text-sky-400">seleccionado/a</span>
+                    @endif
+                    @if ($postulacion->modificada_at && $postulacion->estado === 'pendiente')
+                        <span class="ms-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-sky-100 text-sky-800 dark:bg-sky-900/40 dark:text-sky-300"
+                            title="El postulante modificó su inscripción después de enviarla">
+                            Modificada {{ $postulacion->modificada_at->format('d/m H:i') }}
+                        </span>
                     @endif
                 </td>
                 <td class="px-4 py-2">

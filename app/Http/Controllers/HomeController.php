@@ -40,7 +40,7 @@ class HomeController extends Controller
      * (también con la inscripción cerrada, hasta que empieza la temporada, para ver el resultado de la
      * revisión y la selección) o, si no hay, la de postularse cuando hay una abierta. Null = no hay card.
      *
-     * @return array{temporada: Temporada, postulacion: ?Postulacion}|null
+     * @return array{temporada: Temporada, postulacion: ?Postulacion, cerrada?: bool}|null
      */
     private function postulacionParaCard(\App\Models\User $user): ?array
     {
@@ -48,9 +48,20 @@ class HomeController extends Controller
             return ['temporada' => $vigente->temporada, 'postulacion' => $vigente];
         }
 
-        $abierta = Temporada::conPostulacionAbierta();
+        if ($abierta = Temporada::conPostulacionAbierta()) {
+            return ['temporada' => $abierta, 'postulacion' => null];
+        }
 
-        return $abierta ? ['temporada' => $abierta, 'postulacion' => null] : null;
+        if ($cerrada = Temporada::inscripcionCerradaSinComenzar()) {
+            return [
+                'temporada' => $cerrada,
+                // Un borrador que no llegó a enviar (vigenteDe no lo cuenta), o null si ni empezó.
+                'postulacion' => Postulacion::where('user_id', $user->id)->where('temporada_id', $cerrada->id)->first(),
+                'cerrada' => true,
+            ];
+        }
+
+        return null;
     }
 
     public function index()

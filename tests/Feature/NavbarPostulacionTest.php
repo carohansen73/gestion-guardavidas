@@ -134,6 +134,33 @@ class NavbarPostulacionTest extends TestCase
         $post->update(['estado' => 'aceptada']);
     }
 
+    public function test_con_la_inscripcion_cerrada_se_avisa_a_quien_no_se_inscribio_o_no_llego_a_enviar(): void
+    {
+        $temporada = Temporada::first();
+        $temporada->update(['fecha_inicio_postulacion' => now()->subDays(30), 'fecha_fin_postulacion' => now()->subDays(2)]);
+        Temporada::create([
+            'nombre' => '2027/28', 'fecha_inicio_postulacion' => now()->addDays(200), 'fecha_fin_postulacion' => now()->addDays(230),
+            'fecha_inicio' => now()->addMonths(10), 'fecha_fin' => now()->addMonths(14),
+        ]);
+        $postulante = $this->usuario('postulante');
+        $cerro = now()->subDays(2)->format('d/m/Y');
+
+        // Ni empezó: sabe que cerró, y también cuándo abre la próxima.
+        $this->actingAs($postulante)->get(route('home'))
+            ->assertOk()->assertSee('INSCRIPCIÓN CERRADA')->assertSee("cerró el {$cerro}")->assertSee('Próxima inscripción')
+            ->assertDontSee('Postularme')->assertDontSee('INSCRIPCIÓN ABIERTA');
+
+        // Dejó un borrador sin enviar: lo mismo, con el motivo y sin forma de continuar.
+        \App\Models\Postulacion::create(['user_id' => $postulante->id, 'temporada_id' => $temporada->id, 'estado' => 'borrador']);
+        $this->actingAs($postulante)->get(route('home'))
+            ->assertOk()->assertSee('INSCRIPCIÓN CERRADA')->assertSee('no llegaste a enviarla')
+            ->assertDontSee('Continuar postulación')->assertDontSee('TU PROGRESO');
+
+        // Empezó la temporada: ya no hace falta el aviso.
+        $temporada->update(['fecha_inicio' => now()->subDay()]);
+        $this->actingAs($postulante)->get(route('home'))->assertOk()->assertDontSee('INSCRIPCIÓN CERRADA');
+    }
+
     public function test_quien_fue_seleccionado_ve_la_card_hasta_que_empieza_la_temporada(): void
     {
         $postulante = $this->usuario('postulante');

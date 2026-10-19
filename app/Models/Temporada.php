@@ -176,6 +176,20 @@ class Temporada extends Model
             ->first();
     }
 
+    /**
+     * La temporada cuya inscripción ya cerró pero que todavía no empezó (la más reciente): para avisarle
+     * a quien no llegó a inscribirse (o dejó la inscripción sin enviar) que ya cerró.
+     */
+    public static function inscripcionCerradaSinComenzar(): ?self
+    {
+        $hoy = Carbon::today();
+
+        return static::whereDate('fecha_fin_postulacion', '<', $hoy)
+            ->whereDate('fecha_inicio', '>', $hoy)
+            ->orderByDesc('fecha_fin_postulacion')
+            ->first();
+    }
+
     /** La próxima temporada cuya inscripción todavía no abrió (la más cercana), para avisarle al postulante cuándo abre. */
     public static function proximaInscripcion(): ?self
     {
