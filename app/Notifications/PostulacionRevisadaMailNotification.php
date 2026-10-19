@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\HtmlString;
 
 /**
  * Mail al postulante cuando el admin acepta, rechaza o pide correcciones en su inscripción (con el
@@ -52,6 +53,9 @@ class PostulacionRevisadaMailNotification extends Notification implements Should
                 ->subject("Necesitamos que corrijas tu inscripción a {$this->temporada}")
                 ->line("Revisamos tu inscripción a la temporada {$this->temporada} y necesitamos que corrijas o completes algo."),
         };
+
+        $etiqueta = ucfirst($this->estado);
+        $mail->line(new HtmlString("<span class=\"estado estado-{$this->estado}\">Estado: {$etiqueta}</span>"));
 
         if (filled($this->observaciones)) {
             $mail->line('**Comentario del equipo:**')->line($this->observaciones);
