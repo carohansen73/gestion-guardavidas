@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\Temporada;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +17,8 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): View
     {
-        return view('auth.login');
+        // Mientras hay una inscripción abierta, el login ofrece el link para registrarse y postularse.
+        return view('auth.login', ['inscripcionAbierta' => Temporada::conPostulacionAbierta()]);
     }
 
     /**

@@ -244,6 +244,30 @@ class PostulacionTest extends TestCase
             ->assertSessionHas('error');
     }
 
+    public function test_el_paso_4_se_adapta_a_si_la_inscripcion_ya_fue_enviada(): void
+    {
+        $this->temporadaAbierta();
+        $playa = $this->playa('Playa Norte', '#00aaff');
+        $user = $this->usuario('postulante');
+        $postulacion = $this->completarInscripcion($user, $playa);
+
+        // Borrador completo: invita a enviarla.
+        $this->actingAs($user)->get(route('postulacion.paso', 4))
+            ->assertOk()->assertSee('Ya podés enviar tu inscripción')->assertSee('Enviar inscripción')->assertDontSee('Volver al inicio');
+
+        // Ya enviada: lo dice, no ofrece enviarla de nuevo.
+        $this->actingAs($user)->post(route('postulacion.enviar'));
+        $this->actingAs($user)->get(route('postulacion.paso', 4))
+            ->assertOk()->assertSee('fue enviada')->assertSee('la está revisando')->assertSee('Volver al inicio')
+            ->assertDontSee('Ya podés enviar tu inscripción')->assertDontSee('Enviar inscripción')->assertDontSee('Confirmar cambios');
+
+        // Devuelta por el equipo: se la vuelve a enviar.
+        $postulacion->update(['estado' => 'incompleta']);
+        $this->actingAs($user)->get(route('postulacion.paso', 4))
+            ->assertOk()->assertSee('te pidió correcciones')->assertSee('Revisá lo que te pidió el equipo')->assertSee('Enviar inscripción')
+            ->assertDontSee('Ya podés enviar tu inscripción');
+    }
+
     public function test_cerrada_la_inscripcion_no_se_suman_inscripciones_nuevas(): void
     {
         $temporada = $this->temporadaAbierta();
@@ -368,12 +392,7 @@ class PostulacionTest extends TestCase
         $postulacion = $this->completarInscripcion($user, $playa);
         $this->actingAs($user)->post(route('postulacion.enviar'));
 
-        // Sin explicar qué corregir no se puede devolver.
-        $this->actingAs($admin)->patch(route('postulaciones.revisar', $postulacion), ['estado' => 'incompleta'])
-            ->assertSessionHasErrors('observaciones');
-        $this->assertSame('pendiente', $postulacion->fresh()->estado);
-
-        // Con la indicación, queda "incompleta" y sigue figurando entre las pendientes (con su insignia).
+        // El comentario es opcional: el admin decide si lo escribe. Queda "incompleta" y sigue figurando entre las pendientes (con su insignia).
         $this->actingAs($admin)->patch(route('postulaciones.revisar', $postulacion), ['estado' => 'incompleta', 'observaciones' => 'Subí el DNI más nítido'])
             ->assertRedirect(route('postulaciones.show', $postulacion));
         $this->assertSame('incompleta', $postulacion->fresh()->estado);

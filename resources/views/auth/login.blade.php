@@ -47,6 +47,17 @@
         </div>
     </form>
 
+    {{-- Solo mientras la inscripción está abierta. --}}
+    @if (! empty($inscripcionAbierta))
+        <div class="mt-6 rounded-md border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-900">
+            <p class="font-semibold">¿Querés ser guardavidas en la temporada {{ $inscripcionAbierta->nombre }}?</p>
+            <p class="mt-1">
+                La inscripción está abierta hasta el {{ $inscripcionAbierta->fecha_fin_postulacion->format('d/m/Y') }}.
+                <a href="{{ route('register') }}" class="font-semibold underline hover:text-sky-700">Registrate para postularte</a>.
+            </p>
+        </div>
+    @endif
+
     <div id="error" class="mt-3 text-sm font-semibold text-red-600"></div>
 
     <div id="contenedorOffline" style="display: none;">

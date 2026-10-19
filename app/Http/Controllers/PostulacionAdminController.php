@@ -7,6 +7,7 @@ use App\Models\Playa;
 use App\Models\Postulacion;
 use App\Models\PostulacionDocumento;
 use App\Models\Temporada;
+use App\Notifications\PostulacionRevisadaMailNotification;
 use App\Services\GuardadoPostulacion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -78,10 +79,7 @@ class PostulacionAdminController extends Controller
 
         $datos = $request->validate([
             'estado' => ['required', Rule::in(Postulacion::ESTADOS_REVISION)],
-            // Al pedir correcciones el comentario es obligatorio: es lo que le dice al postulante qué arreglar.
-            'observaciones' => 'required_if:estado,'.Postulacion::ESTADO_INCOMPLETA.'|nullable|string|max:2000',
-        ], [
-            'observaciones.required_if' => 'Escribí en las observaciones qué tiene que corregir o completar el postulante.',
+            'observaciones' => 'nullable|string|max:2000',
         ]);
 
         // Una vez seleccionada (Fase 5) tiene un Guardavida asociado: no se
@@ -90,12 +88,26 @@ class PostulacionAdminController extends Controller
             return back()->with('error', 'Esta inscripción ya fue seleccionada: no se puede cambiar su estado.');
         }
 
+        $estadoAnterior = $postulacion->estado;
+
         // Al guardar la revisión se da por vista cualquier modificación posterior al envío.
         $postulacion->update($datos + [
             'revisado_por_user_id' => Auth::id(),
             'fecha_revision' => now(),
             'modificada_at' => null,
         ]);
+
+        // Mail al postulante solo si el estado cambió a aceptada, rechazada o incompleta (no al dejarla
+        // pendiente ni al guardar de nuevo el mismo estado). Va en cola; si no se puede encolar no se
+        // corta la revisión: se registra en el log.
+        if ($datos['estado'] !== $estadoAnterior && $datos['estado'] !== Postulacion::ESTADO_PENDIENTE) {
+            rescue(fn () => $postulacion->user->notify(new PostulacionRevisadaMailNotification(
+                $postulacion->temporada->nombre,
+                $datos['estado'],
+                $datos['observaciones'] ?? null,
+                $postulacion->temporada->fecha_inicio->format('d/m/Y'),
+            )));
+        }
 
         return redirect()->route('postulaciones.show', $postulacion)->with('success', 'Revisión guardada.');
     }

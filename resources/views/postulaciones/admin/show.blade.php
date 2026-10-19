@@ -132,7 +132,7 @@
                 @csrf
                 @method('PATCH')
                 <div>
-                    <label for="observaciones" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Observaciones <span class="text-gray-400">(las ve el postulante; obligatorias al pedir correcciones)</span></label>
+                    <label for="observaciones" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Observaciones <span class="text-gray-400">(las ve el postulante y se incluyen en el mail que recibe)</span></label>
                     <textarea name="observaciones" id="observaciones" rows="3" class="{{ $input }}">{{ old('observaciones', $postulacion->observaciones) }}</textarea>
                 </div>
                 <div class="flex flex-wrap gap-2">

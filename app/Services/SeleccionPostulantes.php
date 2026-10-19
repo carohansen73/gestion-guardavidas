@@ -7,6 +7,7 @@ use App\Models\Postulacion;
 use App\Models\Puesto;
 use App\Models\Temporada;
 use App\Models\User;
+use App\Notifications\PostulacionSeleccionadaMailNotification;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -99,7 +100,27 @@ class SeleccionPostulantes
             }
         });
 
+        // Recién con la selección ya guardada se avisa por mail a cada persona (en cola: confirmar en
+        // lote no depende de lo que tarde el servidor de mail, y un mail que falla no deshace nada).
+        foreach ($filas as $fila) {
+            $this->avisarSeleccion($fila['postulacion'], $desde);
+        }
+
         return ['creados' => $creados, 'actualizados' => $actualizados];
+    }
+
+    private function avisarSeleccion(Postulacion $postulacion, Carbon $desde): void
+    {
+        $postulacion->load(['user', 'temporada', 'playaAsignada', 'puestoAsignado']);
+
+        rescue(fn () => $postulacion->user->notify(new PostulacionSeleccionadaMailNotification(
+            $postulacion->temporada->nombre,
+            $postulacion->playaAsignada?->nombre ?? '—',
+            $postulacion->puestoAsignado?->nombre,
+            ['M' => 'Mañana', 'T' => 'Tarde'][$postulacion->turno_asignado] ?? null,
+            $postulacion->funcion_asignada,
+            $desde->format('d/m/Y'),
+        )));
     }
 
     /**
