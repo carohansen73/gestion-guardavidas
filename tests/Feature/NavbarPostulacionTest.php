@@ -72,4 +72,96 @@ class NavbarPostulacionTest extends TestCase
         $this->actingAs($super);
         $this->assertStringContainsString('Administración', view('layouts.sidebar')->render());
     }
+
+    public function test_la_postulacion_usa_el_mismo_layout_con_sidebar_para_todos_y_los_permisos_deciden_que_se_ve(): void
+    {
+        // Postulante: sidebar solo con Home (sin los grupos del sistema) y sin la barra inferior del celular.
+        $this->actingAs($this->usuario('postulante'))->get(route('postulacion.paso', 1))
+            ->assertOk()
+            ->assertSee('id="separator-sidebar"', false)
+            ->assertDontSee('Mi inscripción')
+            ->assertSee('<span class="ms-3">Home</span>', false)
+            ->assertDontSee('Operación')
+            ->assertDontSee('buttom-navigation', false);
+    }
+
+    public function test_el_inicio_del_postulante_muestra_la_card_si_hay_inscripcion_abierta_y_las_fechas_si_no(): void
+    {
+        $postulante = $this->usuario('postulante');
+
+        // Inscripción abierta: la card de postulación (la misma de guardavidas) y el acceso a "Mi inscripción".
+        $this->actingAs($postulante)->get(route('home'))
+            ->assertOk()->assertSee('INSCRIPCIÓN ABIERTA')->assertSee('2026/27')->assertSee('Postularme')->assertSee('TU PROGRESO')
+            ->assertDontSee('Operación');
+
+        // Sin inscripción abierta: avisa cuándo abre la próxima.
+        Temporada::query()->delete();
+        Temporada::create([
+            'nombre' => '2027/28', 'fecha_inicio_postulacion' => now()->addDays(40), 'fecha_fin_postulacion' => now()->addDays(70),
+            'fecha_inicio' => now()->addMonths(5), 'fecha_fin' => now()->addMonths(9),
+        ]);
+        $this->actingAs($postulante)->get(route('home'))
+            ->assertOk()->assertSee('Próxima inscripción')->assertSee('2027/28')->assertSee(now()->addDays(40)->format('d/m/Y'))
+            ->assertDontSee('INSCRIPCIÓN ABIERTA');
+
+        // Las demás pantallas del sistema lo mandan a su inicio.
+        $this->actingAs($postulante)->get(route('intervencion.index'))->assertRedirect(route('home'));
+    }
+
+    public function test_la_card_del_inicio_muestra_el_resultado_y_el_comentario_aunque_la_inscripcion_haya_cerrado(): void
+    {
+        $postulante = $this->usuario('postulante');
+        $temporada = Temporada::first();
+        $post = \App\Models\Postulacion::create(['user_id' => $postulante->id, 'temporada_id' => $temporada->id, 'estado' => 'rechazada', 'observaciones' => 'Falta el apto médico']);
+
+        // Inscripción abierta: ya no es la card naranja de "abierta", muestra el resultado y el comentario.
+        $this->actingAs($postulante)->get(route('home'))
+            ->assertOk()->assertSee('INSCRIPCIÓN NO ACEPTADA')->assertSee('Falta el apto médico')->assertDontSee('INSCRIPCIÓN ABIERTA');
+
+        // Cerrada la inscripción (la temporada todavía no terminó): sigue visible.
+        $temporada->update(['fecha_inicio_postulacion' => now()->subDays(30), 'fecha_fin_postulacion' => now()->subDays(2)]);
+        $this->actingAs($postulante)->get(route('home'))
+            ->assertOk()->assertSee('INSCRIPCIÓN NO ACEPTADA')->assertSee('Inscripción cerrada')->assertSee('Falta el apto médico');
+
+        // Ya revisada no se puede corregir: la card es informativa, sin botón.
+        $this->actingAs($postulante)->get(route('home'))->assertDontSee('Revisar / corregir mi inscripción');
+
+        // Terminada la temporada deja de mostrarse (no hay historial).
+        $temporada->update(['fecha_inicio' => now()->subMonths(8), 'fecha_fin' => now()->subDays(1)]);
+        $this->actingAs($postulante)->get(route('home'))
+            ->assertOk()->assertDontSee('INSCRIPCIÓN NO ACEPTADA')->assertDontSee('inscripciones anteriores');
+
+        $post->update(['estado' => 'aceptada']);
+    }
+
+    public function test_quien_fue_seleccionado_ve_la_card_hasta_que_empieza_la_temporada(): void
+    {
+        $postulante = $this->usuario('postulante');
+        $temporada = Temporada::first();
+        $playa = \App\Models\Playa::forceCreate(['nombre' => 'Playa Norte', 'lat' => -38, 'lon' => -57, 'color' => '#00aaff']);
+        \App\Models\Postulacion::create([
+            'user_id' => $postulante->id, 'temporada_id' => $temporada->id, 'estado' => 'aceptada',
+            'seleccionado' => true, 'playa_asignada_id' => $playa->id,
+        ]);
+
+        // Inscripción abierta y también cerrada, con la temporada por empezar: ve que fue seleccionado/a y dónde.
+        $this->actingAs($postulante)->get(route('home'))
+            ->assertOk()->assertSee('INSCRIPCIÓN ACEPTADA')->assertSee('seleccionado/a')->assertSee('Playa Norte');
+        $temporada->update(['fecha_inicio_postulacion' => now()->subDays(30), 'fecha_fin_postulacion' => now()->subDays(2)]);
+        $this->actingAs($postulante)->get(route('home'))
+            ->assertOk()->assertSee('INSCRIPCIÓN ACEPTADA')->assertSee('Playa Norte');
+
+        // Empezó la temporada: la card deja de mostrarse.
+        $temporada->update(['fecha_inicio' => now()->subDay()]);
+        $this->actingAs($postulante)->get(route('home'))
+            ->assertOk()->assertDontSee('INSCRIPCIÓN ACEPTADA')->assertDontSee('Playa Norte');
+    }
+
+    public function test_el_guardavida_ve_en_la_postulacion_el_mismo_sidebar_con_home(): void
+    {
+        $this->actingAs($this->usuario('guardavida'))->get(route('postulacion.paso', 1))
+            ->assertOk()
+            ->assertSee('id="separator-sidebar"', false)
+            ->assertSee('<span class="ms-3">Home</span>', false);
+    }
 }

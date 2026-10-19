@@ -65,7 +65,9 @@
 
     {{-- POSTULACION --}}
     @if (! empty($postularme))
-        @include('dashboard.partials.postulacion')
+        <div class="mb-3">
+            @include('dashboard.partials.postulacion')
+        </div>
     @endif
     {{-- END POSTULACION --}}
 
@@ -182,7 +184,7 @@
 
     {{-- Atajos. --}}
     @can('agregar_intervencion')
-        <a href="{{ route('intervencion.create') }}" class="col-span-2 lg:col-span-1 flex items-center gap-3 rounded-2xl bg-red-500 p-4 text-left text-slate-50 shadow-[var(--shadow-glass)] transition hover:-translate-y-0.5">
+        <a href="{{ route('intervencion.create') }}" class="col-span-2 lg:col-span-1 flex items-center gap-3 rounded-3xl bg-red-500 p-4 text-left text-slate-50 shadow-[var(--shadow-glass)] transition hover:-translate-y-0.5">
             <span class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-slate-50/15">
                <svg class="lucide lucide-plus h-5 w-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path>
             </svg>
@@ -195,7 +197,7 @@
     @endcan
 
     @can('agregar_novedad_material')
-        <a href="{{ route('novedad-de-material.create') }}" class="bg-gradient-to-r from-blue-600 to-sky-500 dark:from-blue-900 dark:to-sky-700 col-span-2 lg:col-span-1 flex items-center gap-3 rounded-2xl p-4 text-left text-slate-50 shadow-[var(--shadow-glass)] transition hover:-translate-y-0.5">
+        <a href="{{ route('novedad-de-material.create') }}" class="bg-gradient-to-r from-blue-600 to-sky-500 dark:from-blue-900 dark:to-sky-700 col-span-2 lg:col-span-1 flex items-center gap-3 rounded-3xl p-4 text-left text-slate-50 shadow-[var(--shadow-glass)] transition hover:-translate-y-0.5">
             <span class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-slate-50/15">
                 <svg class="lucide lucide-megaphone h-5 w-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 6a13 13 0 0 0 8.4-2.8A1 1 0 0 1 21 4v12a1 1 0 0 1-1.6.8A13 13 0 0 0 11 14H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z"></path><path d="M6 14a12 12 0 0 0 2.4 7.2 2 2 0 0 0 3.2-2.4A8 8 0 0 1 10 14"></path><path d="M8 6v8"></path></svg>
             </span>
@@ -284,7 +286,7 @@
 
 
 @canany(['ver_bandera', 'ver_intervencion', 'ver_novedad_material'])
-            <div class="rounded-2xl border border-gray-100 dark:border-gray-700/60 bg-white dark:bg-gray-800 shadow-sm p-card">
+            <div class="glass rounded-3xl p-card">
                 <div class="mb-4 flex items-center justify-between gap-3">
         <h3 class="font-display text-sm font-bold uppercase tracking-wide">
             Últimas novedades

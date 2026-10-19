@@ -174,7 +174,7 @@ class PersonalFijoTest extends TestCase
         foreach (['bandera.index', 'intervencion.index', 'novedad-de-material.index', 'guardavida.index', 'guardavidas.bajas', 'guardavidas.export', 'asistencias.index', 'licencia.index', 'cambio-de-turno.index', 'postulaciones.index'] as $ruta) {
             $this->assertSame(403, $this->actingAs($user)->get(route($ruta))->status(), $ruta);
         }
-        $this->actingAs($user)->get(route('postulacion.index'))->assertForbidden();
+        $this->actingAs($user)->get(route('postulacion.paso', 1))->assertForbidden();
         $this->actingAs($user)->get(route('franco-intercambio.index'))->assertForbidden();
     }
 

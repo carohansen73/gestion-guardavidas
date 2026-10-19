@@ -1,6 +1,6 @@
 @props(['label', 'value' => null, 'href' => null, 'valueClass' => null])
 
- <a href="{{ $href }}" class="group flex min-w-0 flex-col justify-between gap-3 rounded-2xl bg-card/70 p-4 ring-1 ring-border transition hover:-translate-y-0.5">
+ <a href="{{ $href }}" class="glass group flex min-w-0 flex-col justify-between gap-3 rounded-3xl p-4 transition hover:-translate-y-0.5">
       <div class="flex items-center justify-between">
         {{ $slot }}
         @if(! is_null($value))

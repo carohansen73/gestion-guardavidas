@@ -73,7 +73,10 @@
         </main>
     </div>
 
-    @include('layouts.bottom-navigation')
+    {{-- Barra inferior del celular: sus atajos (perfil, home, QR) no aplican a un postulante, que solo tiene su inscripción. --}}
+    @unless (auth()->user()->hasRole('postulante'))
+        @include('layouts.bottom-navigation')
+    @endunless
 
     <!---<script src="{{ asset('js/script.js') }}"></script>-->
     <script type="module" src="{{ asset('app.js') }}"></script>

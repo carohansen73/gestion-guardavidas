@@ -43,7 +43,6 @@ Route::middleware(['auth', 'force.password', 'postulante.redirect'])->group(func
     // (ver RolesYPermisosSeeder), así que ya queda bloqueado de casi todo
     // por el propio sistema de @can/Policy; postulante.redirect (arriba)
     // se encarga de mandarlo para acá si intenta ir a cualquier otro lado.
-    Route::get('/postulacion', [PostulacionController::class, 'index'])->name('postulacion.index');
     Route::get('/postulacion/paso/{paso}', [PostulacionController::class, 'paso'])->whereNumber('paso')->name('postulacion.paso');
     Route::post('/postulacion/paso/{paso}', [PostulacionController::class, 'guardar'])->whereNumber('paso')->name('postulacion.guardar');
     Route::post('/postulacion/enviar', [PostulacionController::class, 'enviar'])->name('postulacion.enviar');

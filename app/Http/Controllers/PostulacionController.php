@@ -29,29 +29,6 @@ class PostulacionController extends Controller
 {
     private const PASOS = [1, 2, 3, 4];
 
-    public function index()
-    {
-        $this->autorizarPostulante();
-
-        $user = Auth::user();
-        $temporada = Temporada::conPostulacionAbierta();
-        $postulacion = $temporada
-            ? Postulacion::with(['temporada', 'playaAsignada', 'puestoAsignado'])
-                ->where('user_id', $user->id)
-                ->where('temporada_id', $temporada->id)
-                ->first()
-            : null;
-
-        $anteriores = Postulacion::with(['temporada', 'playaAsignada', 'puestoAsignado'])
-            ->where('user_id', $user->id)
-            ->when($postulacion, fn ($q) => $q->where('id', '!=', $postulacion->id))
-            ->where('estado', '!=', Postulacion::ESTADO_BORRADOR)
-            ->latest('id')
-            ->get();
-
-        return view('postulaciones.postulante.index', compact('temporada', 'postulacion', 'anteriores'));
-    }
-
     public function paso(int $paso)
     {
         abort_unless(in_array($paso, self::PASOS, true), 404);
@@ -131,7 +108,7 @@ class PostulacionController extends Controller
             ]);
         }
 
-        return redirect()->route('postulacion.index')->with('success', '¡Inscripción enviada! Te avisamos por acá cuando sea revisada.');
+        return redirect()->route('home')->with('success', '¡Inscripción enviada! Te avisamos por acá cuando sea revisada.');
     }
 
     /** El postulante descarga el modelo de declaración jurada de la temporada. */
@@ -224,7 +201,7 @@ class PostulacionController extends Controller
     {
         $temporada = Temporada::conPostulacionAbierta();
         if (! $temporada) {
-            return redirect()->route('postulacion.index')
+            return redirect()->route('home')
                 ->with('error', 'Por ahora no hay una inscripción abierta.');
         }
 
@@ -241,7 +218,7 @@ class PostulacionController extends Controller
         }
 
         if (! $postulacion->editablePorPostulante()) {
-            return redirect()->route('postulacion.index')
+            return redirect()->route('home')
                 ->with('error', 'Tu inscripción ya fue revisada y no se puede modificar.');
         }
 

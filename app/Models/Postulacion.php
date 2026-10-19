@@ -172,6 +172,28 @@ class Postulacion extends Model
         return $tipo !== 'declaracion_jurada' || filled($this->temporada->declaracion_jurada_modelo);
     }
 
+    /**
+     * La inscripción que se le muestra al usuario como "la actual": la de la temporada con inscripción
+     * abierta (null si todavía no la empezó) o, si no hay ninguna abierta, la última ya enviada cuya
+     * temporada operativa todavía no empezó (así ve su resultado —y si fue seleccionado— aunque la
+     * inscripción haya cerrado). Cuando empieza la temporada deja de mostrarse.
+     */
+    public static function vigenteDe(int $userId): ?self
+    {
+        $con = ['temporada', 'perfil', 'documentos', 'playaAsignada', 'puestoAsignado'];
+
+        if ($abierta = Temporada::conPostulacionAbierta()) {
+            return static::with($con)->where('user_id', $userId)->where('temporada_id', $abierta->id)->first();
+        }
+
+        return static::with($con)
+            ->where('user_id', $userId)
+            ->where('estado', '!=', self::ESTADO_BORRADOR)
+            ->whereHas('temporada', fn ($t) => $t->whereDate('fecha_inicio', '>', now()->toDateString()))
+            ->latest('id')
+            ->first();
+    }
+
     /** Puede corregirla el postulante: estado editable y ventana de postulación abierta. */
     public function editablePorPostulante(): bool
     {

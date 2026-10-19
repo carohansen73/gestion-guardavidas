@@ -21,8 +21,44 @@ use Jenssegers\Agent\Agent;
 
 class HomeController extends Controller
 {
+    /**
+     * Inicio del postulante: la card de su inscripción vigente (la misma que ven guardavidas y
+     * encargados: postularse, progreso, resultado y comentario del equipo) o, si no hay, las fechas
+     * de la próxima. El formulario por pasos vive en PostulacionController. No se muestra el
+     * historial de temporadas anteriores.
+     */
+    private function inicioPostulante(\App\Models\User $user)
+    {
+        return view('postulaciones.postulante.inicio', [
+            'postularme' => $this->postulacionParaCard($user),
+            'proxima' => Temporada::proximaInscripcion(),
+        ]);
+    }
+
+    /**
+     * Qué muestra la card de inscripción (postulantes, guardavidas y encargados): la inscripción vigente
+     * (también con la inscripción cerrada, hasta que empieza la temporada, para ver el resultado de la
+     * revisión y la selección) o, si no hay, la de postularse cuando hay una abierta. Null = no hay card.
+     *
+     * @return array{temporada: Temporada, postulacion: ?Postulacion}|null
+     */
+    private function postulacionParaCard(\App\Models\User $user): ?array
+    {
+        if ($vigente = Postulacion::vigenteDe($user->id)) {
+            return ['temporada' => $vigente->temporada, 'postulacion' => $vigente];
+        }
+
+        $abierta = Temporada::conPostulacionAbierta();
+
+        return $abierta ? ['temporada' => $abierta, 'postulacion' => null] : null;
+    }
+
     public function index()
     {
+        if (Auth::user()->hasRole('postulante')) {
+            return $this->inicioPostulante(Auth::user());
+        }
+
         // $intervenciones = Intervencion::with('guardavidas')->with('fuerzas')->get();
         $agent = new Agent;
         $isMobile = $agent->isMobile();
@@ -152,13 +188,9 @@ class HomeController extends Controller
 
         // Guardavidas y encargados también se postulan cada temporada: si la ventana está abierta,
         // se les muestra el acceso (y el estado de su inscripción, si ya la empezaron).
-        $postularme = null;
-        if ($esGuardavidaOEncargado && ! $user->hasRole('personal') && $temporadaAbierta = Temporada::conPostulacionAbierta()) {
-            $postularme = [
-                'temporada' => $temporadaAbierta,
-                'postulacion' => Postulacion::with(['temporada', 'perfil', 'documentos'])->where('user_id', $user->id)->where('temporada_id', $temporadaAbierta->id)->first(),
-            ];
-        }
+        $postularme = $esGuardavidaOEncargado && ! $user->hasRole('personal')
+            ? $this->postulacionParaCard($user)
+            : null;
 
         $data = compact(
             'postularme',

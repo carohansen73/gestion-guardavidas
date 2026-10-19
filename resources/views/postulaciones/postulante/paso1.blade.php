@@ -1,5 +1,8 @@
-@extends('layouts.postulante')
+@extends('layouts.app')
 @section('content')
+<div class="mx-auto max-w-3xl">
+    <x-session-alerts />
+
 
 @include('postulaciones.postulante._pasos', ['paso' => 1])
 
@@ -116,9 +119,10 @@
     </x-form-seccion>
 
     <div class="flex justify-between items-center">
-        <a href="{{ route('postulacion.index') }}" class="text-sm text-gray-500 dark:text-gray-400 hover:underline">Volver</a>
+        <a href="{{ route('home') }}" class="text-sm text-gray-500 dark:text-gray-400 hover:underline">Volver</a>
         <button type="submit" class="bg-sky-500 hover:bg-sky-400 text-white rounded-full px-3 sm:px-5 md:px-5 lg:px-5 py-2 shadow">Guardar y continuar</button>
     </div>
 </x-form-tarjeta>
 
+</div>
 @endsection

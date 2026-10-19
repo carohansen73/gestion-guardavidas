@@ -8,7 +8,7 @@
 
 
         {{-- <div class="p-2"> --}}
-            <section class="relative overflow-hidden bg-gradient-to-r from-blue-600 to-sky-500 dark:from-blue-900 dark:to-sky-700 rounded shadow-sm p-6 md:px-10 transform transition hover:scale-105 duration-300 col-span-2 lg:row-span-2">
+            <section class="relative overflow-hidden bg-gradient-to-r from-blue-600 to-sky-500 dark:from-blue-900 dark:to-sky-700 rounded-3xl shadow-[var(--shadow-glass)] p-6 md:px-10 transform transition hover:scale-105 duration-300 col-span-2 lg:row-span-2">
                 <a href="{{ $hrefCard }}">
 
                     <svg xmlns="http://www.w3.org/2000/svg"

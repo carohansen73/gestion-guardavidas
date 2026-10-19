@@ -1,5 +1,8 @@
-@extends('layouts.postulante')
+@extends('layouts.app')
 @section('content')
+<div class="mx-auto max-w-3xl">
+    <x-session-alerts />
+
 
 @include('postulaciones.postulante._pasos', ['paso' => 4])
 
@@ -59,4 +62,5 @@
     </div>
 </x-form-tarjeta>
 
+</div>
 @endsection

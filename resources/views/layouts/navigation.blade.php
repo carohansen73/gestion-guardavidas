@@ -5,7 +5,7 @@
     $rol = Auth::user()->getRoleNames()->first();
     $rolPrincipal = RolUsuario::principal(Auth::user());
     $notificacionesFrancoSinLeer = Auth::user()->unreadNotifications->count();
-    // Esta misma barra se reutiliza en layouts/postulante.blade.php (sin sidebar): ahí se pasa $conSidebar = false.
+    // $conSidebar = false saca el margen del sidebar (por si algún layout futuro no lo incluye); por defecto, siempre hay sidebar.
     $conSidebar = $conSidebar ?? true;
     // Un postulante solo puede ir a su postulación (ver RedirectPostulante): no se le muestran los enlaces del sistema.
     $esPostulante = Auth::user()->hasRole('postulante');

@@ -175,4 +175,12 @@ class Temporada extends Model
             ->whereDate('fecha_fin_postulacion', '>=', $hoy)
             ->first();
     }
+
+    /** La próxima temporada cuya inscripción todavía no abrió (la más cercana), para avisarle al postulante cuándo abre. */
+    public static function proximaInscripcion(): ?self
+    {
+        return static::whereDate('fecha_inicio_postulacion', '>', Carbon::today())
+            ->orderBy('fecha_inicio_postulacion')
+            ->first();
+    }
 }

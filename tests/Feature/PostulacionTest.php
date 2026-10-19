@@ -140,7 +140,7 @@ class PostulacionTest extends TestCase
         $user = $this->usuario('postulante');
 
         $this->actingAs($user)->get(route('postulacion.paso', 1))
-            ->assertRedirect(route('postulacion.index'))
+            ->assertRedirect(route('home'))
             ->assertSessionHas('error');
     }
 
@@ -158,7 +158,7 @@ class PostulacionTest extends TestCase
         $this->assertCount(7, $postulacion->documentos);
         Storage::disk('local')->assertExists($postulacion->documento('dni_frente')->ruta);
 
-        $this->actingAs($user)->post(route('postulacion.enviar'))->assertRedirect(route('postulacion.index'));
+        $this->actingAs($user)->post(route('postulacion.enviar'))->assertRedirect(route('home'));
 
         $postulacion->refresh();
         $this->assertSame('pendiente', $postulacion->estado);
@@ -240,7 +240,7 @@ class PostulacionTest extends TestCase
         $postulacion->update(['estado' => 'aceptada']);
 
         $this->actingAs($user)->post(route('postulacion.guardar', 1), $this->datosPaso1(['telefono' => '999']))
-            ->assertRedirect(route('postulacion.index'))
+            ->assertRedirect(route('home'))
             ->assertSessionHas('error');
     }
 
@@ -248,7 +248,7 @@ class PostulacionTest extends TestCase
     {
         $user = $this->usuario('postulante');
 
-        $this->actingAs($user)->get(route('postulaciones.index'))->assertRedirect(route('postulacion.index'));
+        $this->actingAs($user)->get(route('postulaciones.index'))->assertRedirect(route('home'));
     }
 
     public function test_admin_ve_solo_pendientes_y_puede_revisar(): void
@@ -301,7 +301,7 @@ class PostulacionTest extends TestCase
         $this->actingAs($dueno)->get(route('postulacion.documento', [$postulacion, 'dni_frente']))->assertOk();
         $this->actingAs($otro)->get(route('postulacion.documento', [$postulacion, 'dni_frente']))->assertForbidden();
         $this->actingAs($admin)->get(route('postulaciones.documento', [$postulacion, 'dni_frente']))->assertOk();
-        $this->actingAs($otro)->get(route('postulaciones.documento', [$postulacion, 'dni_frente']))->assertRedirect(route('postulacion.index'));
+        $this->actingAs($otro)->get(route('postulaciones.documento', [$postulacion, 'dni_frente']))->assertRedirect(route('home'));
     }
 
     public function test_no_se_puede_borrar_una_temporada_con_postulaciones(): void
