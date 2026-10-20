@@ -11,12 +11,12 @@
     $hastaInicio = 'Podés corregirla hasta que empiece la temporada (' . $tempPost->fecha_inicio->format('d/m/Y') . ').';
 
     // El color lo da el estado: naranja = tenés que hacer algo; el resto, el resultado.
-    $tema = $cerradaSinEnviar ? ['from-slate-600 to-gray-500 dark:from-slate-800 dark:to-gray-700', 'text-slate-700', 'text-slate-100'] : [
-        'pendiente' => ['from-sky-600 to-blue-500 dark:from-sky-900 dark:to-blue-800', 'text-sky-700', 'text-sky-100'],
-        'incompleta' => ['from-amber-600 to-yellow-500 dark:from-amber-900 dark:to-yellow-700', 'text-amber-700', 'text-amber-100'],
-        'aceptada' => ['from-emerald-600 to-green-500 dark:from-emerald-900 dark:to-green-700', 'text-emerald-700', 'text-emerald-100'],
-        'rechazada' => ['from-red-600 to-rose-500 dark:from-red-900 dark:to-rose-700', 'text-red-700', 'text-red-100'],
-    ][$estado] ?? ['from-orange-600 to-amber-500 dark:from-orange-900 dark:to-amber-700', 'text-orange-700', 'text-amber-100'];
+    $tema = $cerradaSinEnviar ? 'from-slate-600 to-gray-500 dark:from-slate-800 dark:to-gray-700' : [
+        'pendiente' => 'from-sky-600 to-blue-500 dark:from-sky-900 dark:to-blue-800',
+        'incompleta' => 'from-yellow-600 to-yellow-500 dark:from-yellow-900 dark:to-yellow-700',
+        'aceptada' => 'from-emerald-600 to-green-500 dark:from-emerald-900 dark:to-green-700',
+        'rechazada' => 'from-red-600 to-rose-500 dark:from-red-900 dark:to-rose-700',
+    ][$estado] ?? 'from-orange-600 to-orange-500 dark:from-orange-900 dark:to-orange-700';
 
     $titulo = $cerradaSinEnviar ? 'INSCRIPCIÓN CERRADA' : ([
         'pendiente' => 'INSCRIPCIÓN ENVIADA',
@@ -33,7 +33,7 @@
         $estado === 'aceptada' && $miPostulacion->seleccionado => 'Fuiste seleccionado/a para trabajar esta temporada: ' . $miPostulacion->playaAsignada?->nombre . ($miPostulacion->puestoAsignado ? ' — ' . $miPostulacion->puestoAsignado->nombre : '') . '.',
         $estado === 'aceptada' => 'Tu inscripción fue aceptada. La selección de quienes trabajan la temporada es un paso posterior: te avisamos por acá.',
         $estado === 'rechazada' => 'Tu inscripción no fue aceptada para esta temporada.',
-        default => 'Tus datos de la temporada anterior ya están precargados: solo revisalos y actualizá la documentación.',
+        default => 'Completá los 4 pasos y enviá tu inscripción para postularte.  ¡Recordá que, hasta que no la envíes, tu postulación no será tenida en cuenta!.',
     };
 
     // El botón solo existe mientras se puede empezar o corregir; ya revisada, la card es solo informativa.
@@ -41,7 +41,7 @@
     $boton = ! $miPostulacion ? 'Postularme' : ($estado === 'borrador' ? 'Continuar postulación' : 'Revisar / corregir mi inscripción');
 @endphp
 
-<section class="relative overflow-hidden bg-gradient-to-r {{ $tema[0] }} rounded-3xl shadow-[var(--shadow-glass)] p-6 md:px-10 col-span-2 lg:row-span-2">
+<section class="relative overflow-hidden bg-gradient-to-r {{ $tema }} rounded-3xl shadow-[var(--shadow-glass)] p-6 md:px-10 col-span-2 lg:row-span-2">
     <div class="relative grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(300px,.85fr)] lg:items-end">
         {{-- col 1 card --}}
         <div>
@@ -68,9 +68,11 @@
                 </div>
             </div>
 
-            <p class="mt-4 flex items-center gap-1.5 text-slate-100 text-sm {{ $enCurso ? 'opacity-70' : '' }}">
-                {{ $mensaje }}
-            </p>
+            @if ($mensaje !== '')
+                <p class="mt-4 flex items-center gap-1.5 text-slate-100 text-sm {{ $enCurso ? 'opacity-70' : '' }}">
+                    {{ $mensaje }}
+                </p>
+            @endif
 
             @if ($puedeEditar)
                 <a href="{{ route('postulacion.paso', 1) }}"
@@ -122,7 +124,7 @@
                 </ol>
             </div>
         @elseif ($comentario !== '')
-            {{-- Comentario del equipo, en el mismo card de color --}}
+            {{-- Comentario del admin --}}
             <div class="min-w-0 rounded-2xl bg-slate-50/10 p-4 ring-1 ring-white/20 backdrop-blur shadow-lg">
                 <p class="text-sm font-semibold opacity-70 text-slate-100">COMENTARIO DEL EQUIPO</p>
                 <p class="mt-2 whitespace-pre-line text-sm text-white">{{ $comentario }}</p>
