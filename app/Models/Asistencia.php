@@ -72,17 +72,33 @@ class Asistencia extends Model
         return $this->belongsTo(Puesto::class);
     }
 
-    /*
-    public static function asistenciaPorPlaya(){
+    /** Fórmula de Haversine: distancia en metros entre dos coordenadas. */
+    public static function distanciaMetros(float $lat1, float $lon1, float $lat2, float $lon2): float
+    {
+        $radioTierra = 6371000; // metros
+        $deltaLat = deg2rad($lat2 - $lat1);
+        $deltaLon = deg2rad($lon2 - $lon1);
 
-        $asistenciaPorPlaya = Asistencia::where
+        $a = sin($deltaLat / 2) ** 2
+            + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($deltaLon / 2) ** 2;
 
+        return $radioTierra * 2 * atan2(sqrt($a), sqrt(1 - $a));
+    }
+
+    /**
+     * Metros entre donde se fichó y el puesto, o null si falta alguna de las dos ubicaciones.
+     * (Es la misma distancia que se usa para marcar un fichaje como fuera de rango.)
+     */
+    public function distanciaAlPuesto(): ?int
+    {
+        $puesto = $this->puesto;
+
+        if (! $puesto || $this->latitud === null || $this->longitud === null || $puesto->latitud === null || $puesto->longitud === null) {
+            return null;
+        }
+
+        return (int) round(self::distanciaMetros((float) $this->latitud, (float) $this->longitud, (float) $puesto->latitud, (float) $puesto->longitud));
     }
 
 
-    public static function asistenciaPorTurno($turno){
-
-        $asistenciaPorTurno = Asistencia::
-    }
-        */
 }

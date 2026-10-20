@@ -17,6 +17,7 @@ class HistorialAsistenciaService
 
         // Asistencias del rango
         $asistencias = Asistencia::where('guardavidas_id', $guardavidaId)
+            ->with('puesto')
             ->whereBetween('fecha_hora', [$inicio, $fin])
             ->orderBy('fecha_hora')
             ->get()
@@ -44,6 +45,8 @@ class HistorialAsistenciaService
             ->whereBetween('fecha', [$inicio, $fin])
             ->get()
             ->keyBy(fn ($e) => $e->fecha->toDateString());
+
+        $movilIds = \App\Models\Puesto::getMovil()->pluck('id');
 
         // Construcción del historial día x día
         $historial = [];
@@ -94,6 +97,15 @@ class HistorialAsistenciaService
                     'egreso' => $huboEgresoDistinto ? $asistencia->last()->fecha_hora : null,
                     'puesto' => $asistencia->first()->puesto->nombre ?? '-',
                     'fuera_de_rango' => $asistencia->contains(fn ($a) => $a->estado_validacion === 'fuera_de_rango'),
+                    // Cada fichaje del día (lo usa el detalle de la pantalla de historial; los Excel no lo leen).
+                    // En los puestos móviles ("Fuera zona de baño") no hay radio fijo, así que no se muestra distancia.
+                    'fichajes' => $asistencia->map(fn ($a) => [
+                        'hora' => Carbon::parse($a->fecha_hora)->format('H:i'),
+                        'puesto' => $a->puesto->nombre ?? '-',
+                        'distancia' => $movilIds->contains($a->puesto_id) ? null : $a->distanciaAlPuesto(),
+                        'precision' => $a->precision !== null ? (int) round($a->precision) : null,
+                        'fuera_de_rango' => $a->estado_validacion === 'fuera_de_rango',
+                    ])->values()->all(),
                 ];
 
                 continue;
@@ -116,6 +128,7 @@ class HistorialAsistenciaService
                 $historial[] = [
                     'fecha' => $dateString,
                     'estado' => 'FRANCO',
+                    'detalle' => $excepcion ? 'Cambio de franco cargado' : 'Franco fijo',
                     'ingreso' => null,
                     'egreso' => null,
                     'puesto' => '-',

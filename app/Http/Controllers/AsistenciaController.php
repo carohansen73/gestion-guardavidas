@@ -94,7 +94,7 @@ class AsistenciaController extends Controller
             return 'valido';
         }
 
-        $distancia = $this->calcularDistanciaMetros($lat, $lng, (float) $puesto->latitud, (float) $puesto->longitud);
+        $distancia = Asistencia::distanciaMetros($lat, $lng, (float) $puesto->latitud, (float) $puesto->longitud);
 
         $distanciaConTolerancia = $distancia - $precisionMetros;
 
@@ -102,21 +102,38 @@ class AsistenciaController extends Controller
     }
 
     /**
-     * Fórmula de Haversine — distancia en metros entre dos coordenadas.
+     * ?mes=YYYY-MM (flechas de mes): el mes pedido, o null si falta, está mal escrito o es futuro.
      */
-    private function calcularDistanciaMetros(float $lat1, float $lon1, float $lat2, float $lon2): float
+    private function mesPedido(Request $request): ?Carbon
     {
-        $radioTierra = 6371000; // metros
-        $radLat1 = deg2rad($lat1);
-        $radLat2 = deg2rad($lat2);
-        $deltaLat = deg2rad($lat2 - $lat1);
-        $deltaLon = deg2rad($lon2 - $lon1);
+        if (! $request->filled('mes') || ! preg_match('/^\d{4}-(0[1-9]|1[0-2])$/', $request->input('mes'))) {
+            return null;
+        }
 
-        $a = sin($deltaLat / 2) ** 2
-            + cos($radLat1) * cos($radLat2) * sin($deltaLon / 2) ** 2;
-        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+        $mes = Carbon::createFromFormat('!Y-m', $request->input('mes'));
 
-        return $radioTierra * $c;
+        return $mes->gt(Carbon::now()->startOfMonth()) ? null : $mes;
+    }
+
+    /**
+     * Datos de las flechas de mes ("Oct 2026" y los meses vecinos), solo cuando el período mostrado es un
+     * mes entero (o el actual hasta hoy); con fechas a mano o una temporada devuelve null.
+     *
+     * @return array{nombre:string,anterior:string,siguiente:?string}|null
+     */
+    private function navegacionMes(Carbon $inicio, Carbon $fin): ?array
+    {
+        if (! $inicio->isSameDay($inicio->copy()->startOfMonth()) || ! $fin->isSameMonth($inicio)
+            || ! ($fin->isSameDay($inicio->copy()->endOfMonth()) || $fin->isSameDay(Carbon::now()))) {
+            return null;
+        }
+
+        return [
+            // Mes abreviado a 3 letras ("Oct 2026"), a mano: las abreviaturas de Carbon en español traen punto y varían.
+            'nombre' => ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'][$inicio->month - 1].' '.$inicio->year,
+            'anterior' => $inicio->copy()->subMonthNoOverflow()->format('Y-m'),
+            'siguiente' => $inicio->lt(Carbon::now()->startOfMonth()) ? $inicio->copy()->addMonthNoOverflow()->format('Y-m') : null,
+        ];
     }
 
     /**
@@ -134,13 +151,22 @@ class AsistenciaController extends Controller
         $temporadas = Temporada::orderByDesc('fecha_inicio')->get();
         $temporadaElegida = $request->filled('temporada') ? $temporadas->firstWhere('id', (int) $request->input('temporada')) : null;
 
+        // ?mes=YYYY-MM (flechas del celular): ese mes completo, o hasta hoy si es el actual. Un mes futuro o mal
+        // escrito se ignora. Las fechas a mano y la temporada tienen prioridad sobre el mes.
+        $mes = $this->mesPedido($request);
+
         $inicio = $request->filled('inicio')
             ? Carbon::parse($request->input('inicio'))->startOfDay()
-            : ($temporadaElegida ? $temporadaElegida->fecha_inicio->copy()->startOfDay() : Carbon::now()->startOfMonth());
+            : ($temporadaElegida ? $temporadaElegida->fecha_inicio->copy()->startOfDay() : ($mes ?? Carbon::now())->copy()->startOfMonth());
 
         $fin = $request->filled('fin')
             ? Carbon::parse($request->input('fin'))->endOfDay()
-            : ($temporadaElegida ? $temporadaElegida->fecha_fin->copy()->endOfDay()->min(Carbon::now()->endOfDay()) : Carbon::now()->endOfDay());
+            : ($temporadaElegida
+                ? $temporadaElegida->fecha_fin->copy()->endOfDay()->min(Carbon::now()->endOfDay())
+                : ($mes ?? Carbon::now())->copy()->endOfMonth()->min(Carbon::now()->endOfDay()));
+
+        // Navegación por mes (flechas): solo cuando el período mostrado es un mes entero (o el actual hasta hoy).
+        $mesNav = $temporadaElegida ? null : $this->navegacionMes($inicio, $fin);
 
         // Filtros de playa y búsqueda. nombre/apellido ya no viven en
         // guardavidas -> join a users para buscar/ordenar.
@@ -163,19 +189,43 @@ class AsistenciaController extends Controller
             });
         }
 
-        $guardavidas = $guardavidasQuery
-            ->orderBy('users.lastname')
-            ->orderBy('users.name')
-            ->paginate(10)
-            ->withQueryString();
+        $guardavidasQuery->orderBy('users.lastname')->orderBy('users.name');
 
-        $resumen = (new ResumenAsistenciaService)->generar($guardavidas->getCollection(), $inicio, $fin);
+        // Orden: alfabético por defecto. "faltas" depende del resumen (que se calcula en PHP, no en SQL), así que
+        // ahí se calcula para todas las personas del filtro y se pagina a mano.
+        $orden = $request->input('orden') === 'faltas' ? 'faltas' : 'alfabetico';
+        $service = new ResumenAsistenciaService;
+
+        if ($orden === 'alfabetico') {
+            $guardavidas = $guardavidasQuery->paginate(10)->withQueryString();
+            $resumen = $service->generar($guardavidas->getCollection(), $inicio, $fin);
+        } else {
+            $todos = $guardavidasQuery->get();
+            $resumen = $service->generar($todos, $inicio, $fin);
+
+            // sortBy es estable: dentro de un empate queda el orden alfabético de arriba.
+            $ordenados = $todos->sortByDesc(fn ($g) => $resumen[$g->id]['faltas'] ?? 0);
+
+            $pagina = LengthAwarePaginator::resolveCurrentPage();
+            $guardavidas = new LengthAwarePaginator(
+                $ordenados->forPage($pagina, 10)->values(),
+                $ordenados->count(),
+                10,
+                $pagina,
+                ['path' => $request->url(), 'query' => $request->query()]
+            );
+        }
 
         $playas = Playa::all();
         $agent = new Agent;
 
+        // Búsqueda en vivo del celular: solo se pide la lista (tarjetas + paginación), no la página entera.
+        if ($request->ajax()) {
+            return view('asistencias.partials.lista-mobile', compact('guardavidas', 'resumen'));
+        }
+
         if ($agent->isMobile()) {
-            return view('asistencias.index', compact('guardavidas', 'playas', 'resumen', 'inicio', 'fin', 'temporadas', 'temporadaElegida'));
+            return view('asistencias.index', compact('guardavidas', 'playas', 'resumen', 'inicio', 'fin', 'temporadas', 'temporadaElegida', 'mesNav'));
         } else {
             return view('asistencias.index-desktop', compact('guardavidas', 'playas', 'resumen', 'inicio', 'fin', 'temporadas', 'temporadaElegida'));
         }
@@ -189,17 +239,46 @@ class AsistenciaController extends Controller
      */
     public function asistenciasPorGuardavida(Request $request, $id)
     {
-        $guardavida = Guardavida::with(['puesto.playa', 'asistencias.puesto.playa'])->findOrFail($id);
+        $guardavida = Guardavida::with(['puesto.playa', 'user', 'francoHistorial', 'periodos'])->findOrFail($id);
 
         // Esta pantalla es de gestión (necesita ver_asistencia). Cada uno ve las propias en "Mis asistencias".
         abort_unless(auth()->user()->can('ver_asistencia'), 403);
 
         $esAdmin = auth()->user()->hasAnyRole(['admin', 'encargado']);
 
-        // Solo si es admin, mandamos balnearios y puestos
-        $balnearios = $esAdmin ? Playa::all() : null;
-        $puestos = $esAdmin ? Puesto::all() : null;
-        $historial = $esAdmin ? $this->getAttendanceHistory($request, $id) : null;
+        // Período: el mes en curso por defecto (igual que la lista), o el mes de las flechas (?mes=YYYY-MM), o
+        // fechas a mano (?inicio&fin). Hasta hoy como máximo: los días que vienen no son ni asistencia ni falta.
+        $mes = $this->mesPedido($request);
+        $inicio = $request->filled('inicio')
+            ? Carbon::parse($request->input('inicio'))->startOfDay()
+            : ($mes ?? Carbon::now())->copy()->startOfMonth();
+        $fin = $request->filled('fin')
+            ? Carbon::parse($request->input('fin'))->endOfDay()
+            : ($mes ?? Carbon::now())->copy()->endOfMonth()->min(Carbon::now()->endOfDay());
+        $mesNav = $this->navegacionMes($inicio, $fin);
+
+        // Mismo cálculo que la lista y los Excel, así los números nunca discrepan entre pantallas.
+        $historial = array_reverse((new HistorialAsistenciaService)->generar($guardavida->id, $inicio, $fin)); // más nuevo primero
+        $resumen = (new ResumenAsistenciaService)->generar(collect([$guardavida]), $inicio, $fin)[$guardavida->id] ?? null;
+
+        // Aviso si no estaba en el plantel durante todo el período: esos días no se listan ni cuentan como falta
+        // (ver Guardavida::enPlantelEl), y sin el aviso parece que faltan datos.
+        $diasFuera = 0;
+        $diasTotales = 0;
+        for ($dia = $inicio->copy()->startOfDay(); $dia->lte($fin); $dia->addDay()) {
+            $diasTotales++;
+            $diasFuera += $guardavida->enPlantelEl($dia) ? 0 : 1;
+        }
+
+        $avisoPlantel = null;
+        if ($diasFuera > 0) {
+            $hastaUltimo = $guardavida->periodos->whereNotNull('hasta')->sortByDesc('hasta')->first()?->hasta;
+            $avisoPlantel = $diasFuera === $diasTotales
+                ? 'Fuera del plantel: en este período no figura dado de alta, así que solo se listan los días en que fichó y no se cuentan faltas.'
+                  .($hastaUltimo ? ' Estuvo en el plantel hasta el '.$hastaUltimo->format('d/m/Y').'.' : '')
+                : 'Estuvo en el plantel solo una parte de este período: los días en que no figuraba dado de alta no se listan ni cuentan como falta.';
+        }
+
         $francoExcepciones = $esAdmin
             ? $guardavida->francoExcepciones()->orderByDesc('fecha')->limit(15)->get()
             : null;
@@ -210,7 +289,7 @@ class AsistenciaController extends Controller
             $francoIntercambios = $comoSolicitante->concat($comoDestinatario)->sortByDesc('created_at')->take(15)->values();
         }
 
-        return view('asistencias.show-desktop', compact('guardavida', 'esAdmin', 'balnearios', 'puestos', 'historial', 'francoExcepciones', 'francoIntercambios'));
+        return view('asistencias.show', compact('guardavida', 'esAdmin', 'inicio', 'fin', 'mesNav', 'historial', 'resumen', 'avisoPlantel', 'francoExcepciones', 'francoIntercambios'));
     }
 
     /**
@@ -248,40 +327,5 @@ class AsistenciaController extends Controller
         $guardavidas = $asistencias->pluck('guardavida')->unique('id')->values();
 
         return view('asistencias.index', compact('guardavidas'));
-    }
-
-    /**
-     * Historial de asistencias día por día para el guardavida seleccionado.
-     * La construcción del historial (ASISTIÓ/FALTA/LICENCIA, fuera_de_rango)
-     * vive en HistorialAsistenciaService — la misma lógica que usan los
-     * excels de asistencia, para que pantalla y Excel nunca se desincronicen.
-     */
-    public function getAttendanceHistory($request, $guardavidaId)
-    {
-
-        // Toma el filtro de fechas, y si no se selecciono fecha, toma desde hace 30 dias atras.
-        $inicio = $request->filled('inicio')
-            ? Carbon::parse($request->input('inicio'))->startOfDay()
-            : Carbon::now()->subDays(30)->startOfDay();
-
-        $fin = $request->filled('fin')
-            ? Carbon::parse($request->input('fin'))->endOfDay()
-            : Carbon::now()->endOfDay();
-
-        $historial = (new HistorialAsistenciaService)->generar($guardavidaId, $inicio, $fin);
-
-        // Paginación (el historial se arma completo en memoria, día por día)
-        $page = request()->input('page', 1);
-        $perPage = 10;
-
-        $items = array_slice($historial, ($page - 1) * $perPage, $perPage);
-
-        return new LengthAwarePaginator(
-            $items,
-            count($historial),
-            $perPage,
-            $page,
-            ['path' => request()->url(), 'query' => request()->query()]
-        );
     }
 }
