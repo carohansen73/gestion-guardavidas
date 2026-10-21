@@ -4,6 +4,8 @@
 @php $esCreacion = Route::currentRouteName() == 'cambio-de-turno.create'; @endphp
 
 <section class="sm:px-4 sm:py-10">
+    <x-volver :href="route('cambio-de-turno.index')" class="mb-4" />
+
     <x-form-tarjeta action="{{ isset($cambioDeTurno) ? route('cambio-de-turno.update', $cambioDeTurno->id) : route('cambio-de-turno.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
         @if(isset($cambioDeTurno))

@@ -4,6 +4,8 @@
 @section('content')
 
 <section class="sm:px-4 sm:py-10">
+    <x-volver :href="route('intervencion.index')" class="mb-4" />
+
     <x-form-tarjeta action="{{ route('intervencion.update', $intervencion->id) }}" method="POST">
         @csrf
         @method('PUT')

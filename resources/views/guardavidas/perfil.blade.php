@@ -18,6 +18,8 @@
 
     <main class="overflow-x-hidden sm:pb-5 sm:mx-4">
 
+        <x-volver :href="route('home')" class="mt-1 sm:mt-4" />
+
         <!-- Alert Messages -->
         <div id="alertContainer"></div>
 
@@ -359,13 +361,6 @@
                         </div>
                     @endforeach
                 </div>
-            </div>
-        @else
-            <div class="flex justify-end px-4 sm:px-10 my-4">
-                <button type="button" class="btn btn-secondary" onclick="window.history.back()">
-                    <i class="fas fa-arrow-left"></i>
-                    Volver
-                </button>
             </div>
         @endif
 

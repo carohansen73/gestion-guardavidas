@@ -9,10 +9,7 @@
 
 @section('content')
 
-<button type="button" class="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-sky-100 dark:hover:text-gray-300" onclick="window.history.back()">
-    <i class="fas fa-arrow-left"></i>
-    <span class=" hover:underline">Volver</span>
-</button>
+<x-volver :href="route('guardavida.index')" />
 
     <main class="overflow-x-hidden">
 

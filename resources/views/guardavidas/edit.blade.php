@@ -2,6 +2,8 @@
 
 @section('content')
 <section class="sm:px-4 sm:py-10">
+    <x-volver :href="route('guardavida.index')" class="mb-4" />
+
 
     @if ($errors->any())
         <div class="bg-red-100 text-red-700 p-3 rounded mb-4 dark:bg-red-900/40 dark:text-red-300">

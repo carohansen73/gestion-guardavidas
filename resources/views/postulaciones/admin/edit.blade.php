@@ -8,6 +8,8 @@
 @endphp
 
 <section class="sm:px-4 sm:py-10">
+    <x-volver :href="route('postulaciones.show', $postulacion)" class="mb-4" />
+
     <x-form-tarjeta method="POST" action="{{ route('postulaciones.update', $postulacion) }}" enctype="multipart/form-data">
         @csrf
         @method('PUT')

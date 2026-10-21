@@ -3,6 +3,8 @@
 @section('content')
 
 <section class="sm:px-4 sm:py-10">
+    <x-volver :href="route('guardavida.index')" class="mb-4" />
+
     <x-form-tarjeta action="{{ isset($guardavida) ? route('guardavida.update', $guardavida->id) : route('guardavida.store') }}" method="POST">
         @csrf
         @if(isset($guardavida))

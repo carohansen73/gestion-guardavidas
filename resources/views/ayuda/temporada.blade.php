@@ -16,6 +16,8 @@
 @endphp
 
 <section class="sm:px-4 sm:py-10">
+    <x-volver class="mb-4" />
+
     <x-form-tarjeta tag="div">
 
         <x-form-encabezado titulo="Guía: temporada, postulaciones y selección" icono="life-buoy" etiqueta="Ayuda para administradores">

@@ -2,6 +2,8 @@
 @section('content')
 
 <section class="sm:px-4 sm:py-10">
+    <x-volver :href="route('novedad-de-material.index')" class="mb-4" />
+
     <x-form-tarjeta action="{{ isset($novedadDeMaterial) ? route('novedad-de-material.update', $novedadDeMaterial->id) : route('novedad-de-material.store') }}" method="POST">
         @csrf
         @if(isset($novedadDeMaterial))

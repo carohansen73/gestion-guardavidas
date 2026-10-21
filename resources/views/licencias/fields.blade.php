@@ -4,6 +4,8 @@
 @php $esEdicion = Route::currentRouteName() === 'licencia.edit'; @endphp
 
 <section class="sm:px-4 sm:py-10">
+    <x-volver :href="route('licencia.index')" class="mb-4" />
+
     <x-form-tarjeta action="{{ isset($licencia) ? route('licencia.update', $licencia->id) : route('licencia.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
         @if(isset($licencia))

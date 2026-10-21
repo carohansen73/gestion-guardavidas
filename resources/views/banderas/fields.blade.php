@@ -3,6 +3,8 @@
 @section('content')
 
 <section class="sm:px-4 sm:py-10">
+    <x-volver :href="route('bandera.index')" class="mb-4" />
+
     <x-form-tarjeta action="{{ isset($bandera) ? route('bandera.update', $bandera->id) : route('bandera.store') }}" method="POST">
         @csrf
         @if(isset($bandera))

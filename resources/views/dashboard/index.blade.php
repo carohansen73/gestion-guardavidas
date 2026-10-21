@@ -16,7 +16,7 @@
    {{-- <div class="flex-1 px-4 pb-28 pt-5 lg:px-8 lg:pb-10"> --}}
 
 <div class="">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-0 md:mb-4">
         <div>
             <p class="text-sm text-gray-500 dark:text-gray-400">
                 {{ ucfirst(now()->locale('es')->isoFormat('dddd D [de] MMMM')) }}

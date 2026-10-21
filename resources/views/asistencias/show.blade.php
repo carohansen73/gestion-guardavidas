@@ -82,10 +82,7 @@
         @keydown.escape.window="dia = null; francoModal = false">
 
         {{-- Volver (igual que en la ficha del guardavidas): conserva los filtros del listado --}}
-        <button type="button" class="mb-3 inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-sky-100 sm:mt-4" onclick="window.history.back()">
-            <i class="fas fa-arrow-left"></i>
-            <span class="hover:underline">Volver</span>
-        </button>
+        <x-volver :href="route('asistencias.index')" class="mb-3 sm:mt-4" />
 
         {{-- Encabezado --}}
         <div class="mb-4 flex items-start gap-3">
