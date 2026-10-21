@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\RolUsuario;
 use App\Models\Asistencia;
 use App\Models\Bandera;
 use App\Models\Guardavida;
@@ -12,6 +13,7 @@ use App\Models\NovedadMaterial;
 use App\Models\Playa;
 use App\Models\Postulacion;
 use App\Models\Temporada;
+use App\Services\CatalogoRoles;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -64,10 +66,42 @@ class HomeController extends Controller
         return null;
     }
 
+    /**
+     * Primera pantalla a la que puede entrar un usuario sin permiso para el panel de inicio: la primera de esta
+     * lista (en orden de importancia) cuyo permiso tenga. Si no tiene ninguna, su perfil.
+     */
+    private function primeraSeccionPermitida(\App\Models\User $user): string
+    {
+        $secciones = [
+            'ver_asistencia' => 'asistencias.index',
+            'ver_guardavida' => 'guardavida.index',
+            'ver_licencia' => 'licencia.index',
+            'ver_cambio_turno' => 'cambio-de-turno.index',
+            'ver_intervencion' => 'intervencion.index',
+            'ver_bandera' => 'bandera.index',
+            'ver_novedad_material' => 'novedad-de-material.index',
+            'ver_temporada' => 'temporada.index',
+            'ver_postulacion' => 'postulaciones.index',
+        ];
+
+        foreach ($secciones as $permiso => $ruta) {
+            if ($user->can($permiso)) {
+                return route($ruta);
+            }
+        }
+
+        return route('guardavida.myProfile');
+    }
+
     public function index()
     {
-        if (Auth::user()->hasRole('postulante')) {
+        if (Auth::user()->hasRole(RolUsuario::Postulante->value)) {
             return $this->inicioPostulante(Auth::user());
+        }
+
+        // Sin permiso para el panel (ej. RRHH), el inicio es la primera sección que sí puede ver.
+        if (! Auth::user()->can('ver_panel_inicio')) {
+            return redirect($this->primeraSeccionPermitida(Auth::user()));
         }
 
         // $intervenciones = Intervencion::with('guardavidas')->with('fuerzas')->get();
@@ -114,7 +148,8 @@ class HomeController extends Controller
         // infiere por cantidad de fichajes de hoy: 0 = falta el ingreso,
         // 1 = ya fichó ingreso y falta el egreso, 2+ = turno completo (se
         // muestra el primer y el último fichaje).
-        $esGuardavidaOEncargado = $user->hasAnyRole(Guardavida::ROLES_PLANTEL);
+        $catalogoRoles = app(CatalogoRoles::class);
+        $esGuardavidaOEncargado = $user->hasAnyRole($catalogoRoles->plantel());
         $asistenciasHoyPropias = collect();
         if ($esGuardavidaOEncargado) {
             $asistenciasHoyPropias = Asistencia::where('guardavidas_id', $user->guardavida->id)
@@ -199,7 +234,7 @@ class HomeController extends Controller
 
         // Guardavidas y encargados también se postulan cada temporada: si la ventana está abierta,
         // se les muestra el acceso (y el estado de su inscripción, si ya la empezaron).
-        $postularme = $esGuardavidaOEncargado && ! $user->hasRole('personal')
+        $postularme = $user->hasAnyRole($catalogoRoles->plantelConTemporada())
             ? $this->postulacionParaCard($user)
             : null;
 

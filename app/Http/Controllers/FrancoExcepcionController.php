@@ -27,7 +27,7 @@ class FrancoExcepcionController extends Controller
      */
     public function store(Request $request, Guardavida $guardavida)
     {
-        if (! auth()->user()->hasAnyRole(['admin', 'encargado'])) {
+        if (! auth()->user()->can('editar_guardavida')) {
             abort(403, 'No tenés permisos para cargar cambios de franco.');
         }
 
@@ -94,7 +94,7 @@ class FrancoExcepcionController extends Controller
 
     public function destroy(FrancoExcepcion $francoExcepcion)
     {
-        if (! auth()->user()->hasAnyRole(['admin', 'encargado'])) {
+        if (! auth()->user()->can('editar_guardavida')) {
             abort(403, 'No tenés permisos para eliminar cambios de franco.');
         }
 

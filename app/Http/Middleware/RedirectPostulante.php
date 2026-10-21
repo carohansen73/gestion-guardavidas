@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\RolUsuario;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,7 +22,7 @@ class RedirectPostulante
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && Auth::user()->hasRole('postulante') && ! $request->routeIs('postulacion.*', 'home')) {
+        if (Auth::check() && Auth::user()->hasRole(RolUsuario::Postulante->value) && ! $request->routeIs('postulacion.*', 'home')) {
             return redirect()->route('home');
         }
 

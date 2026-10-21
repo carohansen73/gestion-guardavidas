@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\RolUsuario;
 use App\Models\Guardavida;
 use App\Models\Postulacion;
 use App\Models\Puesto;
@@ -29,7 +30,7 @@ use Illuminate\Support\Facades\DB;
  */
 class SeleccionPostulantes
 {
-    private const ROLES_INTOCABLES = ['admin', 'superadmin', 'personal'];
+    public function __construct(private CatalogoRoles $roles) {}
 
     /**
      * @param  array<int,array{postulacion:Postulacion,playa_id:int,puesto_id:?int,turno:?string,encargado:bool}>  $filas
@@ -47,8 +48,8 @@ class SeleccionPostulantes
                 $postulacion = $fila['postulacion'];
                 $user = $postulacion->user;
 
-                if ($user->hasAnyRole(self::ROLES_INTOCABLES)) {
-                    throw new \DomainException("{$user->lastname}, {$user->name} tiene rol de administrador o de personal y no puede pasar a guardavida desde acá.");
+                if ($user->hasAnyRole($this->roles->intocables())) {
+                    throw new \DomainException("{$user->lastname}, {$user->name} tiene un rol que la selección no modifica (administrativo o de personal fijo) y no puede pasar a guardavida desde acá.");
                 }
 
                 // El puesto es opcional: si no se define, el propio guardavida lo elige al ingresar por primera vez.
@@ -87,7 +88,7 @@ class SeleccionPostulantes
                 // Alta en el plantel a partir de la fecha de inicio (para el presentismo).
                 $guardavida->darDeAlta($desde, $postulacion->temporada_id, null, $esNuevo);
 
-                $user->syncRoles([$encargado ? 'encargado' : 'guardavida']);
+                $user->syncRoles([($encargado ? RolUsuario::Encargado : RolUsuario::Guardavida)->value]);
                 $user->update(['enabled' => true]);
 
                 $postulacion->update([
@@ -190,7 +191,7 @@ class SeleccionPostulantes
             $guardavida->darDeBajaDelPeriodo($hasta, $motivo);
 
             // El personal fijo (rol `personal`) no vuelve a postulante: conserva su rol y se lo deshabilita.
-            if ($guardavida->user->hasRole('personal')) {
+            if ($this->roles->userEsPlantelSinTemporada($guardavida->user)) {
                 $guardavida->user->update(['enabled' => false]);
                 $guardavida->user->tokens()->delete(); // un celular con la sesión offline guardada no puede seguir fichando
 
@@ -211,7 +212,7 @@ class SeleccionPostulantes
         $user = $guardavida->user;
 
         // Personal fijo dado de baja: se vuelve a habilitar con un período nuevo; no pasa por la temporada.
-        if ($user->hasRole('personal') && ! $user->hasAnyRole(['admin', 'superadmin'])) {
+        if ($this->roles->userEsPlantelSinTemporada($user) && ! $this->roles->userEsAdministrativo($user)) {
             DB::transaction(function () use ($guardavida, $user, $desde) {
                 $guardavida->darDeAlta($desde, null, 'Reincorporación');
                 $user->update(['enabled' => true]);
@@ -220,7 +221,7 @@ class SeleccionPostulantes
             return;
         }
 
-        if ($user->hasAnyRole(self::ROLES_INTOCABLES)) {
+        if ($user->hasAnyRole($this->roles->intocables())) {
             throw new \DomainException('Un administrador o un empleado de personal no puede darse de alta como guardavida desde acá.');
         }
 
@@ -230,7 +231,7 @@ class SeleccionPostulantes
             if ($temporada) {
                 $this->incluirEnTemporada($guardavida, $temporada, 'Reincorporado/a por la administración');
             }
-            $user->syncRoles([$guardavida->funcion === 'Encargado' ? 'encargado' : 'guardavida']);
+            $user->syncRoles([($guardavida->funcion === 'Encargado' ? RolUsuario::Encargado : RolUsuario::Guardavida)->value]);
             $user->update(['enabled' => true]);
         });
     }
@@ -239,7 +240,7 @@ class SeleccionPostulantes
     public function candidatosCierre(Temporada $temporada): Collection
     {
         return Guardavida::activos()
-            ->whereDoesntHave('user', fn ($u) => $u->role(self::ROLES_INTOCABLES))
+            ->whereDoesntHave('user', fn ($u) => $u->role($this->roles->intocables()))
             ->whereDoesntHave('user.postulaciones', fn ($p) => $p->where('temporada_id', $temporada->id)->where('seleccionado', true))
             ->with(['user:id,name,lastname,dni', 'playa', 'puesto'])
             ->get()
@@ -269,11 +270,11 @@ class SeleccionPostulantes
 
     private function volverAPostulante(User $user): void
     {
-        if ($user->hasAnyRole(self::ROLES_INTOCABLES)) {
+        if ($user->hasAnyRole($this->roles->intocables())) {
             return;
         }
 
-        $user->syncRoles(['postulante']);
+        $user->syncRoles([RolUsuario::Postulante->value]);
         // Un celular con la sesión offline guardada no tiene que poder seguir fichando.
         $user->tokens()->delete();
     }

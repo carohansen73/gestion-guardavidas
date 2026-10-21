@@ -23,7 +23,7 @@ class FrancoIntercambioController extends Controller
     public function index()
     {
         $guardavida = auth()->user()->guardavida;
-        if (! $guardavida || auth()->user()->hasRole('personal')) {
+        if (! $guardavida) {
             abort(403, 'No tenés un perfil de guardavida asignado.');
         }
 
@@ -65,7 +65,7 @@ class FrancoIntercambioController extends Controller
     public function store(Request $request)
     {
         $guardavida = auth()->user()->guardavida;
-        if (! $guardavida || auth()->user()->hasRole('personal')) {
+        if (! $guardavida) {
             abort(403, 'No tenés un perfil de guardavida asignado.');
         }
 

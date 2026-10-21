@@ -9,7 +9,6 @@
 @php
 
     $playa = Auth::user()->guardavida?->playa?->nombre;
-    $rol = Auth::user()->getRoleNames()->first();
 @endphp
 
     <aside id="separator-sidebar"
@@ -21,7 +20,7 @@
                     @auth   <a href="{{ route('home') }}" class="flex">
                     @else   <a href="{{ route('welcome') }}" class="flex  p-2 ">
                     @endauth
-                        @if ($rol !== 'admin' && $playa)
+                        @if ($playa)
                             <svg xmlns="http://www.w3.org/2000/svg"
                                 class="w-7 h-7 animate-bounce md:animate-none text-red-500 dark:text-red-500 me-2" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor" stroke-width="2">
@@ -38,6 +37,8 @@
                 </li>
             </ul>
 
+            {{-- Sin el permiso del panel (ej. RRHH) no hay Home: el inicio lleva a su primera sección. --}}
+            @can('ver_panel_inicio')
             <ul class="pt-4 mt-4 space-y-2 font-medium border-t border-gray-200 dark:border-gray-700">
                 <li>
                     <a href="{{ route('home') }}"
@@ -59,6 +60,7 @@
                 </li>
 
             </ul>
+            @endcan
             @canany(['ver_bandera', 'ver_intervencion', 'ver_novedad_material'])
                 <ul class="pt-4 mt-4 space-y-2 font-medium border-t border-gray-200 dark:border-gray-700">
                     <li>

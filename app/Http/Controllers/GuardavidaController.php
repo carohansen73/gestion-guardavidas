@@ -9,6 +9,7 @@ use App\Models\Playa;
 use App\Models\Puesto;
 use App\Models\Temporada;
 use App\Models\User;
+use App\Services\CatalogoRoles;
 use App\Services\SeleccionPostulantes;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -114,9 +115,10 @@ class GuardavidaController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(CatalogoRoles $roles)
     {
         $user = Auth::user();
+        $rolesAsignables = $roles->asignablesPara($user);
         if ($user->hasAnyRole(['guardavida', 'encargado'])) {
             $playas = Playa::where('id', $user->guardavida->playa_id)->get();
             $puestos = Puesto::where('playa_id', $user->guardavida->playa_id)->get();
@@ -128,19 +130,19 @@ class GuardavidaController extends Controller
         $guardavida = null;
 
         return view('guardavidas.create', compact(
-            'playas', 'puestos', 'guardavida'
+            'playas', 'puestos', 'guardavida', 'rolesAsignables'
         ));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreGuardavidaRequest $request)
+    public function store(StoreGuardavidaRequest $request, CatalogoRoles $roles)
     {
         // Validación de datos
         $validated = $request->validated();
 
-        DB::transaction(function () use ($validated) {
+        DB::transaction(function () use ($validated, $roles) {
             // 1 Registro usuario
             $user = User::create([
                 'name' => $validated['nombre'],
@@ -152,13 +154,11 @@ class GuardavidaController extends Controller
             ]);
 
             // 2 Asigno rol
-            if (auth()->user()->hasRole('encargado') && $validated['rol'] === 'admin') {
-                abort(403, 'No tenés permisos para crear un usuario con el rol administrador.');
-            }
+            abort_unless($roles->asignablesPara(auth()->user())->contains('name', $validated['rol']), 403, 'No tenés permisos para crear un usuario con ese rol.');
             $user->assignRole($validated['rol']);
 
             // 3 Si es guardavida o encargado → creo registro en tabla guardavidas
-            if (in_array($validated['rol'], ['guardavida', 'encargado', 'personal'])) {
+            if ($roles->esPlantel($validated['rol'])) {
                 // nombre/apellido/dni NO se guardan acá — ya quedaron en
                 // $user arriba, y Guardavida::nombre/apellido/dni son
                 // accessors que leen de ahí (ver Guardavida model, Fase 3b).
@@ -179,10 +179,9 @@ class GuardavidaController extends Controller
                 // cae fuera de todas, la más cercana) y queda como seleccionado/a en ella, igual que el resto
                 // del plantel: así el cierre de la selección no lo da de baja.
                 $fechaAlta = Carbon::parse($validated['fecha_alta'] ?? now());
-                // El personal fijo (rol `personal`) no trabaja por temporada: su período queda sin
+                // El plantel fijo (rol `personal`) no trabaja por temporada: su período queda sin
                 // temporada y no se le crea postulación.
-                $esPersonal = $validated['rol'] === 'personal';
-                $temporadaAlta = $esPersonal ? null : Temporada::paraFecha($fechaAlta);
+                $temporadaAlta = $roles->usaTemporada($validated['rol']) ? Temporada::paraFecha($fechaAlta) : null;
                 $guardavida->darDeAlta($fechaAlta, $temporadaAlta?->id, 'Alta manual', true);
                 if ($temporadaAlta) {
                     app(SeleccionPostulantes::class)->incluirEnTemporada($guardavida, $temporadaAlta);
@@ -201,9 +200,9 @@ class GuardavidaController extends Controller
 
         return redirect()
             ->route('guardavida.index')
-            ->with('success', $validated['rol'] === 'personal'
+            ->with('success', $roles->esPlantel($validated['rol']) && ! $roles->usaTemporada($validated['rol'])
                 ? 'Personal creado correctamente. Ficha como el resto, no pasa por postulaciones ni por el cierre de temporada.'
-                : (in_array($validated['rol'], ['guardavida', 'encargado'])
+                : ($roles->esPlantel($validated['rol'])
                 ? 'Guardavida creado correctamente. Quedó incluido en la temporada como seleccionado; si querés cargar sus datos de inscripción y documentos, hacelo desde Postulaciones → su inscripción → "Completar datos y documentos".'
                 : 'Usuario creado correctamente.'));
     }
@@ -215,8 +214,6 @@ class GuardavidaController extends Controller
     public function show(Guardavida $guardavida)
     {
         $user = Auth::user();
-
-        abort_unless($user->hasAnyRole(['admin', 'superadmin', 'encargado']), 403, 'No tenés permisos para ver este perfil.');
 
         $guardavida->load(['playa', 'puesto', 'user']);
 
@@ -278,16 +275,17 @@ class GuardavidaController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Guardavida $guardavida)
+    public function edit(Guardavida $guardavida, CatalogoRoles $roles)
     {
         $user = Auth::user();
+        $rolesAsignables = $roles->asignablesPara($user);
         $guardavidaAuth = $user->guardavida;
         $rol = $guardavida->user?->getRoleNames()->first() ?? '';
 
         $playas = Playa::with('puestos')->get();
 
         return view('guardavidas.edit', compact(
-            'guardavidaAuth', 'rol', 'playas', 'guardavida'
+            'guardavidaAuth', 'rol', 'playas', 'guardavida', 'rolesAsignables'
         ));
     }
 
@@ -344,7 +342,7 @@ class GuardavidaController extends Controller
      * en listados, selectores y asistencias, conserva todo su historial y puede
      * volver a postularse la próxima temporada.
      */
-    public function baja(Request $request, Guardavida $guardavida, SeleccionPostulantes $seleccion)
+    public function baja(Request $request, Guardavida $guardavida, SeleccionPostulantes $seleccion, CatalogoRoles $roles)
     {
         abort_unless(auth()->user()->can('eliminar_guardavida'), 403);
 
@@ -355,7 +353,7 @@ class GuardavidaController extends Controller
 
         $user = $guardavida->user;
 
-        if (! $user || ! $guardavida->estaEnPlantel() || $user->hasAnyRole(['admin', 'superadmin'])) {
+        if (! $user || ! $guardavida->estaEnPlantel() || $roles->userEsAdministrativo($user)) {
             return back()->withErrors('Solo se puede dar de baja a una persona del plantel actual.');
         }
 
@@ -364,19 +362,19 @@ class GuardavidaController extends Controller
         $fecha = Carbon::parse($datos['fecha'])->format('d/m/Y');
 
         return redirect()->route('guardavida.index')
-            ->with('success', $user->hasRole('personal')
+            ->with('success', $roles->userEsPlantelSinTemporada($user)
                 ? "{$user->lastname}, {$user->name} fue dado de baja el {$fecha}. Ya no aparece en los listados y su usuario quedó deshabilitado."
                 : "{$user->lastname}, {$user->name} fue dado de baja el {$fecha}. Ya no aparece en los listados y puede volver a postularse.");
     }
 
     /** Personas con fila de guardavida que hoy están fuera del plantel (bajas y no seleccionados). */
-    public function bajas(Request $request)
+    public function bajas(Request $request, CatalogoRoles $roles)
     {
         abort_unless(auth()->user()->can('ver_guardavida'), 403);
 
         $buscar = trim((string) $request->input('buscar'));
 
-        $guardavidas = Guardavida::whereDoesntHave('user', fn ($u) => Guardavida::condicionPlantel($u, ['admin', 'superadmin']))
+        $guardavidas = Guardavida::whereDoesntHave('user', fn ($u) => Guardavida::condicionPlantel($u, $roles->administrativos()))
             ->join('users', 'users.id', '=', 'guardavidas.user_id')
             ->select('guardavidas.*')
             ->when($buscar !== '', fn ($q) => $q->where(function ($w) use ($buscar) {
@@ -416,53 +414,22 @@ class GuardavidaController extends Controller
     /**
      * Update rol de usuario
      */
-    public function updateUserRol(Request $request, User $user)
+    public function updateUserRol(Request $request, User $user, CatalogoRoles $roles)
     {
-        // Valida que venga un rol válido
+        $actor = auth()->user();
+
+        // Solo roles que quien lo hace puede asignar (asignables y de rango igual o menor al suyo). superadmin queda
+        // siempre afuera: se administra a mano por SQL, y syncRoles() reemplaza TODOS los roles, así que tampoco se
+        // puede tocar a quien ya lo tiene (le borraría el rol sin querer).
         $validated = $request->validate([
-            'role' => 'required|string|exists:roles,name',
+            'role' => ['required', 'string', Rule::in($roles->asignablesPara($actor)->pluck('name')->all())],
         ]);
 
-        $nuevoRol = $validated['role'];
-        $usuarioLogueado = auth()->user();
+        abort_unless($actor->puedeGestionarA($user), 403, 'No tenés permisos para modificar el rol de este usuario.');
 
-        // El rol superadmin nunca se toca desde esta pantalla (ni para
-        // asignarlo ni para modificar a quien ya lo tiene) — se administra
-        // siempre a mano por SQL. syncRoles() reemplaza TODOS los roles del
-        // usuario, así que si no bloqueamos esto acá, editar el rol de un
-        // superadmin por esta vía le borraría el tag superadmin sin querer.
-        if ($nuevoRol === 'superadmin' || $user->hasRole('superadmin')) {
-            abort(403, 'El rol superadmin se administra manualmente, no desde esta pantalla.');
-        }
+        $user->syncRoles([$validated['role']]);
 
-        // admin actualiza cualquier rol
-        if ($usuarioLogueado->hasRole('admin')) {
-            // Actualiza rol
-            $user->syncRoles([$nuevoRol]);
-
-            return back()->with('success', 'Rol actualizado correctamente.');
-        }
-
-        // Encargado actualiza guardavida/encargado
-        if ($usuarioLogueado->hasRole('encargado')) {
-
-            // no puede asignar o modificar admin
-            if ($nuevoRol === 'admin' || $user->hasRole('admin')) {
-                abort(403, 'No tenés permisos para asignar o modificar el rol administrador.');
-            }
-
-            // Solo puede actualizar entre roles permitidos
-            if (in_array($nuevoRol, ['guardavida', 'encargado'])) {
-                $user->syncRoles([$nuevoRol]);
-
-                return back()->with('success', 'Rol actualizado correctamente.');
-            }
-
-            abort(403, 'No tenés permisos para asignar este rol.');
-        }
-
-        // por si otro rol quiere modificar
-        abort(403, 'No tenés permisos para asignar este rol.');
+        return back()->with('success', 'Rol actualizado correctamente.');
     }
 
     /**
@@ -559,7 +526,7 @@ class GuardavidaController extends Controller
         $user = Auth::user();
         $esPropietario = $user->guardavida && $user->guardavida->id === $guardavida->id;
 
-        abort_unless($esPropietario || $user->hasAnyRole(['admin', 'superadmin', 'encargado']), 403);
+        abort_unless($esPropietario || $user->can('ver_guardavida'), 403);
 
         $documento = $guardavida->fotoPersonal();
         abort_unless($documento && Storage::disk('local')->exists($documento->ruta), 404);

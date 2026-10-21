@@ -2,17 +2,16 @@
 
 @php
     $playa = Auth::user()->guardavida?->playa?->nombre;
-    $rol = Auth::user()->getRoleNames()->first();
-    $rolPrincipal = RolUsuario::principal(Auth::user());
+    $rolPrincipal = Auth::user()->rolPrincipal();
     $notificacionesFrancoSinLeer = Auth::user()->unreadNotifications->count();
     // $conSidebar = false saca el margen del sidebar (por si algún layout futuro no lo incluye); por defecto, siempre hay sidebar.
     $conSidebar = $conSidebar ?? true;
     // Un postulante solo puede ir a su postulación (ver RedirectPostulante): no se le muestran los enlaces del sistema.
-    $esPostulante = Auth::user()->hasRole('postulante');
-    // El personal fijo (rol `personal`) no tiene franco intercambiable.
-    $esPersonal = Auth::user()->hasRole('personal');
+    $esPostulante = Auth::user()->hasRole(RolUsuario::Postulante->value);
     // Admin y superadmin no tienen ficha de guardavidas: "Mis asistencias" y "Cambios de franco" les darían 403, así que no se muestran.
     $tieneFicha = Auth::user()->guardavida !== null;
+    $verMisAsistencias = $tieneFicha && Auth::user()->can('ver_asistencia_propia');
+    $verCambiosDeFranco = $tieneFicha && Auth::user()->can('solicitar_cambio_franco');
 @endphp
 
 {{-- Barra superior. Escritorio (sm+): modo oscuro + desplegable de usuario a la derecha.
@@ -38,7 +37,7 @@
             <!-- Logo / playa (con sidebar, en escritorio lo muestra el sidebar) -->
             <div class="shrink-0 flex items-center {{ $conSidebar ? 'solo-celular-o-tablet' : '' }}">
                 <a href="{{ route('home') }}" class="flex items-center">
-                    @if ($rol !== 'admin' && $playa)
+                    @if ($playa)
                         <svg xmlns="http://www.w3.org/2000/svg"
                             class="w-7 h-7 animate-bounce md:animate-none text-red-600 dark:text-red-500 mx-2" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor" stroke-width="2">
@@ -90,23 +89,23 @@
                                 {{ __('Mis datos') }}
                             </x-dropdown-link>
                         @else
-                            @unless ($conSidebar)
+                            @if (! $conSidebar && Auth::user()->can('ver_panel_inicio'))
                                 <x-dropdown-link :href="route('home')">
                                     {{ __('Inicio') }}
                                 </x-dropdown-link>
-                            @endunless
+                            @endif
 
                             <x-dropdown-link :href="route('guardavida.myProfile')">
                                 {{ __('Perfil') }}
                             </x-dropdown-link>
 
-                            @if ($tieneFicha)
+                            @if ($verMisAsistencias)
                                 <x-dropdown-link :href="route('guardavida.misAsistencias')">
                                     {{ __('Mis Asistencias') }}
                                 </x-dropdown-link>
                             @endif
 
-                            @if ($tieneFicha && ! $esPersonal)
+                            @if ($verCambiosDeFranco)
                                 <x-dropdown-link :href="route('franco-intercambio.index')">
                                     {{ __('Cambios de Franco') }}
                                     @if ($notificacionesFrancoSinLeer > 0)
@@ -157,9 +156,11 @@
 
         @unless ($esPostulante)
             <div class="py-2 space-y-1">
-                <x-responsive-nav-link :href="route('home')" :active="request()->routeIs('home')">
-                    {{ __('Inicio') }}
-                </x-responsive-nav-link>
+                @can('ver_panel_inicio')
+                    <x-responsive-nav-link :href="route('home')" :active="request()->routeIs('home')">
+                        {{ __('Inicio') }}
+                    </x-responsive-nav-link>
+                @endcan
             </div>
             @canany(['ver_bandera', 'ver_intervencion', 'ver_novedad_material'])
                 <div class="py-2 border-t border-gray-200 dark:border-gray-700">
@@ -268,12 +269,12 @@
                     <x-responsive-nav-link :href="route('guardavida.myProfile')">
                         {{ __('Perfil') }}
                     </x-responsive-nav-link>
-                    @if ($tieneFicha)
+                    @if ($verMisAsistencias)
                         <x-responsive-nav-link :href="route('guardavida.misAsistencias')">
                             {{ __('Mis Asistencias') }}
                         </x-responsive-nav-link>
                     @endif
-                    @if ($tieneFicha && ! $esPersonal)
+                    @if ($verCambiosDeFranco)
                         <x-responsive-nav-link :href="route('franco-intercambio.index')">
                             {{ __('Cambios de Franco') }}
                             @if ($notificacionesFrancoSinLeer > 0)

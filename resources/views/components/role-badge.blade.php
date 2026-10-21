@@ -1,15 +1,15 @@
-@use('App\Enums\RolUsuario')
-
 @props(['rol', 'label' => true, 'size' => 'w-4 h-4'])
 
 @php
-    // Acepta tanto un case de RolUsuario como el string crudo del rol de Spatie.
-    $rol = $rol instanceof RolUsuario ? $rol : (RolUsuario::tryFrom($rol) ?? RolUsuario::Guardavida);
+    // Acepta un Rol (ej. $user->rolPrincipal()) o el nombre del rol; etiqueta, color e ícono salen de la tabla `roles`.
+    $rolModelo = $rol instanceof \App\Models\Rol ? $rol : app(\App\Services\CatalogoRoles::class)->rol((string) $rol);
+    $color = $rolModelo?->colorRol() ?? \App\Enums\ColorRol::Slate;
+    $textoRol = $rolModelo?->nombre_visible ?? ucfirst((string) $rol);
 @endphp
 
-<span {{ $attributes->merge(['class' => "inline-flex items-center gap-1.5 rounded-full {$rol->fondo()} {$rol->color()} " . ($label ? 'px-2 py-0.5' : 'p-1')]) }}
-    title="Rol: {{ $rol->texto() }}">
-    @switch($rol->icono())
+<span {{ $attributes->merge(['class' => "inline-flex items-center gap-1.5 rounded-full {$color->fondo()} {$color->texto()} " . ($label ? 'px-2 py-0.5' : 'p-1')]) }}
+    title="Rol: {{ $textoRol }}">
+    @switch($rolModelo?->icono ?? 'user')
         @case('sparkles')
             <svg xmlns="http://www.w3.org/2000/svg" class="{{ $size }} shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z" />
@@ -44,6 +44,6 @@
     @endswitch
 
     @if ($label)
-        <span class="text-xs font-semibold">{{ $rol->texto() }}</span>
+        <span class="text-xs font-semibold">{{ $textoRol }}</span>
     @endif
 </span>

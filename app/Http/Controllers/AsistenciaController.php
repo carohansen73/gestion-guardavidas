@@ -244,7 +244,8 @@ class AsistenciaController extends Controller
         // Esta pantalla es de gestión (necesita ver_asistencia). Cada uno ve las propias en "Mis asistencias".
         abort_unless(auth()->user()->can('ver_asistencia'), 403);
 
-        $esAdmin = auth()->user()->hasAnyRole(['admin', 'encargado']);
+        // Quien puede editar guardavidas puede además cargar cambios de franco (sección del historial).
+        $esAdmin = auth()->user()->can('editar_guardavida');
 
         // Período: el mes en curso por defecto (igual que la lista), o el mes de las flechas (?mes=YYYY-MM), o
         // fechas a mano (?inicio&fin). Hasta hoy como máximo: los días que vienen no son ni asistencia ni falta.

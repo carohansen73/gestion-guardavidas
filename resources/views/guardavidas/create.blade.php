@@ -77,10 +77,10 @@
                             class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm"
                             required>
                                 <option class="w-auto" value="">Seleccione</option>
-                                <option value="guardavida" {{ old('rol', $rol ?? '' ) == 'guardavida' ? 'selected' : '' }}>Guardavida</option>
-                                <option value="encargado" {{ old('rol', $rol ?? '' ) == 'encargado' ? 'selected' : '' }}>Encargado</option>
-                                <option value="personal" {{ old('rol', $rol ?? '' ) == 'personal' ? 'selected' : '' }}>Personal (solo ficha, sin temporada)</option>
-                                <option value="admin" {{ old('rol', $rol ?? '' ) == 'admin' ? 'selected' : '' }}>Administrador</option>
+                                @foreach ($rolesAsignables as $rolOpcion)
+                                    <option value="{{ $rolOpcion->name }}" data-plantel="{{ $rolOpcion->es_plantel ? 1 : 0 }}"
+                                        {{ old('rol', $rol ?? '') == $rolOpcion->name ? 'selected' : '' }}>{{ $rolOpcion->texto_selector }}</option>
+                                @endforeach
                             </select>
                     </div>
                 </div>
@@ -329,7 +329,8 @@
         const guardavidaFields = document.getElementById('guardavida-fields');
 
         function toggleGuardavidaFields(){
-            const isGuardavida = ['guardavida', 'encargado', 'personal'].includes(rolSelect.value);
+            // Los campos de la ficha se muestran para los roles de plantel (columna es_plantel de la tabla roles).
+            const isGuardavida = rolSelect.selectedOptions[0]?.dataset.plantel === '1';
             guardavidaFields.style.display = isGuardavida ? 'grid' : 'none';
         }
 

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Services\CatalogoRoles;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -72,6 +73,18 @@ class User extends Authenticatable
     public function perfil()
     {
         return $this->hasOne(Perfil::class);
+    }
+
+    /** Rol de mayor rango del usuario (para mostrar su etiqueta, color e ícono). */
+    public function rolPrincipal(): ?Rol
+    {
+        return app(CatalogoRoles::class)->principal($this);
+    }
+
+    /** ¿Puede este usuario modificar a otro (datos, contraseña, rol)? Solo a quien no tenga mayor rango y nunca a un superadmin. */
+    public function puedeGestionarA(User $otro): bool
+    {
+        return app(CatalogoRoles::class)->puedeGestionar($this, $otro);
     }
 
     public function scopeHabilitados($query)

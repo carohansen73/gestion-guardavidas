@@ -3,7 +3,9 @@
 namespace App\Http\Requests;
 
 use App\Models\Guardavida;
+use App\Services\CatalogoRoles;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreGuardavidaRequest extends FormRequest
 {
@@ -22,7 +24,8 @@ class StoreGuardavidaRequest extends FormRequest
      */
     public function rules(): array
     {
-        $esGuardavidaOEncargado = in_array($this->input('rol'), ['guardavida', 'encargado', 'personal']);
+        $roles = app(CatalogoRoles::class);
+        $esGuardavidaOEncargado = $roles->esPlantel((string) $this->input('rol'));
 
         // verifico datos primero para usuario, luego, si es guardavida para guardavidas.
         $rules = [
@@ -40,7 +43,8 @@ class StoreGuardavidaRequest extends FormRequest
                 'unique:users,dni',
             ]),
             'email' => 'required|email|unique:users,email',
-            'rol' => 'required|string|in:guardavida,encargado,personal,admin',
+            // Solo los roles que quien da el alta puede asignar (asignables y de rango igual o menor al suyo).
+            'rol' => ['required', 'string', Rule::in($roles->asignablesPara($this->user())->pluck('name')->all())],
         ];
         if ($esGuardavidaOEncargado) {
             $rules = array_merge($rules, [

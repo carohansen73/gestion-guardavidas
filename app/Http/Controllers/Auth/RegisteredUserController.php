@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\RolUsuario;
 use App\Http\Controllers\Controller;
 use App\Models\Guardavida;
 use App\Models\User;
@@ -59,7 +60,7 @@ class RegisteredUserController extends Controller
             'must_change_psw' => false,
         ]);
 
-        $user->assignRole('postulante');
+        $user->assignRole(RolUsuario::Postulante->value);
 
         event(new Registered($user));
 
@@ -78,7 +79,7 @@ class RegisteredUserController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'lastname' => 'required|string|max:255',
-            'email' => ['required','email','max:255', Rule::unique('users')->ignore($user->id)],
+            'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'current_password' => ['required_with:password', 'current_password'],
             'password' => ['nullable', 'confirmed', 'min:8'],
         ]);
@@ -87,7 +88,7 @@ class RegisteredUserController extends Controller
         if ($validated['password']) {
             $validated['password'] = Hash::make($validated['password']);
         } else {
-            //elimina password
+            // elimina password
             unset($validated['password']);
         }
 
@@ -108,28 +109,28 @@ class RegisteredUserController extends Controller
     /***
      * Perfil de usuario actualizado por el admin
      */
-    public function updateUserByAdmin(Request $request, User $user){
+    public function updateUserByAdmin(Request $request, User $user)
+    {
 
-        //solo un admin puede editar a otro admin
-        if (Auth::user()->hasRole('admin') === false && $user->hasRole('admin')) {
-            abort(403, "No tiene permisos para editar un usuario administrador.");
-        }
+        // Solo se puede editar a quien no tiene un rol de mayor rango que el propio (un encargado no edita a un
+        // administrador) y a un superadmin nunca desde acá.
+        abort_unless(Auth::user()->puedeGestionarA($user), 403, 'No tenés permisos para editar a este usuario.');
 
-        //valido los campos
+        // valido los campos
         $validated = $request->validate([
             'nombre' => ['required', 'string', 'max:255'],
             'apellido' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255',
-                Rule::unique('users', 'email')->ignore($user->id),],
+                Rule::unique('users', 'email')->ignore($user->id), ],
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        //actualiza Usuario
+        // actualiza Usuario
         $user->name = $validated['nombre'];
         $user->lastname = $validated['apellido'];
         $user->email = $validated['email'];
 
-        if(!empty($validated['password'])){
+        if (! empty($validated['password'])) {
             $user->password = Hash::make($validated['password']);
         }
 

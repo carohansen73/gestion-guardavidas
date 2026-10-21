@@ -28,7 +28,7 @@
 
                     <div class="flex items-center gap-2 min-w-0">
                         <h3 class="truncate text-base font-semibold text-gray-900 dark:text-white">{{ $nombreCompleto }}</h3>
-                        <x-role-badge :rol="\App\Enums\RolUsuario::principal($registro->user)" :label="false" size="w-3.5 h-3.5" class="shrink-0" />
+                        <x-role-badge :rol="$registro->user->rolPrincipal()" :label="false" size="w-3.5 h-3.5" class="shrink-0" />
                     </div>
                     <p class="text-sm text-gray-600 dark:text-gray-200">
                         {{ str_replace('_', ' ', $registro->funcion) }}@if ($registro->turno) - T.{{ $registro->turno }}@endif

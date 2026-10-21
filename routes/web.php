@@ -76,7 +76,7 @@ Route::middleware(['auth', 'force.password', 'postulante.redirect'])->group(func
     Route::patch('/mi-dia-franco', [GuardavidaController::class, 'actualizarDiaFranco'])->name('guardavida.actualizarDiaFranco');
 
     Route::get('/home', [HomeController::class, 'index'])->name('home');
-    Route::get('/dashboard', [HomeController::class, 'dashboard'])->name('dashboard');
+    Route::get('/dashboard', [HomeController::class, 'dashboard'])->name('dashboard')->middleware('can:ver_panel_inicio');
 
     // Datos para los gráficos del dashboard (dashboard-charts.js). Antes
     // vivía en routes/api.php sin ningún middleware de autenticación —
@@ -85,9 +85,9 @@ Route::middleware(['auth', 'force.password', 'postulante.redirect'])->group(func
     // como el resto de las rutas de api.php (pensadas para el token
     // Sanctum del flujo QR offline). Por eso va acá, autenticado por
     // sesión igual que la propia página del dashboard.
-    Route::get('/api/dashboard', [HomeController::class, 'getData']);
+    Route::get('/api/dashboard', [HomeController::class, 'getData'])->middleware('can:ver_panel_inicio');
 
-    Route::get('/activeCamera', [QrController::class, 'activeCamera'])->name('activeCamera');
+    Route::get('/activeCamera', [QrController::class, 'activeCamera'])->name('activeCamera')->middleware('can:ver_asistencia_propia');
 
     // Escritura (crear/editar/borrar) bloqueada para guardavida/encargado
     // fuera de una temporada con ventana operativa activa — ver
@@ -100,14 +100,16 @@ Route::middleware(['auth', 'force.password', 'postulante.redirect'])->group(func
     Route::resource('novedad-de-material', App\Http\Controllers\NovedadMaterialController::class)
         ->middlewareFor(['store', 'update', 'destroy'], 'temporada.activa');
 
-    // Gestión de guardavidas: el rol `personal` (solo ficha) no entra (ver EnsureNoPersonal).
-    Route::middleware('no.personal')->group(function () {
-        Route::post('guardavida/{guardavida}/baja', [GuardavidaController::class, 'baja'])->name('guardavida.baja');
-        Route::post('guardavida/{guardavida}/reincorporar', [GuardavidaController::class, 'reincorporar'])->name('guardavida.reincorporar');
-        Route::get('guardavidas-dados-de-baja', [GuardavidaController::class, 'bajas'])->name('guardavidas.bajas');
-        Route::resource('guardavida', App\Http\Controllers\GuardavidaController::class);
-        Route::get('/get-all-guardavidas', [GuardavidaController::class, 'getAll']);
-    });
+    // Gestión de guardavidas: cada acción pide su permiso.
+    Route::post('guardavida/{guardavida}/baja', [GuardavidaController::class, 'baja'])->name('guardavida.baja')->middleware('can:eliminar_guardavida');
+    Route::post('guardavida/{guardavida}/reincorporar', [GuardavidaController::class, 'reincorporar'])->name('guardavida.reincorporar')->middleware('can:agregar_guardavida');
+    Route::get('guardavidas-dados-de-baja', [GuardavidaController::class, 'bajas'])->name('guardavidas.bajas')->middleware('can:ver_guardavida');
+    Route::resource('guardavida', App\Http\Controllers\GuardavidaController::class)
+        ->middlewareFor(['index', 'show'], 'can:ver_guardavida')
+        ->middlewareFor(['create', 'store'], 'can:agregar_guardavida')
+        ->middlewareFor(['edit', 'update'], 'can:editar_guardavida')
+        ->middlewareFor('destroy', 'can:eliminar_guardavida');
+    Route::get('/get-all-guardavidas', [GuardavidaController::class, 'getAll'])->middleware('can:ver_guardavida');
 
     // Constancia médica de una licencia: la sirve la app (login + permiso), no una URL pública de storage.
     Route::get('licencia/{licencia}/constancia', [App\Http\Controllers\LicenciaController::class, 'constancia'])->name('licencia.constancia');
@@ -137,8 +139,8 @@ Route::middleware(['auth', 'force.password', 'postulante.redirect'])->group(func
 
     // pasar a moddleware admin
     // Route::middleware(['auth', 'can:admin'])
-    Route::put('/update-user/{user}', [RegisteredUserController::class, 'updateUserByAdmin'])->name('user.update');
-    Route::put('/update-rol/{user}', [GuardavidaController::class, 'updateUserRol'])->name('rol.update');
+    Route::put('/update-user/{user}', [RegisteredUserController::class, 'updateUserByAdmin'])->name('user.update')->middleware('can:editar_guardavida');
+    Route::put('/update-rol/{user}', [GuardavidaController::class, 'updateUserRol'])->name('rol.update')->middleware('can:editar_guardavida');
 
     //  NUEVAS RUTAS PARA PERFILES (dentro del middleware)
     Route::get('/profile', [GuardavidaController::class, 'myProfile'])->name('guardavida.myProfile');
@@ -157,28 +159,30 @@ Route::middleware(['auth', 'force.password', 'postulante.redirect'])->group(func
     Route::get('/puestos-por-playa/{id}', [GuardavidaController::class, 'obtenerPuestos']);
 
     // Listado general (admin)
-    Route::get('asistencias', [AsistenciaController::class, 'index'])->name('asistencias.index');
+    Route::get('asistencias', [AsistenciaController::class, 'index'])->name('asistencias.index')->middleware('can:ver_asistencia');
 
     // Historial individual por guardavida
-    Route::get('asistencias/{id}', [AsistenciaController::class, 'asistenciasPorGuardavida'])->name('asistencias.guardavida');
+    Route::get('asistencias/{id}', [AsistenciaController::class, 'asistenciasPorGuardavida'])->name('asistencias.guardavida')->middleware('can:ver_asistencia');
 
     // Cambios puntuales de franco cargados directo por encargado/admin (caso
     // excepcional/corrección) — el día franco fijo lo configura el propio
     // guardavida desde su perfil (guardavida.updateProfile).
-    Route::post('guardavida/{guardavida}/franco-excepcion', [FrancoExcepcionController::class, 'store'])->name('franco-excepcion.store');
-    Route::delete('franco-excepcion/{francoExcepcion}', [FrancoExcepcionController::class, 'destroy'])->name('franco-excepcion.destroy');
+    Route::post('guardavida/{guardavida}/franco-excepcion', [FrancoExcepcionController::class, 'store'])->name('franco-excepcion.store')->middleware('can:editar_guardavida');
+    Route::delete('franco-excepcion/{francoExcepcion}', [FrancoExcepcionController::class, 'destroy'])->name('franco-excepcion.destroy')->middleware('can:editar_guardavida');
 
     // Intercambio de franco entre guardavidas (self-service, requiere que el
     // compañero acepte). Es puntual: no modifica el esquema de franco fijo de nadie.
-    Route::get('/mis-cambios-de-franco', [FrancoIntercambioController::class, 'index'])->name('franco-intercambio.index');
-    Route::post('/franco-intercambio', [FrancoIntercambioController::class, 'store'])->name('franco-intercambio.store');
-    Route::post('/franco-intercambio/{francoIntercambio}/aceptar', [FrancoIntercambioController::class, 'aceptar'])->name('franco-intercambio.aceptar');
-    Route::post('/franco-intercambio/{francoIntercambio}/rechazar', [FrancoIntercambioController::class, 'rechazar'])->name('franco-intercambio.rechazar');
-    Route::delete('/franco-intercambio/{francoIntercambio}', [FrancoIntercambioController::class, 'cancelar'])->name('franco-intercambio.cancelar');
+    Route::middleware('can:solicitar_cambio_franco')->group(function () {
+        Route::get('/mis-cambios-de-franco', [FrancoIntercambioController::class, 'index'])->name('franco-intercambio.index');
+        Route::post('/franco-intercambio', [FrancoIntercambioController::class, 'store'])->name('franco-intercambio.store');
+        Route::post('/franco-intercambio/{francoIntercambio}/aceptar', [FrancoIntercambioController::class, 'aceptar'])->name('franco-intercambio.aceptar');
+        Route::post('/franco-intercambio/{francoIntercambio}/rechazar', [FrancoIntercambioController::class, 'rechazar'])->name('franco-intercambio.rechazar');
+        Route::delete('/franco-intercambio/{francoIntercambio}', [FrancoIntercambioController::class, 'cancelar'])->name('franco-intercambio.cancelar');
+    });
 
     // para la seccion de "mis asistencias" cerca de "ver perfil"
     Route::get('/mis-asistencias', [AsistenciaController::class, 'misAsistencias'])
-        ->name('guardavida.misAsistencias');
+        ->name('guardavida.misAsistencias')->middleware('can:ver_asistencia_propia');
 
     // Guía de ayuda para administradores (temporada, postulaciones, selección).
     // Reutiliza ver_postulacion: lo tienen admin/superadmin, no guardavida ni encargado.
@@ -192,6 +196,7 @@ Route::middleware(['auth', 'force.password', 'postulante.redirect'])->group(func
     Route::middleware('can:abm_roles_y_permisos')->group(function () {
         Route::get('/permisos', [PermissionController::class, 'index'])->name('permisos.index');
         Route::put('/permisos', [PermissionController::class, 'update'])->name('permisos.update');
+        Route::post('/permisos/roles', [PermissionController::class, 'storeRol'])->name('permisos.roles.store');
     });
 });
 

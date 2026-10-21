@@ -19,7 +19,6 @@ class Guardavida extends Model
      * fijos que usan el sistema solo para fichar (p. ej. el aeródromo): no se postulan ni pasan por
      * la selección de temporada.
      */
-    public const ROLES_PLANTEL = ['guardavida', 'encargado', 'personal'];
 
     /** Datos personales que viven en `perfiles` (ver más abajo). */
     public const DATOS_PERSONALES = ['telefono', 'direccion', 'numero', 'piso_dpto'];
@@ -299,15 +298,22 @@ class Guardavida extends Model
     // ******************** Plantel activo (por rol) ******************************
 
     /**
-     * Quién está hoy en el plantel, para aplicar sobre una consulta de `users`: guardavida/encargado por
-     * rol (más `$extraRoles`, p. ej. admin cuando se arma "los que no están fuera") y `personal` mientras
-     * su usuario siga habilitado. La baja del personal no le cambia el rol: lo deshabilita.
+     * Quién está hoy en el plantel, para aplicar sobre una consulta de `users`: los roles de plantel con
+     * temporada (guardavida, encargado…) por rol (más `$extraRoles`, p. ej. los administrativos cuando se arma
+     * "los que no están fuera") y los de plantel fijo (personal) mientras su usuario siga habilitado. La baja
+     * del personal fijo no le cambia el rol: lo deshabilita. Qué rol es cuál sale de la tabla `roles`.
      */
     public static function condicionPlantel($usuarios, array $extraRoles = [])
     {
-        return $usuarios->where(function ($w) use ($extraRoles) {
-            $w->role(array_merge(['guardavida', 'encargado'], $extraRoles))
-                ->orWhere(fn ($p) => $p->role('personal')->where('users.enabled', true));
+        $catalogo = app(\App\Services\CatalogoRoles::class);
+        $conTemporada = array_merge($catalogo->plantelConTemporada(), $extraRoles);
+        $sinTemporada = $catalogo->plantelSinTemporada();
+
+        return $usuarios->where(function ($w) use ($conTemporada, $sinTemporada) {
+            $w->role($conTemporada);
+            if ($sinTemporada !== []) {
+                $w->orWhere(fn ($p) => $p->role($sinTemporada)->where('users.enabled', true));
+            }
         });
     }
 
@@ -316,7 +322,7 @@ class Guardavida extends Model
     {
         $user = $this->user;
 
-        return (bool) ($user && ($user->hasAnyRole(['guardavida', 'encargado']) || ($user->hasRole('personal') && $user->enabled)));
+        return (bool) ($user && app(\App\Services\CatalogoRoles::class)->userEstaEnPlantel($user));
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Enums\RolUsuario;
 use App\Models\Bandera;
 use App\Models\Intervencion;
 use App\Models\NovedadMaterial;
@@ -9,10 +10,9 @@ use App\Models\User;
 use App\Observers\BanderaObserver;
 use App\Observers\IntervencionObserver;
 use App\Observers\NovedadMaterialObserver;
-use Illuminate\Support\ServiceProvider;
+use App\Services\CatalogoRoles;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Route;
-
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,7 +21,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Qué significa cada rol (tabla `roles`): se lee una vez por request y se recarga solo en el siguiente.
+        $this->app->scoped(CatalogoRoles::class);
     }
 
     /**
@@ -39,7 +40,7 @@ class AppServiceProvider extends ServiceProvider
         // Devolver null (no false) para todos los demás roles es clave: así se
         // deja que Spatie y las Policies sigan resolviendo el resto normalmente.
         Gate::before(function (User $user, string $ability) {
-            return $user->hasRole('superadmin') ? true : null;
+            return $user->hasRole(RolUsuario::Superadmin->value) ? true : null;
         });
     }
 }

@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\RolUsuario;
 use App\Models\Perfil;
 use App\Models\Playa;
 use App\Models\Postulacion;
 use App\Models\PostulacionDocumento;
 use App\Models\Temporada;
+use App\Services\CatalogoRoles;
 use App\Services\GuardadoPostulacion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -272,7 +274,7 @@ class PostulacionController extends Controller
     /** El postulante, o un guardavida/encargado que vuelve a inscribirse el año siguiente. */
     private function autorizarPostulante(): void
     {
-        abort_unless(Auth::user()->hasAnyRole(['postulante', 'guardavida', 'encargado']), 403);
+        abort_unless(Auth::user()->hasAnyRole([RolUsuario::Postulante->value, ...app(CatalogoRoles::class)->plantelConTemporada()]), 403);
     }
 
     /** Usado también por el controlador de admin. */

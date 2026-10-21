@@ -2,12 +2,26 @@
 
 namespace Database\Seeders;
 
+use App\Models\Rol;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 
 class RolesYPermisosSeeder extends Seeder
 {
+    /**
+     * Cómo es cada rol para el sistema (ver la migración add_metadatos_a_roles para el significado de cada columna).
+     * Un rol nuevo se crea desde la app, no hace falta agregarlo acá: esto es el punto de partida de una base nueva.
+     */
+    private const ROLES = [
+        'superadmin' => ['etiqueta' => 'Superadmin', 'descripcion' => null, 'color' => 'fuchsia', 'icono' => 'sparkles', 'es_plantel' => false, 'usa_temporada' => true, 'asignable' => false, 'intocable' => true, 'rango' => 100],
+        'admin' => ['etiqueta' => 'Administrador', 'descripcion' => null, 'color' => 'sky', 'icono' => 'shield-check', 'es_plantel' => false, 'usa_temporada' => true, 'asignable' => true, 'intocable' => true, 'rango' => 80],
+        'rrhh' => ['etiqueta' => 'RRHH', 'descripcion' => 'solo consulta', 'color' => 'teal', 'icono' => 'user', 'es_plantel' => false, 'usa_temporada' => true, 'asignable' => true, 'intocable' => true, 'rango' => 60],
+        'encargado' => ['etiqueta' => 'Encargado', 'descripcion' => null, 'color' => 'amber', 'icono' => 'star', 'es_plantel' => true, 'usa_temporada' => true, 'asignable' => true, 'intocable' => false, 'rango' => 40],
+        'guardavida' => ['etiqueta' => 'Guardavida', 'descripcion' => null, 'color' => 'emerald', 'icono' => 'lifebuoy', 'es_plantel' => true, 'usa_temporada' => true, 'asignable' => true, 'intocable' => false, 'rango' => 20],
+        'personal' => ['etiqueta' => 'Personal', 'descripcion' => 'solo ficha, sin temporada', 'color' => 'violet', 'icono' => 'user', 'es_plantel' => true, 'usa_temporada' => false, 'asignable' => true, 'intocable' => true, 'rango' => 50],
+        'postulante' => ['etiqueta' => 'Postulante', 'descripcion' => null, 'color' => 'slate', 'icono' => 'user', 'es_plantel' => false, 'usa_temporada' => true, 'asignable' => false, 'intocable' => false, 'rango' => 10],
+    ];
+
     /**
      * Run the database seeds.
      */
@@ -16,24 +30,28 @@ class RolesYPermisosSeeder extends Seeder
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
         // --- Roles ---
-        $guardavida = Role::firstOrCreate(['name' => 'guardavida']);
-        $encargado = Role::firstOrCreate(['name' => 'encargado']);
+        $guardavida = $this->rol('guardavida');
+        $encargado = $this->rol('encargado');
         // Empleados fijos que solo usan el sistema para fichar (p. ej. aeródromo): sin postulación ni temporada.
-        $personal = Role::firstOrCreate(['name' => 'personal']);
-        $admin = Role::firstOrCreate(['name' => 'admin']);
+        $personal = $this->rol('personal');
+        // RRHH: solo consulta (asistencias, listado y ficha de guardavidas, con sus Excel). No crea ni modifica nada:
+        // todo lo demás le queda cerrado porque cada ruta pide su permiso.
+        $rrhh = $this->rol('rrhh');
+        $admin = $this->rol('admin');
         // superadmin: rol adicional (no reemplaza a admin). Un usuario superadmin
         // tiene AMBOS roles asignados (admin + superadmin), así que todo chequeo
         // hasRole('admin')/hasAnyRole([...,'admin']) que ya existe en el código
         // sigue funcionando sin tocarlo. Lo único exclusivo de superadmin es el
         // permiso abm_roles_y_permisos (ver más abajo), que gatea la pantalla de
         // administración de permisos.
-        $superadmin = Role::firstOrCreate(['name' => 'superadmin']);
+        $superadmin = $this->rol('superadmin');
         // postulante: sin ningún permiso asignado a propósito — queda
         // bloqueado de todo el sistema existente por el propio sistema de
         // permisos, sin necesidad de chequeos ad-hoc en cada pantalla. Solo
         // puede acceder a lo que esté explícitamente fuera del sistema de
         // permisos (su propia postulación), vía RedirectPostulante.
-        Role::firstOrCreate(['name' => 'postulante']);
+        // Su único permiso es tener Home (sus fechas de inscripción y su postulación): el resto sigue cerrado.
+        $postulante = $this->rol('postulante');
 
         // --- Permisos ---
         Permission::create(['name' => 'agregar_bandera']);
@@ -73,6 +91,13 @@ class RolesYPermisosSeeder extends Seeder
 
         Permission::create(['name' => 'ver_asistencia_propia']);
 
+        // ver_panel_inicio: entrar al panel de inicio (home/dashboard); sin él, el home redirige a su primera sección.
+        // solicitar_cambio_franco: pedir/aceptar intercambios de franco con compañeros (autoservicio).
+        Permission::create(['name' => 'ver_panel_inicio']);
+        // gestionar_temporada_cerrada: editar o borrar registros de temporadas pasadas y cargarlos fuera de la temporada en curso.
+        Permission::create(['name' => 'gestionar_temporada_cerrada']);
+        Permission::create(['name' => 'solicitar_cambio_franco']);
+
         Permission::create(['name' => 'agregar_temporada']);
         Permission::create(['name' => 'editar_temporada']);
         Permission::create(['name' => 'eliminar_temporada']);
@@ -101,9 +126,15 @@ class RolesYPermisosSeeder extends Seeder
             'eliminar_bandera',
             'ver_bandera',
             'ver_asistencia_propia',
+            'ver_panel_inicio',
+            'solicitar_cambio_franco',
         ]);
 
-        $personal->givePermissionTo(['ver_asistencia_propia']);
+        $personal->givePermissionTo(['ver_asistencia_propia', 'ver_panel_inicio']);
+
+        $rrhh->givePermissionTo(['ver_guardavida', 'ver_asistencia']);
+
+        $postulante->givePermissionTo(['ver_panel_inicio']);
 
         $encargado->givePermissionTo([
             'agregar_bandera',
@@ -111,7 +142,6 @@ class RolesYPermisosSeeder extends Seeder
             'eliminar_bandera',
             'ver_bandera',
 
-            'agregar_guardavida',
             'editar_guardavida',
             'eliminar_guardavida',
             'ver_guardavida',
@@ -138,6 +168,8 @@ class RolesYPermisosSeeder extends Seeder
 
             'ver_asistencia',
             'ver_asistencia_propia',
+            'ver_panel_inicio',
+            'solicitar_cambio_franco',
         ]);
 
         // admin tiene todos los permisos MENOS abm_roles_y_permisos: la gestión
@@ -147,5 +179,10 @@ class RolesYPermisosSeeder extends Seeder
         );
 
         $superadmin->givePermissionTo(Permission::all());
+    }
+
+    private function rol(string $nombre): Rol
+    {
+        return Rol::updateOrCreate(['name' => $nombre, 'guard_name' => 'web'], self::ROLES[$nombre]);
     }
 }

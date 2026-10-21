@@ -74,7 +74,7 @@
     </div>
 
     {{-- Barra inferior del celular: sus atajos (perfil, home, QR) no aplican a un postulante, que solo tiene su inscripción. --}}
-    @unless (auth()->user()->hasRole('postulante'))
+    @unless (auth()->user()->hasRole(\App\Enums\RolUsuario::Postulante->value))
         @include('layouts.bottom-navigation')
     @endunless
 

@@ -15,10 +15,9 @@
                     class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm"
                     required>
                         <option class="w-auto" value="">Seleccione</option>
-                        <option value="guardavida" {{ old('rol', $rol ) == 'guardavida' ? 'selected' : '' }}>Guardavida</option>
-                        <option value="encargado" {{ old('rol', $rol ) == 'encargado' ? 'selected' : '' }}>Encargado</option>
-                        <option value="personal" {{ old('rol', $rol ) == 'personal' ? 'selected' : '' }}>Personal (solo ficha, sin temporada)</option>
-                        <option value="admin" {{ old('rol', $rol ) == 'admin' ? 'selected' : '' }}>Administrador</option>
+                        @foreach ($rolesAsignables as $rolOpcion)
+                            <option value="{{ $rolOpcion->name }}" {{ old('rol', $rol) == $rolOpcion->name ? 'selected' : '' }}>{{ $rolOpcion->texto_selector }}</option>
+                        @endforeach
                     </select>
                 </div>
             </div>
@@ -33,8 +32,9 @@
 </x-form-tarjeta>
 
 @php
-    $enPlantel = $guardavida->estaEnPlantel() && ! $guardavida->user?->hasAnyRole(['admin', 'superadmin']);
-    $esPersonal = $guardavida->user?->hasRole('personal');
+    $catalogoRoles = app(\App\Services\CatalogoRoles::class);
+    $enPlantel = $guardavida->estaEnPlantel() && ! ($guardavida->user && $catalogoRoles->userEsAdministrativo($guardavida->user));
+    $esPersonal = $guardavida->user && $catalogoRoles->userEsPlantelSinTemporada($guardavida->user);
     $periodos = $guardavida->periodos()->with('temporada')->get();
 @endphp
 

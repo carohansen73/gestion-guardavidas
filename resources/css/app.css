@@ -38,4 +38,20 @@
         --tw-ring-color: theme('colors.sky.400 / 30%');
         border-color: theme('colors.sky.400');
     }
+
+    /*
+     * Placeholders: el plugin de formularios los pinta en gray-500, casi igual al
+     * texto escrito, y un campo vacío parece completo. Un gris más claro (y sin
+     * la transparencia que le pone cada navegador) los distingue de un valor real.
+     */
+    input::placeholder,
+    textarea::placeholder {
+        color: theme('colors.gray.400');
+        opacity: 1;
+    }
+
+    :where(.dark) input::placeholder,
+    :where(.dark) textarea::placeholder {
+        color: theme('colors.gray.500');
+    }
 }

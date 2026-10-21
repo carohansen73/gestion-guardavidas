@@ -32,7 +32,7 @@
             <div class="flex flex-col items-center md:items-start mt-3 md:mt-0 md:w-3/4 md:pl-4">
 
                 <div class="flex flex-wrap items-center justify-center gap-2 md:justify-start">
-                    <x-role-badge :rol="\App\Enums\RolUsuario::principal($perfilUser)" size="w-3.5 h-3.5" />
+                    <x-role-badge :rol="$perfilUser->rolPrincipal()" size="w-3.5 h-3.5" />
 
                     <span class="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-semibold text-white {{ $perfilUser->enabled ? 'bg-sky-400 dark:bg-sky-500' : 'bg-red-500 dark:bg-red-600' }}">
                         <i class="fas {{ $perfilUser->enabled ? 'fa-check-circle' : 'fa-times-circle' }}"></i>
@@ -263,7 +263,7 @@
                             <i class="fas fa-user me-1 text-sky-600"></i> Rol
                         </label>
                         <div class="mt-1">
-                            <x-role-badge :rol="\App\Enums\RolUsuario::principal($perfilUser)" size="w-3.5 h-3.5" />
+                            <x-role-badge :rol="$perfilUser->rolPrincipal()" size="w-3.5 h-3.5" />
                         </div>
                     </div>
                 </aside>

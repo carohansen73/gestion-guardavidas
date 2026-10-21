@@ -38,7 +38,7 @@
                         <td class="px-4 py-2 {{ $color }}">{{ str_replace('_', ' ', $registro->funcion) }}</td>
 
                         <td class="px-4 py-2">
-                            <x-role-badge :rol="\App\Enums\RolUsuario::principal($registro->user)" :label="false" />
+                            <x-role-badge :rol="$registro->user->rolPrincipal()" :label="false" />
                         </td>
                         <td class="px-4 py-2">{{ $registro->playa->nombre ?? '-' }} - {{ $registro->puesto->nombre ?? '-' }}</td>
                         <td class="px-4 py-2">

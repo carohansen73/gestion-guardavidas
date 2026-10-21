@@ -25,7 +25,7 @@ class EnsureTemporadaActiva
     {
         $user = Auth::user();
 
-        if ($user && ($user->hasRole('admin') || $user->hasRole('superadmin'))) {
+        if ($user && $user->can('gestionar_temporada_cerrada')) {
             return $next($request);
         }
 

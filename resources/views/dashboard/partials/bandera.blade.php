@@ -3,7 +3,6 @@
 
 @auth
     @php
-        $rol = Auth::user()->getRoleNames()->first();
         $playaModel = Auth::user()->guardavida->playa ?? null;
         $playaUsuario = $playaModel->nombre ?? null;
     @endphp
@@ -11,7 +10,7 @@
 
 
 {{-- Guardavidas/encargado ve bandera en su playa --}}
-@if($rol !== 'admin' && $playaUsuario)
+@if($playaUsuario)
 
     @include('components.card-bandera', ['bandera' => $bandera, 'playa' => $playaModel])
 

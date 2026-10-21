@@ -45,7 +45,7 @@
                 <!-- Info -->
                 <div class="flex flex-col items-center md:items-start mt-3 md:mt-0 md:w-3/4 md:pl-4 md:text-left">
 
-                    <x-role-badge :rol="\App\Enums\RolUsuario::principal($perfilUser)" size="w-3.5 h-3.5" />
+                    <x-role-badge :rol="$perfilUser->rolPrincipal()" size="w-3.5 h-3.5" />
 
                     <h2 class="profile-name text-white text-xl font-semibold mt-2">
                         @if ($guardavida)

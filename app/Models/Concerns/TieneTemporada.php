@@ -53,7 +53,7 @@ trait TieneTemporada
      */
     public function modificablePor(?\App\Models\User $usuario): bool
     {
-        if ($usuario?->hasAnyRole(['admin', 'superadmin'])) {
+        if ($usuario?->can('gestionar_temporada_cerrada')) {
             return true;
         }
 
