@@ -12,10 +12,10 @@
 
         // Un estado = un color (punto del calendario y etiqueta). Clases completas para que Tailwind las encuentre.
         $meta = [
-            'ASISTIÓ' => ['texto' => 'Asistió', 'punto' => 'bg-emerald-500', 'chip' => 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300'],
-            'FALTA' => ['texto' => 'Falta', 'punto' => 'bg-red-500', 'chip' => 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'],
-            'FRANCO' => ['texto' => 'Franco', 'punto' => 'bg-sky-400', 'chip' => 'bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300'],
-            'LICENCIA' => ['texto' => 'Licencia', 'punto' => 'bg-violet-500', 'chip' => 'bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300'],
+            'ASISTIÓ' => ['texto' => 'Asistió', 'punto' => 'bg-emerald-500', 'chip' => 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300', 'tile' => 'bg-emerald-100 dark:bg-emerald-900/40', 'num' => 'text-emerald-700 dark:text-emerald-300'],
+            'FALTA' => ['texto' => 'Falta', 'punto' => 'bg-red-500', 'chip' => 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300', 'tile' => 'bg-red-100 dark:bg-red-900/40', 'num' => 'text-red-700 dark:text-red-300'],
+            'FRANCO' => ['texto' => 'Franco', 'punto' => 'bg-sky-400', 'chip' => 'bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300', 'tile' => 'bg-sky-100 dark:bg-sky-900/40', 'num' => 'text-sky-700 dark:text-sky-300'],
+            'LICENCIA' => ['texto' => 'Licencia', 'punto' => 'bg-violet-500', 'chip' => 'bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300', 'tile' => 'bg-violet-100 dark:bg-violet-900/40', 'num' => 'text-violet-700 dark:text-violet-300'],
         ];
 
         $hora = fn ($valor) => $valor ? \Carbon\Carbon::parse($valor)->format('H:i') : null;
@@ -60,11 +60,18 @@
         $periodo = $inicio->format('d/m').' – '.$fin->format('d/m/Y');
         $r = $resumen;
         $pct = $r['porcentaje'] ?? null;
-        $colorPct = match (true) {
+        // El porcentaje cambia de color según qué tan bien viene (mismos cortes que en la lista).
+        $pctColor = match (true) {
             $pct === null => 'text-gray-400 dark:text-gray-500',
             $pct >= 90 => 'text-emerald-600 dark:text-emerald-400',
             $pct >= 75 => 'text-amber-600 dark:text-amber-400',
             default => 'text-red-600 dark:text-red-400',
+        };
+        $pctBarra = match (true) {
+            $pct === null => 'bg-gray-400',
+            $pct >= 90 => 'bg-emerald-500',
+            $pct >= 75 => 'bg-amber-500',
+            default => 'bg-red-500',
         };
         $rutaMes = fn ($mes) => route('asistencias.guardavida', [$guardavida->id, 'mes' => $mes]);
     @endphp
@@ -74,12 +81,14 @@
             abrir(f) { this.dia = this.detalles[f] ?? null; } }"
         @keydown.escape.window="dia = null; francoModal = false">
 
+        {{-- Volver (igual que en la ficha del guardavidas): conserva los filtros del listado --}}
+        <button type="button" class="mb-3 inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-sky-100 sm:mt-4" onclick="window.history.back()">
+            <i class="fas fa-arrow-left"></i>
+            <span class="hover:underline">Volver</span>
+        </button>
+
         {{-- Encabezado --}}
-        <div class="mb-4 flex items-start gap-3 sm:mt-4">
-            <a href="{{ route('asistencias.index') }}" aria-label="Volver al listado"
-                class="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-600 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>
-            </a>
+        <div class="mb-4 flex items-start gap-3">
             <div class="min-w-0 flex-1">
                 <h2 class="truncate text-2xl font-bold tracking-tight text-gray-700 dark:text-white md:text-3xl">{{ $nombre }}</h2>
                 <p class="truncate text-sm text-gray-500 dark:text-gray-300">
@@ -105,14 +114,14 @@
         @endif
 
         @if ($avisoPlantel)
-            <div class="mb-4 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-700 dark:bg-amber-900/30 dark:text-amber-200">
+            <div class="mb-4 rounded-2xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-700 dark:bg-amber-900/30 dark:text-amber-200">
                 <i class="fas fa-circle-info me-1" aria-hidden="true"></i> {{ $avisoPlantel }}
             </div>
         @endif
 
         {{-- Mes (flechas) + período a mano --}}
         <div class="mb-4 max-w-md space-y-2">
-            <div class="flex items-center rounded-md border border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700">
+            <div class="flex items-center overflow-hidden rounded-2xl border border-gray-300 bg-white shadow-sm dark:border-gray-600 dark:bg-gray-700">
                 @if ($mesNav)
                     <a href="{{ $rutaMes($mesNav['anterior']) }}" aria-label="Mes anterior"
                         class="flex h-10 w-10 shrink-0 items-center justify-center text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600">
@@ -164,39 +173,81 @@
 
         {{-- Resumen del período (el mismo cálculo que la lista de asistencias) --}}
         @if ($r)
-            <div class="mb-4 grid grid-cols-3 gap-2 lg:grid-cols-6 lg:gap-3">
-                <div class="rounded-xl border border-gray-200 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                    <p class="text-2xl font-bold leading-none {{ $colorPct }}">{{ $pct !== null ? $pct.'%' : '-' }}</p>
-                    <p class="mt-1 text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Asistencia</p>
+
+            <section class="glass mb-4 rounded-3xl bg-white px-5 py-6 text-gray-600 dark:text-gray-300">
+                <h2 class="text-lg text-gray-700 dark:text-gray-50">
+                    <i class="fas fa-chart-line text-sky-600"></i>
+                    Resumen
+                </h2>
+                <p class="text-sm text-gray-600 dark:text-gray-300">{{ $periodo }}</p>
+
+                <div class="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+                    <div class="rounded-2xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
+                        <div class="flex items-center justify-between gap-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                            Asistencia
+                            <i class="fas fa-percent text-sky-600 dark:text-sky-400" aria-hidden="true"></i>
+                        </div>
+                        <div class="mt-2 text-3xl font-bold {{ $pctColor }}">{{ $pct !== null ? $pct.'%' : '-' }}</div>
+                        <div class="mt-1 h-1.5 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-600">
+                            <div class="h-1.5 rounded-full {{ $pctBarra }}" style="width: {{ (int) min(max($pct ?? 0, 0), 100) }}%"></div>
+                        </div>
+                        <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                            {{ $pct !== null ? $r['asistencias'].' de '.$r['dias_habiles'].' días hábiles' : 'Sin días hábiles' }}
+                        </div>
+                    </div>
+                    <div class="rounded-2xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
+                        <div class="flex items-center justify-between gap-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                            Asistió
+                            <i class="fas fa-check text-emerald-600 dark:text-emerald-400" aria-hidden="true"></i>
+                        </div>
+                        <div class="mt-2 text-3xl font-bold text-gray-800 dark:text-white">{{ $r['asistencias'] }}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">Días con fichaje</div>
+                    </div>
+                    <div class="rounded-2xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
+                        <div class="flex items-center justify-between gap-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                            Faltas
+                            <i class="fas fa-xmark text-red-600 dark:text-red-400" aria-hidden="true"></i>
+                        </div>
+                        <div class="mt-2 text-3xl font-bold text-gray-800 dark:text-white">{{ $r['faltas'] }}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">Sin fichaje ni licencia</div>
+                    </div>
+                    <div class="rounded-2xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
+                        <div class="flex items-center justify-between gap-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                            Licencias
+                            <i class="fas fa-file-medical text-violet-600 dark:text-violet-400" aria-hidden="true"></i>
+                        </div>
+                        <div class="mt-2 text-3xl font-bold text-gray-800 dark:text-white">{{ $r['licencias'] }}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">Días de licencia</div>
+                    </div>
+                    <div class="rounded-2xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
+                        <div class="flex items-center justify-between gap-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                            Francos
+                            <i class="fas fa-umbrella-beach text-sky-600 dark:text-sky-400" aria-hidden="true"></i>
+                        </div>
+                        <div class="mt-2 text-3xl font-bold text-gray-800 dark:text-white">{{ $r['francos'] }}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">Días libres</div>
+                    </div>
+                    <div class="rounded-2xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
+                        <div class="flex items-center justify-between gap-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                            Fuera de rango
+                            <i class="fas fa-location-dot text-amber-600 dark:text-amber-400" aria-hidden="true"></i>
+                        </div>
+                        <div class="mt-2 text-3xl font-bold text-gray-800 dark:text-white">{{ $r['fuera_de_rango'] }}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">+200m del puesto</div>
+                    </div>
                 </div>
-                <div class="rounded-xl border border-gray-200 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                    <p class="text-2xl font-bold leading-none text-emerald-600 dark:text-emerald-400">{{ $r['asistencias'] }}</p>
-                    <p class="mt-1 text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Asistió</p>
-                </div>
-                <div class="rounded-xl border border-gray-200 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                    <p class="text-2xl font-bold leading-none {{ $r['faltas'] > 0 ? 'text-red-600 dark:text-red-400' : 'text-gray-400 dark:text-gray-500' }}">{{ $r['faltas'] }}</p>
-                    <p class="mt-1 text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Faltas</p>
-                </div>
-                <div class="rounded-xl border border-gray-200 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                    <p class="text-2xl font-bold leading-none text-violet-600 dark:text-violet-400">{{ $r['licencias'] }}</p>
-                    <p class="mt-1 text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Licencias</p>
-                </div>
-                <div class="rounded-xl border border-gray-200 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                    <p class="text-2xl font-bold leading-none text-sky-600 dark:text-sky-400">{{ $r['francos'] }}</p>
-                    <p class="mt-1 text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400">Francos</p>
-                </div>
-                <div class="rounded-xl border border-gray-200 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-                    <p class="text-2xl font-bold leading-none {{ $r['fuera_de_rango'] > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-gray-400 dark:text-gray-500' }}">{{ $r['fuera_de_rango'] }}</p>
-                    <p class="mt-1 text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400" title="Fichajes a más de 200 m del puesto según el GPS">Fuera de rango</p>
-                </div>
-            </div>
+            </section>
         @endif
 
         <div class="grid gap-4 {{ $mostrarCalendario ? 'lg:grid-cols-[22rem_minmax(0,1fr)] lg:items-start' : '' }}">
 
             {{-- Calendario de puntitos --}}
             @if ($mostrarCalendario)
-                <section class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                <section class="glass rounded-3xl p-4 sm:p-5">
+                    <div class="mb-3 flex items-center justify-between gap-3">
+                        <h3 class="font-display text-sm font-bold uppercase tracking-wide">Calendario</h3>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">Tocá un día para ver el detalle</span>
+                    </div>
                     <div class="grid grid-cols-7 gap-y-1 text-center">
                         @foreach (['L', 'M', 'M', 'J', 'V', 'S', 'D'] as $letra)
                             <span class="pb-1 text-[11px] font-medium text-gray-400 dark:text-gray-500">{{ $letra }}</span>
@@ -214,7 +265,7 @@
                             @elseif ($item)
                                 <button type="button" @click="abrir('{{ $f }}')"
                                     aria-label="{{ $item['modal']['titulo'] }}: {{ $item['modal']['estado'] }}"
-                                    class="flex h-11 flex-col items-center justify-center gap-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 {{ $f === $hoy ? 'ring-1 ring-sky-500' : '' }}">
+                                    class="flex h-11 flex-col items-center justify-center gap-1 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 {{ $f === $hoy ? 'ring-1 ring-sky-500' : '' }}">
                                     <span class="text-xs {{ $f === $hoy ? 'font-bold text-sky-600 dark:text-sky-400' : 'text-gray-700 dark:text-gray-200' }}">{{ $d->day }}</span>
                                     <span class="h-2.5 w-2.5 rounded-full {{ $item['meta']['punto'] }} {{ ($item['fuera_de_rango'] ?? false) ? 'ring-2 ring-amber-400' : '' }}"></span>
                                 </button>
@@ -237,14 +288,19 @@
             @endif
 
             {{-- Lista de días (el más nuevo primero) --}}
-            <section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+            <section class="glass overflow-hidden rounded-3xl">
+                <div class="flex items-center justify-between gap-3 px-4 pb-2 pt-4 sm:px-5 sm:pt-5">
+                    <h3 class="font-display text-sm font-bold uppercase tracking-wide">Días</h3>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">{{ $dias->count() }} {{ $dias->count() === 1 ? 'día' : 'días' }} · el más reciente primero</span>
+                </div>
                 <div class="divide-y divide-gray-200 dark:divide-gray-700">
                     @forelse ($dias as $d)
                         <button type="button" @click="abrir('{{ $d['fecha'] }}')"
-                            class="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                            <div class="w-11 shrink-0 text-center">
-                                <p class="text-lg font-bold leading-none text-gray-900 dark:text-white">{{ $d['dia'] }}</p>
-                                <p class="mt-1 text-[11px] uppercase text-gray-500 dark:text-gray-400">{{ $d['dia_semana'] }}</p>
+                            class="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 sm:px-5">
+                            {{-- Cuadradito del color del estado, como los íconos de las cards del panel --}}
+                            <div class="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-2xl {{ $d['meta']['tile'] }}">
+                                <p class="text-lg font-bold leading-none {{ $d['meta']['num'] }}">{{ $d['dia'] }}</p>
+                                <p class="mt-0.5 text-[10px] font-medium uppercase {{ $d['meta']['num'] }} opacity-80">{{ $d['dia_semana'] }}</p>
                             </div>
                             <div class="min-w-0 flex-1">
                                 <div class="flex flex-wrap items-center gap-1.5">
@@ -269,9 +325,9 @@
 
         {{-- Franco (solo admin/encargado): plegado para que no tape el historial --}}
         @if ($esAdmin)
-            <section class="mt-4 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+            <section class="glass mt-4 rounded-3xl">
                 <button type="button" @click="francoAbierto = !francoAbierto"
-                    class="flex w-full items-center justify-between gap-3 px-4 py-3 text-left">
+                    class="flex w-full items-center justify-between gap-3 px-4 py-3 text-left sm:px-5">
                     <span class="font-medium text-gray-800 dark:text-gray-100"><i class="fas fa-bed me-2 text-sky-600 dark:text-sky-400"></i>Franco y cambios de franco</span>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
                         class="h-4 w-4 shrink-0 text-gray-500 transition dark:text-gray-400" :class="francoAbierto ? 'rotate-180' : ''" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
@@ -349,7 +405,7 @@
 
         {{-- Detalle de un día: cada fichaje con hora, puesto, distancia al puesto y precisión del GPS --}}
         <div x-show="dia" x-cloak class="fixed inset-0 z-50 flex items-end justify-center bg-black/50 sm:items-center sm:p-4" @click.self="dia = null">
-            <div class="max-h-[85vh] w-full overflow-y-auto rounded-t-2xl bg-white p-5 shadow-xl dark:bg-gray-800 sm:max-w-md sm:rounded-2xl" role="dialog" aria-modal="true">
+            <div class="max-h-[85vh] w-full overflow-y-auto rounded-t-3xl bg-white p-5 shadow-xl dark:bg-gray-800 sm:max-w-md sm:rounded-3xl" role="dialog" aria-modal="true">
                 <template x-if="dia">
                     <div>
                         <div class="flex items-start justify-between gap-3">
@@ -372,7 +428,7 @@
                                 <span x-show="!dia.egreso" class="text-amber-600 dark:text-amber-400"> · sin egreso registrado</span>
                             </p>
                             <template x-for="(f, i) in dia.fichajes" :key="i">
-                                <div class="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-700">
+                                <div class="rounded-2xl border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-700">
                                     <div class="flex items-center justify-between gap-2">
                                         <p class="text-base font-semibold text-gray-900 dark:text-white"><span x-text="f.hora"></span> hs</p>
                                         <span x-show="f.fuera_de_rango" class="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">⚠ Revisar ubicación</span>
@@ -394,7 +450,7 @@
         {{-- Cargar cambio de franco (admin/encargado) --}}
         @if ($esAdmin)
             <div x-show="francoModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" @click.self="francoModal = false">
-                <div class="max-h-[90vh] w-full max-w-sm overflow-y-auto rounded-xl bg-white p-6 shadow-xl dark:bg-gray-800" x-data="{ accion: 'mover' }">
+                <div class="max-h-[90vh] w-full max-w-sm overflow-y-auto rounded-3xl bg-white p-6 shadow-xl dark:bg-gray-800" x-data="{ accion: 'mover' }">
                     <h2 class="mb-4 text-lg font-semibold text-gray-800 dark:text-gray-200">Cargar cambio de franco</h2>
 
                     <div class="mb-3 rounded border border-amber-200 bg-amber-50 p-2 text-xs text-amber-800 dark:border-amber-700 dark:bg-amber-900/30 dark:text-amber-200">

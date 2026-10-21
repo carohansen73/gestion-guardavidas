@@ -14,11 +14,18 @@
                 default => 'text-red-600 dark:text-red-400',
             };
             $nombre = trim("{$g->apellido} {$g->nombre}") ?: 'Sin nombre';
+            // El círculo de la izquierda repite el semáforo del porcentaje, así se barre la lista de un vistazo.
+            $colorIcono = match (true) {
+                $porcentaje === null => 'gray',
+                $porcentaje >= 90 => 'teal',
+                $porcentaje >= 75 => 'amber',
+                default => 'red',
+            };
         @endphp
 
         <x-tarjeta-listado :href="route('asistencias.guardavida', $g->id)" :titulo="$nombre" :playa="$g->playa->id ?? ''">
             <x-slot:lead>
-                <x-icono-listado icono="fa-user" color="teal" size="w-10 h-10" />
+                <x-icono-listado icono="fa-user" :color="$colorIcono" size="w-10 h-10" />
             </x-slot:lead>
 
             <div class="flex items-center justify-between gap-3">

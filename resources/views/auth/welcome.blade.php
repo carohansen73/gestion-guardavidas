@@ -6,9 +6,9 @@
     <h1 class="text-3xl font-bold tracking-tight text-heading md:text-3xl lg:text-4xl"> Bienvenido </h1>
 
 
-    <img src="{{ asset('img/lifeguards.jpg') }}" alt="Logo" class="w-106 h-106 ">
+    <img src="{{ asset('img/lifeguards.jpg') }}" alt="Logo" class="w-106 h-106 lg:mx-auto lg:h-auto lg:max-h-72 lg:w-auto">
 
-    <a class="block mx-auto mt-16 text-white bg-sky-600 border-0 py-2 px-8 focus:outline-none
+    <a class="block mx-auto mt-16 lg:mt-8 text-white bg-sky-600 border-0 py-2 px-8 focus:outline-none
     hover:bg-sky-700 rounded text-lg text-center"
         href="{{ route('login') }}">
         {{ __('Iniciar Sesión') }}

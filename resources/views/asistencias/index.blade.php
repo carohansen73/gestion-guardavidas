@@ -14,7 +14,7 @@
         </div>
 
         {{-- Playas: una sola fila que se desliza, para no ocupar alto. --}}
-        <div class="-mx-4 mb-3 flex gap-2 overflow-x-auto px-4 pb-1">
+        <div class="-mx-4 mb-3 flex gap-2 overflow-x-auto px-4 pb-3">
             <a href="{{ route('asistencias.index', ['playa_id' => 'all'] + request()->except(['page', 'playa_id'])) }}"
                 class="{{ $chip(! request('playa_id') || request('playa_id') == 'all') }}">Todas</a>
             @foreach ($playas as $playa)
@@ -30,7 +30,7 @@
             <div class="relative">
                 <input type="search" name="search" id="search" value="{{ request('search') }}" placeholder="Buscar por nombre o apellido"
                     autocomplete="off"
-                    class="block w-full rounded-md border-gray-300 pr-10 shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                    class="block w-full rounded-2xl border-gray-300 pr-10 shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                     class="pointer-events-none absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
@@ -40,7 +40,7 @@
             <div class="flex items-center gap-2">
                 {{-- Mes: flechas para pasar de un mes al otro (el presentismo se mira por mes). Tocar el nombre abre el
                      período a mano / la temporada. Con fechas a mano o temporada no hay flechas: se ve el período. --}}
-                <div class="flex min-w-0 flex-1 items-center rounded-md border border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700">
+                <div class="flex min-w-0 flex-1 items-center overflow-hidden rounded-2xl border border-gray-300 bg-white shadow-sm dark:border-gray-600 dark:bg-gray-700">
                     @if ($mesNav)
                         <a href="{{ route('asistencias.index', ['mes' => $mesNav['anterior']] + request()->only(['playa_id', 'search', 'orden'])) }}"
                             aria-label="Mes anterior"
@@ -75,7 +75,7 @@
                 </div>
 
                 <select name="orden" id="orden" aria-label="Ordenar"
-                    class="rounded-md border-gray-300 py-2 text-sm text-gray-700 shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
+                    class="rounded-2xl border-gray-300 py-2 text-sm text-gray-700 shadow-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
                     <option value="alfabetico" @selected(request('orden', 'alfabetico') !== 'faltas')>A-Z</option>
                     <option value="faltas" @selected(request('orden') === 'faltas')>Más faltas</option>
                 </select>
@@ -83,7 +83,7 @@
 
             {{-- Período: temporada o fechas a mano (elegir una borra la otra, igual que en escritorio). --}}
             <div x-show="abierto" x-cloak
-                class="space-y-3 rounded-md border border-gray-200 bg-gray-50 p-3 dark:border-gray-600 dark:bg-gray-700">
+                class="space-y-3 rounded-2xl border border-gray-200 bg-gray-50 p-3 dark:border-gray-600 dark:bg-gray-700">
                 <div>
                     <label for="temporada" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Temporada</label>
                     <select name="temporada" id="temporada"
