@@ -36,7 +36,7 @@
             </div>
 
             <div class="flex gap-2">
-                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Filtrar</button>
+                <button type="submit" class="bg-sky-500 hover:bg-sky-400 text-white px-4 py-2 rounded">Filtrar</button>
                 <a href="{{ route('cambio-de-turno.index') }}"
                     class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">Limpiar</a>
             </div>
@@ -61,9 +61,9 @@
                     <td class="px-4 py-2">{{ $cambio->guardavida->nombre }} {{ $cambio->guardavida->apellido }}</td>
                     <td class="px-4 py-2">
                         @if ($cambio->turno_nuevo === 'M')
-                            <span class="bg-blue-200 text-blue-800 px-2 py-1 rounded dark:text-blue-200">Mañana</span>
+                            <span class="bg-sky-100 text-sky-800 px-2 py-1 rounded dark:bg-sky-900/40 dark:text-sky-200">Mañana</span>
                         @else
-                            <span class="bg-yellow-200 text-yellow-800 px-2 py-1 rounded dark:text-yellow-200">Tarde</span>
+                            <span class="bg-amber-100 text-amber-800 px-2 py-1 rounded dark:bg-amber-900/40 dark:text-amber-200">Tarde</span>
                         @endif
                     </td>
                     <td class="px-4 py-2">{{ $cambio->fecha->format('d/m/Y') }}</td>

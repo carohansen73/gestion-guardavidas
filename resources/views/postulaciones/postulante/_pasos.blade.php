@@ -6,7 +6,7 @@
     $estadoActual = $postulacion?->estado ?? 'borrador';
     [$etiquetaEstado, $claseEstado, $bajada] = [
         'pendiente' => ['Enviada, en revisión', 'bg-sky-500/20 text-sky-600 dark:text-sky-400', 'Ya la enviaste. Podés corregir lo que necesites y volver a confirmar en el último paso.'],
-        'incompleta' => ['Incompleta', 'bg-orange-500/20 text-orange-600 dark:text-orange-400', 'El equipo te pidió correcciones. Revisá el comentario, corregí y volvé a enviarla en el último paso.'],
+        'incompleta' => ['Incompleta', 'bg-orange-500/20 text-red-500 dark:text-orange-400', 'El equipo te pidió correcciones. Revisá el comentario, corregí y volvé a enviarla en el último paso.'],
     ][$estadoActual] ?? ['Borrador', 'bg-amber-500/20 text-amber-500', 'Completá los cuatro pasos para enviar tu inscripción.'];
     $pedidoDelEquipo = $estadoActual === 'incompleta' ? trim((string) $postulacion->observaciones) : '';
 @endphp

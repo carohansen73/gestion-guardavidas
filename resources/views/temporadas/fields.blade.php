@@ -26,7 +26,7 @@
         @endif
 
         <x-form-seccion titulo="Nombre" icono="file-text">
-            <div class="mb-1 rounded-md bg-blue-50 dark:bg-blue-900/30 p-3 text-sm text-blue-800 dark:text-blue-200 border border-blue-200 dark:border-blue-800">
+            <div class="mb-1 rounded-md bg-sky-50 dark:bg-sky-900/30 p-3 text-sm text-sky-800 dark:text-sky-200 border border-sky-200 dark:border-sky-800">
                 La ventana de <strong>postulación</strong> es cuando alguien puede completar el formulario de inscripción
                 (normalmente meses antes). La ventana <strong>operativa</strong> es la temporada en sí — la que se usa para
                 cargar intervenciones, banderas, etc., y fuera de la cual guardavida/encargado no pueden crear/editar nada.

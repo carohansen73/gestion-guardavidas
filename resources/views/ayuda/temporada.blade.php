@@ -10,8 +10,8 @@
         ['n' => 5, 'icono' => 'flag', 'titulo' => 'Cerrar la selección', 'donde' => 'Postulaciones → Selección → Cierre'],
         ['n' => 6, 'icono' => 'life-buoy', 'titulo' => 'Durante la temporada', 'donde' => 'Personal → Guardavidas'],
     ];
-    $aviso = 'rounded-md bg-blue-50 dark:bg-blue-900/30 p-3 text-sm text-blue-800 dark:text-blue-200 border border-blue-200 dark:border-blue-800';
-    $alerta = 'rounded-md bg-yellow-50 dark:bg-yellow-900/30 p-3 text-sm text-yellow-800 dark:text-yellow-200 border border-yellow-200 dark:border-yellow-800';
+    $aviso = 'rounded-md bg-sky-50 dark:bg-sky-900/30 p-3 text-sm text-sky-800 dark:text-sky-200 border border-sky-200 dark:border-sky-800';
+    $alerta = 'rounded-md bg-amber-50 dark:bg-amber-900/30 p-3 text-sm text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800';
     $lista = 'list-disc pl-5 space-y-1 text-sm';
 @endphp
 

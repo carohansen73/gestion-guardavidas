@@ -23,7 +23,7 @@
                     @endauth
                         @if ($rol !== 'admin' && $playa)
                             <svg xmlns="http://www.w3.org/2000/svg"
-                                class="w-7 h-7 animate-bounce md:animate-none text-orange-600 dark:text-orange-500 me-2" fill="none" viewBox="0 0 24 24"
+                                class="w-7 h-7 animate-bounce md:animate-none text-red-500 dark:text-red-500 me-2" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
@@ -41,7 +41,7 @@
             <ul class="pt-4 mt-4 space-y-2 font-medium border-t border-gray-200 dark:border-gray-700">
                 <li>
                     <a href="{{ route('home') }}"
-                        class="{{ request()->routeIs('home') ?'text-sky-600 bg-sky-100 dark:bg-gray-600' : 'text-gray-800' }} flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                        class="{{ request()->routeIs('home') ?'text-red-600 bg-sky-100 dark:bg-gray-600' : 'text-gray-800' }} flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                         {{-- <svg class="shrink-0 w-5 h-5 text-sky-600 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
                             aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
                             viewBox="0 0 18 18">
@@ -49,7 +49,7 @@
                                 d="M6.143 0H1.857A1.857 1.857 0 0 0 0 1.857v4.286C0 7.169.831 8 1.857 8h4.286A1.857 1.857 0 0 0 8 6.143V1.857A1.857 1.857 0 0 0 6.143 0Zm10 0h-4.286A1.857 1.857 0 0 0 10 1.857v4.286C10 7.169 10.831 8 11.857 8h4.286A1.857 1.857 0 0 0 18 6.143V1.857A1.857 1.857 0 0 0 16.143 0Zm-10 10H1.857A1.857 1.857 0 0 0 0 11.857v4.286C0 17.169.831 18 1.857 18h4.286A1.857 1.857 0 0 0 8 16.143v-4.286A1.857 1.857 0 0 0 6.143 10Zm10 0h-4.286A1.857 1.857 0 0 0 10 11.857v4.286c0 1.026.831 1.857 1.857 1.857h4.286A1.857 1.857 0 0 0 18 16.143v-4.286A1.857 1.857 0 0 0 16.143 10Z" />
                         </svg> --}}
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
-                        class="shrink-0 w-5 h-5 text-orange-600 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white">
+                        class="shrink-0 w-5 h-5 text-red-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white">
                         <path d="M11.47 3.841a.75.75 0 0 1 1.06 0l8.69 8.69a.75.75 0 1 0 1.06-1.061l-8.689-8.69a2.25 2.25 0 0 0-3.182 0l-8.69 8.69a.75.75 0 1 0 1.061 1.06l8.69-8.689Z" />
                         <path d="m12 5.432 8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 0 1-.75-.75v-4.5a.75.75 0 0 0-.75-.75h-3a.75.75 0 0 0-.75.75V21a.75.75 0 0 1-.75.75H5.625a1.875 1.875 0 0 1-1.875-1.875v-6.198a2.29 2.29 0 0 0 .091-.086L12 5.432Z" />
                         </svg>
@@ -80,7 +80,7 @@
                                             </svg>
                                             <span class="flex-1 ms-3 whitespace-nowrap">Banderas</span>
                                             <span
-                                                class="inline-flex items-center justify-center px-2 py-1 ms-3 text-sm font-medium text-orange-800 bg-orange-100 rounded-full dark:bg-orange-900 dark:text-orange-300">
+                                                class="inline-flex items-center justify-center px-2 py-1 ms-3 text-sm font-medium text-red-800 bg-red-100 rounded-full dark:bg-red-900 dark:text-red-300">
                                                 @if ($conteos['banderas'] < 4)
                                                     {{ $conteos['banderas'] ?? 0 }}/4
                                                 @else
@@ -106,7 +106,7 @@
                                             </svg>
                                             <span class="flex-1 ms-3 whitespace-nowrap">Intervenciones</span>
                                             <span
-                                                class="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-orange-800 bg-orange-100 rounded-full dark:bg-orange-900 dark:text-orange-300">{{ $conteos['intervenciones'] ?? 0 }}
+                                                class="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-red-800 bg-red-100 rounded-full dark:bg-red-900 dark:text-red-300">{{ $conteos['intervenciones'] ?? 0 }}
                                             </span>
                                         </a>
                                     </li>

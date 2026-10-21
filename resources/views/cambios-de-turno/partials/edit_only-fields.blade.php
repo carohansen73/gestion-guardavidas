@@ -6,13 +6,13 @@
         <label class="inline-flex items-center">
             <input type="radio" name="turno_nuevo" value="M"
                 {{ old('turno_nuevo', $cambioDeTurno->turno_nuevo ?? '') == 'M' ? 'checked' : '' }}
-                class="text-sky-600 border-gray-300 focus:ring-indigo-500 dark:border-gray-600">
+                class="text-sky-600 border-gray-300 focus:ring-sky-500 dark:border-gray-600">
             <span class="ml-2">Mañana</span>
         </label>
         <label class="inline-flex items-center">
             <input type="radio" name="turno_nuevo" value="T"
                 {{ old('turno_nuevo', $cambioDeTurno->turno_nuevo ?? '') == 'T' ? 'checked' : '' }}
-                class="text-sky-600 border-gray-300 focus:ring-indigo-500 dark:border-gray-600">
+                class="text-sky-600 border-gray-300 focus:ring-sky-500 dark:border-gray-600">
             <span class="ml-2">Tarde</span>
         </label>
     </div>

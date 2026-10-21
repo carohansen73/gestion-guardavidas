@@ -11,6 +11,8 @@
     $esPostulante = Auth::user()->hasRole('postulante');
     // El personal fijo (rol `personal`) no tiene franco intercambiable.
     $esPersonal = Auth::user()->hasRole('personal');
+    // Admin y superadmin no tienen ficha de guardavidas: "Mis asistencias" y "Cambios de franco" les darían 403, así que no se muestran.
+    $tieneFicha = Auth::user()->guardavida !== null;
 @endphp
 
 {{-- Barra superior. Escritorio (sm+): modo oscuro + desplegable de usuario a la derecha.
@@ -38,7 +40,7 @@
                 <a href="{{ route('home') }}" class="flex items-center">
                     @if ($rol !== 'admin' && $playa)
                         <svg xmlns="http://www.w3.org/2000/svg"
-                            class="w-7 h-7 animate-bounce md:animate-none text-orange-600 dark:text-orange-500 mx-2" fill="none" viewBox="0 0 24 24"
+                            class="w-7 h-7 animate-bounce md:animate-none text-red-600 dark:text-red-500 mx-2" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -98,11 +100,13 @@
                                 {{ __('Perfil') }}
                             </x-dropdown-link>
 
-                            <x-dropdown-link :href="route('guardavida.misAsistencias')">
-                                {{ __('Mis Asistencias') }}
-                            </x-dropdown-link>
+                            @if ($tieneFicha)
+                                <x-dropdown-link :href="route('guardavida.misAsistencias')">
+                                    {{ __('Mis Asistencias') }}
+                                </x-dropdown-link>
+                            @endif
 
-                            @unless ($esPersonal)
+                            @if ($tieneFicha && ! $esPersonal)
                                 <x-dropdown-link :href="route('franco-intercambio.index')">
                                     {{ __('Cambios de Franco') }}
                                     @if ($notificacionesFrancoSinLeer > 0)
@@ -111,7 +115,7 @@
                                         </span>
                                     @endif
                                 </x-dropdown-link>
-                            @endunless
+                            @endif
                         @endif
 
                         <form method="POST" action="{{ route('logout') }}">
@@ -264,10 +268,12 @@
                     <x-responsive-nav-link :href="route('guardavida.myProfile')">
                         {{ __('Perfil') }}
                     </x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('guardavida.misAsistencias')">
-                        {{ __('Mis Asistencias') }}
-                    </x-responsive-nav-link>
-                    @unless ($esPersonal)
+                    @if ($tieneFicha)
+                        <x-responsive-nav-link :href="route('guardavida.misAsistencias')">
+                            {{ __('Mis Asistencias') }}
+                        </x-responsive-nav-link>
+                    @endif
+                    @if ($tieneFicha && ! $esPersonal)
                         <x-responsive-nav-link :href="route('franco-intercambio.index')">
                             {{ __('Cambios de Franco') }}
                             @if ($notificacionesFrancoSinLeer > 0)
@@ -276,7 +282,7 @@
                                 </span>
                             @endif
                         </x-responsive-nav-link>
-                    @endunless
+                    @endif
                 @endif
 
                 <!-- Modo oscuro (en celular vive acá adentro; en escritorio es el botón de la barra) -->

@@ -16,7 +16,7 @@
         'incompleta' => 'from-yellow-600 to-yellow-500 dark:from-yellow-900 dark:to-yellow-700',
         'aceptada' => 'from-emerald-600 to-green-500 dark:from-emerald-900 dark:to-green-700',
         'rechazada' => 'from-red-600 to-rose-500 dark:from-red-900 dark:to-rose-700',
-    ][$estado] ?? 'from-orange-600 to-orange-500 dark:from-orange-900 dark:to-orange-700';
+    ][$estado] ?? 'from-red-500 to-orange-500 dark:from-orange-900 dark:to-orange-700';
 
     $titulo = $cerradaSinEnviar ? 'INSCRIPCIÓN CERRADA' : ([
         'pendiente' => 'INSCRIPCIÓN ENVIADA',

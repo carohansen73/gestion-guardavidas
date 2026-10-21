@@ -254,8 +254,8 @@
 
         @can('ver_intervencion')
             <x-counter label="Intervenciones" description="En la temporada" :value="$panelIntervenciones"
-                value-id="card-intervenciones" icon-bg="bg-orange-100 dark:bg-orange-900/40">
-                <x-icon name="siren" class="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                value-id="card-intervenciones" icon-bg="bg-red-100 dark:bg-red-900/40">
+                <x-icon name="siren" class="h-5 w-5 text-red-600 dark:text-red-400" />
             </x-counter>
         @endcan
 

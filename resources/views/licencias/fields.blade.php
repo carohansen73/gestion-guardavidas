@@ -28,13 +28,13 @@
 
         <x-form-seccion titulo="Licencia" icono="users">
             @if ($esEdicion)
-                <div class="mb-1 rounded-md bg-yellow-50 p-3 text-sm text-yellow-800 border border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-200 dark:border-yellow-800">
+                <div class="mb-1 rounded-md bg-amber-50 p-3 text-sm text-amber-800 border border-amber-200 dark:bg-amber-900/30 dark:text-amber-200 dark:border-amber-800">
                     ⚠️ Si cambiás el <strong>guardavidas</strong>, recordá actualizar los campos
                     <strong>Playa</strong>, <strong>Puesto</strong> y <strong>Turno</strong>
                     para que coincidan con el nuevo guardavidas seleccionado.
                 </div>
             @else
-                <div class="mb-1 rounded-md bg-blue-50 p-3 text-sm text-blue-800 border border-blue-200 dark:bg-blue-900/30 dark:text-blue-200 dark:border-blue-800">
+                <div class="mb-1 rounded-md bg-sky-50 p-3 text-sm text-sky-800 border border-sky-200 dark:bg-sky-900/30 dark:text-sky-200 dark:border-sky-800">
                     Recordá que la <strong>Playa, Puesto y Turno</strong> se asignan automáticamente de acuerdo al guardavidas seleccionado.
                     Si necesitás modificar esta información, podrás hacerlo desde la edición de la licencia.
                 </div>
@@ -104,14 +104,14 @@
                         <label class="inline-flex items-center">
                             <input type="radio" name="en_tiempo" value="1" required
                                 {{ old('en_tiempo', $licencia->en_tiempo ?? '') == true ? 'checked' : '' }}
-                                class="text-sky-600 border-gray-300 focus:ring-indigo-500 dark:border-gray-600">
+                                class="text-sky-600 border-gray-300 focus:ring-sky-500 dark:border-gray-600">
                             <span class="ml-2">Si</span>
                         </label>
 
                         <label class="inline-flex items-center">
                             <input type="radio" name="en_tiempo" value="0"
                             {{ old('en_tiempo', $licencia->en_tiempo ?? '') == false ? 'checked' : '' }}
-                                class="text-sky-600 border-gray-300 focus:ring-indigo-500 dark:border-gray-600">
+                                class="text-sky-600 border-gray-300 focus:ring-sky-500 dark:border-gray-600">
                             <span class="ml-2">No</span>
                         </label>
                     </div>
@@ -161,7 +161,7 @@
 
                     <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
                         Archivo actual:
-                        <a href="{{ route('licencia.constancia', $licencia) }}" target="_blank" class="text-indigo-600 underline">Ver archivo</a>
+                        <a href="{{ route('licencia.constancia', $licencia) }}" target="_blank" class="text-sky-600 underline dark:text-sky-400">Ver archivo</a>
                     </p>
 
                 @endif

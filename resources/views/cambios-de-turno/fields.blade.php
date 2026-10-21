@@ -28,12 +28,12 @@
 
         <x-form-seccion titulo="Cambio" icono="arrow-left-right">
             @if ($esCreacion)
-                <div class="mb-1 rounded-md bg-blue-50 p-3 text-sm text-blue-800 border border-blue-200 dark:bg-blue-900/30 dark:text-blue-200 dark:border-blue-800">
+                <div class="mb-1 rounded-md bg-sky-50 p-3 text-sm text-sky-800 border border-sky-200 dark:bg-sky-900/30 dark:text-sky-200 dark:border-sky-800">
                     Recordá que la <strong>Playa, Puesto, Turno y Función</strong> se asignan automáticamente de acuerdo al guardavidas seleccionado.
                     Si necesitás modificar esta información, podrás hacerlo desde la edición del cambio de turno.
                 </div>
             @else
-                <div class="mb-1 rounded-md bg-yellow-50 p-3 text-sm text-yellow-800 border border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-200 dark:border-yellow-800">
+                <div class="mb-1 rounded-md bg-amber-50 p-3 text-sm text-amber-800 border border-amber-200 dark:bg-amber-900/30 dark:text-amber-200 dark:border-amber-800">
                     ⚠️ Si cambiás el <strong>guardavidas</strong>, recordá actualizar los campos
                     <strong>Playa</strong>, <strong>Puesto</strong>, <strong>Turno</strong> y <strong>Función</strong>
                     para que coincidan con el nuevo guardavidas seleccionado.

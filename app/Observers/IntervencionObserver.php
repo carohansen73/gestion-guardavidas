@@ -20,7 +20,7 @@ class IntervencionObserver
             'playa_id' => $intervencion->playa_id,
             'referencia_modelo' => Intervencion::class,
             'icono' => '<i class="fas fa-life-ring"></i>',
-            'color' => 'orange',
+            'color' => 'red',
             'referencia_id' => $intervencion->id,
         ]);
     }

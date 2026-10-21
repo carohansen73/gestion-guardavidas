@@ -31,14 +31,14 @@
                 {{-- Excel de asistencias → abre modal para seleccioanr fechas --}}
                 <button type="button"
                     onclick="openAsistenciaModal('{{ $tipo }}')"
-                    class="px-3 py-1 bg-emerald-600 text-gray-100 rounded hover:bg-emerald-500 hover:shadow-lg dark:bg-emerald-700 dark:hover:bg-teal-500 dark:text-gray-200">
+                    class="px-3 py-1 rounded bg-emerald-600 text-white shadow hover:bg-emerald-500 hover:shadow-lg dark:bg-emerald-700 dark:hover:bg-emerald-600">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
                     </svg>
                 </button>
             @else
                 {{-- En otras vistas → genera excel directamente --}}
-                <a href="{{ route('export.playas', ['tipo' => $tipo, 'temporada' => isset($temporadas) ? (($temporada ?? null)?->id ?? 'todas') : null]) }}" class="px-3 py-1 bg-emerald-600 text-gray-100 rounded hover:bg-emerald-500 hover:shadow-lg dark:bg-emerald-700 dark:hover:bg-teal-500 dark:text-gray-200">
+                <a href="{{ route('export.playas', ['tipo' => $tipo, 'temporada' => isset($temporadas) ? (($temporada ?? null)?->id ?? 'todas') : null]) }}" class="px-3 py-1 rounded bg-emerald-600 text-white shadow hover:bg-emerald-500 hover:shadow-lg dark:bg-emerald-700 dark:hover:bg-emerald-600">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
                     </svg>
@@ -109,7 +109,7 @@
 
                 <button type="button"
                     onclick="submitAsistenciaExcel()"
-                    class="px-3 py-1 bg-emerald-600 text-white rounded hover:bg-emerald-500 shadow">
+                    class="px-3 py-1 rounded bg-emerald-600 text-white shadow hover:bg-emerald-500 hover:shadow-lg dark:bg-emerald-700 dark:hover:bg-emerald-600">
                     Generar Excel
                 </button>
             </div>
