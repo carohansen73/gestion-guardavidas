@@ -199,25 +199,4 @@ class LicenciaController extends Controller
 
         return redirect()->route('licencia.index')->with('success', 'Licencia eliminada correctamente.');
     }
-
-    /**
-     * funcion para que de la cantidad de licencias en la seccion licencias del perfil del guardavidas y en el historial de
-     * sus licencias
-     */
-    public function misLicencias()
-    {
-        $guardavida = auth()->user()->guardavida;
-        if (! $guardavida) {
-            abort(403, 'No tiene un perfil de guardavida asignado.');
-        }
-
-        // Cargar relaciones
-        $guardavida->load('licencias.puesto.playa', 'licencias');
-
-        // Pasamos $esAdmin = false para que el Blade detecte que no es vista administrativa
-        $esAdmin = false;
-
-        // No necesitamos filtros ni balnearios/puestos para este caso
-        return view('asistencias.por-perfil', compact('guardavida', 'esAdmin'));
-    }
 }

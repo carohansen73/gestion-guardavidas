@@ -33,6 +33,7 @@ class DatabaseSeeder extends Seeder
 
 
         $this->call([
+            RolesYPermisosSeeder::class,
             UserSeeder::class,
         ]);
 
@@ -42,10 +43,6 @@ class DatabaseSeeder extends Seeder
 
          $this->call([
             GuardavidaSeeder::class,
-        ]);
-
-        $this->call([
-            RolesYPermisosSeeder::class,
         ]);
     }
 }
