@@ -7,5 +7,4 @@ use Illuminate\Database\Eloquent\Model;
 class BanderaTipo extends Model
 {
     protected $fillable = ['codigo', 'color'];
-
 }

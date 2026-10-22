@@ -36,8 +36,8 @@ class LicenciaPolicy
      */
     public function update(User $user, Licencia $licencia): bool
     {
-        // Las temporadas cerradas solo las modifica un admin (ver TieneTemporada::modificablePor).
-        return $licencia->modificablePor($user) && ($user->can('editar_licencia'));
+        // Temporada abierta (o gestionar_temporada_cerrada) y, además, que sea suyo o pueda gestionar los ajenos (ver TieneAutor).
+        return $licencia->modificablePor($user) && $user->can('editar_licencia') && $licencia->esPropioOGestionaAjenos($user);
     }
 
     /**
@@ -45,8 +45,8 @@ class LicenciaPolicy
      */
     public function delete(User $user, Licencia $licencia): bool
     {
-        // Las temporadas cerradas solo las modifica un admin (ver TieneTemporada::modificablePor).
-        return $licencia->modificablePor($user) && ($user->can('eliminar_licencia'));
+        // Temporada abierta (o gestionar_temporada_cerrada) y, además, que sea suyo o pueda gestionar los ajenos (ver TieneAutor).
+        return $licencia->modificablePor($user) && $user->can('eliminar_licencia') && $licencia->esPropioOGestionaAjenos($user);
     }
 
     /**

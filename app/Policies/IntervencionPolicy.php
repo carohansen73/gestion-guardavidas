@@ -40,8 +40,8 @@ class IntervencionPolicy
      */
     public function update(User $user, Intervencion $intervencion): bool
     {
-        // Las temporadas cerradas solo las modifica un admin (ver TieneTemporada::modificablePor).
-        return $intervencion->modificablePor($user) && ($user->can('editar_intervencion'));
+        // Temporada abierta (o gestionar_temporada_cerrada) y, además, que sea suyo o pueda gestionar los ajenos (ver TieneAutor).
+        return $intervencion->modificablePor($user) && $user->can('editar_intervencion') && $intervencion->esPropioOGestionaAjenos($user);
     }
 
     /**
@@ -49,11 +49,8 @@ class IntervencionPolicy
      */
     public function delete(User $user, Intervencion $intervencion): bool
     {
-        // return $user->id === $intervencion->user_id || $user->rol === 'encargado' || $user->rol === 'jefePlaya'
-        // || $user->role === 'admin' ;
-
-        // Las temporadas cerradas solo las modifica un admin (ver TieneTemporada::modificablePor).
-        return $intervencion->modificablePor($user) && ($user->can('eliminar_intervencion'));
+        // Temporada abierta (o gestionar_temporada_cerrada) y, además, que sea suyo o pueda gestionar los ajenos (ver TieneAutor).
+        return $intervencion->modificablePor($user) && $user->can('eliminar_intervencion') && $intervencion->esPropioOGestionaAjenos($user);
     }
 
     /**
@@ -70,12 +67,5 @@ class IntervencionPolicy
     public function forceDelete(User $user, Intervencion $intervencion): bool
     {
         return false;
-    }
-
-    public function before(User $user, string $ability)
-    {
-        if ($user->role === 'admin') {
-            return true;
-        }
     }
 }

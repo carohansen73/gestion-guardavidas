@@ -36,8 +36,8 @@ class CambioDeTurnoPolicy
      */
     public function update(User $user, CambioDeTurno $cambioDeTurno): bool
     {
-        // Las temporadas cerradas solo las modifica un admin (ver TieneTemporada::modificablePor).
-        return $cambioDeTurno->modificablePor($user) && ($user->can('editar_cambio_turno'));
+        // Temporada abierta (o gestionar_temporada_cerrada) y, además, que sea suyo o pueda gestionar los ajenos (ver TieneAutor).
+        return $cambioDeTurno->modificablePor($user) && $user->can('editar_cambio_turno') && $cambioDeTurno->esPropioOGestionaAjenos($user);
     }
 
     /**
@@ -45,8 +45,8 @@ class CambioDeTurnoPolicy
      */
     public function delete(User $user, CambioDeTurno $cambioDeTurno): bool
     {
-        // Las temporadas cerradas solo las modifica un admin (ver TieneTemporada::modificablePor).
-        return $cambioDeTurno->modificablePor($user) && ($user->can('eliminar_cambio_turno'));
+        // Temporada abierta (o gestionar_temporada_cerrada) y, además, que sea suyo o pueda gestionar los ajenos (ver TieneAutor).
+        return $cambioDeTurno->modificablePor($user) && $user->can('eliminar_cambio_turno') && $cambioDeTurno->esPropioOGestionaAjenos($user);
     }
 
     /**

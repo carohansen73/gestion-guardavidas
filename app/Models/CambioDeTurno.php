@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\TieneAutor;
 use App\Models\Concerns\TieneTemporada;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -9,7 +10,10 @@ use Illuminate\Database\Eloquent\Model;
 class CambioDeTurno extends Model
 {
     /** @use HasFactory<\Database\Factories\CambioDeTurnoFactory> */
-    use HasFactory, TieneTemporada;
+    use HasFactory, TieneAutor, TieneTemporada;
+
+    /** Permiso para editar/borrar los registros que cargó otro usuario (ver TieneAutor). */
+    protected string $permisoAjenos = 'gestionar_ajenos_cambio_turno';
 
     protected $fillable = [
         'fecha',

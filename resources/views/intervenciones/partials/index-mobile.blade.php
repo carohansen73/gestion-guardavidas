@@ -4,12 +4,11 @@
         <div class="space-y-3">
             @forelse ($intervenciones as $intervencion)
                 @php
-                    $puedeModificar = $intervencion->modificablePor(auth()->user());
                     $titulo = $intervencion->tipo_intervencion.' - '.$intervencion->fecha->format('d/m/Y');
                     $acciones = array_values(array_filter([
                         ['texto' => 'Ver detalle', 'icono' => 'fa-eye', 'href' => route('intervencion.show', $intervencion), 'detalle' => true],
-                        auth()->user()->can('editar_intervencion') && $puedeModificar ? ['texto' => 'Editar', 'icono' => 'fa-pen', 'href' => route('intervencion.edit', $intervencion)] : null,
-                        auth()->user()->can('eliminar_intervencion') && $puedeModificar ? [
+                        auth()->user()->can('update', $intervencion) ? ['texto' => 'Editar', 'icono' => 'fa-pen', 'href' => route('intervencion.edit', $intervencion)] : null,
+                        auth()->user()->can('delete', $intervencion) ? [
                             'texto' => 'Eliminar', 'icono' => 'fa-trash', 'peligro' => true,
                             'form' => route('intervencion.destroy', $intervencion), 'confirmar' => '¿Seguro que querés eliminar esta intervención?',
                         ] : null,

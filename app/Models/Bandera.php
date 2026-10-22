@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\TieneAutor;
 use App\Models\Concerns\TieneTemporada;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,7 +11,10 @@ use Illuminate\Database\Eloquent\Model;
 class Bandera extends Model
 {
     /** @use HasFactory<\Database\Factories\BanderaFactory> */
-    use HasFactory, TieneTemporada;
+    use HasFactory, TieneAutor, TieneTemporada;
+
+    /** Permiso para editar/borrar los registros que cargó otro usuario (ver TieneAutor). */
+    protected string $permisoAjenos = 'gestionar_ajenos_bandera';
 
     protected $fillable = [
         'fecha',
@@ -27,11 +31,6 @@ class Bandera extends Model
     protected $casts = [
         'fecha' => 'datetime',
     ];
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
 
     public function playa()
     {

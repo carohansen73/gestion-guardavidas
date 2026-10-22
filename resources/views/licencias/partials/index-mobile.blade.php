@@ -4,14 +4,13 @@
         <div class="space-y-3">
             @forelse ($registros as $registro)
                 @php
-                    $puedeModificar = $registro->modificablePor(auth()->user());
                     $guardavida = trim(($registro->guardavida->nombre ?? '').' '.($registro->guardavida->apellido ?? '')) ?: '-';
                     $titulo = "Licencia por {$registro->tipo_licencia} - {$guardavida}";
                     $acciones = array_values(array_filter([
                         ['texto' => 'Ver detalle', 'icono' => 'fa-eye', 'href' => route('licencia.show', $registro), 'detalle' => true],
                         $registro->archivo ? ['texto' => 'Ver constancia', 'icono' => 'fa-file-lines', 'href' => route('licencia.constancia', $registro), 'blank' => true] : null,
-                        auth()->user()->can('editar_licencia') && $puedeModificar ? ['texto' => 'Editar', 'icono' => 'fa-pen', 'href' => route('licencia.edit', $registro)] : null,
-                        auth()->user()->can('eliminar_licencia') && $puedeModificar ? [
+                        auth()->user()->can('update', $registro) ? ['texto' => 'Editar', 'icono' => 'fa-pen', 'href' => route('licencia.edit', $registro)] : null,
+                        auth()->user()->can('delete', $registro) ? [
                             'texto' => 'Eliminar', 'icono' => 'fa-trash', 'peligro' => true,
                             'form' => route('licencia.destroy', $registro), 'confirmar' => '¿Seguro que querés eliminar esta licencia?',
                         ] : null,

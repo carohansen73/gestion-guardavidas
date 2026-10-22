@@ -36,8 +36,8 @@ class NovedadMaterialPolicy
      */
     public function update(User $user, NovedadMaterial $novedadMaterial): bool
     {
-        // Las temporadas cerradas solo las modifica un admin (ver TieneTemporada::modificablePor).
-        return $novedadMaterial->modificablePor($user) && ($user->can('editar_novedad_material'));
+        // Temporada abierta (o gestionar_temporada_cerrada) y, además, que sea suyo o pueda gestionar los ajenos (ver TieneAutor).
+        return $novedadMaterial->modificablePor($user) && $user->can('editar_novedad_material') && $novedadMaterial->esPropioOGestionaAjenos($user);
     }
 
     /**
@@ -45,8 +45,8 @@ class NovedadMaterialPolicy
      */
     public function delete(User $user, NovedadMaterial $novedadMaterial): bool
     {
-        // Las temporadas cerradas solo las modifica un admin (ver TieneTemporada::modificablePor).
-        return $novedadMaterial->modificablePor($user) && ($user->can('eliminar_novedad_material'));
+        // Temporada abierta (o gestionar_temporada_cerrada) y, además, que sea suyo o pueda gestionar los ajenos (ver TieneAutor).
+        return $novedadMaterial->modificablePor($user) && $user->can('eliminar_novedad_material') && $novedadMaterial->esPropioOGestionaAjenos($user);
     }
 
     /**

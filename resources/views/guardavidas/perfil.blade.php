@@ -141,7 +141,7 @@
                                 Información Laboral
                             </h2>
                             <p class="text-sm text-gray-600 dark:text-gray-300">
-                                @if ($esEncargado)
+                                @if ($puedeCambiarPuestoYTurno)
                                     Como encargado podés cambiar tu puesto y tu turno. El resto lo administra el personal autorizado (Jefe de Playa o Administrador).
                                 @else
                                     La información laboral es administrada exclusivamente por el personal autorizado (Jefe de Playa, Encargado o Administrador).
@@ -172,7 +172,7 @@
 
                         <div class="sm:col-span-4">
                             <label class="info-label text-gray-800 dark:text-gray-100"><i class="fas fa-clock me-1 text-sky-600"></i> Turno actual</label>
-                            @if ($esEncargado)
+                            @if ($puedeCambiarPuestoYTurno)
                                 <div class="mt-2 flex gap-4 text-gray-700 dark:text-gray-200">
                                     @foreach (['M' => 'Mañana', 'T' => 'Tarde'] as $valor => $nombreTurno)
                                         <label class="inline-flex items-center">

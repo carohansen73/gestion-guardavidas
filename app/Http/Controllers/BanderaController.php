@@ -36,20 +36,11 @@ class BanderaController extends Controller
         $user = Auth::user();
         [$temporadas, $temporada] = Temporada::seleccionada($request->query('temporada'));
 
-        // El acceso ya está autorizado (ver_bandera) por authorizeResource();
-        // acá solo decido el alcance de los datos según el rol.
-        if ($user->hasRole('guardavida')) {
-            $registros = Bandera::where('playa_id', $user->guardavida->playa_id)
-                ->deTemporada($temporada)
-                ->with(['bandera', 'playa'])
-                ->latest()
-                ->get();
-        } else {
-            $registros = Bandera::deTemporada($temporada)
-                ->with(['bandera', 'playa'])
-                ->latest()
-                ->get();
-        }
+        // El acceso ya está autorizado (ver_bandera) por authorizeResource(): quien lo tiene ve las de todas las playas.
+        $registros = Bandera::deTemporada($temporada)
+            ->with(['bandera', 'playa'])
+            ->latest()
+            ->get();
 
         $playas = Playa::all();
 
@@ -69,14 +60,8 @@ class BanderaController extends Controller
         $user = Auth::user();
         $guardavidaAuth = $user->guardavida;
 
-        // Los guardavidas solo agregan registros en la playa a la que pertenecen
-        if ($user->hasAnyRole(['guardavida', 'encargado']) && $guardavidaAuth) {
-            $playas = Playa::where('id', $guardavidaAuth->playa_id)->get();
-            $puestos = Puesto::where('playa_id', $guardavidaAuth->playa_id)->get();
-        } else {
-            $playas = Playa::all();
-            $puestos = Puesto::orderBy('nombre')->get();
-        }
+        $playas = Playa::all();
+        $puestos = Puesto::orderBy('nombre')->get();
 
         $banderas = BanderaTipo::all();
         $bandera = null;
@@ -130,14 +115,8 @@ class BanderaController extends Controller
         $guardavidaAuth = $user->guardavida;
         $banderas = BanderaTipo::all();
 
-        // Los guardavidas solo agregan registros en la playa a la que pertenecen
-        if ($user->hasAnyRole(['guardavida', 'encargado']) && $guardavidaAuth) {
-            $playas = Playa::where('id', $guardavidaAuth->playa_id)->get();
-            $puestos = Puesto::where('playa_id', $guardavidaAuth->playa_id)->get();
-        } else {
-            $playas = Playa::all();
-            $puestos = Puesto::orderBy('nombre')->get();
-        }
+        $playas = Playa::all();
+        $puestos = Puesto::orderBy('nombre')->get();
 
         return view('banderas.fields', compact(
             'guardavidaAuth', 'banderas', 'playas', 'puestos', 'bandera'

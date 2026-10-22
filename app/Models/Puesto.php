@@ -3,11 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-
 use Illuminate\Database\Eloquent\Model;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\Storage;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class Puesto extends Model
 {
@@ -19,7 +17,7 @@ class Puesto extends Model
         'latitud',
         'longitud',
         'qr_encriptado',
-        'playa_id'
+        'playa_id',
     ];
 
     // Un puesto puede estar asignado a varios guardavidas
@@ -44,13 +42,13 @@ class Puesto extends Model
         parent::boot();
 
         static::created(function ($puesto) {
-            if (!$puesto->qr_encriptado) {
+            if (! $puesto->qr_encriptado) {
                 $data = [
-                    'puesto_id'   => $puesto->id,
+                    'puesto_id' => $puesto->id,
                     'puesto_name' => $puesto->nombre,
-                    'puesto_lat'   => $puesto->latitud,
-                    'puesto_lng'   => $puesto->longitud,
-                    'playa_id'    => $puesto->playa_id,
+                    'puesto_lat' => $puesto->latitud,
+                    'puesto_lng' => $puesto->longitud,
+                    'playa_id' => $puesto->playa_id,
                 ];
 
                 // Convertir a JSON y encriptar
@@ -64,13 +62,12 @@ class Puesto extends Model
                 $qrImage = QrCode::format('svg')->size(300)->generate($encoded);
                 $filePath = public_path("qr/puesto_{$puesto->nombre}_{$puesto->id}.svg");
                 file_put_contents($filePath, $qrImage);
-            };
+            }
         });
     }
 
-
-    public static function getMovil(){
+    public static function getMovil()
+    {
         return Puesto::where('nombre', 'Fuera zona de bano')->get();
     }
-
 }

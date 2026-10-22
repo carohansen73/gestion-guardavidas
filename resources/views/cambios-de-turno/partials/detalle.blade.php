@@ -1,6 +1,6 @@
 {{-- Contenido del detalle de un cambio de turno (modal y respaldo show-fields). Solo lectura. --}}
 @php
-    $puedeEditar = auth()->user()->can('editar_cambio_turno') && $cambioDeTurno->modificablePor(auth()->user());
+    $puedeEditar = auth()->user()->can('update', $cambioDeTurno);
     $guardavida = trim(($cambioDeTurno->guardavida->nombre ?? '').' '.($cambioDeTurno->guardavida->apellido ?? '')) ?: '-';
     $turnoNuevo = ['M' => 'Mañana', 'T' => 'Tarde'][$cambioDeTurno->turno_nuevo] ?? $cambioDeTurno->turno_nuevo;
 @endphp

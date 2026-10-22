@@ -25,7 +25,7 @@
                     <td class="px-4 py-2">{{ $intervencion->playa->nombre ?? '-' }}</td>
                     <td class="px-4 py-2">
                         <div class="flex space-x-2">
-                            @if (auth()->user()->can('editar_intervencion') && $intervencion->modificablePor(auth()->user()))
+                            @if (auth()->user()->can('update', $intervencion))
                                 <a href="{{ route('intervencion.edit', $intervencion) }}" class="text-amber-600 hover:underline dark:text-amber-400">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                                         class="text-sky-500 hover:text-sky-400 dark:text-sky-400 hover:dark:text-sky-300 w-7 h-7  rounded p-1">
@@ -33,7 +33,7 @@
                                     </svg>
                                 </a>
                             @endif
-                            @if (auth()->user()->can('eliminar_intervencion') && $intervencion->modificablePor(auth()->user()))
+                            @if (auth()->user()->can('delete', $intervencion))
                                 <form action="{{ route('intervencion.destroy', $intervencion) }}" method="POST"
                                     onsubmit="return confirm('¿Seguro que deseas eliminar esta intervención?')">
                                     @csrf

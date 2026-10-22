@@ -1,6 +1,6 @@
 {{-- Contenido del detalle de una licencia (modal y respaldo show-fields). Solo lectura. --}}
 @php
-    $puedeEditar = auth()->user()->can('editar_licencia') && $licencia->modificablePor(auth()->user());
+    $puedeEditar = auth()->user()->can('update', $licencia);
     $guardavida = trim(($licencia->guardavida->nombre ?? '').' '.($licencia->guardavida->apellido ?? '')) ?: '-';
     $dias = $licencia->fecha_inicio->diffInDays($licencia->fecha_fin) + 1;
     $turno = ['M' => 'Mañana', 'T' => 'Tarde'][$licencia->turno] ?? $licencia->turno;

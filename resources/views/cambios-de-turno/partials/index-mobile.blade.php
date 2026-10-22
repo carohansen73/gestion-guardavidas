@@ -4,13 +4,12 @@
         <div class="space-y-3">
             @forelse ($registros as $registro)
                 @php
-                    $puedeModificar = $registro->modificablePor(auth()->user());
                     $guardavida = trim(($registro->guardavida->nombre ?? '').' '.($registro->guardavida->apellido ?? '')) ?: '-';
                     $titulo = "{$guardavida} - turno {$registro->turno_nuevo}";
                     $acciones = array_values(array_filter([
                         ['texto' => 'Ver detalle', 'icono' => 'fa-eye', 'href' => route('cambio-de-turno.show', $registro), 'detalle' => true],
-                        auth()->user()->can('editar_cambio_turno') && $puedeModificar ? ['texto' => 'Editar', 'icono' => 'fa-pen', 'href' => route('cambio-de-turno.edit', $registro)] : null,
-                        auth()->user()->can('eliminar_cambio_turno') && $puedeModificar ? [
+                        auth()->user()->can('update', $registro) ? ['texto' => 'Editar', 'icono' => 'fa-pen', 'href' => route('cambio-de-turno.edit', $registro)] : null,
+                        auth()->user()->can('delete', $registro) ? [
                             'texto' => 'Eliminar', 'icono' => 'fa-trash', 'peligro' => true,
                             'form' => route('cambio-de-turno.destroy', $registro), 'confirmar' => '¿Seguro que querés eliminar este cambio de turno?',
                         ] : null,

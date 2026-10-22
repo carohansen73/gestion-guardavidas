@@ -15,21 +15,9 @@ class BanderaPolicy
         return $user->can('ver_bandera');
     }
 
-    /**
-     * Un guardavida solo ve banderas de su propia playa.
-     * encargado y admin ven cualquiera.
-     */
     public function view(User $user, Bandera $bandera): bool
     {
-        if (! $user->can('ver_bandera')) {
-            return false;
-        }
-
-        if ($user->hasRole('guardavida')) {
-            return $user->guardavida?->playa_id === $bandera->playa_id;
-        }
-
-        return true;
+        return $user->can('ver_bandera');
     }
 
     /**
@@ -45,8 +33,8 @@ class BanderaPolicy
      */
     public function update(User $user, Bandera $bandera): bool
     {
-        // Las temporadas cerradas solo las modifica un admin (ver TieneTemporada::modificablePor).
-        return $bandera->modificablePor($user) && ($user->id === $bandera->user_id || $user->hasAnyRole(['encargado', 'admin']));
+        // Temporada abierta (o gestionar_temporada_cerrada) y, además, que sea suyo o pueda gestionar los ajenos (ver TieneAutor).
+        return $bandera->modificablePor($user) && $user->can('editar_bandera') && $bandera->esPropioOGestionaAjenos($user);
     }
 
     /**
@@ -54,8 +42,8 @@ class BanderaPolicy
      */
     public function delete(User $user, Bandera $bandera): bool
     {
-        // Las temporadas cerradas solo las modifica un admin (ver TieneTemporada::modificablePor).
-        return $bandera->modificablePor($user) && ($user->id === $bandera->user_id || $user->hasAnyRole(['encargado', 'admin']));
+        // Temporada abierta (o gestionar_temporada_cerrada) y, además, que sea suyo o pueda gestionar los ajenos (ver TieneAutor).
+        return $bandera->modificablePor($user) && $user->can('eliminar_bandera') && $bandera->esPropioOGestionaAjenos($user);
     }
 
     /**

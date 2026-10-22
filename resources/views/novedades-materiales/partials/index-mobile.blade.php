@@ -4,13 +4,12 @@
         <div class="space-y-3">
             @forelse ($registros as $registro)
                 @php
-                    $puedeModificar = $registro->modificablePor(auth()->user());
                     $material = trim(($registro->material->nombre ?? '').' '.($registro->material->detalle ?? '')) ?: '-';
                     $titulo = "{$registro->tipo_novedad?->value} {$material}";
                     $acciones = array_values(array_filter([
                         ['texto' => 'Ver detalle', 'icono' => 'fa-eye', 'href' => route('novedad-de-material.show', $registro), 'detalle' => true],
-                        auth()->user()->can('editar_novedad_material') && $puedeModificar ? ['texto' => 'Editar', 'icono' => 'fa-pen', 'href' => route('novedad-de-material.edit', $registro)] : null,
-                        auth()->user()->can('eliminar_novedad_material') && $puedeModificar ? [
+                        auth()->user()->can('update', $registro) ? ['texto' => 'Editar', 'icono' => 'fa-pen', 'href' => route('novedad-de-material.edit', $registro)] : null,
+                        auth()->user()->can('delete', $registro) ? [
                             'texto' => 'Eliminar', 'icono' => 'fa-trash', 'peligro' => true,
                             'form' => route('novedad-de-material.destroy', $registro), 'confirmar' => '¿Seguro que querés eliminar esta novedad?',
                         ] : null,

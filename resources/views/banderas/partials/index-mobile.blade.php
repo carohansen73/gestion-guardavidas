@@ -4,12 +4,11 @@
         <div class="space-y-3">
             @forelse ($registros as $registro)
                 @php
-                    $puedeModificar = $registro->modificablePor(auth()->user());
                     $titulo = ($registro->bandera->codigo ?? 'Bandera').' - '.$registro->fecha->format('d/m/Y');
                     $acciones = array_values(array_filter([
                         ['texto' => 'Ver detalle', 'icono' => 'fa-eye', 'href' => route('bandera.show', $registro), 'detalle' => true],
-                        auth()->user()->can('editar_bandera') && $puedeModificar ? ['texto' => 'Editar', 'icono' => 'fa-pen', 'href' => route('bandera.edit', $registro)] : null,
-                        auth()->user()->can('eliminar_bandera') && $puedeModificar ? [
+                        auth()->user()->can('update', $registro) ? ['texto' => 'Editar', 'icono' => 'fa-pen', 'href' => route('bandera.edit', $registro)] : null,
+                        auth()->user()->can('delete', $registro) ? [
                             'texto' => 'Eliminar', 'icono' => 'fa-trash', 'peligro' => true,
                             'form' => route('bandera.destroy', $registro), 'confirmar' => '¿Seguro que querés eliminar este registro de bandera?',
                         ] : null,

@@ -1,6 +1,6 @@
 {{-- Contenido del detalle de un registro de bandera (modal y respaldo show-fields). Solo lectura. --}}
 @php
-    $puedeEditar = auth()->user()->can('editar_bandera') && $bandera->modificablePor(auth()->user());
+    $puedeEditar = auth()->user()->can('update', $bandera);
     $turno = ['M' => 'Mañana', 'T' => 'Tarde'][$bandera->turno] ?? $bandera->turno;
 @endphp
 

@@ -29,7 +29,7 @@
                 <td class="px-4 py-2">
 
                     <div class="flex space-x-2">
-                        @if (auth()->user()->can('editar_cambio_turno') && $registro->modificablePor(auth()->user()))
+                        @if (auth()->user()->can('update', $registro))
                             <a href="{{ route('cambio-de-turno.edit', $registro) }}"
                                 class="text-amber-600 hover:underline dark:text-amber-400">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
@@ -38,7 +38,7 @@
                                 </svg>
                             </a>
                         @endif
-                        @if (auth()->user()->can('eliminar_cambio_turno') && $registro->modificablePor(auth()->user()))
+                        @if (auth()->user()->can('delete', $registro))
                             <form action="{{ route('cambio-de-turno.destroy', $registro) }}" method="POST"
                                 onsubmit="return confirm('¿Seguro que deseas eliminar este cambio de turno?')">
                                 @csrf

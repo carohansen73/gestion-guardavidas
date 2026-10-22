@@ -118,7 +118,7 @@ class PermissionController extends Controller
      */
     private function recursoDelPermiso(string $nombrePermiso): string
     {
-        $prefijos = ['agregar_', 'editar_', 'eliminar_', 'ver_'];
+        $prefijos = ['agregar_', 'editar_', 'eliminar_', 'gestionar_ajenos_', 'ver_'];
 
         foreach ($prefijos as $prefijo) {
             if (str_starts_with($nombrePermiso, $prefijo)) {

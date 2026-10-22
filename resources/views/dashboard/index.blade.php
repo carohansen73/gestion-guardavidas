@@ -29,17 +29,16 @@
             <p class="text-sm text-gray-500 dark:text-gray-400 mb-3 md:text-right ">
             Mostrando datos de
             <span class="tituloPlayaSeleccionada font-medium text-sky-600 dark:text-sky-400">
-                {{ $esAdmin ? 'todas las playas' : (Auth::user()->guardavida->playa->nombre ?? 'tu playa') }}
+                todas las playas
             </span>
             @if ($temporadaPanel)
                 <span class="text-gray-500 dark:text-gray-400">· temporada {{ $temporadaPanel->nombre }}</span>
             @endif
         </p>
-            @if ($esAdmin)
         <!-- Filtro playas: va acá, antes de las cards, para que se entienda que las
              cards/gráfico de abajo se pueden filtrar por playa (en mobile, la
              columna del filtro quedaba después de las cards y no se entendía).
-             Solo para admin/superadmin: el resto ya está limitado a la suya. -->
+             Para todos: nadie queda limitado a su playa. -->
         <div class="mb-5 flex flex-wrap gap-2 items-center">
             <button
                 class="btn-filtro bg-sky-600 text-white px-3 py-1 rounded-full text-xs font-medium transition"
@@ -57,7 +56,6 @@
                 </button>
             @endforeach
         </div>
-    @endif
 </div>
 
     </div>

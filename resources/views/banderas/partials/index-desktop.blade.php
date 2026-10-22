@@ -28,7 +28,7 @@
                 <td class="px-4 py-2">{{ $registro->playa->nombre ?? '-' }}</td>
                 <td class="px-4 py-2">
                     <div class="flex space-x-2">
-                        @if (auth()->user()->can('editar_bandera') && $registro->modificablePor(auth()->user()))
+                        @if (auth()->user()->can('update', $registro))
                             <a href="{{ route('bandera.edit', $registro) }}"
                                 class="text-amber-600 hover:underline dark:text-amber-400">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
@@ -37,7 +37,7 @@
                                 </svg>
                             </a>
                         @endif
-                        @if (auth()->user()->can('eliminar_bandera') && $registro->modificablePor(auth()->user()))
+                        @if (auth()->user()->can('delete', $registro))
                             <form action="{{ route('bandera.destroy', $registro) }}" method="POST"
                                 onsubmit="return confirm('¿Seguro que deseas eliminar esta intervención?')">
                                 @csrf

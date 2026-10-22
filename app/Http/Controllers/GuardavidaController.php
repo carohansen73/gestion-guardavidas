@@ -117,15 +117,9 @@ class GuardavidaController extends Controller
      */
     public function create(CatalogoRoles $roles)
     {
-        $user = Auth::user();
-        $rolesAsignables = $roles->asignablesPara($user);
-        if ($user->hasAnyRole(['guardavida', 'encargado'])) {
-            $playas = Playa::where('id', $user->guardavida->playa_id)->get();
-            $puestos = Puesto::where('playa_id', $user->guardavida->playa_id)->get();
-        } else {
-            $playas = Playa::all();
-            $puestos = Puesto::orderBy('nombre')->get();
-        }
+        $rolesAsignables = $roles->asignablesPara(Auth::user());
+        $playas = Playa::all();
+        $puestos = Puesto::orderBy('nombre')->get();
 
         $guardavida = null;
 
@@ -579,13 +573,13 @@ class GuardavidaController extends Controller
 
         [$estadisticas, $temporadaStats] = $this->estadisticasDe($guardavida);
 
-        // El encargado puede cambiarse el puesto (de su misma playa) y el turno.
-        $esEncargado = $user->hasRole('encargado');
-        $puestos = $esEncargado && $guardavida->playa_id
+        // Quien puede editar guardavidas (el encargado) puede cambiarse el puesto (de su misma playa) y el turno.
+        $puedeCambiarPuestoYTurno = $user->can('editar_guardavida');
+        $puestos = $puedeCambiarPuestoYTurno && $guardavida->playa_id
             ? Puesto::where('playa_id', $guardavida->playa_id)->orderBy('nombre')->get()
             : null;
 
-        return view('guardavidas.perfil', compact('guardavida', 'esEncargado', 'puestos', 'estadisticas', 'temporadaStats'));
+        return view('guardavidas.perfil', compact('guardavida', 'puedeCambiarPuestoYTurno', 'puestos', 'estadisticas', 'temporadaStats'));
     }
 
     /**
@@ -599,7 +593,7 @@ class GuardavidaController extends Controller
         // etc.) se hace desde la vista de admin con tabs (guardavida.edit),
         // no desde acá — esta ruta es autoservicio, solo el dueño del
         // perfil puede usarla.
-        $esEncargado = $user->hasRole('encargado');
+        $puedeCambiarPuestoYTurno = $user->can('editar_guardavida');
         $esPropietario = $user->guardavida && $user->guardavida->id === $guardavida->id;
 
         if (! $esPropietario) {
@@ -618,7 +612,7 @@ class GuardavidaController extends Controller
         ];
         // El encargado también puede cambiarse el puesto (siempre dentro de su playa,
         // que no puede cambiar) y el turno. Playa y función los define el admin.
-        if ($esEncargado) {
+        if ($puedeCambiarPuestoYTurno) {
             if ($guardavida->playa_id) {
                 $rules['puesto_id'] = ['required', Rule::exists('puestos', 'id')->where('playa_id', $guardavida->playa_id)];
             }

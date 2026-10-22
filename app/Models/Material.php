@@ -11,7 +11,7 @@ class Material extends Model
     protected $fillable = [
         'nombre',
         'detalle',
-        'playa_id'
+        'playa_id',
     ];
 
     //  public function playa()

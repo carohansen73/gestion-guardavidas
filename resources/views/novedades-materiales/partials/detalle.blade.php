@@ -1,6 +1,6 @@
 {{-- Contenido del detalle de una novedad de material (modal y respaldo show-fields). Solo lectura. --}}
 @php
-    $puedeEditar = auth()->user()->can('editar_novedad_material') && $novedadDeMaterial->modificablePor(auth()->user());
+    $puedeEditar = auth()->user()->can('update', $novedadDeMaterial);
     $material = trim(($novedadDeMaterial->material->nombre ?? '').' '.($novedadDeMaterial->material->detalle ?? '')) ?: '-';
 @endphp
 

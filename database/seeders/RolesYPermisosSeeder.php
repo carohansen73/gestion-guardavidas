@@ -98,6 +98,12 @@ class RolesYPermisosSeeder extends Seeder
         Permission::create(['name' => 'gestionar_temporada_cerrada']);
         Permission::create(['name' => 'solicitar_cambio_franco']);
 
+        // gestionar_ajenos_*: editar o borrar los registros que cargó OTRO usuario. Sin él, cada uno toca solo lo que cargó
+        // (ver App\Models\Concerns\TieneAutor). Por defecto solo admin/superadmin; se reparte desde la pantalla de Permisos.
+        foreach (['bandera', 'intervencion', 'novedad_material', 'licencia', 'cambio_turno'] as $recurso) {
+            Permission::create(['name' => "gestionar_ajenos_{$recurso}"]);
+        }
+
         Permission::create(['name' => 'agregar_temporada']);
         Permission::create(['name' => 'editar_temporada']);
         Permission::create(['name' => 'eliminar_temporada']);

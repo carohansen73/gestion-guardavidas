@@ -29,23 +29,14 @@ class IntervencionController extends Controller
      */
     public function index(Request $request)
     {
-        // TODO ver que rol puede ver en tdas las playas o solo algunas
         $user = Auth::user();
         [$temporadas, $temporada] = Temporada::seleccionada($request->query('temporada'));
-        if ($user->hasRole('guardavida')) {
-            $intervenciones = Intervencion::where('playa_id', $user->guardavida->playa_id)
-                ->deTemporada($temporada)
-                ->with(['guardavidas', 'fuerzas', 'puesto', 'playa'])
-                ->latest()
-                ->get();
-        } elseif ($user->hasAnyRole(['admin', 'encargado'])) {
-            $intervenciones = Intervencion::deTemporada($temporada)
-                ->with(['guardavidas', 'fuerzas', 'puesto', 'playa'])
-                ->latest()
-                ->get();
-        } else {
-            abort(403, 'No tienes permisos para ver estas intervenciones');
-        }
+
+        // El acceso ya está autorizado (ver_intervencion) por authorizeResource(): quien lo tiene ve las de todas las playas.
+        $intervenciones = Intervencion::deTemporada($temporada)
+            ->with(['guardavidas', 'fuerzas', 'puesto', 'playa'])
+            ->latest()
+            ->get();
 
         $playas = Playa::all();
 
@@ -69,41 +60,19 @@ class IntervencionController extends Controller
         $fuerzas = Fuerza::all();
         $intervencion = null;
 
-        // Los guardavidas solo agregan registros en la playa a la que pertenecen
-        if ($user->hasAnyRole(['guardavida', 'encargado']) && $guardavidaAuth) {
-            $playas = Playa::where('id', $guardavidaAuth->playa_id)->get();
-            $puestos = Puesto::where('playa_id', $guardavidaAuth->playa_id)->get();
-
-            $guardavidas = Guardavida::activos()->where('playa_id', $guardavidaAuth->playa_id)
-                ->with('user:id,name,lastname')
-                ->get()
-                // Ojo: sortBy([[callback, dir], ...]) necesita un COMPARADOR
-                // de 2 argumentos (a, b) => ..., no un extractor de 1 valor
-                // — con un extractor, Laravel lo llama igual con (a, b), el
-                // segundo argumento se ignora, y el string que devuelve se
-                // castea a 0 como resultado de comparación (no ordena nada).
-                // Por eso acá se usa la forma con string "user.lastname"
-                // (dot notation vía data_get), que sí es segura.
-                ->sortBy([
-                    ['user.lastname', 'asc'],
-                    ['user.name', 'asc'],
-                ], SORT_FLAG_CASE | SORT_NATURAL)
-                ->values();
-        } else {
-            $playas = Playa::all();
-            $puestos = Puesto::orderBy('nombre')->get();
-            // Lista completa (sin filtrar por playa a nivel servidor): el
-            // admin ve todas las playas, y el select de guardavidas se
-            // acota por playa en el cliente (ver fields.blade.php) a medida
-            // que cambia el select de playa, sin recargar la página.
-            $guardavidas = Guardavida::activos()->with('user:id,name,lastname')
-                ->get()
-                ->sortBy([
-                    ['user.lastname', 'asc'],
-                    ['user.name', 'asc'],
-                ], SORT_FLAG_CASE | SORT_NATURAL)
-                ->values();
-        }
+        $playas = Playa::all();
+        $puestos = Puesto::orderBy('nombre')->get();
+        // Lista completa (sin filtrar por playa a nivel servidor): el
+        // admin ve todas las playas, y el select de guardavidas se
+        // acota por playa en el cliente (ver fields.blade.php) a medida
+        // que cambia el select de playa, sin recargar la página.
+        $guardavidas = Guardavida::activos()->with('user:id,name,lastname')
+            ->get()
+            ->sortBy([
+                ['user.lastname', 'asc'],
+                ['user.name', 'asc'],
+            ], SORT_FLAG_CASE | SORT_NATURAL)
+            ->values();
 
         return view('intervenciones.create', compact(
             'guardavidas', 'banderas', 'playas', 'puestos', 'fuerzas', 'guardavidaAuth', 'intervencion'
@@ -179,34 +148,18 @@ class IntervencionController extends Controller
         $banderas = BanderaTipo::all();
         $fuerzas = Fuerza::all();
 
-        // Los guardavidas solo agregan registros en la playa a la que pertenecen
-        if ($user->hasAnyRole(['guardavida', 'encargado']) && $guardavidaAuth) {
-            $playas = Playa::where('id', $guardavidaAuth->playa_id)->get();
-            $puestos = Puesto::where('playa_id', $guardavidaAuth->playa_id)->get();
-            // nombre ya no vive en guardavidas - lista chica para
-            // un <select>.
-            $guardavidas = Guardavida::activos($idsActuales)->where('playa_id', $guardavidaAuth->playa_id)
-                ->with('user:id,name,lastname')
-                ->get()
-                ->sortBy([
-                    ['user.lastname', 'asc'],
-                    ['user.name', 'asc'],
-                ], SORT_FLAG_CASE | SORT_NATURAL)
-                ->values();
-        } else {
-            $playas = Playa::all();
-            $puestos = Puesto::orderBy('nombre')->get();
-            // Lista completa (sin filtrar por playa a nivel servidor): ver
-            // comentario equivalente en create() — se acota por playa en
-            // el cliente.
-            $guardavidas = Guardavida::activos($idsActuales)->with('user:id,name,lastname')
-                ->get()
-                ->sortBy([
-                    ['user.lastname', 'asc'],
-                    ['user.name', 'asc'],
-                ], SORT_FLAG_CASE | SORT_NATURAL)
-                ->values();
-        }
+        $playas = Playa::all();
+        $puestos = Puesto::orderBy('nombre')->get();
+        // Lista completa (sin filtrar por playa a nivel servidor): ver
+        // comentario equivalente en create() — se acota por playa en
+        // el cliente.
+        $guardavidas = Guardavida::activos($idsActuales)->with('user:id,name,lastname')
+            ->get()
+            ->sortBy([
+                ['user.lastname', 'asc'],
+                ['user.name', 'asc'],
+            ], SORT_FLAG_CASE | SORT_NATURAL)
+            ->values();
 
         return view('intervenciones.edit', compact(
             'guardavidas', 'banderas', 'playas', 'puestos', 'fuerzas', 'guardavidaAuth', 'intervencion'

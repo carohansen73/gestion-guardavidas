@@ -2,7 +2,7 @@
      "Editar" aparece solo si el usuario puede modificarla. --}}
 @php
     $bandera = $intervencion->bandera;
-    $puedeEditar = auth()->user()->can('editar_intervencion') && $intervencion->modificablePor(auth()->user());
+    $puedeEditar = auth()->user()->can('update', $intervencion);
 @endphp
 
 <div class="flex items-center gap-4 border-b border-gray-200 px-5 py-5 pr-14 dark:border-gray-700">

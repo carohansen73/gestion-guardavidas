@@ -99,6 +99,4 @@ class Asistencia extends Model
 
         return (int) round(self::distanciaMetros((float) $this->latitud, (float) $this->longitud, (float) $puesto->latitud, (float) $puesto->longitud));
     }
-
-
 }
